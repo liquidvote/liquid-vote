@@ -1,0 +1,24 @@
+{
+  "compilerOptions": {
+    "target": "esnext",
+    "module": "esnext",
+    "jsx": "preserve",
+    "moduleResolution": "node",
+    "strict": true,
+    "noEmit": true,
+    "allowJs": true,
+    "skipLibCheck": true,
+    "isolatedModules": true,
+    "esModuleInterop": true,
+    "baseUrl": "./",
+    "paths": {
+        "@env": ["environments/index"],
+        "@components/*": ["src/components/*"],
+        "@assets/*": ["src/assets/*"]
+    }
+  },
+  "include": [
+    "src",
+    "custom.d.ts"
+  ]
+}

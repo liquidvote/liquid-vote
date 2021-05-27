@@ -1,0 +1,6 @@
+{
+  "scripts": {
+    "syncUp": "aws s3 sync ./dist s3://images.liquid-vote.com --profile pedro",
+    "syncDown": "aws s3 sync s3://images.liquid-vote.com ./dist --profile pedro"
+  }
+}
