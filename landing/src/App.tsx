@@ -3,6 +3,8 @@ import { BrowserRouter as Router, Switch, Route, Link } from "react-router-dom";
 import loadable from "@loadable/component";
 
 import twitterIcon from "@assets/twitter.svg";
+import Navi from "./components/shared/Navi/Navi";
+import Title from "./components/shared/Title/Title";
 
 export default function App() {
   const themeFromParams = ((q) => q.get("theme") || "3")(
@@ -13,10 +15,9 @@ export default function App() {
     <div className={`AppContainer theme${themeFromParams}`}>
       <div className="row">
         <div className="col-12">
-          <p>Webpack + TypeScript + React + SASS + Bootstrap = ❤️</p>
-
+          <Navi />
+          <Title />
           <hr />
-
           <Router>
             <nav>
               <ul>
