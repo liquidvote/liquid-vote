@@ -24,10 +24,10 @@ export default function Title() {
             </svg>
           </div>
           <div className="col-md-7">
-            <h2 className="featurette-heading">
+            <h1 className="featurette-heading">
               First featurette heading.{" "}
               <span className="text-muted">It’ll blow your mind.</span>
-            </h2>
+            </h1>
             <p className="lead">
               Lorem ipsum dolor sit amet consectetur adipisicing elit. Omnis
               ullam doloremque culpa harum! Perferendis mollitia velit excepturi

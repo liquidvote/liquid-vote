@@ -5,6 +5,7 @@ import loadable from "@loadable/component";
 import twitterIcon from "@assets/twitter.svg";
 import Navi from "./components/shared/Navi/Navi";
 import Title from "./components/shared/Title/Title";
+import HowSection from "./components/shared/HowSection/HowSection";
 
 export default function App() {
   const themeFromParams = ((q) => q.get("theme") || "3")(
@@ -17,6 +18,8 @@ export default function App() {
         <div className="col-12">
           <Navi />
           <Title />
+          <hr />
+          <HowSection />
           <hr />
           <Router>
             <nav>
