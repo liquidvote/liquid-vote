@@ -6,6 +6,8 @@ import twitterIcon from "@assets/twitter.svg";
 import Navi from "./components/shared/Navi/Navi";
 import Title from "./components/shared/Title/Title";
 import HowSection from "./components/shared/HowSection/HowSection";
+import WhySection from "./components/shared/WhySection/WhySection";
+import TestimonialsSection from "./components/shared/TestimonialsSection/TestimonialsSection";
 
 export default function App() {
   const themeFromParams = ((q) => q.get("theme") || "3")(
@@ -21,6 +23,11 @@ export default function App() {
           <hr />
           <HowSection />
           <hr />
+          <WhySection />
+          <hr />
+          <TestimonialsSection />
+          <hr />
+
           <Router>
             <nav>
               <ul>
