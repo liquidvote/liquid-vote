@@ -24,7 +24,7 @@ $theme5-colors: ("bg": #0b414d, "primary": #08f3a5, "secondary": white, "border"
     .bg
         fill: map-get($theme, "bg") !important
 
-    &.AppContainer, .AppContainer, .Modal
+    &.AppContainer, .AppContainer, .Modal, .Modal-Header
         background: map-get($theme, "bg")
         color: map-get($theme, "primary")
 
@@ -140,7 +140,15 @@ $theme5-colors: ("bg": #0b414d, "primary": #08f3a5, "secondary": white, "border"
 
     .Modal
         background-color: map-get($theme, "bg")
-        border: 1px solid map-get($theme, "primary")
+        border: 2px solid map-get($theme, "bg")
+
+    .InputWrapper
+        &.isFocused
+            input
+                border: 1px solid map-get($theme, "primary")
+
+            label
+                color: map-get($theme, "primary")
 
 .theme1
     @include theme($theme1-colors)
@@ -158,6 +166,7 @@ $theme5-colors: ("bg": #0b414d, "primary": #08f3a5, "secondary": white, "border"
     @include theme($theme5-colors)
 
 .AppContainer
+    position: relative
     display: flex
     justify-content: center
 
@@ -172,6 +181,14 @@ a
 
     &:hover
         color: inherit
+
+ul
+    list-style-type: none
+    padding: 0
+    margin: 0
+
+form
+    display: contents
 
 .button_
     display: flex
@@ -485,13 +502,22 @@ hr
     align-items: center
 
     .Modal
+        display: flex
+        flex-direction: column
+        position: relative
         border-radius: 20px
         width: 500px
         outline: none
-        padding: 15px
-        max-height: 100%
-        overflow: auto
-        // background-color: papayawhip
+        max-height: calc(100% - 30px)
+
+        .Modal-Header
+            padding: 15px
+            padding-bottom: 0
+            border-radius: 20px
+
+        .Modal-Content
+            overflow: auto
+            padding: 0 15px
 
 .time-ago
     position: absolute
@@ -513,9 +539,53 @@ hr
     @media (max-width: 500px)
         max-width: 180px
 
-
 .mw-80-px
     max-width: 80px
 
 .pointer
     cursor: pointer
+
+.InputWrapper
+    position: relative
+    width: 100%
+    min-height: 60px
+
+    label
+        position: absolute
+        transition: top, font-size 0.3s
+        top: 5px
+        font-size: 18px
+        left: 10px
+        color: rgb(110, 118, 125)
+        pointer-events: none
+        text-transform: capitalize
+
+    input
+        outline: none
+        box-sizing: border-box
+        width: 100%
+        background-color: transparent
+        border: 1px solid rgba(0,0,0,0.3)
+        border-radius: 5px
+        padding: 5px 10px
+        padding-top: 25px
+        color: white
+
+        &[type='password']
+            padding-right: 26px
+
+        &[disabled]
+            color: grey
+
+    &.hasValue, &.isFocused
+        label
+            top: 7px
+            font-size: 14px
+
+    &.hasError
+        input
+            border: 1px solid red
+
+    .error
+        color: red
+        font-size: 0.8rem

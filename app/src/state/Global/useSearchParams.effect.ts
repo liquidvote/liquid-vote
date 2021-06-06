@@ -7,6 +7,9 @@ export default function useSearchParams() {
 
     const allSearchParams = Object.fromEntries(new URLSearchParams(location.search)) as {
         theme?: '1' | '2' | '3',
+        modal?: 'editProfile' | 'editGroup' | 'editQuestion' | 'listUsers' | 'listGroups',
+        modalData?: any,
+        refetch?: 'user'
     };
 
     const getNewSearchParamsString = ({
@@ -23,15 +26,20 @@ export default function useSearchParams() {
             .filter(([k, v]) => !keysToRemove?.includes(k))
             .reduce((p, [k, v]) => ({ ...p, [k]: v }), {})).toString();
 
-    const updateParams = ({ search }: { search: string }) =>
+    const updateParams = ({ keysToRemove, paramsToAdd }: {
+        keysToRemove?: Array<string>,
+        paramsToAdd?: Object
+    }) =>
         history.push({
             pathname: location.pathname,
-            search
+            search: getNewSearchParamsString({
+                keysToRemove,
+                paramsToAdd
+            })
         })
 
     return {
         allSearchParams,
-        getNewSearchParamsString,
         updateParams
     };
 }
