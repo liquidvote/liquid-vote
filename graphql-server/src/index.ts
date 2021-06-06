@@ -6,6 +6,7 @@ const atlasCredentials = require("../credentials/atlas-credentials.json");
 const awsCredentials = require("../credentials/aws-credentials.json");
 import { BookTypeDefs, BookResolvers } from "./state/BooksDemo";
 import { AuthUserTypeDefs, AuthUserResolvers } from "./state/AuthUser";
+import { UserTypeDefs, UserResolvers } from "./state/Users";
 
 const mongoClient = new MongoClient(
     `mongodb+srv://${atlasCredentials.username}:${atlasCredentials.password}@aiaiaiaminhavida.oobyz.mongodb.net/Enron?retryWrites=true&w=majority`,
@@ -37,17 +38,17 @@ mongoClient.connect(async (err) => {
     const mongoDB = mongoClient.db("LiquidVote");
   
     const server = new ApolloServer({
-        typeDefs: [QueryTypeDefs, BookTypeDefs, AuthUserTypeDefs],
+        typeDefs: [QueryTypeDefs, BookTypeDefs, AuthUserTypeDefs, UserTypeDefs],
         resolvers: {
-            ...BookResolvers,
-            ...AuthUserResolvers,
             Query: {
                 ...BookResolvers.Query,
-                ...AuthUserResolvers.Query
+                ...AuthUserResolvers.Query,
+                ...UserResolvers.Query
             },
             Mutation: {
                 // ...BookResolvers.Mutation,
-                ...AuthUserResolvers.Mutation
+                ...AuthUserResolvers.Mutation,
+                ...UserResolvers.Mutation
             }
         },
         context: async ({ req }) => {
@@ -55,6 +56,8 @@ mongoClient.connect(async (err) => {
 
             const AuthUser = token && await mongoDB.collection("Users")
                 .findOne({ 'Auth0User.sub': token });
+
+            // console.log({ ContextAuthUser: AuthUser });
 
             return { AuthUser, mongoDB, s3 };
         },
