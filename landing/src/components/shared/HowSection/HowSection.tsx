@@ -1,7 +1,13 @@
 import React from "react";
+import HowCard from "../HowCard/HowCard";
 
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faVoteYea } from "@fortawesome/free-solid-svg-icons";
+import {
+  faVoteYea,
+  faPoll,
+  faUserFriends,
+  faSitemap,
+} from "@fortawesome/free-solid-svg-icons";
 
 export default function HowSection() {
   return (
@@ -15,57 +21,30 @@ export default function HowSection() {
 
       <div className="container features">
         <div className="row">
-          <div className="col-lg-6 feat-box">
-            <FontAwesomeIcon icon={faVoteYea} />
-            <h3>Access your files, anywhere</h3>
-            <p>
-              The ability to use a smartphone, tablet, or computer to access
-              your account means your files follow you everywhere.
-            </p>
-          </div>
-
-          <div className="col-lg-6 feat-box">
-            <img
-              className="icons"
-              src="images/icon-security.svg"
-              alt="security"
-            />
-            <h3>Security you can trust</h3>
-            <p>
-              2-factor authentication and user-controlled encryption are just a
-              couple of the security features we allow to help secure your
-              files.
-            </p>
-          </div>
-        </div>
-
-        <div className="row">
-          <div className="col-lg-6 feat-box">
-            <img
-              className="icons"
-              src="images/icon-collaboration.svg"
-              alt="collaboration"
-            />
-            <h3>Real-time collaboration</h3>
-            <p>
-              Securely share files and folders with friends, family and
-              colleagues for live collaboration. No email attachments required.
-            </p>
-          </div>
-
-          <div className="col-lg-6 feat-box">
-            <img
-              className="icons"
-              src="images/icon-any-file.svg"
-              alt="icon-any-file"
-            />
-            <h3>Store any type of file</h3>
-            <p>
-              Whether you're sharing holidays photos or work documents, Fylo has
-              you covered allowing for all file types to be securely stored and
-              shared.
-            </p>
-          </div>
+          <HowCard
+            ic={faVoteYea}
+            title="Create group polls"
+            paragraph="The ability to use a smartphone, tablet, or computer to access
+              your account means your files follow you everywhere."
+          />
+          <HowCard
+            ic={faSitemap}
+            title="Delegate votes"
+            paragraph="The ability to use a smartphone, tablet, or computer to access
+              your account means your files follow you everywhere."
+          />
+          <HowCard
+            ic={faUserFriends}
+            title="Engage with your community"
+            paragraph="The ability to use a smartphone, tablet, or computer to access
+              your account means your files follow you everywhere."
+          />
+          <HowCard
+            ic={faPoll}
+            title="Decide based on liquid democracy"
+            paragraph="The ability to use a smartphone, tablet, or computer to access
+              your account means your files follow you everywhere."
+          />
         </div>
       </div>
     </div>
