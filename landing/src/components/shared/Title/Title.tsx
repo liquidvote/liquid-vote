@@ -25,8 +25,8 @@ export default function Title() {
           </div>
           <div className="col-md-7">
             <h1 className="featurette-heading">
-              First featurette heading.{" "}
-              <span className="text-muted">It’ll blow your mind.</span>
+              Liquid Voting.{" "}
+              <span className="text-muted">Delegate your opinion.</span>
             </h1>
             <p className="lead">
               Lorem ipsum dolor sit amet consectetur adipisicing elit. Omnis

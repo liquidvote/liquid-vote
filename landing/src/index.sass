@@ -30,6 +30,10 @@ $theme5-colors: ("bg": #0b414d, "primary": #08f3a5, "secondary": white, "border"
 
     hr, .border-bottom
         border-bottom: 1px solid map-get($theme, "border") !important
+    
+    .cta-container, .box
+        background: map-get($theme, "border" )
+        // box-shadow: 7px 7px 8px map-get($theme, "border" )
 
     .border-sides
         border-left: 1px solid map-get($theme, "border")
@@ -307,9 +311,12 @@ hr
 //     > *
 //         margin-bottom: 10px
 
-.navbar, .container-fluid
+.container-fluid
     padding-left: 0
     padding-right: 0
+
+.navbar
+    padding: 35px 20px
 
 .title
     .container-fluid
@@ -320,6 +327,74 @@ hr
     text-align: center
     padding: 20px 10px    
 
+.rounded-circle
+    border: 100%
+
+// cta
+
+.cta 
+  position: relative
+  left: 20%
+  width: 60%
+
+// .cta p
+//   font-size: 0.9rem
+
+.cta-container, .box, .author
+    // background-color: hsl(217, 28%, 15%)
+    border-radius: 7px
+    position: relative
+    // left: 0
+    // bottom: 150px
+    padding: 4% 9%
+    
+    .button_
+        display: inline-block
+
+    form
+        display: flex
+        // width: 100%
+        justify-content: space-between
+        
+
+.myEmail
+    background-color: white
+    display: inline-block
+    // justify-content: center
+    // align-items: center
+    padding: 8px 10px
+    border-radius: 20px
+    border: 0
+    width: 60%
+    // margin: 0 0.25rem
+    // font-weight: bold
+    // color: inherit
+    // background: inherit
+    // white-space: nowrap
+    // height: fit-content
+
+
+.myEmail:focus 
+  outline: 0
+
+// form 
+//   font-size: 0.9rem
+
+.myButton 
+  background: linear-gradient(to right, hsl(176, 68%, 64%) 5%, hsl(198, 60%, 50%) 100%)
+  background-color: hsl(176, 68%, 64%)
+  border-radius: 28px
+  border: 0
+  display: inline-block
+  cursor: pointer
+  color: #ffffff
+  margin: 3% auto
+  padding: 13px 65px
+  text-decoration: none
+
+
+
+// cta
 
 .icon
     width: 27px
