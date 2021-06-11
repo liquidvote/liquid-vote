@@ -183,7 +183,7 @@ export const VoteWrapper: FunctionComponent<{
 
                     <div className="mt-n2">
                         {people.map((el, i) => (
-                            <PersonInList person={el} />
+                            <PersonInList person={el} key={el.name} />
                         ))}
                     </div>
 
