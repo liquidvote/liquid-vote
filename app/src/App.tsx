@@ -11,15 +11,12 @@ import loadable from '@loadable/component';
 
 import SideMenu from "@shared/SideMenu";
 import SideInfo from "@shared/SideInfo";
+import ModalRoutes from "@components/ModalRoutes";
 
 export default function App() {
 
-    const themeFromParams = (q =>
-        q.get('theme') || '3'
-    )(new URLSearchParams(window.location.search));
-
     return (
-        <div className={`AppContainer theme${themeFromParams}`}>
+        <div className={`AppContainer theme3`}>
             <Router>
                 <ScrollToTop />
                 <SideMenu />
@@ -35,6 +32,7 @@ export default function App() {
                         <Route path="/create-vote/:groupName" component={loadable(() => import('./components/Routes/CreateVote'))} />
                         {/* <Route path="/create-sub-vote/:voteName" component={loadable(() => import('./components/Routes/CreateVote'))} /> */}
                         <Route path="/profile/:profileName/:section" component={loadable(() => import('./components/Routes/Profile'))} />
+                        <Route path="/profile/:handle" component={loadable(() => import('./components/Routes/Profile'))} />
                         <Route path="/profile" component={loadable(() => import('./components/Routes/Profile'))} />
                         <Route path="/profile-people/:which" component={loadable(() => import('./components/Routes/ProfilePeople'))} />
                         <Route path="/trending" component={loadable(() => import('./components/Routes/Trending'))} />
@@ -47,6 +45,7 @@ export default function App() {
                     </Switch>
                 </div>
                 {/* <SideInfo /> */}
+                <ModalRoutes />
             </Router>
         </div>
     );

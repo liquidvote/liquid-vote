@@ -9,7 +9,7 @@ import localforage from "localforage";
 import { useAuth0 } from "@auth0/auth0-react";
 import env from '@env';
 
-import { AUTH_USER_LOGGEDIN } from '@state/AuthUser/typeDefs';
+import { AUTH_USER, AUTH_USER_LOGGEDIN } from '@state/AuthUser/typeDefs';
 import App from './App';
 import './index.sass';
 
@@ -38,6 +38,9 @@ const AppolloAppWrapper: FunctionComponent<{}> = ({ }) => {
             });
             client.setLink(authLink.concat(httpLink));
             client.mutate({ mutation: AUTH_USER_LOGGEDIN, variables: { Auth0User: user } });
+            const q = client.readQuery({ query: AUTH_USER });
+
+            console.log({ q });
         } else {
             client.setLink(httpLink);
         }

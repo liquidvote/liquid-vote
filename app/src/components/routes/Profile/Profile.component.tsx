@@ -1,5 +1,6 @@
-import * as React from "react";
+import React, { FunctionComponent, useEffect } from "react";
 import { Link, useParams } from "react-router-dom";
+import { useQuery } from "@apollo/client";
 
 import BackArrowSVG from "@shared/Icons/BackArrow.svg";
 import LinkSVG from "@shared/Icons/Link.svg";
@@ -15,46 +16,100 @@ import { VoteTimeline } from "@state/Mock/Notifications";
 import Notification from '@shared/Notification';
 import GroupInList from "@shared/GroupInList";
 import { groups } from "@state/Mock/Groups";
+import { USER } from "@state/User/typeDefs";
+import { AUTH_USER } from "@state/AuthUser/typeDefs";
+import useSearchParams from "@state/Global/useSearchParams.effect";
 
 import './style.sass';
 
 export default function Profile() {
 
-    let { profileName, section } = useParams<any>();
+    let { profileName, section, handle } = useParams<any>();
+    const { allSearchParams, updateParams } = useSearchParams();
+
+    const {
+        loading: authUser_loading,
+        error: authUser_error,
+        data: authUser_data,
+        refetch: authUser_refetch
+    } = useQuery(AUTH_USER);
+
+    const {
+        loading: user_loading,
+        error: user_error,
+        data: user_data,
+        refetch: user_refetch
+    } = useQuery(USER, {
+        variables: { handle }
+    });
+
+    const profile = user_data?.User;
+    const authUser = authUser_data?.authUser;
 
     const [isRepresenting, setIsRepresenting] = React.useState(false);
 
-    return (
+    console.log({ profile, authUser });
+
+    useEffect(() => {
+        if (allSearchParams.refetch === 'user') {
+            user_refetch()
+        }
+    }, [allSearchParams.refetch]);
+
+    return user_loading ? 'Loading' : user_error ? 'Error' : (
         <>
-            <Header title="Dan Price" />
+            <Header title={profile.name} />
 
             <div className="profile-top">
-                <div className="cover" />
-                <div className="profile-avatar bg"></div>
+                <div
+                    className="cover"
+                    style={{
+                        background: profile.cover && `url(${profile.cover}) no-repeat`,
+                        backgroundSize: 'cover'
+                    }}
+                />
+                <div
+                    className="profile-avatar bg"
+                    style={{
+                        background: profile.avatar && `url(${profile.avatar}) no-repeat`,
+                        backgroundSize: 'cover'
+                    }}
+                />
                 <div className="profile-buttons-container">
                     {/* <div className="button_">
                         <AddNotificationSVG />
                     </div> */}
-                    <div
-                        onClick={() => setIsRepresenting(!isRepresenting)}
-                        className={`button_ ${isRepresenting ? "selected" : ""}`}
-                    >
-                        {isRepresenting ? "Represents You" : "Delegate Votes To"}
-                    </div>
+                    {profile.isThisUser ? (
+                        <div
+                            onClick={() => updateParams({
+                                paramsToAdd: {
+                                    modal: "EditProfile",
+                                    modalData: JSON.stringify({ userHandle: profile.handle })
+                                }
+                            })}
+                            className={`button_`}
+                        >
+                            Edit profile
+                        </div>
+                    ) : (
+                        <div
+                            onClick={() => setIsRepresenting(!isRepresenting)}
+                            className={`button_ ${isRepresenting ? "selected" : ""}`}
+                        >
+                            {isRepresenting ? "Represents You" : "Delegate Votes To"}
+                        </div>
+                    )}
                 </div>
             </div>
-            <h2 className="profile-name">Dan Price</h2>
-            <p className="profile-handle">@DanPriceSeattle</p>
+            <h2 className="profile-name">{profile.name}</h2>
+            <p className="profile-handle">@{profile.handle}</p>
             <div className="profile-description">
-                I cut my CEO pay by a million dollars so all workers could make at
-                least $70,000 per year. <br />
-                <br />
-                Author of WORTH IT - buy it for your boss from a small bookstore
+                {profile.bio}
             </div>
             <div className="profile-icons-container d-flex">
                 <div>
                     <LocationSVG />
-                    <div>Seattle, WA</div>
+                    <div>{profile.location}</div>
                 </div>
                 <div>
                     <LinkSVG />
@@ -68,15 +123,15 @@ export default function Profile() {
                 </div>
                 <div>
                     <CalendarSVG />
-                    <div>Joined November 2013</div>
+                    <div>Joined {profile.joinedOn}</div>
                 </div>
             </div>
             <div className="profile-stats-container">
                 <Link to="/profile-people/representing">
-                    <b>1,063</b> Representing Dan
+                    <b>{profile.representing}</b> Representing {profile.name}
                 </Link>
                 <Link to="/profile-people/represented" className="ml-2">
-                    <b>229.1K</b> Represented by Dan
+                    <b>{profile.representedBy}</b> Represented by {profile.name}
                 </Link>
             </div>
 
@@ -122,13 +177,6 @@ export default function Profile() {
             {(section === 'groups') && groups.map((el, i) => (
                 <GroupInList group={el} />
             ))}
-
-
-            {/* <div>
-                {profileVotes.map((l, i) => (
-                    <VoteWrapper l={l} />
-                ))}
-            </div> */}
         </>
     );
 }
