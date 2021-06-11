@@ -1,4 +1,5 @@
 import React from "react";
+import Avatar from "react-avatar";
 
 export default function TestimonialsSection() {
   return (
@@ -14,7 +15,8 @@ export default function TestimonialsSection() {
               </p>
             </div>
             <div className="author">
-              <img className="rounded-circle" src="assets/img/1.jpg" />
+              {/* <img className="rounded-circle" src="assets/img/1.jpg" /> */}
+              <Avatar className="rounded-circle" name="Ben Johnson" size="40" />
               <h5 className="name">Ben Johnson</h5>
               <p className="title">CEO of Company Inc.</p>
             </div>
@@ -27,7 +29,7 @@ export default function TestimonialsSection() {
               </p>
             </div>
             <div className="author">
-              <img className="rounded-circle" src="assets/img/3.jpg" />
+              <Avatar className="rounded-circle" name="Carl Kent" size="40" />
               <h5 className="name">Carl Kent</h5>
               <p className="title">Founder of Style Co.</p>
             </div>
@@ -41,7 +43,7 @@ export default function TestimonialsSection() {
               </p>
             </div>
             <div className="author">
-              <img className="rounded-circle" src="assets/img/2.jpg" />
+              <Avatar className="rounded-circle" name="Emily Clark" size="40" />
               <h5 className="name">Emily Clark</h5>
               <p className="title">Owner of Creative Ltd.</p>
             </div>

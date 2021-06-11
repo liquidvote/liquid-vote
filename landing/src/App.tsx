@@ -8,6 +8,7 @@ import Title from "./components/shared/Title/Title";
 import HowSection from "./components/shared/HowSection/HowSection";
 import WhySection from "./components/shared/WhySection/WhySection";
 import TestimonialsSection from "./components/shared/TestimonialsSection/TestimonialsSection";
+import CtaSection from "./components/shared/CtaSection/CtaSection";
 
 export default function App() {
   const themeFromParams = ((q) => q.get("theme") || "3")(
@@ -27,8 +28,10 @@ export default function App() {
           <hr />
           <TestimonialsSection />
           <hr />
+          <CtaSection />
+          <hr />
 
-          <Router>
+          {/* <Router>
             <nav>
               <ul>
                 <li>
@@ -50,9 +53,7 @@ export default function App() {
                 component={loadable(() => import("./components/Routes/Page2"))}
               />
             </Switch>
-          </Router>
-
-          <hr />
+          </Router> */}
 
           <a
             className="btn btn-sm"
