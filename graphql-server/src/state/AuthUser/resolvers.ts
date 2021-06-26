@@ -9,7 +9,7 @@ export const AuthUserResolvers = {
 
         authUser: async (_source, { }, { mongoDB, s3, AuthUser }) => {
 
-            console.log({ AuthUser });
+            // console.log({ AuthUser });
 
             return AuthUser;
         },

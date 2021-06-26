@@ -1,7 +1,7 @@
-import React, { FunctionComponent, useState } from 'react';
+import React, { FunctionComponent, useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
-import Modal from 'react-modal';
-import numeral from 'numeral';
+import { useQuery, useMutation } from "@apollo/client";
+import ReactTooltip from 'react-tooltip';
 
 import VoteGraph1 from "@shared/VoteGraph1";
 import Header from "@shared/Header";
@@ -9,8 +9,6 @@ import LinkSVG from "@shared/Icons/Link.svg";
 import CalendarSVG from "@shared/Icons/Calendar.svg";
 import LocationSVG from "@shared/Icons/Location.svg";
 import DropPlusSVG from "@shared/Icons/Drop+.svg";
-import MultiDrop from "@shared/Icons/MultiDrop.svg";
-import XSVG from "@shared/Icons/X.svg";
 import { profileVotes, byGroups, valores } from "@state/Mock/Votes";
 import { people } from "@state/Mock/People";
 import { defaults, groups, subGroups } from "@state/Mock/Groups";
@@ -23,111 +21,145 @@ import GroupInList from "@shared/GroupInList";
 import CreateVote from "@shared/CreateVote";
 import { VoteTimeline } from "@state/Mock/Notifications";
 import Notification from '@shared/Notification';
-import GroupSvg from "@shared/Icons/Group.svg";
+import GroupSmallSvg from "@shared/Icons/Group-small.svg";
 import MultiVoteInList from "@shared/MultiVoteInList";
-
+import { GROUP, EDIT_GROUP } from "@state/Group/typeDefs";
+import { EDIT_GROUP_MEMBER_CHANNEL_RELATION } from "@state/User/typeDefs";
+import { AUTH_USER } from "@state/AuthUser/typeDefs";
+import useSearchParams from "@state/Global/useSearchParams.effect";
+import GroupPolls from './GroupPolls';
 import './style.sass';
 
 export const Group: FunctionComponent<{}> = ({ }) => {
 
-    let { groupName, section } = useParams<any>();
+    let { handle, section } = useParams<any>();
+    const { allSearchParams, updateParams } = useSearchParams();
 
-    const selectedGroup = groups.find((g) => g.name === groupName) || groups[0];
+    const {
+        loading: group_loading,
+        error: group_error,
+        data: group_data,
+        refetch: group_refetch
+    } = useQuery(GROUP, {
+        variables: { handle }
+    });
 
-    console.log({ selectedGroup });
+    const [editGroupMemberChannelRelation, {
+        loading: editGroupMemberChannelRelation_loading,
+        error: editGroupMemberChannelRelation_error,
+        data: editGroupMemberChannelRelation_data,
+    }] = useMutation(EDIT_GROUP_MEMBER_CHANNEL_RELATION);
+
+    const {
+        loading: authUser_loading,
+        error: authUser_error,
+        data: authUser_data,
+        refetch: authUser_refetch
+    } = useQuery(AUTH_USER);
+
+    const authUser = authUser_data?.authUser;
+
+    useEffect(() => {
+        if (allSearchParams.refetch === 'group') {
+            group_refetch();
+            updateParams({ keysToRemove: ['refetch'] })
+        }
+    }, [allSearchParams.refetch]);
+
+    const selectedGroup = group_data?.Group;
 
     const [isRepresenting, setIsRepresenting] = useState(false);
     const [isJoined, setIsJoined] = useState(false);
     const [isCreatingPoll, setIsCreatingPoll] = useState(false);
-    const [selectedSubGroups, setSelectedSubGroups] = useState(selectedGroup.subGroups?.map(s => s.name));
+    const [selectedChannels, setSelectedChannels] = useState<string[]>([]);
 
-    const selectGroup = (group: string) => {
-        if (selectedSubGroups.indexOf(group) !== -1) {
-            setSelectedSubGroups(selectedSubGroups?.filter((el, i) => i !== selectedSubGroups.indexOf(group)))
+    const selectChannel = (channel: string) => {
+        if (selectedChannels.indexOf(channel) !== -1) {
+            setSelectedChannels(selectedChannels?.filter((el: any, i: number) => i !== selectedChannels.indexOf(channel)))
         } else {
-            setSelectedSubGroups([...selectedSubGroups, group])
+            setSelectedChannels([...selectedChannels, channel])
         }
     }
 
-    const selectAllGroups = () => {
+    const selectAllChannels = () => {
         // TODO
-        if (selectedSubGroups.length === selectedGroup.subGroups.length) {
-            setSelectedSubGroups([]);
+        if (selectedChannels.length === selectedGroup.channels.length) {
+            setSelectedChannels([]);
         } else {
-            setSelectedSubGroups(selectedGroup.subGroups?.map(s => s.name));
+            setSelectedChannels(selectedGroup?.channels?.map((s: any) => s.name));
         }
     }
 
-    return (
+    useEffect(() => {
+        if (authUser && selectedGroup) {
+            editGroupMemberChannelRelation({
+                variables: {
+                    UserHandle: authUser.LiquidUser.handle,
+                    GroupHandle: selectedGroup.handle,
+                    Channels: selectedChannels
+                }
+            });
+        } else if (selectedChannels?.length === 0 && selectedGroup) {
+            selectAllChannels();
+        }
+    }, [selectedChannels, selectedGroup]);
+
+    useEffect(() => {
+        ReactTooltip.rebuild();
+    }, [group_loading]);
+
+    return group_loading ? (<>Loading</>) : group_error ? (<>Error</>) : (
         <>
-            <Header title={groupName} />
-            <Modal
-                isOpen={isCreatingPoll}
-                // onAfterOpen={afterOpenModal}
-                onRequestClose={() => setIsCreatingPoll(false)}
-                // style={customStyles}
-                contentLabel="Example Modal"
-                className="Modal"
-                overlayClassName="Overlay"
-            >
-                <div className="d-flex align-items-center mb-n2">
-                    <div onClick={() => setIsCreatingPoll(false)} role="button">
-                        <XSVG />
-                    </div>
-                    <h4 className="ml-4 mb-0">Create Poll</h4>
-                </div>
-
-                <hr className="mb-0" />
-
-                <CreateVote group={groupName} />
-
-            </Modal>
+            <Header title={selectedGroup?.name} />
 
             <div className="profile-top">
-                <div className="cover" />
-                {/* <div className="profile-avatar bg"></div> */}
-                {/* <div className="profile-buttons-container">
-                    <div className="button_ small">
-                        Invite
-                    </div>
-                    <div
-                        onClick={() => setIsJoined(!isJoined)}
-                        className={`button_ small ${isJoined ? "selected" : ""}`}
-                    >
-                        {isJoined ? "Joined" : "Ask to Join"}
-                    </div>
-                    <div
-                        onClick={() => setIsRepresenting(!isRepresenting)}
-                        className={`button_ small ${isRepresenting ? "selected" : ""}`}
-                    >
-                        {isRepresenting ? "Represents You" : "Delegate Votes To"}
-                    </div>
-                </div> */}
+                <div
+                    className="cover"
+                    style={{
+                        background: selectedGroup?.cover && `url(${selectedGroup?.cover}) no-repeat`,
+                        backgroundSize: 'cover'
+                    }}
+                />
             </div>
             <div className="d-flex flex-wrap mt-2 justify-content-between">
                 <div className="d-flex flex-column mb-1">
                     <h4 className="d-flex align-items-center m-0">
-                        {groupName}
+                        {selectedGroup?.name}
                         <div className="ml-2 mt-n1">
-                            {defaults.private ? (
+                            {selectedGroup?.privacy === "private" ? (
                                 <LockSVG />
                             ) : (
                                 <WorldSVG />
                             )}
                         </div>
                     </h4>
-                    <p className="profile-handle">@{groupName.replace(" ", "")}</p>
+                    <p className="profile-handle">@{selectedGroup?.handle}</p>
                 </div>
                 <div className="d-flex mb-1 ml-n1">
                     <div className="button_ small mb-0">
                         Invite
                     </div>
-                    <div
-                        onClick={() => setIsJoined(!isJoined)}
-                        className={`button_ small mb-0 ${isJoined ? "selected" : ""}`}
-                    >
-                        {isJoined ? "Joined" : "Ask to Join"}
-                    </div>
+                    {
+                        selectedGroup?.thisUserIsAdmin ? (
+                            <div
+                                onClick={() => updateParams({
+                                    paramsToAdd: {
+                                        modal: "EditGroup",
+                                        modalData: JSON.stringify({ groupHandle: selectedGroup?.handle })
+                                    }
+                                })}
+                                className={`button_ small ml-1 mb-0`}
+                            >
+                                Edit
+                            </div>
+                        ) : (
+                            <div
+                                onClick={() => setIsJoined(!isJoined)}
+                                className={`button_ small mb-0 ${isJoined ? "selected" : ""}`}
+                            >
+                                {isJoined ? "Joined" : "Ask to Join"}
+                            </div>
+                        )}
                     {/* <div
                         onClick={() => setIsRepresenting(!isRepresenting)}
                         className={`button_ small mb-0 ${isRepresenting ? "selected" : ""}`}
@@ -136,33 +168,34 @@ export const Group: FunctionComponent<{}> = ({ }) => {
                     </div> */}
                 </div>
             </div>
-            {/* <p className="profile-handle">@{groupName.replace(" ", "")}</p> */}
             <div className="profile-description">
-                Projecto de Eco-Aldeia no Freguesia da Abrigada
+                {selectedGroup?.bio}
             </div>
             <div className="profile-icons-container d-flex">
-                <div>
+                {/* <div>
                     <LocationSVG />
-                    <div>Alenquer, Portugal</div>
-                </div>
+                    <div>{selectedGroup?.bio}</div>
+                </div> */}
+                {selectedGroup?.externalLink && (
+                    <div>
+                        <div className="mr-1"><LinkSVG /></div>
+                        <a
+                            href={selectedGroup?.externalLink}
+                            target="_blank"
+                            rel="noreferrer"
+                        >
+                            {selectedGroup?.externalLink}
+                        </a>
+                    </div>
+                )}
                 <div>
-                    <LinkSVG />
-                    <a
-                        href="#"
-                    // target="_blank"
-                    // rel="noreferrer"
-                    >
-                        instagram.com/{groupName}
-                    </a>
-                </div>
-                <div>
-                    <CalendarSVG />
-                    <div>Started November 2013</div>
+                    <div className="mr-1"><CalendarSVG /></div>
+                    <div>Joined {selectedGroup?.createdOn}</div>
                 </div>
             </div>
             <div className="profile-stats-container">
-                <Link to={`/group-people/${groupName}`}>
-                    <b>327</b> Members
+                <Link to={`/group-people/${selectedGroup?.handle}`}>
+                    <b>{selectedGroup?.members}</b> Member{selectedGroup?.members.length > 1 && 's'}
                 </Link>
                 {/* <Link to={`/group/${groupName}/subgroups`} className="ml-2">
                     <b>16</b> Sub Groups
@@ -171,39 +204,58 @@ export const Group: FunctionComponent<{}> = ({ }) => {
 
             <div className="mt-4 mb-3 d-flex align-items-start flex-nowrap justify-content-between">
                 <div className="d-flex flex-column">
-                    <div data-tip="Selected groups">
-                        {/* <GroupSvg />  */}
-                        <b>{selectedGroup.subGroups?.length || 0}</b> Sub Groups
-                    </div>
-                    <div className="d-flex flex-wrap justify-content-start ml-n1">
+                    {/* <div data-tip="Selected channels">
+                        <GroupSmallSvg />
+                        <b className="ml-1">{selectedGroup.channels?.length || 0}</b> Channels
+                    </div> */}
+                    <div
+                        className="d-flex flex-wrap justify-content-start"
+                    >
+                        <div data-tip="Selected channels">
+                            <GroupSmallSvg />
+                        </div>
                         <div
-                            className={`badge ${selectedSubGroups?.length === selectedGroup.subGroups?.length ? '' : 'inverted'} ml-1 mb-1 mt-1`}
-                            onClick={() => selectAllGroups()}
+                            className={`ml-1 badge pointer ${selectedChannels?.length === selectedGroup.channels?.length ? '' : 'inverted'} ml-1 mb-1 mt-1`}
+                            onClick={() => selectAllChannels()}
                         >All</div>
-                        {selectedGroup.subGroups?.map((el) => (
-                            <div onClick={() => selectGroup(el.name)} className={`badge ${selectedSubGroups.indexOf(el.name) === -1 && 'inverted'} ml-1 mb-1 mt-1`}>{el.name}</div>
+                        {selectedGroup?.channels?.map((el: any, i: any) => (
+                            <div
+                                key={'s-'+el.name}
+                                onClick={() => selectChannel(el.name)}
+                                className={`badge pointer ${selectedChannels.indexOf(el.name) === -1 && 'inverted'} ml-1 mb-1 mt-1`}
+                            >{el.name}</div>
                         ))}
                         {/* <div className={`badge inverted ml-1 mb-1 mt-1`}>+3</div> */}
                     </div>
                 </div>
-                {/* <div onClick={() => setIsPollingInOtherGroup(true)} className="button_ small mb-0 mw-25">
-                    poll this in another group
-                </div> */}
             </div>
 
-            <div onClick={() => setIsCreatingPoll(true)} className="button_ mx-5 my-3">
-                <DropPlusSVG />
-                <div className="ml-2">Create New Poll</div>
-            </div>
+            {selectedGroup?.thisUserIsAdmin && (
+                <div
+                    onClick={() => updateParams({
+                        paramsToAdd: {
+                            modal: "EditQuestion",
+                            modalData: JSON.stringify({
+                                questionHandle: 'new',
+                                groupHandle: selectedGroup.handle,
+                            })
+                        }
+                    })}
+                    className="button_ mx-5 my-3"
+                >
+                    <DropPlusSVG />
+                    <div className="ml-2">Create New Poll</div>
+                </div>
+            )}
 
             <ul className="nav d-flex flex-nowrap justify-content-around align-items-center mt-1 mb-n4 mx-n3">
                 <li className="nav-item">
-                    <Link className={`nav-link ${(!section || section === 'polls') && 'active'}`} to={`/group/${groupName}/polls`}>
+                    <Link className={`nav-link ${(!section || section === 'polls') && 'active'}`} to={`/group/${selectedGroup?.handle}/polls`}>
                         <b>{selectedGroup?.votes?.length}</b> Polls
                     </Link>
                 </li>
                 <li className="nav-item">
-                    <Link className={`nav-link ${section === 'timeline' && 'active'}`} to={`/group/${groupName}/timeline`}>
+                    <Link className={`nav-link ${section === 'timeline' && 'active'}`} to={`/group/${selectedGroup?.handle}/timeline`}>
                         Timeline
                     </Link>
                 </li>
@@ -213,10 +265,11 @@ export const Group: FunctionComponent<{}> = ({ }) => {
 
             { (!section || section === 'polls') && (
                 <div>
+                    <GroupPolls selectedChannels={selectedChannels} />
 
-                    {selectedGroup?.votes?.filter(
+                    {/* {selectedGroup?.votes?.filter(
                         v => v.subgroups.reduce(
-                            (acc, sg) => selectedSubGroups.includes(sg) || acc,
+                            (acc, sg) => selectedChannels.includes(sg) || acc,
                             false
                         )
                     )
@@ -231,16 +284,7 @@ export const Group: FunctionComponent<{}> = ({ }) => {
                                 <hr />
                             </>
                         ))
-                    }
-
-                    {/* <div>
-                        {profileVotes.map((l, i) => (
-                            <>
-                                <VoteWrapper l={l} />
-                                <hr />
-                            </>
-                        ))}
-                    </div> */}
+                    } */}
                 </div>
             )}
             { section === 'members' && (

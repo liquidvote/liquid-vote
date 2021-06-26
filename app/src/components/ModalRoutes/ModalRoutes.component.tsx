@@ -7,11 +7,16 @@ import useSearchParams from "@state/Global/useSearchParams.effect";
 
 import './style.sass';
 
-const AsyncPage = loadable((props: any) => import(`@components/ModalRoutes/modals/${props.modalTitle}`));
+const AsyncPage = loadable(
+    (props: any) => import(`@components/ModalRoutes/modals/${props.modalTitle}`), {
+    cacheKey: props => props.modalTitle,
+});
 
 export const ModalRoutes: FunctionComponent<{}> = ({ }) => {
 
     const { allSearchParams, updateParams } = useSearchParams();
+
+    Modal.setAppElement('#app')
 
     return (
         <Modal
@@ -22,7 +27,7 @@ export const ModalRoutes: FunctionComponent<{}> = ({ }) => {
             // contentLabel="Example Modal"
             className="Modal"
             overlayClassName="Overlay"
-            // appElement={'*'}
+        // appElement={document.querySelector('#app')}
         >
             <>
                 {!!allSearchParams.modal && (
@@ -30,9 +35,10 @@ export const ModalRoutes: FunctionComponent<{}> = ({ }) => {
                         FallbackComponent={() =>
                             <>Error</>
                         }
-                        onError={() =>
+                        onError={(err) => {
+                            console.log({ err });
                             updateParams({ keysToRemove: ['modal', 'modalData'] })
-                        }
+                        }}
                     >
                         <AsyncPage modalTitle={allSearchParams.modal} />
                     </ErrorBoundary>
