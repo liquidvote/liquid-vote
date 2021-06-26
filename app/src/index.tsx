@@ -38,9 +38,7 @@ const AppolloAppWrapper: FunctionComponent<{}> = ({ }) => {
             });
             client.setLink(authLink.concat(httpLink));
             client.mutate({ mutation: AUTH_USER_LOGGEDIN, variables: { Auth0User: user } });
-            const q = client.readQuery({ query: AUTH_USER });
 
-            console.log({ q });
         } else {
             client.setLink(httpLink);
         }
