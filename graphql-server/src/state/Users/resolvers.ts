@@ -97,12 +97,12 @@ export const UserResolvers = {
                 })
                 .toArray();
 
-            console.log({
-                UserHandle,
-                GroupHandle,
-                GroupsMemberRelation,
-                Channels
-            })
+            // console.log({
+            //     UserHandle,
+            //     GroupHandle,
+            //     GroupsMemberRelation,
+            //     Channels
+            // })
 
             // const updated = (AuthUser && User) ? await mongoDB.collection("Users").updateOne(
             //     { _id: AuthUser._id },

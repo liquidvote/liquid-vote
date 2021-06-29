@@ -3,10 +3,11 @@ import { Link, useParams } from "react-router-dom";
 import { useQuery } from "@apollo/client";
 
 import VoteWrapper from "@shared/VoteWrapper";
+import SingleVoteInList from "@shared/SingleVoteInList";
 import MultiVoteInList from "@shared/MultiVoteInList";
 import DropPlusSVG from "@shared/Icons/Drop+.svg";
 import useSearchParams from "@state/Global/useSearchParams.effect";
-import { GROUP_QUESTIONS } from "@state/Group/typeDefs";
+import { QUESTIONS } from "@state/Question/typeDefs";
 
 import './style.sass';
 
@@ -20,22 +21,22 @@ export const GroupPolls: FunctionComponent<{
         const { allSearchParams, updateParams } = useSearchParams();
 
         const {
-            loading: groupQuestions_loading,
-            error: groupQuestions_error,
-            data: groupQuestions_data,
-            refetch: groupQuestions_refetch
-        } = useQuery(GROUP_QUESTIONS, {
+            loading: questions_loading,
+            error: questions_error,
+            data: questions_data,
+            refetch: questions_refetch
+        } = useQuery(QUESTIONS, {
             variables: {
-                handle,
-                selectedChannels
+                group: handle,
+                channels: selectedChannels
             }
         });
 
-        // console.log({ groupQuestions_data });
+        console.log({ questions_data });
 
         useEffect(() => {
             if (allSearchParams.refetch === 'question') {
-                groupQuestions_refetch();
+                questions_refetch();
                 updateParams({ keysToRemove: ['refetch'] })
             }
         }, [allSearchParams.refetch]);
@@ -43,7 +44,7 @@ export const GroupPolls: FunctionComponent<{
         return (
             <>
 
-                {groupQuestions_data?.GroupQuestions?.map((v: any, i: any) => (
+                {questions_data?.Questions?.map((v: any, i: any) => (
                     <div key={'polls-' + i}>
                         {v.questionType === 'multi' && (
                             <MultiVoteInList
@@ -52,7 +53,7 @@ export const GroupPolls: FunctionComponent<{
                             />
                         )}
                         {v.questionType === 'single' && (
-                            <VoteWrapper
+                            <SingleVoteInList
                                 l={v}
                                 showGroup={true}
                                 showIntroMessage={true}

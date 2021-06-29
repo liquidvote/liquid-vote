@@ -2,15 +2,29 @@ import { gql } from "apollo-server";
 
 export const VoteTypeDefs = gql`
 
-    type Vote {
-        questionText: String
-        choiceText: String
-        groupChannel: JSON
+    type RepresentativeVote {
+        representativeHandle: String
+        representativeAvatar: String
+        representativeName: String
         position: String
 
         createdOn: String
         lastEditOn: String
+    }
+
+    type Vote {
+        questionText: String
+        choiceText: String
+        groupChannel: GroupChannel
+        position: String
+        representatives: [RepresentativeVote]
+
+        # createdBy
+        # user
+        createdOn: String
+        lastEditOn: String
         thisUserIsAdmin: Boolean
+        QuestionStats: QuestionStats
     }
 
     extend type Query {
@@ -29,6 +43,6 @@ export const VoteTypeDefs = gql`
             group: String,
             channel: String,
             Vote: JSON
-        ): JSON
+        ): Vote
     }
 `;
