@@ -2,22 +2,50 @@ import React, { FunctionComponent, useState } from 'react';
 import { Link } from "react-router-dom";
 import numeral from 'numeral';
 import Modal from 'react-modal';
+import { useQuery, useMutation } from "@apollo/client";
 
 import VoteGraph1 from "@shared/VoteGraph1";
 import XSVG from "@shared/Icons/X.svg";
 import { people } from "@state/Mock/People";
 import PersonInList from '@shared/PersonInList';
+import { EDIT_VOTE } from '@state/Vote/typeDefs';
 
 import './style.sass';
 
-export const VoteWrapper: FunctionComponent<{
-    l: any, introMessage?: string, showIntroMessage?: boolean, showColorLegend?: boolean, showGroup?: boolean
+export const SingleVoteInList: FunctionComponent<{
+    l: any,
+    introMessage?: string,
+    showIntroMessage?: boolean,
+    showColorLegend?: boolean,
+    showGroup?: boolean
 }> = ({
-    l, introMessage, showIntroMessage, showColorLegend, showGroup
+    l,
+    introMessage,
+    showIntroMessage,
+    showColorLegend,
+    showGroup
 }) => {
+
+        const [editVote, {
+            loading: editVote_loading,
+            error: editVote_error,
+            data: editVote_data,
+        }] = useMutation(EDIT_VOTE);
+
+
+        console.log({ editVote_data });
 
         const [userVote, setUserVote] = React.useState(null);
         const handleUserVote = (vote: string) => {
+            editVote({ variables: {
+                questionText: l.questionText,
+                // choiceText
+                group: l.groupChannel.group,
+                channel: l.groupChannel.channel,
+                Vote: {
+                    position: vote
+                },
+            }})
             if (vote === userVote) {
                 setUserVote(null)
             } else {

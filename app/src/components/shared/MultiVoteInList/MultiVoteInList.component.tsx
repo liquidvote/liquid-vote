@@ -27,11 +27,18 @@ export const MultiVoteInList: FunctionComponent<{ v: any, i: number }> = ({ v, i
                 <small data-tip="last vote was">{format(Date.now() - (i + Math.random()) * 1000 * 60 * 60)}</small>
             </div>
 
-            <a className="white mb-2 d-flex align-items-center flex-wrap" href={`/multipoll/${v.questionText}`}>
-                <div className="text-truncate mw-180-px-sm mr-2" title={v.questionText}>{v.questionText}</div>
-                {/* {' '}·{' '} */}
-                <div className="badge m-0 ml-2 text-truncate">{v.groupChannel.group}: {v.groupChannel.channel}</div>
-            </a>
+            <div className="d-flex align-items-center flex-wrap mb-2">
+                <a className="white" href={`/multipoll/${v.questionText}`}>
+                    <div
+                        className="text-truncate mw-180-px-sm mr-2"
+                        title={v.questionText}
+                    >{v.questionText}</div>
+                </a>
+
+                <div
+                    className="badge m-0 ml-2 text-truncate"
+                >{v.groupChannel.group}: {v.groupChannel.channel}</div>
+            </div>
 
             <div className="bar-container flex-column">
                 {v.choices.map((l, i) => (

@@ -15,12 +15,12 @@ export const GroupTypeDefs = gql`
         members: Int
         questions: Int
         admins: [User]
-        channels: [GroupChannel]
+        channels: [Channel]
         thisUserIsAdmin: Boolean
         memberRelation: JSON
     }
 
-    type GroupChannel {
+    type Channel {
         name: String
         # purpose: String
         # privacy: String
@@ -30,6 +30,12 @@ export const GroupTypeDefs = gql`
         # questions: Int
         # admins: [User]
         # thisUserIsAdmin: Boolean
+    }
+
+    # relation
+    type GroupChannel {
+        channel: String
+        group: String
     }
 
     type GroupMemberRelation {

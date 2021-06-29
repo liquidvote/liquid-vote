@@ -2,24 +2,37 @@ import { gql } from "apollo-server";
 
 export const QuestionTypeDefs = gql`
 
+    type QuestionStats {
+        lastVoteOn: String
+        forCount: Int
+        forDirectCount: Int
+        forMostRelevantVoters: [JSON]
+        againstCount: Int
+        againstMostRelevantVoters: [JSON]
+        againstDirectCount: Int
+        userVote: Vote
+    }
+
+    type Choice {
+        text: String,
+
+        stats: QuestionStats
+    }
+
     type Question {
         questionText: String
         questionType: String
         startText: String
-        choices: [JSON]
-        groupChannel: JSON
+        choices: [Choice]
+        groupChannel: GroupChannel
         resultsOn: String
 
+        # createdBy
         createdOn: String
         lastEditOn: String
         thisUserIsAdmin: Boolean
 
-        lastVoteOn: String
-        userVote: String
-        forCount: Int
-        againstCount: Int
-        forDirectCount: Int
-        againstDirectCount: Int
+        stats: QuestionStats
     }
 
     extend type Query {
@@ -28,6 +41,10 @@ export const QuestionTypeDefs = gql`
             group: String,
             channel: String
         ): Question
+        Questions(
+            group: String,
+            channels: [String]
+        ): [Question]
     }
 
     extend type Mutation {

@@ -15,6 +15,59 @@ export const QUESTION = gql`
   }
 `;
 
+export const QUESTIONS = gql`
+  query($group: String!, $channels: [String]) {
+    Questions(group: $group, channels: $channels) {
+        questionText
+        questionType
+        startText
+        choices {
+            text
+            stats {
+                ...stats
+            }
+        }
+        groupChannel {
+            group
+            channel
+        }
+        resultsOn
+
+        stats {
+            ...stats
+        }
+        createdOn
+        lastEditOn
+        thisUserIsAdmin
+    }
+  }
+
+  fragment stats on QuestionStats {
+		lastVoteOn
+        forCount
+        forDirectCount
+        forMostRelevantVoters
+        againstCount
+        againstMostRelevantVoters
+        againstDirectCount
+        userVote {
+          position
+          representatives {
+            representativeHandle
+            representativeAvatar
+            representativeName
+            position
+
+            createdOn
+            lastEditOn
+          }
+          
+          createdOn
+          lastEditOn
+        }
+    }
+`;
+
 export const EDIT_QUESTION = gql`
   mutation (
       $questionText: String!,
