@@ -27,24 +27,28 @@ export const MultiVoteInList: FunctionComponent<{ v: any, i: number }> = ({ v, i
                 <small data-tip="last vote was">{format(Date.now() - (i + Math.random()) * 1000 * 60 * 60)}</small>
             </div>
 
-            <a className="white mb-2 d-flex align-items-center flex-wrap" href={`/multipoll/${v.name}`}>
-                <div className="text-truncate mw-180-px-sm mr-2" title={v.name}>{v.name}</div>
-                {/* {' '}·{' '} */}
-                {!!v.subgroups?.length && (
-                    v.subgroups.map(s => (
-                        <div className="badge m-0 mr-2 text-truncate">{s}</div>
-                    ))
-                )}
-            </a>
+            <div className="d-flex align-items-center flex-wrap mb-2">
+                <a className="white" href={`/multipoll/${v.questionText}`}>
+                    <div
+                        className="text-truncate mw-180-px-sm mr-2"
+                        title={v.questionText}
+                    >{v.questionText}</div>
+                </a>
+
+                <div
+                    className="badge m-0 ml-2 text-truncate"
+                >{v.groupChannel.group}: {v.groupChannel.channel}</div>
+            </div>
 
             <div className="bar-container flex-column">
-                {v.subvotes.map((l, i) => (
+                {v.choices.map((l, i) => (
                     <div
+                        key={`choice-${i}`}
                         className="d-flex justify-content-end mb-2 align-items-center flex-column flex-column"
                     >
                         <div className="w-100 d-flex justify-content-between mb-1">
                             <div className="white position-relative ml-1">
-                                <small className="text-truncate d-block ">{l.name}</small>
+                                <small className="text-truncate d-block mr-2">{l.text}</small>
                             </div>
                             <div className="bar-wrapper m-0 mt-n1" style={{ width: l.flexSize * 10 + '%' }}>
                                 <VoteGraph1
@@ -75,15 +79,15 @@ export const MultiVoteInList: FunctionComponent<{ v: any, i: number }> = ({ v, i
                                     {/* <Link to="/profile" className="vote-avatar tiny avatar-1 for ml-n2"></Link> */}
                                     <div onClick={(e) => {
                                         e.preventDefault();
-                                    }} className="vote-avatar tiny count for ml-n2">{numeral(l.forCount).format('0a')}</div>
+                                    }} className="vote-avatar tiny count for ml-n1">{numeral(l.forCount).format('0a')}</div>
                                 </div>
                             </div>
                             <div className="d-flex align-items-center ml-2">
                                 <div className="d-flex">
                                     <div onClick={() => {
                                         // setIsShowingVotersModal(true);
-                                        // setUsersShowing(`People Voting Against on ${l.name}`);
-                                    }} className="vote-avatar tiny count against ml-n2">{numeral(l.againstCount).format('0a')}</div>
+                                        // setUsersShowing(`People Voting Against on ${l.questionText}`);
+                                    }} className="vote-avatar tiny count against mr-1">{numeral(l.againstCount).format('0a')}</div>
                                 </div>
                                 <div
                                     // onClick={() => handleUserVote('against')}

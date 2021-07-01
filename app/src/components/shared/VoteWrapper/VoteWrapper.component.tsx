@@ -52,7 +52,7 @@ export const VoteWrapper: FunctionComponent<{
 
         return (
             <div className="position-relative">
-                {l.name && (
+                {l.questionText && (
                     <small className="time-ago" data-tip="Last vote was">
                         12s
                     </small>
@@ -61,36 +61,27 @@ export const VoteWrapper: FunctionComponent<{
                     {showIntroMessage && (
                         <small className="do-you d-flex mb-n1">{introMessage || 'Do you approve'}</small>
                     )}
-                    <div className="bar-wrapper mb-1">
-                        {!!l.name && (
-                            <a className="white mb-0 d-flex align-items-center" href={`/poll/${l.name}`}>
-                                <div className="text-truncate" title={l.name}>
-                                    {l.name}
-                                    {showIntroMessage && '?'}
-                                </div>
+                    <div className="bar-wrapper">
+                        {!!l.questionText && (
+                            <div className="mb-1 d-flex align-items-center">
+                                <a className="white mb-0" href={`/poll/${l.questionText}`}>
+                                    <div className="text-truncate" title={l.questionText}>
+                                        {l.questionText}
+                                        {showIntroMessage && '?'}
+                                    </div>
+                                </a>
                                 {!!showGroup && (
-                                    <div className="badge m-0 ml-2">Geral</div>
+                                    <div className="badge m-0 ml-2">
+                                        {l.groupChannel.group}:
+                                        {l.groupChannel.channel}
+                                    </div>
                                 )}
-                            </a>
+                            </div>
                         )}
-                        <VoteGraph1 key={`d-${l.name}`} {...l} name="" />
+                        <VoteGraph1 key={`d-${l.questionText}`} {...l} name="" />
                     </div>
 
                     {showColorLegend && (
-                        // <div className="d-flex color-legend">
-                        //     <div>
-                        //         <small>Direct For</small><div className="color forDirect"></div>
-                        //     </div>
-                        //     <div>
-                        //         <small>Delegated For</small><div className="color for"></div>
-                        //     </div>
-                        //     <div>
-                        //         <small>Direct Against</small><div className="color againstDirect"></div>
-                        //     </div>
-                        //     <div>
-                        //         <small>Delegated Against</small><div className="color against"></div>
-                        //     </div>
-                        // </div>
                         <div className="d-flex color-legend mt-0 mb-4">
                             <div>
                                 <small className="px-1">Direct For</small><div className="color forDirect count">{stats.forDirectPercentage.toFixed(0)}%</div>
@@ -108,7 +99,7 @@ export const VoteWrapper: FunctionComponent<{
 
                     )}
 
-                    <div className="d-flex d-flex justify-content-between">
+                    <div className="d-flex d-flex justify-content-between mt-1">
                         <div className="d-flex align-items-center small-for-against-buttons-container">
                             <div
                                 className={`button_ small ${userVote === 'for' && 'selected'}`}
@@ -120,7 +111,7 @@ export const VoteWrapper: FunctionComponent<{
                                     <Link to="/profile" className="vote-avatar tiny avatar-1 for ml-n2 d-none d-md-block"></Link>
                                     <div onClick={() => {
                                         setIsShowingVotersModal(true);
-                                        setUsersShowing(`Your Representatives Voting For on ${l.name}`);
+                                        setUsersShowing(`Your Representatives Voting For on ${l.questionText}`);
                                     }} className="vote-avatar tiny count for ml-n2">+{3}</div>
                                 </div>
                             </div>
@@ -131,7 +122,7 @@ export const VoteWrapper: FunctionComponent<{
                                 <div onClick={(e) => {
                                     e.preventDefault();
                                     setIsShowingVotersModal(true);
-                                    setUsersShowing(`People Voting For on ${l.name}`);
+                                    setUsersShowing(`People Voting For on ${l.questionText}`);
                                 }} className="vote-avatar tiny count for ml-n2">{numeral(l.forCount).format('0a')}</div>
                             </div>
                         </div>
@@ -143,7 +134,7 @@ export const VoteWrapper: FunctionComponent<{
                                 {/* <div className="vote-avatar tiny avatar-1 ml-n2" /> */}
                                 <div onClick={() => {
                                     setIsShowingVotersModal(true);
-                                    setUsersShowing(`People Voting Against on ${l.name}`);
+                                    setUsersShowing(`People Voting Against on ${l.questionText}`);
                                 }} className="vote-avatar tiny count against ml-n2">{numeral(l.againstCount).format('0a')}</div>
                             </div>
                             <div
@@ -156,7 +147,7 @@ export const VoteWrapper: FunctionComponent<{
                                     <Link to="/profile" className="vote-avatar tiny avatar-5 against ml-n2 d-none d-md-block"></Link>
                                     <div onClick={() => {
                                         setIsShowingVotersModal(true);
-                                        setUsersShowing(`Your Representatives Voting Against on ${l.name}`);
+                                        setUsersShowing(`Your Representatives Voting Against on ${l.questionText}`);
                                     }} className="vote-avatar tiny count against ml-n2">+{1}</div>
                                 </div>
                             </div>
@@ -183,7 +174,10 @@ export const VoteWrapper: FunctionComponent<{
 
                     <div className="mt-n2">
                         {people.map((el, i) => (
-                            <PersonInList person={el} key={el.name} />
+                            <PersonInList
+                                key={el.name}
+                                person={el}
+                            />
                         ))}
                     </div>
 

@@ -8,6 +8,7 @@ import {
     useParams
 } from 'react-router-dom';
 import loadable from '@loadable/component';
+import ReactTooltip from 'react-tooltip';
 
 import SideMenu from "@shared/SideMenu";
 import SideInfo from "@shared/SideInfo";
@@ -17,6 +18,7 @@ export default function App() {
 
     return (
         <div className={`AppContainer theme3`}>
+            <ReactTooltip place="bottom" type="dark" effect="solid" />
             <Router>
                 <ScrollToTop />
                 <SideMenu />
@@ -31,16 +33,16 @@ export default function App() {
                         <Route path="/create-vote" component={loadable(() => import('./components/Routes/CreateVote'))} />
                         <Route path="/create-vote/:groupName" component={loadable(() => import('./components/Routes/CreateVote'))} />
                         {/* <Route path="/create-sub-vote/:voteName" component={loadable(() => import('./components/Routes/CreateVote'))} /> */}
-                        <Route path="/profile/:profileName/:section" component={loadable(() => import('./components/Routes/Profile'))} />
+                        <Route path="/profile/:handle/:section" component={loadable(() => import('./components/Routes/Profile'))} />
                         <Route path="/profile/:handle" component={loadable(() => import('./components/Routes/Profile'))} />
                         <Route path="/profile" component={loadable(() => import('./components/Routes/Profile'))} />
-                        <Route path="/profile-people/:which" component={loadable(() => import('./components/Routes/ProfilePeople'))} />
+                        <Route path="/profile-people/:handle/:which" component={loadable(() => import('./components/Routes/ProfilePeople'))} />
                         <Route path="/trending" component={loadable(() => import('./components/Routes/Trending'))} />
                         <Route path="/feed" component={loadable(() => import('./components/Routes/Feed'))} />
                         <Route path="/groups" component={loadable(() => import('./components/Routes/Groups'))} />
-                        <Route path="/group/:groupName/:section" component={loadable(() => import('./components/Routes/Group'))} />
-                        <Route path="/group/:groupName" component={loadable(() => import('./components/Routes/Group'))} />
-                        <Route path="/group-people/:groupName" component={loadable(() => import('./components/Routes/GroupPeople'))} />
+                        <Route path="/group/:handle/:section" component={loadable(() => import('./components/Routes/Group'))} />
+                        <Route path="/group/:handle" component={loadable(() => import('./components/Routes/Group'))} />
+                        <Route path="/group-people/:handle" component={loadable(() => import('./components/Routes/GroupPeople'))} />
                         <Route path="/" component={loadable(() => import('./components/Routes/Home'))} />
                     </Switch>
                 </div>

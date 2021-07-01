@@ -7,8 +7,10 @@ import './style.sass';
 
 export const ModalHeader: FunctionComponent<{
     title: string,
+    submitText?: string,
 }> = ({
     title,
+    submitText
 }) => {
 
         const { allSearchParams, updateParams } = useSearchParams();
@@ -26,7 +28,7 @@ export const ModalHeader: FunctionComponent<{
                         </div>
                         <h4 className="ml-4 my-n2">{title}</h4>
                     </div>
-                    <button className={'button_ inverted'} type="submit">Save</button>
+                    <button className={'button_ inverted'} type="submit">{ submitText || 'Save' }</button>
                 </div>
                 <hr className="mb-0" />
             </div>

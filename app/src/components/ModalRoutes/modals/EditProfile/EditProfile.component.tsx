@@ -31,7 +31,8 @@ export const EditProfile: FunctionComponent<{}> = ({ }) => {
         data: user_data,
         refetch: user_refetch
     } = useQuery(USER, {
-        variables: { handle: modalData.userHandle }
+        variables: { handle: modalData.userHandle },
+        skip: modalData.userHandle === "new"
     });
 
     const [editUser, {
@@ -48,7 +49,9 @@ export const EditProfile: FunctionComponent<{}> = ({ }) => {
     const onSubmit = (values: any) => {
         console.log(values);
 
-        editUser({ variables: { User: values } });
+        editUser({ variables: { User: values } }).then((r) => {
+            console.log({ r })
+        });
     }
 
     useEffect(() => {
