@@ -7,6 +7,9 @@ const awsCredentials = require("../credentials/aws-credentials.json");
 import { BookTypeDefs, BookResolvers } from "./state/BooksDemo";
 import { AuthUserTypeDefs, AuthUserResolvers } from "./state/AuthUser";
 import { UserTypeDefs, UserResolvers } from "./state/Users";
+import { GroupTypeDefs, GroupResolvers } from "./state/Groups";
+import { QuestionTypeDefs, QuestionResolvers } from "./state/Questions";
+import { VoteTypeDefs, VoteResolvers } from "./state/Votes";
 
 const mongoClient = new MongoClient(
     `mongodb+srv://${atlasCredentials.username}:${atlasCredentials.password}@aiaiaiaminhavida.oobyz.mongodb.net/Enron?retryWrites=true&w=majority`,
@@ -38,17 +41,37 @@ mongoClient.connect(async (err) => {
     const mongoDB = mongoClient.db("LiquidVote");
   
     const server = new ApolloServer({
-        typeDefs: [QueryTypeDefs, BookTypeDefs, AuthUserTypeDefs, UserTypeDefs],
+        typeDefs: [
+            QueryTypeDefs,
+            BookTypeDefs,
+            AuthUserTypeDefs,
+            UserTypeDefs,
+            GroupTypeDefs,
+            QuestionTypeDefs,
+            VoteTypeDefs
+        ],
         resolvers: {
+            ...BookResolvers,
+            ...AuthUserResolvers,
+            ...UserResolvers,
+            ...GroupResolvers,
+            ...QuestionResolvers,
+            ...VoteResolvers,
             Query: {
                 ...BookResolvers.Query,
                 ...AuthUserResolvers.Query,
-                ...UserResolvers.Query
+                ...UserResolvers.Query,
+                ...GroupResolvers.Query,
+                ...QuestionResolvers.Query,
+                ...VoteResolvers.Query
             },
             Mutation: {
                 // ...BookResolvers.Mutation,
                 ...AuthUserResolvers.Mutation,
-                ...UserResolvers.Mutation
+                ...UserResolvers.Mutation,
+                ...GroupResolvers.Mutation,
+                ...QuestionResolvers.Mutation,
+                ...VoteResolvers.Mutation
             }
         },
         context: async ({ req }) => {

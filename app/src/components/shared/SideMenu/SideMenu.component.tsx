@@ -1,6 +1,5 @@
 import React, { FunctionComponent, useEffect } from 'react';
 import { Link } from "react-router-dom";
-import ReactTooltip from 'react-tooltip';
 import { useAuth0 } from "@auth0/auth0-react";
 import { useQuery } from "@apollo/client";
 
@@ -12,13 +11,16 @@ import ProfileSvg from "@shared/Icons/Profile.svg";
 import ProfilePlusSvg from "@shared/Icons/Profile+.svg";
 import TrendingSvg from "@shared/Icons/Trending.svg";
 import GroupSvg from "@shared/Icons/Group.svg";
+import LoginIcon from "@shared/Icons/LoginIcon.svg";
 import Popper from "@shared/Popper";
-
+import useSearchParams from "@state/Global/useSearchParams.effect";
 import { AUTH_USER } from "@state/AuthUser/typeDefs";
 
 import './style.sass';
 
 export const SideMenu: FunctionComponent<{}> = ({ }) => {
+
+    const { allSearchParams, updateParams } = useSearchParams();
 
     const { user, isAuthenticated, isLoading, loginWithRedirect, logout } = useAuth0();
 
@@ -36,22 +38,25 @@ export const SideMenu: FunctionComponent<{}> = ({ }) => {
 
     return (
         <div className="sideMenu">
-            <ReactTooltip place="bottom" type="dark" effect="solid" />
             <Link to="/home">
                 <RippleDrop />
             </Link>
             <Link to="home" data-tip="Home">
                 <HomeSvg />
             </Link>
-            <Link to="/feed" data-tip="Notifications">
-                <NotificationSvg />
-            </Link>
-            <Link to="/trending" data-tip="Trending" className="d-block d-md-none">
-                <TrendingSvg />
-            </Link>
-            <Link to="/groups" data-tip="Your Groups">
-                <GroupSvg />
-            </Link>
+            {isAuthenticated && user && (
+                <>
+                    <Link to="/feed" data-tip="Notifications">
+                        <NotificationSvg />
+                    </Link>
+                    <Link to="/trending" data-tip="Trending" className="d-block d-md-none">
+                        <TrendingSvg />
+                    </Link>
+                    <Link to="/groups" data-tip="Your Groups">
+                        <GroupSvg />
+                    </Link>
+                </>
+            )}
             {/* <Link to="/feed">
                 <BookmarkSvg />
             </Link>
@@ -63,30 +68,45 @@ export const SideMenu: FunctionComponent<{}> = ({ }) => {
             <br />
             <br />
             {isAuthenticated && user && (
-                <Popper
-                    button={<div>
-                        <img
-                            className="vote-avatar mb-3"
-                            src={authUser?.LiquidUser?.avatar}
-                            alt={authUser?.LiquidUser?.name}
-                        />
-                    </div>}
-                    popperContent={
-                        <ul className="p-0 m-0">
-                            <li><Link to={`/profile/${authUser?.LiquidUser?.handle}`}>Visit Profile</Link></li>
-                            <li className="pointer" onClick={() => logout({ returnTo: window.location.origin })}>Logout</li>
-                        </ul>
-                    }
-                />
+                <>
+                    <Popper
+                        button={<div>
+                            <img
+                                className="vote-avatar mb-3"
+                                src={authUser?.LiquidUser?.avatar}
+                                alt={authUser?.LiquidUser?.name}
+                            />
+                        </div>}
+                        popperContent={
+                            <ul className="p-0 m-0">
+                                <li><Link to={`/profile/${authUser?.LiquidUser?.handle}`}>Visit Profile</Link></li>
+                                <li className="pointer" onClick={() => logout({ returnTo: window.location.origin })}>Logout</li>
+                            </ul>
+                        }
+                    />
+                    <div
+                        data-tip="Create Poll"
+                        className="button_ inverted icon-contain"
+                        onClick={() => updateParams({
+                            paramsToAdd: {
+                                modal: "EditQuestion",
+                                modalData: JSON.stringify({
+                                    questionHandle: 'new'
+                                })
+                            }
+                        })}
+                    >
+                        <DropPlusSVG />
+                    </div>
+                </>
             )}
             {!isAuthenticated && (
-                <div className="pointer" onClick={() => loginWithRedirect({ redirectUri: window.location.origin })} data-tip="Login">
-                    <ProfilePlusSvg />
-                </div>
+                <>
+                    <div className="pointer" onClick={() => loginWithRedirect({ redirectUri: window.location.origin })} data-tip="Login">
+                        <LoginIcon />
+                    </div>
+                </>
             )}
-            <Link to="/create-vote" data-tip="Create Poll" className="button_ inverted icon-contain">
-                <DropPlusSVG />
-            </Link>
         </div>
     );
 }
