@@ -62,10 +62,10 @@ export const QuestionResolvers = {
             mongoDB, s3, AuthUser
         }) => {
 
-            console.log({
-                Question,
-                questionText, group, channel
-            })
+            // console.log({
+            //     Question,
+            //     questionText, group, channel
+            // })
 
             const Question_ = await mongoDB.collection("Questions")
                 .findOne({ questionText, group, channel });
@@ -109,14 +109,23 @@ export const QuestionResolvers = {
 };
 
 export const updateQuestionVotingStats = async ({
-    questionId,
-    choiceText
+    questionText,
+    choiceText,
+    group,
+    channel,
+    mongoDB,
+    AuthUser
 }) => {
-
-    console.log('updateQuestionVotingStats')
 
     // QUERY:
     //  Get Question
+    const Question_ = await mongoDB.collection("Questions")
+        .findOne({
+            questionText,
+            // choiceText,
+            'groupChannel.group': group,
+            'groupChannel.channel': channel
+        });
     //  Get Votes
 
     // GET VIA AGGREGATION:
@@ -124,15 +133,65 @@ export const updateQuestionVotingStats = async ({
     //  Most recent Vote timestamp
     //  Most Relevant Voters
 
-    // UPDATE:
-    //  lastVoteOn: String
-    //  userVote: Vote
-    //  forCount: Int
-    //  forDirectCount: Int
-    //  forMostRelevantVoters: [JSON]
-    //  againstCount: Int
-    //  againstMostRelevantVoters: [JSON]
-    //  againstDirectCount: Int
+    const VoteCounts = await mongoDB.collection("Votes")
+        .aggregate([
+            {
+                $match: {
+                    "groupChannel.group": group,
+                    "groupChannel.channel": channel,
+                    "questionText": questionText,
+                },
+            },
+            {
+                $group: {
+                    _id: {
+                        position: "$position",
+                        isDirect: "$isDirect"
+                    },
+                    count: { $sum: 1 }
+                },
+            },
+        ])
+        .toArray();
 
-    return {};
+    // console.log('updateQuestionVotingStats', {
+    //     VoteCounts: JSON.stringify(VoteCounts, null, 2)
+    // });
+
+    const updatedQuestion = (await mongoDB.collection("Questions").findOneAndUpdate(
+        { _id: Question_._id },
+        {
+            $set: {
+                'stats.lastVoteOn': Date.now(),
+                'stats.forCount': (
+                    VoteCounts.find(
+                        c => c._id.position === 'for' && c._id.isDirect === true
+                    )?.count || 0 +
+                    VoteCounts.find(
+                        c => c._id.position === 'for' && c._id.isDirect === false
+                    )?.count || 0
+                ) || 0,
+                'stats.forDirectCount': VoteCounts.find(
+                    c => c._id.position === 'for' && c._id.isDirect === true
+                )?.count || 0,
+                'stats.againstCount': (
+                    VoteCounts.find(
+                        c => c._id.position === 'against' && c._id.isDirect === true
+                    )?.count || 0 +
+                    VoteCounts.find(
+                        c => c._id.position === 'against' && c._id.isDirect === false
+                    )?.count || 0
+                ) || 0,
+                'stats.againstDirectCount': VoteCounts.find(
+                    c => c._id.position === 'against' && c._id.isDirect === true
+                )?.count || 0,
+            },
+        },
+        {
+            returnNewDocument: true,
+            returnOriginal: false
+        }
+    ))?.value
+
+    return updatedQuestion?.stats;
 }

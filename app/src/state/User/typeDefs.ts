@@ -13,10 +13,10 @@ export const USER = gql`
         externalLink,
         joinedOn,
         lastEditOn,
-        representing,
-        representedBy,
-        groups,
-        directVotes,
+        # representing,
+        # representedBy,
+        # groups,
+        # directVotes,
         isThisUser
     }
   }

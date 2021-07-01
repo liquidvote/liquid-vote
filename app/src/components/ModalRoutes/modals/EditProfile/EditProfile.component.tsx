@@ -49,7 +49,9 @@ export const EditProfile: FunctionComponent<{}> = ({ }) => {
     const onSubmit = (values: any) => {
         console.log(values);
 
-        editUser({ variables: { User: values } });
+        editUser({ variables: { User: values } }).then((r) => {
+            console.log({ r })
+        });
     }
 
     useEffect(() => {

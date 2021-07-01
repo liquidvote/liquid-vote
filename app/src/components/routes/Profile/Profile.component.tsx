@@ -85,7 +85,16 @@ export const Profile: FunctionComponent<{}> = ({ }) => {
                         </div>
                     ) : (
                         <div
-                            onClick={() => setIsRepresenting(!isRepresenting)}
+                            // onClick={() => setIsRepresenting(!isRepresenting)}
+                            onClick={() => updateParams({
+                                paramsToAdd: {
+                                    modal: "EditRepresentativeRelation",
+                                    modalData: JSON.stringify({
+                                        userHandle: profile.handle,
+                                        userName: profile.name
+                                    })
+                                }
+                            })}
                             className={`button_ ${isRepresenting ? "selected" : ""}`}
                         >
                             {isRepresenting ? "Represents You" : "Delegate Votes To"}

@@ -22,15 +22,7 @@ export const VoteResolvers = {
             mongoDB, s3, AuthUser
         }) => {
 
-            console.log({
-                Vote,
-                questionText,
-                choiceText,
-                group,
-                channel
-            })
-
-            const Vote_ = await mongoDB.collection("Votes")
+            const Vote_ = !!AuthUser && await mongoDB.collection("Votes")
                 .findOne({
                     questionText,
                     choiceText,
@@ -38,16 +30,6 @@ export const VoteResolvers = {
                     'groupChannel.channel': channel,
                     user: AuthUser?.LiquidUser?.handle
                 });
-
-            console.log({
-                Vote,
-                Vote_,
-                questionText,
-                choiceText,
-                group,
-                channel,
-                new: !!AuthUser && !Vote_
-            })
 
             const savedVote = (!!AuthUser && !Vote_) ?
                 (await mongoDB.collection("Votes").insertOne({
@@ -64,7 +46,7 @@ export const VoteResolvers = {
                 }))?.ops[0] : (
                     !!AuthUser &&
                     Vote_.createdBy === AuthUser.LiquidUser.handle
-                ) ? await mongoDB.collection("Votes").updateOne(
+                ) ? (await mongoDB.collection("Votes").findOneAndUpdate(
                     { _id: Vote_._id },
                     {
                         $set: {
@@ -72,8 +54,12 @@ export const VoteResolvers = {
                             'isDirect': true,
                             'lastEditOn': Date.now(),
                         },
+                    },
+                    {
+                        returnNewDocument: true,
+                        returnOriginal: false
                     }
-                ) : null;
+                ))?.value : null;
 
 
             // TODO: Create Votes for representees
@@ -82,10 +68,25 @@ export const VoteResolvers = {
             //          if new -> create with representative Vote
 
             // Update Question Stats
-            const QuestionStats = await updateQuestionVotingStats({
-                questionId: null,
-                choiceText
+            const QuestionStats = !!AuthUser && await updateQuestionVotingStats({
+                questionText,
+                choiceText,
+                group,
+                channel,
+                mongoDB,
+                AuthUser
             });
+
+            // console.log({
+            //     Vote,
+            //     // Vote_,
+            //     // // questionText,
+            //     // // choiceText,
+            //     // // group,
+            //     // // channel,
+            //     // new: !!AuthUser && !Vote_,
+            //     savedVote
+            // })
 
             return {
                 ...savedVote,
