@@ -13,11 +13,37 @@ export const UserTypeDefs = gql`
         externalLink: String
         joinedOn: String
         lastEditOn: String
+        # representing: Int
+        # representedBy: Int
+        # groups: Int
+        # directVotes: String
+        isThisUser: Boolean
+        isRepresentingYou: Boolean
+        stats: UserStats
+    }
+
+    type UserStats {
+        lastDirectVoteOn: String
         representing: Int
         representedBy: Int
-        groups: Int
-        directVotes: String
-        isThisUser: Boolean
+        groupsJoined: Int
+        directVotesMade: Int
+        indirectVotesMade: Int
+    }
+
+    type UserRepresentativeRelation {
+        representativeId: String
+        representeeId: String
+        createdOn: String
+        lastEditOn: String
+        groups: [UserRepresentativeGroupRelation]
+    }
+
+    type UserRepresentativeGroupRelation {
+        groupHandle: String
+        channelNames: [String]
+        createdOn: String
+        lastEditOn: String
     }
 
     extend type Query {

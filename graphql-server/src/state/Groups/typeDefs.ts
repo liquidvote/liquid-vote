@@ -17,7 +17,8 @@ export const GroupTypeDefs = gql`
         admins: [User]
         channels: [Channel]
         thisUserIsAdmin: Boolean
-        memberRelation: JSON
+        userMemberRelation: GroupMemberRelation
+        yourMemberRelation: GroupMemberRelation
     }
 
     type Channel {
@@ -56,7 +57,7 @@ export const GroupTypeDefs = gql`
 
     extend type Query {
         Group(handle: String): Group
-        # UserGroups(handle: String): [Group]
+        Groups(userHandle: String): [Group]
         GroupMembers(handle: String): [User]
         GroupQuestions(handle: String, channels: [String]): [Question]
     }

@@ -46,20 +46,42 @@ export const UserResolvers = {
             const User = await mongoDB.collection("Users")
                 .findOne({ 'LiquidUser.handle': handle });
 
-            const GroupsMemberRelations = await mongoDB.collection("GroupMembers")
+            const UserGroupMemberRelations = await mongoDB.collection("GroupMembers")
                 .find({ 'userId': ObjectID(User?._id) })
+                .toArray();
+
+            const YourGroupMemberRelations = !!AuthUser && await mongoDB.collection("GroupMembers")
+                .find({
+                    'userId': ObjectID(AuthUser?._id),
+                    'groupId': {
+                        "$in": UserGroupMemberRelations.map(
+                            r => ObjectID(r.groupId)
+                        )
+                    }
+                })
                 .toArray();
 
             const Groups = (await mongoDB.collection("Groups").find({
                 "_id": {
-                    "$in": GroupsMemberRelations.map(r => ObjectID(r.groupId))
+                    "$in": UserGroupMemberRelations.map(r => ObjectID(r.groupId))
                 }
             })
                 .toArray())
                 .map((g) => ({
                     ...g,
-                    thisUserIsAdmin: !!g.admins.find(u => u.handle === AuthUser?.LiquidUser?.handle)
+                    thisUserIsAdmin: !!g.admins.find(u => u.handle === AuthUser?.LiquidUser?.handle),
+                    userMemberRelation: UserGroupMemberRelations?.find(
+                        r => r.groupId.toString() === g._id.toString()
+                    ),
+                    yourMemberRelation: YourGroupMemberRelations && YourGroupMemberRelations.find(
+                        r => r.groupId.toString() === g._id.toString()
+                    ),
                 }));
+
+            console.log({
+                YourGroupMemberRelations,
+                Groups
+            })
 
             return Groups;
         },

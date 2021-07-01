@@ -5,6 +5,7 @@ import Modal from 'react-modal';
 import { useQuery, useMutation } from "@apollo/client";
 
 import VoteGraph1 from "@shared/VoteGraph1";
+import Chart from "@shared/VoteGraph1/chart.svg";
 import XSVG from "@shared/Icons/X.svg";
 import { people } from "@state/Mock/People";
 import PersonInList from '@shared/PersonInList';
@@ -32,30 +33,31 @@ export const SingleVoteInList: FunctionComponent<{
             data: editVote_data,
         }] = useMutation(EDIT_VOTE);
 
+        const [userVote, setUserVote] = React.useState(
+            l?.stats?.userVote?.position || null
+        );
 
-        console.log({ editVote_data });
-
-        const [userVote, setUserVote] = React.useState(null);
         const handleUserVote = (vote: string) => {
-            editVote({ variables: {
-                questionText: l.questionText,
-                // choiceText
-                group: l.groupChannel.group,
-                channel: l.groupChannel.channel,
-                Vote: {
-                    position: vote
-                },
-            }})
-            if (vote === userVote) {
-                setUserVote(null)
-            } else {
-                setUserVote(vote);
-            }
+            editVote({
+                variables: {
+                    questionText: l.questionText,
+                    // choiceText
+                    group: l.groupChannel.group,
+                    channel: l.groupChannel.channel,
+                    Vote: {
+                        position: (vote === userVote) ? null : vote
+                    },
+                }
+            }).then(({ data }) => {
+                setUserVote(data?.editVote?.position);
+                console.log({
+                    editVote: data?.editVote
+                })
+            });
         }
 
         const [isShowingVotersModal, setIsShowingVotersModal] = useState(false);
         const [usersShowing, setUsersShowing] = useState('');
-
 
         const stats = (({ forCount, againstCount, forDirectCount, againstDirectCount }) => {
             const forPercentage = (!forCount && !againstCount) ? 50 : ((forCount / (forCount + againstCount)) * 100);
@@ -69,20 +71,31 @@ export const SingleVoteInList: FunctionComponent<{
                 forDelegatedPercentage,
                 forDirectPercentage,
                 againstDelegatedPercentage,
-                againstDirectPercentage
+                againstDirectPercentage,
+
+                forCount,
+                againstCount,
+                forDirectCount,
+                againstDirectCount
             }
         })({
-            forCount: l.forCount,
-            againstCount: l.againstCount,
-            forDirectCount: l.forDirectCount,
-            againstDirectCount: l.againstDirectCount,
-        })
+            forCount: l.stats.forCount,
+            againstCount: l.stats.againstCount,
+            forDirectCount: l.stats.forDirectCount,
+            againstDirectCount: l.stats.againstDirectCount,
+            ...(!!editVote_data?.editVote?.QuestionStats) && {
+                forCount: editVote_data?.editVote?.QuestionStats.forCount,
+                againstCount: editVote_data?.editVote?.QuestionStats.againstCount,
+                forDirectCount: editVote_data?.editVote?.QuestionStats.forDirectCount,
+                againstDirectCount: editVote_data?.editVote?.QuestionStats.againstDirectCount,
+            }
+        });
 
         return (
             <div className="position-relative">
                 {l.questionText && (
                     <small className="time-ago" data-tip="Last vote was">
-                        12s
+                        {l?.stats?.lastVoteOn || '3s ago 🧪'}
                     </small>
                 )}
                 <div>
@@ -106,7 +119,20 @@ export const SingleVoteInList: FunctionComponent<{
                                 )}
                             </div>
                         )}
-                        <VoteGraph1 key={`d-${l.questionText}`} {...l} name="" />
+
+                        <Chart
+                            name={l.questionText}
+                            forDirectCount={stats.forDirectCount}
+                            forCount={stats.forCount}
+                            againstDirectCount={stats.againstDirectCount}
+                            againstCount={stats.againstCount}
+                            userVote={null}
+                            userDelegatedVotes={null}
+                        />
+
+                        {/* <pre>
+                            {JSON.stringify(stats, null, 4)}
+                        </pre> */}
                     </div>
 
                     {showColorLegend && (
@@ -140,22 +166,22 @@ export const SingleVoteInList: FunctionComponent<{
                                     <div onClick={() => {
                                         setIsShowingVotersModal(true);
                                         setUsersShowing(`Your Representatives Voting For on ${l.questionText}`);
-                                    }} className="vote-avatar tiny count for ml-n2">+{3}</div>
+                                    }} className="vote-avatar tiny count for ml-n2">+{}</div>
                                 </div>
                             </div>
-                            <div className="d-flex ml-2">
+                            <div className="d-flex ml-1">
                                 {/* <Link to="/profile" className="vote-avatar tiny avatar-1 for ml-n2"></Link> */}
-                                <Link to="/profile" className="vote-avatar tiny avatar-2 for ml-n2 d-none d-md-block"></Link>
+                                <Link to="/profile" className="vote-avatar tiny avatar-2 for d-none d-md-block"></Link>
                                 <Link to="/profile" className="vote-avatar tiny avatar-3 for ml-n2 d-none d-md-block"></Link>
                                 <div onClick={(e) => {
                                     e.preventDefault();
                                     setIsShowingVotersModal(true);
                                     setUsersShowing(`People Voting For on ${l.questionText}`);
-                                }} className="vote-avatar tiny count for ml-n2">{numeral(l.forCount).format('0a')}</div>
+                                }} className="vote-avatar tiny count for ml-n2">{numeral(stats.forCount).format('0a')}</div>
                             </div>
                         </div>
                         <div className="d-flex align-items-center">
-                            <div className="d-flex ml-2">
+                            <div className="d-flex mr-1">
                                 <Link to="/profile" className="vote-avatar tiny avatar-4 against ml-n2 d-none d-md-block"></Link>
                                 {/* <Link to="/profile" className="vote-avatar tiny avatar-5 against ml-n2 d-none d-md-block"></Link> */}
                                 <Link to="/profile" className="vote-avatar tiny avatar-6 against ml-n2 d-none d-md-block"></Link>
@@ -163,7 +189,7 @@ export const SingleVoteInList: FunctionComponent<{
                                 <div onClick={() => {
                                     setIsShowingVotersModal(true);
                                     setUsersShowing(`People Voting Against on ${l.questionText}`);
-                                }} className="vote-avatar tiny count against ml-n2">{numeral(l.againstCount).format('0a')}</div>
+                                }} className="vote-avatar tiny count against ml-n2">{numeral(stats.againstCount).format('0a')}</div>
                             </div>
                             <div
                                 className={`button_ small ${userVote === 'against' && 'selected'}`}

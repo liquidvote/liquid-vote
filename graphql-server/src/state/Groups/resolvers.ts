@@ -30,7 +30,6 @@ export const GroupResolvers = {
                 memberRelation: GroupMemberRelation
             };
         },
-
         GroupMembers: async (_source, { handle }, { mongoDB, s3, AuthUser }) => {
 
             const Group = await mongoDB.collection("Groups")
@@ -38,7 +37,6 @@ export const GroupResolvers = {
 
             return [];
         },
-
         GroupQuestions: async (_source, { handle, channels }, { mongoDB, s3, AuthUser }) => {
 
             console.log('GroupQuestions');
@@ -52,7 +50,30 @@ export const GroupResolvers = {
                 thisUserIsAdmin: q.createdBy === AuthUser?.LiquidUser?.handle,
             }));
         },
+        Groups: async (_source, { userHandle }, { mongoDB, s3, AuthUser }) => {
 
+            const User = await mongoDB.collection("Users")
+                .findOne({ 'LiquidUser.handle': userHandle });
+
+            const GroupsMemberRelations = await mongoDB.collection("GroupMembers")
+                .find({ 'userId': ObjectID(User?._id) })
+                .toArray();
+
+            const Groups = (
+                await mongoDB.collection("Groups").find({
+                    "_id": {
+                        "$in": GroupsMemberRelations.map(r => ObjectID(r.groupId))
+                    }
+                }).toArray()
+            )
+                .map((g) => ({
+                    ...g,
+                    thisUserIsAdmin: !!g.admins.find(u => u.handle === AuthUser?.LiquidUser?.handle),
+                    // memberRelation: GroupMemberRelation
+                }));
+
+            return Groups;
+        },
     },
     Mutation: {
         editGroup: async (_source, { Group, handle }, { mongoDB, s3, AuthUser }) => {
