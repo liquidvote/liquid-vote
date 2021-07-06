@@ -19,7 +19,12 @@ export const GROUP = gql`
             handle
         }
         thisUserIsAdmin
-        memberRelation
+        yourMemberRelation {
+            createdOn
+            lastEditOn
+            isMember
+            channels
+        }
         privacy,
         channels {
             name,

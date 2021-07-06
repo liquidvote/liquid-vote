@@ -13,11 +13,16 @@ export const USER = gql`
         externalLink,
         joinedOn,
         lastEditOn,
-        # representing,
-        # representedBy,
-        # groups,
-        # directVotes,
         isThisUser
+        isRepresentingYou
+        stats {
+            lastDirectVoteOn
+            representing
+            representedBy
+            groupsJoined
+            directVotesMade
+            indirectVotesMade
+        }
     }
   }
 `;
@@ -28,15 +33,23 @@ export const USER_REPRESENTING = gql`
         handle,
         name,
         bio,
+        email,
         avatar,
+        cover,
         location,
         externalLink,
         joinedOn,
         lastEditOn,
-        representing,
-        representedBy,
-        groups,
-        directVotes,
+        isThisUser
+        isRepresentingYou
+        stats {
+            lastDirectVoteOn
+            representing
+            representedBy
+            groupsJoined
+            directVotesMade
+            indirectVotesMade
+        }
     }
   }
 `;
@@ -47,15 +60,23 @@ export const USER_REPRESENTED = gql`
         handle,
         name,
         bio,
+        email,
         avatar,
+        cover,
         location,
         externalLink,
         joinedOn,
         lastEditOn,
-        representing,
-        representedBy,
-        groups,
-        directVotes
+        isThisUser
+        isRepresentingYou
+        stats {
+            lastDirectVoteOn
+            representing
+            representedBy
+            groupsJoined
+            directVotesMade
+            indirectVotesMade
+        }
     }
   }
 `;
@@ -67,8 +88,8 @@ export const USER_DIRECT_VOTES = gql`
 `;
 
 export const USER_GROUPS = gql`
-  query($handle: String!) {
-    UserGroups(handle: $handle) {
+  query($handle: String!, $representative: String) {
+    UserGroups(handle: $handle, representative: $representative) {
         handle
         name
         bio
@@ -85,7 +106,19 @@ export const USER_GROUPS = gql`
             avatar
             handle
         }
-        privacy
+        privacy,
+        yourMemberRelation {
+            createdOn
+            lastEditOn
+            isMember
+            channels
+        }
+        representativeRelation {
+            isRepresentingYou
+            isGroupMember
+            createdOn
+            lastEditOn
+        }
     }
   }
 `;
@@ -97,7 +130,42 @@ export const EDIT_USER = gql`
 `;
 
 export const EDIT_GROUP_MEMBER_CHANNEL_RELATION = gql`
-  mutation ($UserHandle: String!, $GroupHandle: String!, $Channels: [String]!) {
-    editGroupMemberChannelRelation(UserHandle: $UserHandle, GroupHandle: $GroupHandle, Channels: $Channels)
+  mutation (
+      $UserHandle: String!,
+      $GroupHandle: String!,
+      $Channels: [String]
+      $IsMember: Boolean
+    ) {
+    editGroupMemberChannelRelation(
+        UserHandle: $UserHandle,
+        GroupHandle: $GroupHandle,
+        Channels: $Channels
+        IsMember: $IsMember
+    ) {
+        createdOn
+        lastEditOn
+        isMember
+        channels
+    }
+  }
+`;
+
+export const EDIT_USER_REPRESENTATIVE_GROUP_RELATION = gql`
+  mutation (
+      $RepresenteeHandle: String!,
+      $RepresentativeHandle: String!,
+      $Group: String!,
+      $IsRepresentingYou: Boolean!
+    ) {
+        editUserRepresentativeGroupRelation(
+            RepresenteeHandle: $RepresenteeHandle,
+            RepresentativeHandle: $RepresentativeHandle,
+            Group: $Group,
+            IsRepresentingYou: $IsRepresentingYou
+        ) {
+            isRepresentingYou
+            createdOn
+            lastEditOn
+        }
   }
 `;
