@@ -19,6 +19,7 @@ export const GroupTypeDefs = gql`
         thisUserIsAdmin: Boolean
         userMemberRelation: GroupMemberRelation
         yourMemberRelation: GroupMemberRelation
+        representativeRelation: UserRepresentativeGroupRelation
     }
 
     type Channel {
@@ -42,17 +43,10 @@ export const GroupTypeDefs = gql`
     type GroupMemberRelation {
         groupId: String
         userId: String
-        joinedOn: String
+        createdOn: String
         lastEditOn: String
         isMember: Boolean
-        channels: [GroupMemberChannelRelation]
-    }
-
-    type GroupMemberChannelRelation {
-        channelName: String
-        # joinedOn: String
-        # lastEditOn: String
-        # isMember: Boolean
+        channels: [String]
     }
 
     extend type Query {

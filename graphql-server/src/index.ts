@@ -10,6 +10,7 @@ import { UserTypeDefs, UserResolvers } from "./state/Users";
 import { GroupTypeDefs, GroupResolvers } from "./state/Groups";
 import { QuestionTypeDefs, QuestionResolvers } from "./state/Questions";
 import { VoteTypeDefs, VoteResolvers } from "./state/Votes";
+import { InviteTypeDefs, InviteResolvers } from "./state/Invites";
 
 const mongoClient = new MongoClient(
     `mongodb+srv://${atlasCredentials.username}:${atlasCredentials.password}@aiaiaiaminhavida.oobyz.mongodb.net/Enron?retryWrites=true&w=majority`,
@@ -48,7 +49,8 @@ mongoClient.connect(async (err) => {
             UserTypeDefs,
             GroupTypeDefs,
             QuestionTypeDefs,
-            VoteTypeDefs
+            VoteTypeDefs,
+            InviteTypeDefs
         ],
         resolvers: {
             ...BookResolvers,
@@ -57,13 +59,15 @@ mongoClient.connect(async (err) => {
             ...GroupResolvers,
             ...QuestionResolvers,
             ...VoteResolvers,
+            ...InviteResolvers,
             Query: {
                 ...BookResolvers.Query,
                 ...AuthUserResolvers.Query,
                 ...UserResolvers.Query,
                 ...GroupResolvers.Query,
                 ...QuestionResolvers.Query,
-                ...VoteResolvers.Query
+                ...VoteResolvers.Query,
+                ...InviteResolvers.Query
             },
             Mutation: {
                 // ...BookResolvers.Mutation,
@@ -71,7 +75,8 @@ mongoClient.connect(async (err) => {
                 ...UserResolvers.Mutation,
                 ...GroupResolvers.Mutation,
                 ...QuestionResolvers.Mutation,
-                ...VoteResolvers.Mutation
+                ...VoteResolvers.Mutation,
+                ...InviteResolvers.Mutation
             }
         },
         context: async ({ req }) => {
