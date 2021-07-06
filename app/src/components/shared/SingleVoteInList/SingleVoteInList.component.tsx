@@ -166,7 +166,7 @@ export const SingleVoteInList: FunctionComponent<{
                                     <div onClick={() => {
                                         setIsShowingVotersModal(true);
                                         setUsersShowing(`Your Representatives Voting For on ${l.questionText}`);
-                                    }} className="vote-avatar tiny count for ml-n2">+{}</div>
+                                    }} className="vote-avatar tiny count for ml-n2">+{ }</div>
                                 </div>
                             </div>
                             <div className="d-flex ml-1">
@@ -208,36 +208,20 @@ export const SingleVoteInList: FunctionComponent<{
                         </div>
                     </div>
                 </div>
-                <Modal
-                    isOpen={isShowingVotersModal}
-                    // onAfterOpen={afterOpenModal}
-                    onRequestClose={() => setIsShowingVotersModal(false)}
-                    // style={customStyles}
-                    contentLabel="Example Modal"
-                    className="Modal"
-                    overlayClassName="Overlay"
-                >
-                    <div className="d-flex align-items-center mb-n2">
-                        <div onClick={() => setIsShowingVotersModal(false)} role="button">
-                            <XSVG />
-                        </div>
-                        <h4 className="ml-4 mb-0">{usersShowing}</h4>
-                    </div>
 
-                    <hr className="mb-0" />
-
-                    <div className="mt-n2">
-                        {people.map((el, i) => (
-                            <PersonInList
-                                key={el.name}
-                                person={el}
-                            />
-                        ))}
-                    </div>
-
-                    {/* <CreateVote group={groupName} /> */}
-
-                </Modal>
+                <div className="d-flex justify-content-center">
+                    {l.thisUserIsAdmin && (
+                        <>
+                            <div
+                                onClick={() => alert('soon, maybe')}
+                                className={`button_ small mx-1`}
+                            >Edit</div>
+                        </>
+                    )}
+                    <div
+                        className={`button_ small mx-1`}
+                    >Invite to Vote</div>
+                </div>
             </div>
         );
     }

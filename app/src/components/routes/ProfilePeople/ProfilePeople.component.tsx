@@ -5,7 +5,7 @@ import { useQuery } from "@apollo/client";
 
 import PersonInList from '@shared/PersonInList';
 import { people } from "@state/Mock/People";
-import { USER } from "@state/User/typeDefs";
+import { USER, USER_REPRESENTING, USER_REPRESENTED } from "@state/User/typeDefs";
 
 import './style.sass';
 
@@ -19,6 +19,24 @@ export const ProfilePeople: FunctionComponent<{}> = ({ }) => {
         data: user_data,
         refetch: user_refetch
     } = useQuery(USER, {
+        variables: { handle }
+    });
+
+    const {
+        loading: user_representing_loading,
+        error: user_representing_error,
+        data: user_representing_data,
+        refetch: user_representing_refetch
+    } = useQuery(USER_REPRESENTING, {
+        variables: { handle }
+    });
+
+    const {
+        loading: user_represented_loading,
+        error: user_represented_error,
+        data: user_represented_data,
+        refetch: user_represented_refetch
+    } = useQuery(USER_REPRESENTED, {
         variables: { handle }
     });
 
@@ -41,11 +59,29 @@ export const ProfilePeople: FunctionComponent<{}> = ({ }) => {
             </ul>
             <hr />
 
-            <div className="mt-n2">
-                {people.map((el, i) => (
-                    <PersonInList person={el} />
-                ))}
-            </div>
+            {which === 'representing' && (
+                // <pre>{JSON.stringify(user_representing_data?.UserRepresenting, null, 2)}</pre>
+                <div className="mt-n2">
+                    {user_representing_data?.UserRepresenting?.map((el, i) => (
+                        <PersonInList person={el} />
+                    ))}
+                    {!user_representing_data?.UserRepresenting?.length && (
+                        <>{`${profile?.name} isn't representing anyone yet.`}</>
+                    )}
+                </div>
+            )}
+
+            {which === 'represented' && (
+                // <pre>{JSON.stringify(user_represented_data?.UserRepresented, null, 2)}</pre>
+                <div className="mt-n2">
+                    {user_represented_data?.UserRepresented?.map((el, i) => (
+                        <PersonInList person={el} />
+                    ))}
+                    {!user_represented_data?.UserRepresented?.length && (
+                        <>{`${profile?.name} isn't represented by anyone yet.`}</>
+                    )}
+                </div>
+            )}
         </>
     );
 }

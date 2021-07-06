@@ -68,45 +68,72 @@ export const Group: FunctionComponent<{}> = ({ }) => {
 
     const selectedGroup = group_data?.Group;
 
-    const [isRepresenting, setIsRepresenting] = useState(false);
-    const [isJoined, setIsJoined] = useState(false);
-    const [isCreatingPoll, setIsCreatingPoll] = useState(false);
     const [selectedChannels, setSelectedChannels] = useState<string[]>([]);
 
-    const selectChannel = (channel: string) => {
-        if (selectedChannels.indexOf(channel) !== -1) {
-            setSelectedChannels(selectedChannels?.filter((el: any, i: number) => i !== selectedChannels.indexOf(channel)))
-        } else {
-            setSelectedChannels([...selectedChannels, channel])
-        }
+    const selectChannel = async (channel: string) => {
+
+        const updatedSelectedChannels = [
+            ...(selectedChannels.indexOf(channel) !== -1) ? selectedChannels?.filter(
+                (el: any, i: number) => i !== selectedChannels.indexOf(channel)
+            ) : [...selectedChannels, channel],
+        ]
+
+        setSelectedChannels(updatedSelectedChannels);
+        saveSetSelectedChannels({ updatedSelectedChannels });
     }
 
     const selectAllChannels = () => {
-        // TODO
-        if (selectedChannels.length === selectedGroup.channels.length) {
-            setSelectedChannels([]);
-        } else {
-            setSelectedChannels(selectedGroup?.channels?.map((s: any) => s.name));
-        }
+
+        const updatedSelectedChannels = [
+            ...(selectedChannels.length === selectedGroup.channels.length) ?
+                [] :
+                selectedGroup?.channels?.map((s: any) => s.name)
+        ]
+
+        setSelectedChannels(updatedSelectedChannels);
+        saveSetSelectedChannels({ updatedSelectedChannels });
     }
 
-    useEffect(() => {
-        if (authUser && selectedGroup) {
+    const saveSetSelectedChannels = (
+        { updatedSelectedChannels }:
+            { updatedSelectedChannels: any }
+    ) => {
+        if (authUser?.LiquidUser) {
             editGroupMemberChannelRelation({
                 variables: {
                     UserHandle: authUser.LiquidUser.handle,
                     GroupHandle: selectedGroup.handle,
-                    Channels: selectedChannels
+                    Channels: updatedSelectedChannels,
                 }
             });
-        } else if (selectedChannels?.length === 0 && selectedGroup) {
-            selectAllChannels();
         }
-    }, [selectedChannels, selectedGroup]);
+    }
+
+    useEffect(() => {
+        console.log({
+            c: selectedGroup?.yourMemberRelation,
+            is: !!selectedGroup?.yourMemberRelation?.channels
+        });
+
+        if (!!selectedGroup?.yourMemberRelation?.channels) {
+            setSelectedChannels(
+                selectedGroup?.yourMemberRelation?.channels
+            );
+        } else {
+            setSelectedChannels(
+                selectedGroup?.channels?.map((s: any) => s.name) || []
+            );
+        }
+    }, [selectedGroup]);
 
     useEffect(() => {
         ReactTooltip.rebuild();
     }, [group_loading]);
+
+
+    const isMember =
+        selectedGroup?.yourMemberRelation ||
+        editGroupMemberChannelRelation_data?.editGroupMemberChannelRelation?.isMember;
 
     return group_loading ? (<>Loading</>) : group_error ? (<>Error</>) : (
         <>
@@ -148,16 +175,22 @@ export const Group: FunctionComponent<{}> = ({ }) => {
                                         modalData: JSON.stringify({ groupHandle: selectedGroup?.handle })
                                     }
                                 })}
-                                className={`button_ small ml-1 mb-0`}
+                                className={`button_ small ml-2 mb-0`}
                             >
                                 Edit
                             </div>
                         ) : (
                             <div
-                                onClick={() => setIsJoined(!isJoined)}
-                                className={`button_ small mb-0 ${isJoined ? "selected" : ""}`}
+                                onClick={() => editGroupMemberChannelRelation({
+                                    variables: {
+                                        UserHandle: authUser?.LiquidUse?.handle,
+                                        GroupHandle: selectedGroup.handle,
+                                        IsMember: !selectedGroup?.yourMemberRelation?.isMember
+                                    }
+                                })}
+                                className={`button_ small ml-2 mb-0 ${isMember ? "selected" : ""}`}
                             >
-                                {isJoined ? "Joined" : "Ask to Join"}
+                                {isMember ? "Joined" : "Join"}
                             </div>
                         )}
                     {/* <div
@@ -220,7 +253,7 @@ export const Group: FunctionComponent<{}> = ({ }) => {
                         >All</div>
                         {selectedGroup?.channels?.map((el: any, i: any) => (
                             <div
-                                key={'s-'+el.name}
+                                key={'s-' + el.name}
                                 onClick={() => selectChannel(el.name)}
                                 className={`badge pointer ${selectedChannels.indexOf(el.name) === -1 && 'inverted'} ml-1 mb-1 mt-1`}
                             >{el.name}</div>
@@ -263,7 +296,7 @@ export const Group: FunctionComponent<{}> = ({ }) => {
 
             <hr />
 
-            { (!section || section === 'polls') && (
+            {(!section || section === 'polls') && (
                 <div>
                     <GroupPolls selectedChannels={selectedChannels} />
 
@@ -287,14 +320,14 @@ export const Group: FunctionComponent<{}> = ({ }) => {
                     } */}
                 </div>
             )}
-            { section === 'members' && (
+            {section === 'members' && (
                 <div className="mt-n2">
                     {people.map((el, i) => (
                         <PersonInList person={el} />
                     ))}
                 </div>
             )}
-            { section === 'subgroups' && (
+            {section === 'subgroups' && (
                 <div className="mt-n2">
                     {selectedGroup.subGroups?.map((el, i) => (
                         <GroupInList group={el} />

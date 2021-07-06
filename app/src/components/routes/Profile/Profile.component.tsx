@@ -72,17 +72,30 @@ export const Profile: FunctionComponent<{}> = ({ }) => {
                         <AddNotificationSVG />
                     </div> */}
                     {profile.isThisUser ? (
-                        <div
-                            onClick={() => updateParams({
-                                paramsToAdd: {
-                                    modal: "EditProfile",
-                                    modalData: JSON.stringify({ userHandle: profile.handle })
-                                }
-                            })}
-                            className={`button_`}
-                        >
-                            Edit profile
-                        </div>
+                        <>
+                            <div
+                                onClick={() => updateParams({
+                                    paramsToAdd: {
+                                        modal: "InviteForRepresentation",
+                                        modalData: JSON.stringify({ userHandle: profile.handle })
+                                    }
+                                })}
+                                className={`button_ small mr-1`}
+                            >
+                                Invite Representees
+                            </div>
+                            <div
+                                onClick={() => updateParams({
+                                    paramsToAdd: {
+                                        modal: "EditProfile",
+                                        modalData: JSON.stringify({ userHandle: profile.handle })
+                                    }
+                                })}
+                                className={`button_ small`}
+                            >
+                                Edit profile
+                            </div>
+                        </>
                     ) : (
                         <div
                             // onClick={() => setIsRepresenting(!isRepresenting)}
@@ -95,9 +108,9 @@ export const Profile: FunctionComponent<{}> = ({ }) => {
                                     })
                                 }
                             })}
-                            className={`button_ ${isRepresenting ? "selected" : ""}`}
+                            className={`button_ small ${profile.isRepresentingYou ? "selected" : ""}`}
                         >
-                            {isRepresenting ? "Represents You" : "Delegate Votes To"}
+                            {profile.isRepresentingYou ? `Represents you in ${profile.isRepresentingYou} group` : "Delegate Votes To"}
                         </div>
                     )}
                 </div>
@@ -131,10 +144,10 @@ export const Profile: FunctionComponent<{}> = ({ }) => {
             </div>
             <div className="profile-stats-container">
                 <Link to={`/profile-people/${profile.handle}/representing`}>
-                    <b>{profile.representing}</b> Representing {profile.name}
+                    <b>{profile?.stats?.representing}</b> Representing {profile.name}
                 </Link>
                 <Link to={`/profile-people/${profile.handle}/represented`} className="ml-2">
-                    <b>{profile.representedBy}</b> Represented by {profile.name}
+                    <b>{profile?.stats?.representedBy}</b> Represented by {profile.name}
                 </Link>
             </div>
 

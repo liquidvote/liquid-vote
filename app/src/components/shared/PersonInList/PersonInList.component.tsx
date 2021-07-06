@@ -10,39 +10,44 @@ export const PersonInList: FunctionComponent<{ person: any }> = ({ person }) => 
     return (
         <div className="d-flex relative border-bottom py-2">
             <Link to="/profile">
-                <div className={`small-avatar avatar-${person.avatarClass} bg`}></div>
+                <div
+                    className="small-avatar bg"
+                    style={{
+                        background: person.avatar && `url(${person.avatar}) no-repeat`,
+                        backgroundSize: 'cover'
+                    }}
+                ></div>
             </Link>
             <div className="flex-fill">
                 <div className="d-flex justify-content-between align-items-center flex-wrap">
-                    <Link to="/profile" className="d-flex flex-column mb-1">
+                    <Link to={`/profile/${person.handle}`} className="d-flex flex-column mb-1">
                         <b>{person.name}</b>
-                        <small className="mt-n1">@{person.name.replace(" ", "")}</small>
+                        <small className="mt-n1">@{person.handle}</small>
                     </Link>
                     <div className="d-flex mb-1 ml-n1">
                         <div
                             // onClick={() => setIsRepresenting(!isRepresenting)}
                             className={`button_ small mb-0`}
                         >
-                            Invite to Group
+                            Invite to Group (TODO)
                         </div>
                         <div
                             onClick={() => setIsRepresenting(!isRepresenting)}
-                            className={`button_ small mb-0 ${isRepresenting ? "selected" : ""}`}
+                            className={`button_ small mb-0 ml-1 ${isRepresenting ? "selected" : ""}`}
                         >
-                            {isRepresenting ? "Represents You" : "Delegate Votes To"}
+                            {isRepresenting ? "Represents You" : "Delegate Votes To"} (TODO)
                         </div>
                     </div>
                 </div>
                 <small className="d-flex mb-0">
-                    I cut my CEO pay by a million dollars so all workers could make at
-                    least $70,000 per year.
-                    Author of WORTH IT - buy it for your boss from a small bookstore
+                    {person.bio}
                 </small>
                 <small>
                     Voted the same as you in
                     {' '}<b className="white forDirect px-1 rounded">{useMemo(() => Math.floor(Math.random() * 100), [])}</b>
                     {' '}polls and different in
                     {' '}<b className="white againstDirect px-1 rounded">{useMemo(() => Math.floor(Math.random() * 100), [])}</b>
+                    {' '}(TODO)
                 </small>
             </div>
         </div>
