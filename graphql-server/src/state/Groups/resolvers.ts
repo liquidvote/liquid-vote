@@ -14,12 +14,6 @@ export const GroupResolvers = {
                     'groupId': ObjectID(Group._id)
                 })) : {};
 
-            // console.log({
-            //     GroupMemberRelation,
-            //     AuthUser,
-            //     Group
-            // });
-
             return {
                 ...Group,
                 thisUserIsAdmin: !!Group.admins.find(u => u.handle === AuthUser?.LiquidUser?.handle),
@@ -27,7 +21,7 @@ export const GroupResolvers = {
                 //     ...g,
                 //     // thisUserIsAdmin: !!g.admins.find(u => u.handle === AuthUser?.LiquidUser?.handle),
                 // }))
-                memberRelation: GroupMemberRelation
+                yourMemberRelation: GroupMemberRelation
             };
         },
         GroupMembers: async (_source, { handle }, { mongoDB, s3, AuthUser }) => {

@@ -18,7 +18,7 @@ export const UserTypeDefs = gql`
         # groups: Int
         # directVotes: String
         isThisUser: Boolean
-        isRepresentingYou: Boolean
+        isRepresentingYou: Int
         stats: UserStats
     }
 
@@ -31,17 +31,13 @@ export const UserTypeDefs = gql`
         indirectVotesMade: Int
     }
 
-    type UserRepresentativeRelation {
+    type UserRepresentativeGroupRelation {
         representativeId: String
         representeeId: String
-        createdOn: String
-        lastEditOn: String
-        groups: [UserRepresentativeGroupRelation]
-    }
-
-    type UserRepresentativeGroupRelation {
-        groupHandle: String
+        groupId: String
         channelNames: [String]
+        isRepresentingYou: Boolean
+        isGroupMember: Boolean
         createdOn: String
         lastEditOn: String
     }
@@ -51,11 +47,25 @@ export const UserTypeDefs = gql`
         UserRepresenting(handle: String): [User]
         UserRepresented(handle: String): [User]
         UserDirectVotes(handle: String): JSON
-        UserGroups(handle: String): [Group]
+        UserGroups(
+            handle: String,
+            representative: String
+        ): [Group]
     }
 
     extend type Mutation {
         editUser(User: JSON): JSON
-        editGroupMemberChannelRelation(UserHandle: String, GroupHandle: String, Channels: [String] ): JSON
+        editGroupMemberChannelRelation(
+            UserHandle: String,
+            GroupHandle: String,
+            Channels: [String],
+            IsMember: Boolean
+        ): GroupMemberRelation
+        editUserRepresentativeGroupRelation(
+            RepresenteeHandle: String,
+            RepresentativeHandle: String,
+            Group: String,
+            IsRepresentingYou: Boolean
+        ): UserRepresentativeGroupRelation
     }
 `;
