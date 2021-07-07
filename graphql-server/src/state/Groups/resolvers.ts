@@ -7,7 +7,6 @@ export const GroupResolvers = {
             const Group = await mongoDB.collection("Groups")
                 .findOne({ 'handle': handle });
 
-
             const GroupMemberRelation = AuthUser ? (await mongoDB.collection("GroupMembers")
                 .findOne({
                     'userId': ObjectID(AuthUser._id),
@@ -21,7 +20,12 @@ export const GroupResolvers = {
                 //     ...g,
                 //     // thisUserIsAdmin: !!g.admins.find(u => u.handle === AuthUser?.LiquidUser?.handle),
                 // }))
-                yourMemberRelation: GroupMemberRelation
+                yourMemberRelation: GroupMemberRelation,
+                stats: getGroupStats({
+                    groupHandle: Group.handle,
+                    groupId: Group._id,
+                    mongoDB
+                })
             };
         },
         GroupMembers: async (_source, { handle }, { mongoDB, s3, AuthUser }) => {
@@ -29,7 +33,23 @@ export const GroupResolvers = {
             const Group = await mongoDB.collection("Groups")
                 .findOne({ 'handle': handle });
 
-            return [];
+            const GroupMemberRelations = (
+                await mongoDB.collection("GroupMembers")
+                    .find({
+                        'groupId': ObjectID(Group._id),
+                        'isMember': true
+                    }).toArray()
+            );
+
+            const Members = (
+                await mongoDB.collection("Users").find({
+                    "_id": {
+                        "$in": GroupMemberRelations.map(r => ObjectID(r.userId))
+                    }
+                }).toArray()
+            )?.map(u => u?.LiquidUser);
+
+            return Members;
         },
         GroupQuestions: async (_source, { handle, channels }, { mongoDB, s3, AuthUser }) => {
 
@@ -94,13 +114,7 @@ export const GroupResolvers = {
                     'privacy': Group.privacy,
                     'channels': [{
                         name: 'general',
-                        // purpose: 'An automatically generated channel',
-                        // createdOn: Date.now(),
-                        // lastEditOn: Date.now(),
-                        // members: 1,
-                        // questions: 0
-                    }],
-                    members: 1
+                    }]
                 }))?.ops[0] : (
                     AuthUser &&
                     Group_.admins.find(u => u.handle === AuthUser.LiquidUser.handle)
@@ -214,3 +228,33 @@ export const GroupResolvers = {
         },
     },
 };
+
+const getGroupStats = async ({ groupId, groupHandle, mongoDB }) => {
+
+    return ({
+        lastDirectVoteOn: 0,
+        members: await mongoDB.collection("GroupMembers")
+            .find({
+                "groupId": ObjectID(groupId),
+                "isMember": true
+            }).count(),
+        questions: await mongoDB.collection("Questions")
+            .find({
+                "groupChannel.group": groupHandle,
+            }).count(),
+        representations: await mongoDB.collection("UserRepresentations")
+            .find({
+                "groupId": ObjectID(groupId),
+            }).count(),
+        directVotesMade: await mongoDB.collection("Votes")
+            .find({
+                "groupChannel.group": groupHandle,
+                "isDirect": true
+            }).count(),
+        indirectVotesMade: await mongoDB.collection("Votes")
+            .find({
+                "groupChannel.group": groupHandle,
+                "isDirect": false
+            }).count()
+    });
+}

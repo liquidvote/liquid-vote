@@ -1,11 +1,13 @@
-import React, { FunctionComponent, useState } from 'react';
+import React, { FunctionComponent, useState, useEffect } from 'react';
 import { Link, useParams } from "react-router-dom";
 import { DiscussionEmbed } from 'disqus-react';
 import numeral from 'numeral';
 import ReactTooltip from 'react-tooltip';
 import Modal from 'react-modal';
+import { useQuery, useMutation } from "@apollo/client";
 
 import VoteGraph1 from "@shared/VoteGraph1";
+import Chart from "@shared/VoteGraph1/chart.svg";
 import Header from "@shared/Header";
 import DropPlusSVG from "@shared/Icons/Drop+.svg";
 import XSVG from "@shared/Icons/X.svg";
@@ -16,112 +18,99 @@ import {
     onSubTopics
 } from "@state/Mock/Votes";
 import SubVote from '@shared/SubVote';
-import GroupSvg from "@shared/Icons/Group.svg";
+import GroupSmallSvg from "@shared/Icons/Group-small.svg";
 import { people } from "@state/Mock/People";
 import PersonInList from '@shared/PersonInList';
 import { VoteTimeline } from "@state/Mock/Notifications";
 import Notification from '@shared/Notification';
+import { QUESTION } from '@state/Question/typeDefs';
+import { voteStatsMap } from '@state/Question/map';
+import { EDIT_VOTE } from '@state/Vote/typeDefs';
 
-export default function Vote() {
+export default function Question() {
 
-    let { voteName, section } = useParams<any>();
+    let { voteName, groupChannel, section } = useParams<any>();
+
+    const groupChannel_ = (([g, c]) => ({
+        group: g,
+        channel: c
+    }))(groupChannel.split("-"))
+
+    const {
+        loading: question_loading,
+        error: question_error,
+        data: question_data,
+        refetch: question_refetch
+    } = useQuery(QUESTION, {
+        variables: {
+            questionText: voteName,
+            group: groupChannel_.group,
+            channel: groupChannel_.channel
+        }
+    });
+
+    const [editVote, {
+        loading: editVote_loading,
+        error: editVote_error,
+        data: editVote_data,
+    }] = useMutation(EDIT_VOTE);
+
+    console.log({
+        question_data
+    });
 
     const [userVote, setUserVote] = useState(null);
-    const [isPollingInOtherGroup, setIsPollingInOtherGroup] = useState(false);
-    const [isShowingVotersModal, setIsShowingVotersModal] = useState(false);
-    const [usersShowing, setUsersShowing] = useState('');
-    const [selectedGroups, setSelectedGroups] = useState(['Algarve Flats']);
 
-    const selectGroup = (group: string) => {
-        if (selectedGroups.indexOf(group) !== -1) {
-            setSelectedGroups(selectedGroups.filter((el, i) => i !== selectedGroups.indexOf(group)))
-        } else {
-            setSelectedGroups([...selectedGroups, group])
-        }
-    }
+    useEffect(() => {
+        setUserVote(question_data?.Question?.userVote?.position || null);
+    }, [question_data?.Question?.userVote?.position]);
 
-    const openStats = (for_: any) => {
-        alert(`TODO: open stats for ${for_}`);
-    };
+    console.log({
+        userVote,
+        v: question_data?.Question?.userVote?.position
+    });
+    // const [isPollingInOtherGroup, setIsPollingInOtherGroup] = useState(false);
+    // const [isShowingVotersModal, setIsShowingVotersModal] = useState(false);
+    // const [usersShowing, setUsersShowing] = useState('');
 
     const handleUserVote = (vote: string) => {
-        if (vote === userVote) {
-            setUserVote(null)
-        } else {
-            setUserVote(vote);
-        }
+        editVote({
+            variables: {
+                questionText: question_data?.Question?.questionText,
+                // choiceText
+                group: question_data?.Question?.groupChannel.group,
+                channel: question_data?.Question?.groupChannel.channel,
+                Vote: {
+                    position: (vote === userVote) ? null : vote
+                },
+            }
+        }).then(({ data }) => {
+            setUserVote(data?.editVote?.position);
+            console.log({
+                editVote: data?.editVote
+            })
+        });
     }
 
-    const stats = (({ forCount, againstCount, forDirectCount, againstDirectCount }) => {
-        const forPercentage = (!forCount && !againstCount) ? 50 : ((forCount / (forCount + againstCount)) * 100);
-        const forDirectPercentage = (forDirectCount / (forCount + againstCount)) * 100 || 50;
-        const forDelegatedPercentage = ((forCount - forDirectCount) / (forCount + againstCount)) * 100;
-        const againstPercentage = 100 - forPercentage;
-        const againstDirectPercentage = (againstDirectCount / (forCount + againstCount)) * 100 || 50;
-        const againstDelegatedPercentage = ((againstCount - againstDirectCount) / (forCount + againstCount)) * 100;
-
-        return {
-            forDelegatedPercentage,
-            forDirectPercentage,
-            againstDelegatedPercentage,
-            againstDirectPercentage
+    const stats = voteStatsMap({
+        forCount: question_data?.Question?.stats.forCount,
+        againstCount: question_data?.Question?.stats.againstCount,
+        forDirectCount: question_data?.Question?.stats.forDirectCount,
+        againstDirectCount: question_data?.Question?.stats.againstDirectCount,
+        ...(!!editVote_data?.editVote?.QuestionStats) && {
+            forCount: editVote_data?.editVote?.QuestionStats.forCount,
+            againstCount: editVote_data?.editVote?.QuestionStats.againstCount,
+            forDirectCount: editVote_data?.editVote?.QuestionStats.forDirectCount,
+            againstDirectCount: editVote_data?.editVote?.QuestionStats.againstDirectCount,
         }
-    })({
-        forCount: defaults.forCount,
-        againstCount: defaults.againstCount,
-        forDirectCount: defaults.forDirectCount,
-        againstDirectCount: defaults.againstDirectCount,
-    })
+    });
+    console.log({
+        stats
+    });
 
     return (
         <>
             <ReactTooltip place="bottom" type="dark" effect="solid" />
-            <Modal
-                isOpen={isPollingInOtherGroup}
-                // onAfterOpen={afterOpenModal}
-                onRequestClose={() => setIsPollingInOtherGroup(false)}
-                // style={customStyles}
-                contentLabel="Example Modal"
-                className="Modal"
-                overlayClassName="Overlay"
-            >
-                <div className="d-flex align-items-center mb-n2">
-                    <div onClick={() => setIsPollingInOtherGroup(false)} role="button">
-                        <XSVG />
-                    </div>
-                </div>
-
-                <hr />
-                <div>Todo: List Groups here</div>
-            </Modal>
-            <Modal
-                isOpen={isShowingVotersModal}
-                // onAfterOpen={afterOpenModal}
-                onRequestClose={() => setIsShowingVotersModal(false)}
-                // style={customStyles}
-                contentLabel="Example Modal"
-                className="Modal"
-                overlayClassName="Overlay"
-            >
-                <div className="d-flex align-items-center mb-n2">
-                    <div onClick={() => setIsShowingVotersModal(false)} role="button">
-                        <XSVG />
-                    </div>
-                    <h4 className="ml-4 mb-0">{usersShowing}</h4>
-                </div>
-
-                <hr className="mb-0" />
-
-                <div className="mt-n2">
-                    {people.map((el, i) => (
-                        <PersonInList person={el} />
-                    ))}
-                </div>
-
-                {/* <CreateVote group={groupName} /> */}
-
-            </Modal>
-
 
             <Header title="Opinion Poll" />
 
@@ -129,23 +118,30 @@ export default function Vote() {
             <h2 className="mb-2 white"><b>{voteName}</b>?</h2>
 
             <div>
-                {/* <h4 onClick={() => openStats("Vote")}>Opinions</h4> */}
                 <div className="bar-wrapper">
-                    <VoteGraph1 {...defaults} />
+                    <Chart
+                        name={question_data?.Question?.questionText}
+                        forDirectCount={stats.forDirectCount}
+                        forCount={stats.forCount}
+                        againstDirectCount={stats.againstDirectCount}
+                        againstCount={stats.againstCount}
+                        userVote={null}
+                        userDelegatedVotes={null}
+                    />
                 </div>
 
                 <div className="d-flex color-legend mt-2 mb-n2">
                     <div>
-                        <small>Direct For</small><div className="color forDirect count">{stats.forDirectPercentage.toFixed(0)}%</div>
+                        <small>Direct For</small><div className="color forDirect count">{stats?.forDirectPercentage.toFixed(0)}%</div>
                     </div>
                     <div>
-                        <small>Delegated For</small><div className="color for count">{stats.forDelegatedPercentage.toFixed(0)}%</div>
+                        <small>Delegated For</small><div className="color for count">{stats?.forDelegatedPercentage.toFixed(0)}%</div>
                     </div>
                     <div>
-                        <small>Direct Against</small><div className="color againstDirect count">{stats.againstDirectPercentage.toFixed(0)}%</div>
+                        <small>Direct Against</small><div className="color againstDirect count">{stats?.againstDirectPercentage.toFixed(0)}%</div>
                     </div>
                     <div>
-                        <small>Delegated Against</small><div className="color against count">{stats.againstDelegatedPercentage.toFixed(0)}%</div>
+                        <small>Delegated Against</small><div className="color against count">{stats?.againstDelegatedPercentage.toFixed(0)}%</div>
                     </div>
                 </div>
 
@@ -205,23 +201,36 @@ export default function Vote() {
 
                 <div className="mt-4 d-flex align-items-start flex-nowrap justify-content-between">
                     <div className="d-flex flex-nowrap">
-                        <div data-tip="Selected groups"><GroupSvg /></div>
+                        <div data-tip="Selected groups"><GroupSmallSvg /></div>
                         <div className="d-flex flex-wrap justify-content-start">
-                            <div className="badge inverted ml-1 mb-1 mt-1">All</div>
-                            <div onClick={() => selectGroup('Algarve Flats')} className={`badge ${selectedGroups.indexOf('Algarve Flats') === -1 && 'inverted'} ml-1 mb-1 mt-1`}>Algarve Flats</div>
-                            <div onClick={() => selectGroup('Moon Investors')} className={`badge ${selectedGroups.indexOf('Moon Investors') === -1 && 'inverted'} ml-1 mb-1 mt-1`}>Moon Investors</div>
-                            <div onClick={() => selectGroup('💩s')} className={`badge ${selectedGroups.indexOf('💩s') === -1 && 'inverted'} ml-1 mb-1 mt-1`}>💩s</div>
-                            <div onClick={() => selectGroup('Shoreditch Neighborhood')} className={`badge ${selectedGroups.indexOf('Shoreditch Neighborhood') === -1 && 'inverted'} ml-1 mb-1 mt-1`}>Shoreditch Neighborhood</div>
-                            {/*
-                            <div onClick={() => selectGroup('Moon Investors')} className={`badge ${selectedGroups.indexOf('Moon Investors') === -1 && 'inverted'} ml-1 mb-1 mt-1`}>Moon Investors</div>
-                            <div onClick={() => selectGroup('Moon Investors')} className={`badge ${selectedGroups.indexOf('Moon Investors') === -1 && 'inverted'} ml-1 mb-1 mt-1`}>Moon Investors</div>
-                            */}
-                            <div className={`badge inverted ml-1 mb-1 mt-1`}>+3</div>
+                            <Link
+                                to={`/group/${question_data?.Question?.groupChannel.group}`}
+                                className="badge ml-1 mb-1 mt-1"
+                            >
+                                {question_data?.Question?.groupChannel.group}:
+                                {question_data?.Question?.groupChannel.channel}
+                            </Link>
                         </div>
                     </div>
-                    <div onClick={() => setIsPollingInOtherGroup(true)} className="button_ small mb-0 mw-25">
-                        poll this in another group
+                    <div className="d-flex justify-content-center">
+                        {question_data?.Question?.thisUserIsAdmin && (
+                            <>
+                                <div
+                                    onClick={() => alert('soon')}
+                                    className={`button_ small mx-1`}
+                                >Edit</div>
+                            </>
+                        )}
+                        <div
+                            className={`button_ small mx-1`}
+                        >Invite to Vote</div>
                     </div>
+                    <small data-tip="Last vote was">
+                        {question_data?.Question?.stats?.lastVoteOn || '3s ago 🧪'}
+                    </small>
+                    {/* <div onClick={() => setIsPollingInOtherGroup(true)} className="button_ small mb-0 mw-25">
+                        poll this in another group
+                    </div> */}
                 </div>
 
                 <br />
@@ -230,11 +239,6 @@ export default function Vote() {
                     <li className="nav-item">
                         <Link className={`nav-link ${(!section || section === 'timeline') && 'active'}`} to={`/poll/${voteName}/timeline`}>
                             Timeline
-                        </Link>
-                    </li>
-                    <li className="nav-item">
-                        <Link className={`nav-link ${(section === 'subpolls') && 'active'}`} to={`/poll/${voteName}/subpolls`}>
-                            <b>18</b> Sub Polls
                         </Link>
                     </li>
                     <li className="nav-item">
@@ -251,24 +255,6 @@ export default function Vote() {
 
                 <br />
                 <br />
-
-                {/* <h3>Sub polls</h3> */}
-                {section === 'subpolls' && (
-                    <div className="bar-container-horizontal">
-                        {onSubTopics.map((l, i) => (
-                            <SubVote
-                                l={{ ...l, name: voteName }}
-                                i={i}
-                            />
-                        ))}
-                        <div className="d-flex justify-content-center mt-3" data-tip="Create Sub Poll">
-                            <Link to="#" onClick={() => alert("allows anyone to create a sub poll")} className="button_ icon-contain inverted">
-                                <DropPlusSVG />
-                            </Link>
-                        </div>
-                    </div>
-                )}
-
 
                 {(section === 'votesby') && (
                     <div>

@@ -24,10 +24,10 @@ export default function App() {
                 <SideMenu />
                 <div className="App border-sides">
                     <Switch>
-                        <Route path="/poll/:voteName/:section" component={loadable(() => import('./components/routes/Vote'))} />
-                        <Route path="/poll/:voteName" component={loadable(() => import('./components/routes/Vote'))} />
-                        <Route path="/multipoll/:voteName/:section" component={loadable(() => import('./components/routes/VoteMulti'))} />
-                        <Route path="/multipoll/:voteName" component={loadable(() => import('./components/routes/VoteMulti'))} />
+                        <Route path="/poll/:voteName/:groupChannel/:section" component={loadable(() => import('./components/routes/Question'))} />
+                        <Route path="/poll/:voteName/:groupChannel" component={loadable(() => import('./components/routes/Question'))} />
+                        <Route path="/multipoll/:voteName/:groupChannel/:section" component={loadable(() => import('./components/routes/QuestionMulti'))} />
+                        <Route path="/multipoll/:voteName/:groupChannel" component={loadable(() => import('./components/routes/QuestionMulti'))} />
                         <Route path="/grouping/:groupType/:groupFilter" component={loadable(() => import('./components/routes/Grouping'))} />
                         <Route path="/register" component={loadable(() => import('./components/Routes/CreateProfile'))} />
                         <Route path="/create-vote" component={loadable(() => import('./components/Routes/CreateVote'))} />

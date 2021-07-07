@@ -228,7 +228,7 @@ export const Group: FunctionComponent<{}> = ({ }) => {
             </div>
             <div className="profile-stats-container">
                 <Link to={`/group-people/${selectedGroup?.handle}`}>
-                    <b>{selectedGroup?.members}</b> Member{selectedGroup?.members.length > 1 && 's'}
+                    <b>{selectedGroup?.stats?.members || 0}</b> Member{selectedGroup?.members !== 1 && 's'}
                 </Link>
                 {/* <Link to={`/group/${groupName}/subgroups`} className="ml-2">
                     <b>16</b> Sub Groups

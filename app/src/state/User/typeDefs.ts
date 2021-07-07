@@ -98,8 +98,6 @@ export const USER_GROUPS = gql`
         externalLink
         createdOn
         lastEditOn
-        members
-        questions
         thisUserIsAdmin
         admins {
             name
@@ -118,6 +116,14 @@ export const USER_GROUPS = gql`
             isGroupMember
             createdOn
             lastEditOn
+        }
+        stats {
+            lastDirectVoteOn
+            members
+            questions
+            representations
+            directVotesMade
+            indirectVotesMade
         }
     }
   }
