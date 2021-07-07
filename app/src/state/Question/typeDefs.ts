@@ -1,18 +1,45 @@
 import { gql, useMutation } from '@apollo/client';
 
 export const QUESTION = gql`
-  query($handle: String!) {
-    Question(handle: $handle) {
-        questionType
-        voteText
-        startText
-        choices
-        groupChannel
-        resultsOn
-        createdOn,
-        lastEditOn,
+  query(
+      $questionText: String!,
+      $group: String!,
+      $channel: String!
+    ) {
+        Question(
+            questionText: $questionText,
+            group: $group,
+            channel: $channel
+        ) {
+            questionText
+            questionType
+            startText
+            # choices
+            groupChannel{
+                group
+                channel
+            }
+            resultsOn
+            createdOn
+            lastEditOn
+            thisUserIsAdmin
+            stats {
+                lastVoteOn
+                forCount
+                forDirectCount
+                forMostRelevantVoters
+                againstCount
+                againstMostRelevantVoters
+                againstDirectCount
+            }
+            userVote {
+                position
+                representatives {
+                    representativeHandle
+                }
+            }
+        }
     }
-  }
 `;
 
 export const QUESTIONS = gql`
@@ -26,6 +53,21 @@ export const QUESTIONS = gql`
             stats {
                 ...stats
             }
+            userVote {
+                position
+                representatives {
+                    representativeHandle
+                    representativeAvatar
+                    representativeName
+                    position
+
+                    createdOn
+                    lastEditOn
+                }
+                
+                createdOn
+                lastEditOn
+            }
         }
         groupChannel {
             group
@@ -36,20 +78,6 @@ export const QUESTIONS = gql`
         stats {
             ...stats
         }
-        createdOn
-        lastEditOn
-        thisUserIsAdmin
-    }
-  }
-
-  fragment stats on QuestionStats {
-		lastVoteOn
-        forCount
-        forDirectCount
-        forMostRelevantVoters
-        againstCount
-        againstMostRelevantVoters
-        againstDirectCount
         userVote {
           position
           representatives {
@@ -65,6 +93,20 @@ export const QUESTIONS = gql`
           createdOn
           lastEditOn
         }
+        createdOn
+        lastEditOn
+        thisUserIsAdmin
+    }
+  }
+
+  fragment stats on QuestionStats {
+		lastVoteOn
+        forCount
+        forDirectCount
+        forMostRelevantVoters
+        againstCount
+        againstMostRelevantVoters
+        againstDirectCount
     }
 `;
 

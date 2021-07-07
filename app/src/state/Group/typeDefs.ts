@@ -11,8 +11,6 @@ export const GROUP = gql`
         externalLink,
         createdOn,
         lastEditOn,
-        members,
-        questions,
         admins {
             name,
             avatar,
@@ -37,13 +35,42 @@ export const GROUP = gql`
             # admins,
             # thisUserIsAdmin
         }
+        stats {
+            lastDirectVoteOn
+            members
+            questions
+            representations
+            directVotesMade
+            indirectVotesMade
+        }
     }
   }
 `;
 
 export const GROUP_MEMBERS = gql`
   query($handle: String!) {
-    GroupMembers(handle: $handle)
+    GroupMembers(handle: $handle) {
+        handle,
+        name,
+        bio,
+        email,
+        avatar,
+        cover,
+        location,
+        externalLink,
+        joinedOn,
+        lastEditOn,
+        isThisUser
+        isRepresentingYou
+        stats {
+            lastDirectVoteOn
+            representing
+            representedBy
+            groupsJoined
+            directVotesMade
+            indirectVotesMade
+        }
+    }
   }
 `;
 

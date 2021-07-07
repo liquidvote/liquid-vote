@@ -110,7 +110,11 @@ export const Profile: FunctionComponent<{}> = ({ }) => {
                             })}
                             className={`button_ small ${profile.isRepresentingYou ? "selected" : ""}`}
                         >
-                            {profile.isRepresentingYou ? `Represents you in ${profile.isRepresentingYou} group` : "Delegate Votes To"}
+                            {
+                                profile.isRepresentingYou ?
+                                    `Represents you in ${profile.isRepresentingYou} group` :
+                                    "Delegate Votes To"
+                            }
                         </div>
                     )}
                 </div>

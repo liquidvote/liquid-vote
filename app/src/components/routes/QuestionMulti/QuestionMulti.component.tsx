@@ -22,7 +22,7 @@ import PersonInList from '@shared/PersonInList';
 import { VoteTimeline } from "@state/Mock/Notifications";
 import Notification from '@shared/Notification';
 
-export default function VoteMulti() {
+export default function QuestionMulti() {
 
     let { voteName, section } = useParams<any>();
 

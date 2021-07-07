@@ -10,6 +10,7 @@ import XSVG from "@shared/Icons/X.svg";
 import { people } from "@state/Mock/People";
 import PersonInList from '@shared/PersonInList';
 import { EDIT_VOTE } from '@state/Vote/typeDefs';
+import { voteStatsMap } from '@state/Question/map';
 
 import './style.sass';
 
@@ -34,7 +35,7 @@ export const SingleVoteInList: FunctionComponent<{
         }] = useMutation(EDIT_VOTE);
 
         const [userVote, setUserVote] = React.useState(
-            l?.stats?.userVote?.position || null
+            l?.userVote?.position || null
         );
 
         const handleUserVote = (vote: string) => {
@@ -59,26 +60,7 @@ export const SingleVoteInList: FunctionComponent<{
         const [isShowingVotersModal, setIsShowingVotersModal] = useState(false);
         const [usersShowing, setUsersShowing] = useState('');
 
-        const stats = (({ forCount, againstCount, forDirectCount, againstDirectCount }) => {
-            const forPercentage = (!forCount && !againstCount) ? 50 : ((forCount / (forCount + againstCount)) * 100);
-            const forDirectPercentage = (forDirectCount / (forCount + againstCount)) * 100 || 50;
-            const forDelegatedPercentage = ((forCount - forDirectCount) / (forCount + againstCount)) * 100;
-            const againstPercentage = 100 - forPercentage;
-            const againstDirectPercentage = (againstDirectCount / (forCount + againstCount)) * 100 || 50;
-            const againstDelegatedPercentage = ((againstCount - againstDirectCount) / (forCount + againstCount)) * 100;
-
-            return {
-                forDelegatedPercentage,
-                forDirectPercentage,
-                againstDelegatedPercentage,
-                againstDirectPercentage,
-
-                forCount,
-                againstCount,
-                forDirectCount,
-                againstDirectCount
-            }
-        })({
+        const stats = voteStatsMap({
             forCount: l.stats.forCount,
             againstCount: l.stats.againstCount,
             forDirectCount: l.stats.forDirectCount,
@@ -105,7 +87,10 @@ export const SingleVoteInList: FunctionComponent<{
                     <div className="bar-wrapper">
                         {!!l.questionText && (
                             <div className="mb-1 d-flex align-items-center">
-                                <a className="white mb-0" href={`/poll/${l.questionText}`}>
+                                <a
+                                    className="white mb-0"
+                                    href={`/poll/${l.questionText}/${l.groupChannel.group}-${l.groupChannel.channel}`}
+                                >
                                     <div className="text-truncate" title={l.questionText}>
                                         {l.questionText}
                                         {showIntroMessage && '?'}
@@ -213,7 +198,7 @@ export const SingleVoteInList: FunctionComponent<{
                     {l.thisUserIsAdmin && (
                         <>
                             <div
-                                onClick={() => alert('soon, maybe')}
+                                onClick={() => alert('soon')}
                                 className={`button_ small mx-1`}
                             >Edit</div>
                         </>

@@ -12,14 +12,22 @@ export const GroupTypeDefs = gql`
         externalLink: String
         createdOn: String
         lastEditOn: String
-        members: Int
-        questions: Int
         admins: [User]
         channels: [Channel]
         thisUserIsAdmin: Boolean
         userMemberRelation: GroupMemberRelation
         yourMemberRelation: GroupMemberRelation
         representativeRelation: UserRepresentativeGroupRelation
+        stats: GroupStats
+    }
+
+    type GroupStats {
+        lastDirectVoteOn: String
+        members: Int
+        questions: Int
+        representations: Int
+        directVotesMade: Int
+        indirectVotesMade: Int
     }
 
     type Channel {
@@ -28,7 +36,6 @@ export const GroupTypeDefs = gql`
         # privacy: String
         # createdOn: String
         # lastEditOn: String
-        # members: Int
         # questions: Int
         # admins: [User]
         # thisUserIsAdmin: Boolean

@@ -10,13 +10,13 @@ export const QuestionTypeDefs = gql`
         againstCount: Int
         againstMostRelevantVoters: [JSON]
         againstDirectCount: Int
-        userVote: Vote
     }
 
     type Choice {
         text: String,
 
         stats: QuestionStats
+        userVote: Vote
     }
 
     type Question {
@@ -33,6 +33,7 @@ export const QuestionTypeDefs = gql`
         thisUserIsAdmin: Boolean
 
         stats: QuestionStats
+        userVote: Vote
     }
 
     extend type Query {

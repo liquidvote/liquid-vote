@@ -5,13 +5,25 @@ export const QuestionResolvers = {
         Question: async (_source, { questionText, group, channel }, { mongoDB, s3, AuthUser }) => {
 
             const Question = await mongoDB.collection("Questions")
-                .findOne({ questionText, group, channel });
+                .findOne({
+                    questionText,
+                    'groupChannel.group': group,
+                    'groupChannel.channel': channel
+                });
 
             // TODO: get User Vote
 
             return {
                 ...Question,
-                thisUserIsAdmin: Question.createdBy === AuthUser?.LiquidUser?.handle,
+                ...(Question?.questionType === 'single' && !!AuthUser) && {
+                    stats: Question?.stats,
+                    userVote: await mongoDB.collection("Votes").findOne({
+                        questionText: Question?.questionText,
+                        groupChannel: Question?.groupChannel,
+                        createdBy: AuthUser?.LiquidUser?.handle
+                    })
+                },
+                thisUserIsAdmin: Question?.createdBy === AuthUser?.LiquidUser?.handle,
             };
         },
         Questions: async (_source, {
@@ -31,12 +43,12 @@ export const QuestionResolvers = {
                 ...(q.questionType === 'single' && !!AuthUser) && {
                     stats: {
                         ...q.stats,
-                        userVote: await mongoDB.collection("Votes").findOne({
-                            questionText: q.questionText,
-                            groupChannel: q.groupChannel,
-                            createdBy: AuthUser?.LiquidUser?.handle
-                        })
-                    }
+                    },
+                    userVote: await mongoDB.collection("Votes").findOne({
+                        questionText: q.questionText,
+                        groupChannel: q.groupChannel,
+                        createdBy: AuthUser?.LiquidUser?.handle
+                    })
                 },
                 ...(q.questionType === 'multi' && !!AuthUser) && {
                     choices: Promise.all(q.choices.map(async (c) => ({
@@ -129,7 +141,6 @@ export const updateQuestionVotingStats = async ({
     //  Get Votes
 
     // GET VIA AGGREGATION:
-    //  Direct and Indirect Votes Count
     //  Most recent Vote timestamp
     //  Most Relevant Voters
 
