@@ -27,9 +27,9 @@ export const QUESTION = gql`
                 lastVoteOn
                 forCount
                 forDirectCount
-                forMostRelevantVoters
+                forMostRepresentedVoters
                 againstCount
-                againstMostRelevantVoters
+                againstMostRepresentedVoters
                 againstDirectCount
             }
             userVote {
@@ -103,9 +103,9 @@ export const QUESTIONS = gql`
 		lastVoteOn
         forCount
         forDirectCount
-        forMostRelevantVoters
+        forMostRepresentedVoters
         againstCount
-        againstMostRelevantVoters
+        againstMostRepresentedVoters
         againstDirectCount
     }
 `;

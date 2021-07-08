@@ -17,6 +17,9 @@ export const VoteTypeDefs = gql`
         choiceText: String
         groupChannel: GroupChannel
         position: String
+        forWeight: Int
+        againstWeight: Int
+
         representatives: [RepresentativeVote]
 
         # createdBy
