@@ -29,55 +29,103 @@ export const UserResolvers = {
             const User = await mongoDB.collection("Users")
                 .findOne({ 'LiquidUser.handle': handle });
 
-            const representingRelations = await mongoDB.collection("UserRepresentations")
-                .find({
-                    "representativeId": ObjectID(User?._id),
-                    "isRepresentingYou": true
-                })
-                .toArray();
 
-            const representees = (
-                await mongoDB.collection("Users")
-                    .find({
-                        '_id': {
-                            "$in": representingRelations.map(
-                                r => ObjectID(r.representeeId)
-                            )
+            const representeesAndGroups = (
+                await mongoDB.collection("UserRepresentations").aggregate(
+                    [
+                        {
+                            $match: {
+                                "representativeId": ObjectID(User?._id),
+                                "isRepresentingYou": true
+                            }
+                        }, {
+                            $group: {
+                                _id: {
+                                    representee: '$representeeId'
+                                },
+                                count: {
+                                    $sum: 1
+                                },
+                                groups: {
+                                    $push: "$groupId"
+                                }
+                            }
+                        }, {
+                            $lookup: {
+                                from: 'Groups',
+                                localField: 'groups',
+                                foreignField: '_id',
+                                as: 'groups'
+                            }
+                        }, {
+                            $lookup: {
+                                from: 'Users',
+                                localField: '_id.representee',
+                                foreignField: '_id',
+                                as: 'representeeUser'
+                            }
                         }
-                    })
-                    .toArray()
-            )
-                .map(u => u.LiquidUser);
+                    ]
+                ).toArray())
+                .map(r => ({
+                    ...r?.representeeUser[0]?.LiquidUser,
+                    representationGroups: r?.groups
+                }));
 
-            return representees;
+            return representeesAndGroups;
         },
 
-        UserRepresented: async (_source, { handle }, { mongoDB, s3, AuthUser }) => {
-
+        UserRepresentedBy: async (
+            _source,
+            { handle },
+            { mongoDB, s3, AuthUser }
+        ) => {
             const User = await mongoDB.collection("Users")
                 .findOne({ 'LiquidUser.handle': handle });
 
-            const representeeRelations = await mongoDB.collection("UserRepresentations")
-                .find({
-                    "representeeId": ObjectID(User?._id),
-                    "isRepresentingYou": true
-                })
-                .toArray();
-
-            const representatives = (
-                await mongoDB.collection("Users")
-                    .find({
-                        '_id': {
-                            "$in": representeeRelations.map(
-                                r => ObjectID(r.representativeId)
-                            )
+            const representativesAndGroups = (
+                await mongoDB.collection("UserRepresentations").aggregate(
+                    [
+                        {
+                            $match: {
+                                "representeeId": ObjectID(User?._id),
+                                "isRepresentingYou": true
+                            }
+                        }, {
+                            $group: {
+                                _id: {
+                                    representative: '$representativeId'
+                                },
+                                count: {
+                                    $sum: 1
+                                },
+                                groups: {
+                                    $push: "$groupId"
+                                }
+                            }
+                        }, {
+                            $lookup: {
+                                from: 'Groups',
+                                localField: 'groups',
+                                foreignField: '_id',
+                                as: 'groups'
+                            }
+                        }, {
+                            $lookup: {
+                                from: 'Users',
+                                localField: '_id.representative',
+                                foreignField: '_id',
+                                as: 'representativeUser'
+                            }
                         }
-                    })
-                    .toArray()
-            )
-                .map(u => u.LiquidUser);
+                    ]
+                ).toArray())
+                .map(r => ({
+                    ...r?.representativeUser[0]?.LiquidUser,
+                    representationGroups: r?.groups
+                }));
 
-            return representatives;
+            return representativesAndGroups;
         },
 
         UserDirectVotes: async (_source, { handle }, { mongoDB, s3, AuthUser }) => {
@@ -297,16 +345,40 @@ const getUserStats = async ({ userId, mongoDB }) => {
 
     return ({
         lastDirectVoteOn: 0, // TODO
-        representing: await mongoDB.collection("UserRepresentations")
-            .find({
-                "representativeId": ObjectID(userId),
-                "isRepresentingYou": true
-            }).count(),
-        representedBy: await mongoDB.collection("UserRepresentations")
-            .find({
-                "representeeId": ObjectID(userId),
-                "isRepresentingYou": true
-            }).count(),
+        representing: (
+            await mongoDB.collection("UserRepresentations").aggregate(
+                [{
+                    $match: {
+                        "representeeId": ObjectID(userId),
+                        "isRepresentingYou": true
+                    }
+                }, {
+                    $group: {
+                        _id: {
+                            "representeeId": "$representeeId"
+                        }
+                    }
+                }, {
+                    $count: 'count'
+                }]
+            ).toArray())?.[0]?.count || 0,
+        representedBy: (
+            await mongoDB.collection("UserRepresentations").aggregate(
+                [{
+                    $match: {
+                        "representativeId": ObjectID(userId),
+                        "isRepresentingYou": true
+                    }
+                }, {
+                    $group: {
+                        _id: {
+                            "representativeId": "$representativeId"
+                        }
+                    }
+                }, {
+                    $count: 'count'
+                }]
+            ).toArray())?.[0]?.count || 0,
         groupsJoined: await mongoDB.collection("GroupMembers")
             .find({
                 "userId": ObjectID(userId),

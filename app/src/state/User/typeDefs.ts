@@ -50,13 +50,17 @@ export const USER_REPRESENTING = gql`
             directVotesMade
             indirectVotesMade
         }
+        representationGroups {
+            handle
+            name
+        }
     }
   }
 `;
 
-export const USER_REPRESENTED = gql`
+export const USER_REPRESENTED_BY = gql`
   query($handle: String!) {
-    UserRepresented(handle: $handle) {
+    UserRepresentedBy(handle: $handle) {
         handle,
         name,
         bio,
@@ -76,6 +80,10 @@ export const USER_REPRESENTED = gql`
             groupsJoined
             directVotesMade
             indirectVotesMade
+        }
+        representationGroups {
+            handle
+            name
         }
     }
   }

@@ -8,6 +8,7 @@ import MultiVoteInList from "@shared/MultiVoteInList";
 import DropPlusSVG from "@shared/Icons/Drop+.svg";
 import useSearchParams from "@state/Global/useSearchParams.effect";
 import { QUESTIONS } from "@state/Question/typeDefs";
+import { GROUP } from "@state/Group/typeDefs";
 
 import './style.sass';
 
@@ -32,6 +33,15 @@ export const GroupPolls: FunctionComponent<{
             }
         });
 
+        const {
+            loading: group_loading,
+            error: group_error,
+            data: group_data,
+            refetch: group_refetch
+        } = useQuery(GROUP, {
+            variables: { handle }
+        });
+
         // console.log({ questions_data });
 
         useEffect(() => {
@@ -43,6 +53,25 @@ export const GroupPolls: FunctionComponent<{
 
         return (
             <>
+
+                {group_data?.Group?.thisUserIsAdmin && (
+                    <div
+                        onClick={() => updateParams({
+                            paramsToAdd: {
+                                modal: "EditQuestion",
+                                modalData: JSON.stringify({
+                                    questionHandle: 'new',
+                                    groupHandle: handle,
+                                })
+                            }
+                        })}
+                        className="button_ mx-3 my-4"
+                    >
+                        <DropPlusSVG />
+                        <div className="ml-2">Create New Poll</div>
+                    </div>
+                )}
+
 
                 {questions_data?.Questions?.map((v: any, i: any) => (
                     <div key={'polls-' + i}>
