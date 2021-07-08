@@ -237,17 +237,17 @@ export default function Question() {
 
                 <ul className="nav d-flex justify-content-around mt-1 mb-n4 mx-n3">
                     <li className="nav-item">
-                        <Link className={`nav-link ${(!section || section === 'timeline') && 'active'}`} to={`/poll/${voteName}/timeline`}>
+                        <Link className={`nav-link ${(!section || section === 'timeline') && 'active'}`} to={`/poll/${voteName}/${groupChannel}/timeline`}>
                             Timeline
                         </Link>
                     </li>
                     <li className="nav-item">
-                        <Link className={`nav-link ${section === 'votesby' && 'active'}`} to={`/poll/${voteName}/votesby`}>
+                        <Link className={`nav-link ${section === 'votesby' && 'active'}`} to={`/poll/${voteName}/${groupChannel}/votesby`}>
                             Votes by
                         </Link>
                     </li>
                     <li className="nav-item">
-                        <Link className={`nav-link ${section === 'conversation' && 'active'}`} to={`/poll/${voteName}/conversation`}>
+                        <Link className={`nav-link ${section === 'conversation' && 'active'}`} to={`/poll/${voteName}/${groupChannel}/conversation`}>
                             Conversation
                         </Link>
                     </li>

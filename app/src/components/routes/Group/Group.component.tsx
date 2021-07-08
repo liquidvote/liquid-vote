@@ -132,8 +132,10 @@ export const Group: FunctionComponent<{}> = ({ }) => {
 
 
     const isMember =
-        selectedGroup?.yourMemberRelation ||
-        editGroupMemberChannelRelation_data?.editGroupMemberChannelRelation?.isMember;
+        !!authUser && (
+            selectedGroup?.yourMemberRelation?.isMember ||
+            editGroupMemberChannelRelation_data?.editGroupMemberChannelRelation?.isMember
+        );
 
     return group_loading ? (<>Loading</>) : group_error ? (<>Error</>) : (
         <>
@@ -184,8 +186,8 @@ export const Group: FunctionComponent<{}> = ({ }) => {
                                 onClick={() => editGroupMemberChannelRelation({
                                     variables: {
                                         UserHandle: authUser?.LiquidUser?.handle,
-                                        GroupHandle: selectedGroup.handle,
-                                        IsMember: !selectedGroup?.yourMemberRelation?.isMember
+                                        GroupHandle: selectedGroup?.handle,
+                                        IsMember: !isMember
                                     }
                                 })}
                                 className={`button_ small ml-2 mb-0 ${isMember ? "selected" : ""}`}

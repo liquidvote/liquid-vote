@@ -97,7 +97,7 @@ export const QuestionResolvers = {
                 }))?.ops[0] : (
                     AuthUser &&
                     Question_.createdBy === AuthUser.LiquidUser.handle
-                ) ? await mongoDB.collection("Questions").updateOne(
+                ) ? (await mongoDB.collection("Questions").findOneAndUpdate(
                     { _id: Question_._id },
                     {
                         $set: {
@@ -109,8 +109,12 @@ export const QuestionResolvers = {
                             'resultsOn': Question.resultsOn,
                             'lastEditOn': Date.now(),
                         },
+                    },
+                    {
+                        returnNewDocument: true,
+                        returnOriginal: false
                     }
-                ) : null;
+                ))?.value : null;
 
             return {
                 ...savedQuestion,

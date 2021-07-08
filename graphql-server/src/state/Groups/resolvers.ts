@@ -13,6 +13,12 @@ export const GroupResolvers = {
                     'groupId': ObjectID(Group._id)
                 })) : {};
 
+            // console.log({
+            //     GroupMemberRelation,
+            //     AuthUserId: AuthUser?._id,
+            //     GroupID: Group?._id
+            // })
+
             return {
                 ...Group,
                 thisUserIsAdmin: !!Group.admins.find(u => u.handle === AuthUser?.LiquidUser?.handle),
@@ -118,7 +124,7 @@ export const GroupResolvers = {
                 }))?.ops[0] : (
                     AuthUser &&
                     Group_.admins.find(u => u.handle === AuthUser.LiquidUser.handle)
-                ) ? await mongoDB.collection("Groups").updateOne(
+                ) ? (await mongoDB.collection("Groups").findOneAndUpdate(
                     { _id: Group_._id },
                     {
                         $set: {
@@ -132,8 +138,12 @@ export const GroupResolvers = {
                             'privacy': Group.privacy,
                             // 'channels': Group.channels,
                         },
+                    },
+                    {
+                        returnNewDocument: true,
+                        returnOriginal: false
                     }
-                ) : null;
+                ))?.value : null;
 
             if (AuthUser && handle === 'new') {
 

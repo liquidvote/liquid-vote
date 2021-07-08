@@ -19,6 +19,7 @@ export const GroupTypeDefs = gql`
         yourMemberRelation: GroupMemberRelation
         representativeRelation: UserRepresentativeGroupRelation
         stats: GroupStats
+        yourStats: yourGroupStats
     }
 
     type GroupStats {
@@ -28,6 +29,15 @@ export const GroupTypeDefs = gql`
         representations: Int
         directVotesMade: Int
         indirectVotesMade: Int
+    }
+
+    type yourGroupStats {
+        lastDirectVoteOn: String
+        representing: Int
+        representedBy: Int
+        directVotesMade: Int
+        indirectVotesMadeByYou: Int
+        indirectVotesMadeForYou: Int
     }
 
     type Channel {
