@@ -150,7 +150,7 @@ export const Profile: FunctionComponent<{}> = ({ }) => {
                 <Link to={`/profile-people/${profile.handle}/representing`}>
                     <b>{profile?.stats?.representing}</b> Representing {profile.name}
                 </Link>
-                <Link to={`/profile-people/${profile.handle}/represented`} className="ml-2">
+                <Link to={`/profile-people/${profile.handle}/representedBy`} className="ml-2">
                     <b>{profile?.stats?.representedBy}</b> Represented by {profile.name}
                 </Link>
             </div>

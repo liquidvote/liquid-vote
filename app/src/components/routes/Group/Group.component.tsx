@@ -183,7 +183,7 @@ export const Group: FunctionComponent<{}> = ({ }) => {
                             <div
                                 onClick={() => editGroupMemberChannelRelation({
                                     variables: {
-                                        UserHandle: authUser?.LiquidUse?.handle,
+                                        UserHandle: authUser?.LiquidUser?.handle,
                                         GroupHandle: selectedGroup.handle,
                                         IsMember: !selectedGroup?.yourMemberRelation?.isMember
                                     }
@@ -262,24 +262,6 @@ export const Group: FunctionComponent<{}> = ({ }) => {
                     </div>
                 </div>
             </div>
-
-            {selectedGroup?.thisUserIsAdmin && (
-                <div
-                    onClick={() => updateParams({
-                        paramsToAdd: {
-                            modal: "EditQuestion",
-                            modalData: JSON.stringify({
-                                questionHandle: 'new',
-                                groupHandle: selectedGroup.handle,
-                            })
-                        }
-                    })}
-                    className="button_ mx-5 my-3"
-                >
-                    <DropPlusSVG />
-                    <div className="ml-2">Create New Poll</div>
-                </div>
-            )}
 
             <ul className="nav d-flex flex-nowrap justify-content-around align-items-center mt-1 mb-n4 mx-n3">
                 <li className="nav-item">

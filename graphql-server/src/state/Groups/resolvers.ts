@@ -152,12 +152,7 @@ export const GroupResolvers = {
                         joinedOn: Date.now(),
                         lastEditOn: Date.now(),
                         isMember: true,
-                        channels: [{
-                            channelName: 'general',
-                            joinedOn: Date.now(),
-                            lastEditOn: Date.now(),
-                            isMember: true,
-                        }]
+                        channels: ['general']
                     }))?.ops[0];
             }
 
