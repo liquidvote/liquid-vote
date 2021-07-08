@@ -26,7 +26,18 @@ export const UserTypeDefs = gql`
         representedBy: Int
         groupsJoined: Int
         directVotesMade: Int
-        indirectVotesMade: Int
+        indirectVotesMadeByUser: Int
+        indirectVotesMadeForUser: Int
+    }
+
+    type YourUserStats {
+        indirectVotesMadeByYou: Int
+        indirectVotesMadeForYou: Int
+        groupsInCommon: Int
+        ForVotesInCommon: Int
+        AgainstVotesInCommon: Int
+        ForVotesInDisagreement: Int
+        AgainstVotesInDisagreement: Int
     }
 
     type UserRepresentativeGroupRelation {

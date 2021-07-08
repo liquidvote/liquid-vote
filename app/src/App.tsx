@@ -24,11 +24,11 @@ export default function App() {
                 <SideMenu />
                 <div className="App border-sides">
                     <Switch>
-                        <Route path="/poll/:voteName/:groupChannel/:section" component={loadable(() => import('./components/routes/Question'))} />
-                        <Route path="/poll/:voteName/:groupChannel" component={loadable(() => import('./components/routes/Question'))} />
-                        <Route path="/multipoll/:voteName/:groupChannel/:section" component={loadable(() => import('./components/routes/QuestionMulti'))} />
-                        <Route path="/multipoll/:voteName/:groupChannel" component={loadable(() => import('./components/routes/QuestionMulti'))} />
-                        <Route path="/grouping/:groupType/:groupFilter" component={loadable(() => import('./components/routes/Grouping'))} />
+                        <Route path="/poll/:voteName/:groupChannel/:section" component={loadable(() => import('./components/Routes/Question'))} />
+                        <Route path="/poll/:voteName/:groupChannel" component={loadable(() => import('./components/Routes/Question'))} />
+                        <Route path="/multipoll/:voteName/:groupChannel/:section" component={loadable(() => import('./components/Routes/QuestionMulti'))} />
+                        <Route path="/multipoll/:voteName/:groupChannel" component={loadable(() => import('./components/Routes/QuestionMulti'))} />
+                        <Route path="/grouping/:groupType/:groupFilter" component={loadable(() => import('./components/Routes/Grouping'))} />
                         <Route path="/register" component={loadable(() => import('./components/Routes/CreateProfile'))} />
                         <Route path="/create-vote" component={loadable(() => import('./components/Routes/CreateVote'))} />
                         <Route path="/create-vote/:groupName" component={loadable(() => import('./components/Routes/CreateVote'))} />

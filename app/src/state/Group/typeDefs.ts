@@ -68,7 +68,8 @@ export const GROUP_MEMBERS = gql`
             representedBy
             groupsJoined
             directVotesMade
-            indirectVotesMade
+            indirectVotesMadeByUser
+            indirectVotesMadeForUser
         }
     }
   }

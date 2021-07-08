@@ -206,21 +206,27 @@ export const UserResolvers = {
     Mutation: {
         editUser: async (_source, { User }, { mongoDB, s3, AuthUser }) => {
 
-            const updated = (AuthUser && User) ? await mongoDB.collection("Users").updateOne(
-                { _id: AuthUser._id },
-                {
-                    $set: {
-                        'LiquidUser.name': User.name,
-                        'LiquidUser.location': User.location,
-                        'LiquidUser.bio': User.bio,
-                        'LiquidUser.externalLink': User.externalLink,
-                        'LiquidUser.avatar': User.avatar,
-                        'LiquidUser.cover': User.cover,
-                        'LiquidUser.email': User.email,
-                        'LiquidUser.lastEditOn': Date.now(),
+            const updated = (AuthUser && User) ? (
+                await mongoDB.collection("Users").findOneAndUpdate(
+                    { _id: AuthUser._id },
+                    {
+                        $set: {
+                            'LiquidUser.name': User.name,
+                            'LiquidUser.location': User.location,
+                            'LiquidUser.bio': User.bio,
+                            'LiquidUser.externalLink': User.externalLink,
+                            'LiquidUser.avatar': User.avatar,
+                            'LiquidUser.cover': User.cover,
+                            'LiquidUser.email': User.email,
+                            'LiquidUser.lastEditOn': Date.now(),
+                        },
                     },
-                }
-            ) : null;
+                    {
+                        returnNewDocument: true,
+                        returnOriginal: false
+                    }
+                )
+            )?.value : null;
 
             return updated;
         },
@@ -231,7 +237,7 @@ export const UserResolvers = {
             IsMember
         }, { mongoDB, s3, AuthUser }) => {
 
-            const isUser = AuthUser?.LiquidUser?.handle === UserHandle;
+            const isUser = !!AuthUser && AuthUser?.LiquidUser?.handle === UserHandle;
 
             // console.log('edit relation!', {
             //     UserHandle,
@@ -250,28 +256,36 @@ export const UserResolvers = {
                     'groupId': ObjectID(Group._id)
                 });
 
-            console.log({
-                GroupsMemberRelation,
-                hasRel: !!GroupsMemberRelation
-            })
+            // console.log({
+            //     isUser,
+            //     GroupsMemberRelation:  GroupsMemberRelation._id,
+            //     doIsMember: typeof IsMember !== 'undefined',
+            //     IsMember,
+            //     doChannels: typeof Channels !== 'undefined',
+            //     Channels
+            // })
 
             const updatedOrCreated = (isUser && !!GroupsMemberRelation) ? (
-                await mongoDB.collection("GroupMembers").updateOne(
+                await mongoDB.collection("GroupMembers").findOneAndUpdate(
                     { _id: GroupsMemberRelation._id },
                     {
                         $set: {
-                            ...Channels && { 'channels': [...Channels] },
-                            ...IsMember && { 'isMember': IsMember },
+                            ...(typeof Channels !== 'undefined') && { 'channels': [...Channels] },
+                            ...(typeof IsMember !== 'undefined') && { 'isMember': IsMember },
                             'lastEditOn': Date.now(),
                         },
+                    },
+                    {
+                        returnNewDocument: true,
+                        returnOriginal: false
                     }
                 )
-            ) : isUser ? (
+            )?.value : isUser ? (
                 await mongoDB.collection("GroupMembers").insertOne({
                     groupId: ObjectID(Group._id),
                     userId: ObjectID(AuthUser._id),
-                    ...Channels && { 'channels': [...Channels] },
-                    ...IsMember && { 'isMember': IsMember },
+                    ...(typeof Channels !== 'undefined') && { 'channels': [...Channels] },
+                    ...(typeof IsMember !== 'undefined') && { 'isMember': IsMember },
                     createdOn: Date.now(),
                     lastEditOn: Date.now(),
                 })
@@ -316,16 +330,20 @@ export const UserResolvers = {
             // })
 
             const updatedOrCreated = (isUser && !!RepresentativeGroupRelation) ? (
-                await mongoDB.collection("UserRepresentations").updateOne(
+                await mongoDB.collection("UserRepresentations").findOneAndUpdate(
                     { _id: RepresentativeGroupRelation._id },
                     {
                         $set: {
                             isRepresentingYou: IsRepresentingYou,
                             'lastEditOn': Date.now(),
                         },
+                    },
+                    {
+                        returnNewDocument: true,
+                        returnOriginal: false
                     }
                 )
-            ) : isUser ? (
+            )?.value : isUser ? (
                 await mongoDB.collection("UserRepresentations").insertOne({
                     representativeId: ObjectID(Representative?._id),
                     representeeId: ObjectID(Representee?._id),

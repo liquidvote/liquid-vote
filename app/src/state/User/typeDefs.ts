@@ -21,7 +21,8 @@ export const USER = gql`
             representedBy
             groupsJoined
             directVotesMade
-            indirectVotesMade
+            indirectVotesMadeByUser
+            indirectVotesMadeForUser
         }
     }
   }
@@ -48,7 +49,8 @@ export const USER_REPRESENTING = gql`
             representedBy
             groupsJoined
             directVotesMade
-            indirectVotesMade
+            indirectVotesMadeByUser
+            indirectVotesMadeForUser
         }
         representationGroups {
             handle
@@ -79,7 +81,8 @@ export const USER_REPRESENTED_BY = gql`
             representedBy
             groupsJoined
             directVotesMade
-            indirectVotesMade
+            indirectVotesMadeByUser
+            indirectVotesMadeForUser
         }
         representationGroups {
             handle
