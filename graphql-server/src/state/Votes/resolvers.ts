@@ -37,7 +37,10 @@ export const VoteResolvers = {
                     'choiceText': choiceText,
                     'groupChannel': { group, channel },
                     'position': Vote.position,
+                    'forWeight': Vote.position === 'for' ? 1 : 0,
+                    'againstWeight': Vote.position === 'against' ? 1 : 0,
                     'isDirect': true,
+                    'representatives': [],
 
                     'lastEditOn': Date.now(),
                     'createdOn': Date.now(),
@@ -51,6 +54,8 @@ export const VoteResolvers = {
                     {
                         $set: {
                             'position': Vote.position,
+                            'forWeight': Vote.position === 'for' ? 1 : 0,
+                            'againstWeight': Vote.position === 'against' ? 1 : 0,
                             'isDirect': true,
                             'lastEditOn': Date.now(),
                         },
@@ -63,9 +68,12 @@ export const VoteResolvers = {
 
 
             // TODO: Create Votes for representees
+            const representeesAndVote = [];
+
             //      get UserRepresentations relation
-            //          if existant -> add/change representative Vote
-            //          if new -> create with representative Vote
+            //          if Vote existant -> add/change representative Vote
+            //          if Vote new -> create with representative Vote
+            //          if Vote is not Direct -> calculate vote result
 
             // Update Question Stats
             const QuestionStats = !!AuthUser && await updateQuestionVotingStats({
@@ -76,17 +84,6 @@ export const VoteResolvers = {
                 mongoDB,
                 AuthUser
             });
-
-            // console.log({
-            //     Vote,
-            //     // Vote_,
-            //     // // questionText,
-            //     // // choiceText,
-            //     // // group,
-            //     // // channel,
-            //     // new: !!AuthUser && !Vote_,
-            //     savedVote
-            // })
 
             return {
                 ...savedVote,

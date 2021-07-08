@@ -403,6 +403,7 @@ const getUserStats = async ({ userId, mongoDB }) => {
                 "isMember": true
             }).count(),
         directVotesMade: 0, // TODO
-        indirectVotesMade: 0, // TODO
+        indirectVotesMadeByUser: 0, // TODO
+        indirectVotesMadeForUser: 0, // TODO
     });
 }

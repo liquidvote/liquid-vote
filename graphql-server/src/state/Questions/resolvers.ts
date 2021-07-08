@@ -148,7 +148,7 @@ export const updateQuestionVotingStats = async ({
     //  Most recent Vote timestamp
     //  Most Relevant Voters
 
-    const VoteCounts = await mongoDB.collection("Votes")
+    const VoteCounts = (await mongoDB.collection("Votes")
         .aggregate([
             {
                 $match: {
@@ -160,14 +160,50 @@ export const updateQuestionVotingStats = async ({
             {
                 $group: {
                     _id: {
-                        position: "$position",
-                        isDirect: "$isDirect"
+                        "groupChannel": "$groupChannel",
+                        "questionText": "$questionText",
                     },
-                    count: { $sum: 1 }
-                },
+                    forVotes: {
+                        $sum: "$forWeight"
+                    },
+                    forDirectVotes: {
+                        $sum: {
+                            $cond: [
+                                {
+                                    $and: [
+                                        { "$eq": ["$isDirect", true] },
+                                        { "$eq": ["$position", 'for'] }
+                                    ]
+                                },
+                                1,
+                                0
+                            ]
+                        }
+                    },
+                    againstVotes: {
+                        $sum: "$againstWeight"
+                    },
+                    againstDirectVotes: {
+                        $sum: {
+                            $cond: [
+                                {
+                                    $and: [
+                                        { "$eq": ["$isDirect", true] },
+                                        { "$eq": ["$position", 'against'] }
+                                    ]
+                                },
+                                1,
+                                0
+                            ]
+                        }
+                    },
+                    lastVoteOn: {
+                        $last: "$lastEditOn"
+                    }
+                }
             },
         ])
-        .toArray();
+        .toArray())?.[0];
 
     // console.log('updateQuestionVotingStats', {
     //     VoteCounts: JSON.stringify(VoteCounts, null, 2)
@@ -177,29 +213,11 @@ export const updateQuestionVotingStats = async ({
         { _id: Question_._id },
         {
             $set: {
-                'stats.lastVoteOn': Date.now(),
-                'stats.forCount': (
-                    VoteCounts.find(
-                        c => c._id.position === 'for' && c._id.isDirect === true
-                    )?.count || 0 +
-                    VoteCounts.find(
-                        c => c._id.position === 'for' && c._id.isDirect === false
-                    )?.count || 0
-                ) || 0,
-                'stats.forDirectCount': VoteCounts.find(
-                    c => c._id.position === 'for' && c._id.isDirect === true
-                )?.count || 0,
-                'stats.againstCount': (
-                    VoteCounts.find(
-                        c => c._id.position === 'against' && c._id.isDirect === true
-                    )?.count || 0 +
-                    VoteCounts.find(
-                        c => c._id.position === 'against' && c._id.isDirect === false
-                    )?.count || 0
-                ) || 0,
-                'stats.againstDirectCount': VoteCounts.find(
-                    c => c._id.position === 'against' && c._id.isDirect === true
-                )?.count || 0,
+                'stats.forCount': VoteCounts?.forVotes || 0,
+                'stats.forDirectCount': VoteCounts?.forDirectVotes || 0,
+                'stats.againstCount': VoteCounts?.againstVotes || 0,
+                'stats.againstDirectCount': VoteCounts?.againstDirectVotes || 0,
+                'stats.lastVoteOn': VoteCounts?.lastVoteOn,
             },
         },
         {

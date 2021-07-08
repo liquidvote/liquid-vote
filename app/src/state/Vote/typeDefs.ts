@@ -57,27 +57,10 @@ export const EDIT_VOTE = gql`
 		lastVoteOn
         forCount
         forDirectCount
-        forMostRelevantVoters
+        forMostRepresentedVoters
         againstCount
-        againstMostRelevantVoters
+        againstMostRepresentedVoters
         againstDirectCount
-        userVote {
-          # questionText
-          # choiceText
-          position
-          representatives {
-            representativeHandle
-            representativeAvatar
-            representativeName
-            position
-
-            createdOn
-            lastEditOn
-          }
-          
-          createdOn
-          lastEditOn
-        }
     }
 
 `;

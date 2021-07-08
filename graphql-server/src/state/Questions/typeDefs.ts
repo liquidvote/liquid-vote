@@ -3,12 +3,12 @@ import { gql } from "apollo-server";
 export const QuestionTypeDefs = gql`
 
     type QuestionStats {
-        lastVoteOn: String
-        forCount: Int
-        forDirectCount: Int
-        forMostRelevantVoters: [JSON]
-        againstCount: Int
-        againstMostRelevantVoters: [JSON]
+        lastVoteOn: String                  #
+        forCount: Int                       #
+        forDirectCount: Int                 #
+        forMostRepresentedVoters: [JSON]
+        againstCount: Int                   #
+        againstMostRepresentedVoters: [JSON]   #
         againstDirectCount: Int
     }
 
