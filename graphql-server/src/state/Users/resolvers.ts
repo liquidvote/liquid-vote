@@ -24,11 +24,13 @@ export const UserResolvers = {
             };
         },
 
-        UserRepresenting: async (_source, { handle }, { mongoDB, s3, AuthUser }) => {
+        UserRepresenting: async (_source, { handle, groupHandle }, { mongoDB, s3, AuthUser }) => {
 
             const User = await mongoDB.collection("Users")
                 .findOne({ 'LiquidUser.handle': handle });
 
+            const group = groupHandle && await mongoDB.collection("Groups")
+                .findOne({ 'handle': groupHandle });
 
             const representeesAndGroups = (
                 await mongoDB.collection("UserRepresentations").aggregate(
@@ -36,7 +38,10 @@ export const UserResolvers = {
                         {
                             $match: {
                                 "representativeId": ObjectID(User?._id),
-                                "isRepresentingYou": true
+                                "isRepresentingYou": true,
+                                ...group && {
+                                    groupId: ObjectID(group._id)
+                                }
                             }
                         }, {
                             $group: {
@@ -77,11 +82,14 @@ export const UserResolvers = {
 
         UserRepresentedBy: async (
             _source,
-            { handle },
+            { handle, groupHandle },
             { mongoDB, s3, AuthUser }
         ) => {
             const User = await mongoDB.collection("Users")
                 .findOne({ 'LiquidUser.handle': handle });
+
+            const group = groupHandle && await mongoDB.collection("Groups")
+                .findOne({ 'handle': groupHandle });
 
             const representativesAndGroups = (
                 await mongoDB.collection("UserRepresentations").aggregate(
@@ -89,7 +97,10 @@ export const UserResolvers = {
                         {
                             $match: {
                                 "representeeId": ObjectID(User?._id),
-                                "isRepresentingYou": true
+                                "isRepresentingYou": true,
+                                ...group && {
+                                    groupId: ObjectID(group._id)
+                                }
                             }
                         }, {
                             $group: {

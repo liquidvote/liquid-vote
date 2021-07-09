@@ -229,14 +229,26 @@ export const Group: FunctionComponent<{}> = ({ }) => {
                 </div>
             </div>
             <div className="profile-stats-container">
-                <Link to={`/group-people/${selectedGroup?.handle}`}>
+                <Link to={`/group-people/${selectedGroup?.handle}/members`}>
                     <b>{selectedGroup?.stats?.members || 0}</b> Member{selectedGroup?.members !== 1 && 's'}
                 </Link>
+                {
+                    selectedGroup?.yourStats && (
+                        <>
+                            <Link className="ml-2" to={`/group-people/${selectedGroup?.handle}/representingYou`}>
+                                <b>{selectedGroup?.yourStats.representing || 0}</b> Representing you
+                            </Link>
+                            <Link className="ml-2" to={`/group-people/${selectedGroup?.handle}/representedByYou`}>
+                                <b>{selectedGroup?.yourStats.representedBy || 0}</b> Represented by you
+                            </Link>
+                        </>
+                    )
+                }
                 {/* <Link to={`/group/${groupName}/subgroups`} className="ml-2">
                     <b>16</b> Sub Groups
                 </Link> */}
             </div>
-
+            
             <div className="mt-4 mb-3 d-flex align-items-start flex-nowrap justify-content-between">
                 <div className="d-flex flex-column">
                     {/* <div data-tip="Selected channels">

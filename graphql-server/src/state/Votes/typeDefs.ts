@@ -3,10 +3,13 @@ import { gql } from "apollo-server";
 export const VoteTypeDefs = gql`
 
     type RepresentativeVote {
+        # representativeId
         representativeHandle: String
         representativeAvatar: String
         representativeName: String
         position: String
+        forWeight: Int
+        againstWeight: Int
 
         createdOn: String
         lastEditOn: String
