@@ -42,7 +42,7 @@ export default function App() {
                         <Route path="/groups" component={loadable(() => import('./components/Routes/Groups'))} />
                         <Route path="/group/:handle/:section" component={loadable(() => import('./components/Routes/Group'))} />
                         <Route path="/group/:handle" component={loadable(() => import('./components/Routes/Group'))} />
-                        <Route path="/group-people/:handle" component={loadable(() => import('./components/Routes/GroupPeople'))} />
+                        <Route path="/group-people/:handle/:which" component={loadable(() => import('./components/Routes/GroupPeople'))} />
                         <Route path="/" component={loadable(() => import('./components/Routes/Home'))} />
                     </Switch>
                 </div>

@@ -31,7 +31,13 @@ export const GroupResolvers = {
                     groupHandle: Group.handle,
                     groupId: Group._id,
                     mongoDB
-                })
+                }),
+                yourStats: !!AuthUser && getYourGroupStats({
+                    groupHandle: Group.handle,
+                    groupId: Group._id,
+                    AuthUser,
+                    mongoDB,
+                }),
             };
         },
         GroupMembers: async (_source, { handle }, { mongoDB, s3, AuthUser }) => {
@@ -261,5 +267,40 @@ const getGroupStats = async ({ groupId, groupHandle, mongoDB }) => {
                 "groupChannel.group": groupHandle,
                 "isDirect": false
             }).count()
+    });
+}
+
+const getYourGroupStats = async ({ groupId, groupHandle, AuthUser, mongoDB }) => {
+
+    return ({
+        lastDirectVoteOn: 0,
+        representing: await mongoDB.collection("UserRepresentations")
+            .find({
+                "groupId": ObjectID(groupId),
+                "representeeId": ObjectID(AuthUser._id),
+            }).count(),
+        representedBy: await mongoDB.collection("UserRepresentations")
+            .find({
+                "groupId": ObjectID(groupId),
+                "representativeId": ObjectID(AuthUser._id),
+            }).count(),
+        directVotesMade: await mongoDB.collection("Votes")
+            .find({
+                "groupChannel.group": groupHandle,
+                "isDirect": true,
+                "user": AuthUser.LiquidUser.handle
+            }).count(),
+        indirectVotesMadeByYou: await mongoDB.collection("Votes")
+            .find({
+                "groupChannel.group": groupHandle,
+                "isDirect": false,
+                "representatives.representativeId": ObjectID(AuthUser._id)
+            }).count(),
+        indirectVotesMadeForYou: await mongoDB.collection("Votes")
+            .find({
+                "groupChannel.group": groupHandle,
+                "isDirect": false,
+                "user": AuthUser.LiquidUser.handle
+            }).count(),
     });
 }

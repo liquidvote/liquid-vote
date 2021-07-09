@@ -43,6 +43,14 @@ export const GROUP = gql`
             directVotesMade
             indirectVotesMade
         }
+        yourStats {
+            lastDirectVoteOn
+            representing
+            representedBy
+            directVotesMade
+            indirectVotesMadeByYou
+            indirectVotesMadeForYou
+        }
     }
   }
 `;

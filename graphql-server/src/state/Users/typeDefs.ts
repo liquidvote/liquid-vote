@@ -53,8 +53,8 @@ export const UserTypeDefs = gql`
 
     extend type Query {
         User(handle: String): User
-        UserRepresenting(handle: String): [User] # Users that this user is representing
-        UserRepresentedBy(handle: String): [User] # Users that this user is represented by
+        UserRepresenting(handle: String, groupHandle: String): [User] # Users that this user is representing
+        UserRepresentedBy(handle: String, groupHandle: String): [User] # Users that this user is represented by
         UserDirectVotes(handle: String): JSON
         UserGroups(
             handle: String,

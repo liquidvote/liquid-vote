@@ -31,6 +31,15 @@ export const VoteResolvers = {
                     user: AuthUser?.LiquidUser?.handle
                 });
 
+            console.log({
+                group
+            })
+
+            const Group_ = !!AuthUser && await mongoDB.collection("Groups")
+                .findOne({
+                    handle: group
+                });
+
             const savedVote = (!!AuthUser && !Vote_) ?
                 (await mongoDB.collection("Votes").insertOne({
                     'questionText': questionText,
@@ -68,7 +77,27 @@ export const VoteResolvers = {
 
 
             // TODO: Create Votes for representees
-            const representeesAndVote = [];
+            const representeesAndVote = (await mongoDB.collection("UserRepresentations")
+                .aggregate([{
+                    $match: {
+                        representativeId: ObjectID(AuthUser._id),
+                        groupId: ObjectID(Group_._id),
+                        isRepresentingYou: true
+                    }
+                }, {
+                    $lookup: {
+                        from: 'Votes',
+                        localField: 'representativeId',
+                        foreignField: 'representatives.representativeId',
+                        as: 'Vote'
+                    }
+                }])
+                .toArray()
+            );
+
+            console.log({
+                representeesAndVote
+            });
 
             //      get UserRepresentations relation
             //          if Vote existant -> add/change representative Vote
