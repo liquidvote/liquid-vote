@@ -74,11 +74,6 @@ export const QuestionResolvers = {
             mongoDB, s3, AuthUser
         }) => {
 
-            // console.log({
-            //     Question,
-            //     questionText, group, channel
-            // })
-
             const Question_ = await mongoDB.collection("Questions")
                 .findOne({ questionText, group, channel });
 
@@ -94,6 +89,14 @@ export const QuestionResolvers = {
                     'lastEditOn': Date.now(),
                     'createdOn': Date.now(),
                     'createdBy': AuthUser.LiquidUser.handle,
+
+                    'stats': {
+                        forCount: 0,
+                        forDirectCount: 0,
+                        againstCount: 0,
+                        againstDirectCount: 0,
+                        lastVoteOn: null,
+                    }
                 }))?.ops[0] : (
                     AuthUser &&
                     Question_.createdBy === AuthUser.LiquidUser.handle

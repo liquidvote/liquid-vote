@@ -115,7 +115,7 @@ export const GroupPeople: FunctionComponent<{}> = ({ }) => {
                     {group_members_data?.GroupMembers?.map((el, i) => (
                         <PersonInList person={el} />
                     ))}
-                    {!user_representing_data?.UserRepresenting?.length && (
+                    {!group_members_data?.GroupMembers?.length && (
                         <>{`This group doesn't have any members, yet!`}</>
                     )}
                 </div>
