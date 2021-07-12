@@ -45,6 +45,13 @@ export const EDIT_VOTE = gql`
                 createdOn
                 lastEditOn
             }
+            representeeVotes {
+                isDirect
+                user {
+                    handle
+                    name
+                }
+            }
             createdOn
             lastEditOn
             thisUserIsAdmin

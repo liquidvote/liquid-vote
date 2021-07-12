@@ -20,13 +20,15 @@ export const VoteTypeDefs = gql`
         choiceText: String
         groupChannel: GroupChannel
         position: String
+        isDirect: Boolean
         forWeight: Int
         againstWeight: Int
 
         representatives: [RepresentativeVote]
+        representeeVotes: [Vote]
 
         # createdBy
-        # user
+        user: User
         createdOn: String
         lastEditOn: String
         thisUserIsAdmin: Boolean

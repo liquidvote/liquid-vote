@@ -4,12 +4,12 @@ export const QuestionTypeDefs = gql`
 
     type QuestionStats {
         lastVoteOn: String                  #
-        forCount: Int                       #
-        forDirectCount: Int                 #
+        forCount: Float                       #
+        forDirectCount: Float                 #
         forMostRepresentedVoters: [JSON]
-        againstCount: Int                   #
+        againstCount: Float                   #
         againstMostRepresentedVoters: [JSON]   #
-        againstDirectCount: Int
+        againstDirectCount: Float
     }
 
     type Choice {
