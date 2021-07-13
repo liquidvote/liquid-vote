@@ -27,15 +27,37 @@ export const QUESTION = gql`
                 lastVoteOn
                 forCount
                 forDirectCount
-                forMostRepresentedVoters
+                forMostRepresentingVoters {
+                    handle
+                    avatar
+                    name
+                    representeeCount
+                }
                 againstCount
-                againstMostRepresentedVoters
+                againstMostRepresentingVoters {
+                    handle
+                    avatar
+                    name
+                    representeeCount
+                }
                 againstDirectCount
             }
             userVote {
                 position
+                forWeight
+                againstWeight
                 representatives {
                     representativeHandle
+                    representativeAvatar
+                    representativeName
+                }
+                representeeVotes {
+                    isDirect
+                    position
+                    user {
+                        handle
+                        name
+                    }
                 }
             }
         }
@@ -103,9 +125,19 @@ export const QUESTIONS = gql`
 		lastVoteOn
         forCount
         forDirectCount
-        forMostRepresentedVoters
+        forMostRepresentingVoters {
+            handle
+            avatar
+            name
+            representeeCount
+        }
         againstCount
-        againstMostRepresentedVoters
+        againstMostRepresentingVoters {
+            handle
+            avatar
+            name
+            representeeCount
+        }
         againstDirectCount
     }
 `;

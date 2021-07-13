@@ -115,47 +115,16 @@ export const VoteResolvers = {
             })
 
             const updatedRepresenteesVotes = !!representeesAndVote && await Promise.all(representeesAndVote?.map(async (r) => {
-                return !r.Vote.length ? (await mongoDB.collection("Votes").insertOne({
-                    'questionText': questionText,
-                    'choiceText': choiceText,
-                    'groupChannel': { group, channel },
-                    'position': Vote.position,
-                    'forWeight': Vote.position === 'for' ? 1 : 0,
-                    'againstWeight': Vote.position === 'against' ? 1 : 0,
-                    'isDirect': false,
-                    'representatives': [{
-                        'representativeId': AuthUser._id,
-                        'representativeHandle': AuthUser.LiquidUser.handle,
-                        'representativeAvatar': AuthUser.LiquidUser.avatar,
-                        'representativeName': AuthUser.LiquidUser.name,
+                return !r.Vote.length ?
+                    (await mongoDB.collection("Votes").insertOne({
+                        'questionText': questionText,
+                        'choiceText': choiceText,
+                        'groupChannel': { group, channel },
                         'position': Vote.position,
                         'forWeight': Vote.position === 'for' ? 1 : 0,
                         'againstWeight': Vote.position === 'against' ? 1 : 0,
-                        'lastEditOn': Date.now(),
-                        'createdOn': Date.now(),
-                    }],
-                    'lastEditOn': Date.now(),
-                    'createdOn': Date.now(),
-                    'createdBy': AuthUser.LiquidUser.handle,
-                    'user': r.representeeId // ⚠️ huuuuum - id, should be handle. but handle not great
-                }))?.ops[0] : (async () => {
-
-                    const Vote_ = r.Vote[0];
-                    const isDirect = Vote_?.isDirect;
-                    const userRepresentativeVote_ = Vote_?.representatives?.find(
-                        v => v.representativeHandle === AuthUser.LiquidUser.handle
-                    );
-
-                    // Huuuum..
-                    // thinking this might not be needed..
-                    // since an aggregation would suffice
-                    const representativesToUpdate = Vote_.representatives.reduce(
-                        (acc, curr) => [
-                            ...acc,
-                            // removes previous representative object
-                            ...(curr.representativeHandle !== AuthUser.LiquidUser.handle) ? [curr] : []
-                        ],
-                        [{
+                        'isDirect': false,
+                        'representatives': [{
                             'representativeId': AuthUser._id,
                             'representativeHandle': AuthUser.LiquidUser.handle,
                             'representativeAvatar': AuthUser.LiquidUser.avatar,
@@ -164,33 +133,65 @@ export const VoteResolvers = {
                             'forWeight': Vote.position === 'for' ? 1 : 0,
                             'againstWeight': Vote.position === 'against' ? 1 : 0,
                             'lastEditOn': Date.now(),
-                            'createdOn': userRepresentativeVote_?.createdOn || Date.now(),
-                        }]
-                    );
+                            'createdOn': Date.now(),
+                        }],
+                        'lastEditOn': Date.now(),
+                        'createdOn': Date.now(),
+                        'createdBy': AuthUser.LiquidUser.handle,
+                        'user': r.representeeId // ⚠️ huuuuum - id, should be handle. but handle not great
+                    }))?.ops[0] : (async () => {
 
-                    return (await mongoDB.collection("Votes").findOneAndUpdate(
-                        { _id: Vote_._id },
-                        {
-                            $set: {
-                                'position': isDirect ? Vote_.position : 'delegated',
-                                'forWeight': isDirect ? Vote_.forWeight :
-                                    (representativesToUpdate.reduce(
-                                        (acc, curr) => acc + curr.forWeight, 0
-                                    ) / representativesToUpdate.length) || 0,
-                                'againstWeight': isDirect ? Vote_.againstWeight :
-                                    (representativesToUpdate.reduce(
-                                        (acc, curr) => acc + curr.againstWeight, 0
-                                    ) / representativesToUpdate.length) || 0,
-                                'representatives': representativesToUpdate,
+                        const Vote_ = r.Vote[0];
+                        const isDirect = Vote_?.isDirect;
+                        const userRepresentativeVote_ = Vote_?.representatives?.find(
+                            v => v.representativeHandle === AuthUser.LiquidUser.handle
+                        );
+
+                        // Huuuum..
+                        // thinking this might not be needed..
+                        // since an aggregation would suffice
+                        const representativesToUpdate = Vote_.representatives.reduce(
+                            (acc, curr) => [
+                                ...acc,
+                                // removes previous representative object
+                                ...(curr.representativeHandle !== AuthUser.LiquidUser.handle) ? [curr] : []
+                            ],
+                            [{
+                                'representativeId': AuthUser._id,
+                                'representativeHandle': AuthUser.LiquidUser.handle,
+                                'representativeAvatar': AuthUser.LiquidUser.avatar,
+                                'representativeName': AuthUser.LiquidUser.name,
+                                'position': Vote.position,
+                                'forWeight': Vote.position === 'for' ? 1 : 0,
+                                'againstWeight': Vote.position === 'against' ? 1 : 0,
                                 'lastEditOn': Date.now(),
+                                'createdOn': userRepresentativeVote_?.createdOn || Date.now(),
+                            }]
+                        );
+
+                        return (await mongoDB.collection("Votes").findOneAndUpdate(
+                            { _id: Vote_._id },
+                            {
+                                $set: {
+                                    'position': isDirect ? Vote_.position : 'delegated',
+                                    'forWeight': isDirect ? Vote_.forWeight :
+                                        (representativesToUpdate.reduce(
+                                            (acc, curr) => acc + curr.forWeight, 0
+                                        ) / representativesToUpdate.length) || 0,
+                                    'againstWeight': isDirect ? Vote_.againstWeight :
+                                        (representativesToUpdate.reduce(
+                                            (acc, curr) => acc + curr.againstWeight, 0
+                                        ) / representativesToUpdate.length) || 0,
+                                    'representatives': representativesToUpdate,
+                                    'lastEditOn': Date.now(),
+                                },
                             },
-                        },
-                        {
-                            returnNewDocument: true,
-                            returnOriginal: false
-                        }
-                    ))?.value
-                })()
+                            {
+                                returnNewDocument: true,
+                                returnOriginal: false
+                            }
+                        ))?.value
+                    })()
             }));
 
             // Update Question Stats

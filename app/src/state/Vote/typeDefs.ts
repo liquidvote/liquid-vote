@@ -64,9 +64,19 @@ export const EDIT_VOTE = gql`
 		lastVoteOn
         forCount
         forDirectCount
-        forMostRepresentedVoters
+        forMostRepresentingVoters {
+            handle
+            avatar
+            name
+            representeeCount
+        }
         againstCount
-        againstMostRepresentedVoters
+        againstMostRepresentingVoters {
+            handle
+            avatar
+            name
+            representeeCount
+        }
         againstDirectCount
     }
 

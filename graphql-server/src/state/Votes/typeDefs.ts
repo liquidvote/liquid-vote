@@ -8,8 +8,8 @@ export const VoteTypeDefs = gql`
         representativeAvatar: String
         representativeName: String
         position: String
-        forWeight: Int
-        againstWeight: Int
+        forWeight: Float
+        againstWeight: Float
 
         createdOn: String
         lastEditOn: String
@@ -21,8 +21,8 @@ export const VoteTypeDefs = gql`
         groupChannel: GroupChannel
         position: String
         isDirect: Boolean
-        forWeight: Int
-        againstWeight: Int
+        forWeight: Float
+        againstWeight: Float
 
         representatives: [RepresentativeVote]
         representeeVotes: [Vote]
