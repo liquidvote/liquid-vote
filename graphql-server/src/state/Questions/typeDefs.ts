@@ -6,9 +6,9 @@ export const QuestionTypeDefs = gql`
         lastVoteOn: String                  #
         forCount: Float                       #
         forDirectCount: Float                 #
-        forMostRepresentedVoters: [JSON]
+        forMostRepresentingVoters: [Voter]
         againstCount: Float                   #
-        againstMostRepresentedVoters: [JSON]   #
+        againstMostRepresentingVoters: [Voter]   #
         againstDirectCount: Float
     }
 
@@ -34,6 +34,13 @@ export const QuestionTypeDefs = gql`
 
         stats: QuestionStats
         userVote: Vote
+    }
+
+    type Voter {
+        handle: String
+        avatar: String
+        name: String
+        representeeCount: Int
     }
 
     extend type Query {

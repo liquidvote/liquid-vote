@@ -235,6 +235,11 @@ export default function Question() {
 
                 <br />
 
+                <pre>{JSON.stringify(question_data?.Question, null, 2)}</pre>
+
+                <br />
+
+
                 <ul className="nav d-flex justify-content-around mt-1 mb-n4 mx-n3">
                     <li className="nav-item">
                         <Link className={`nav-link ${(!section || section === 'timeline') && 'active'}`} to={`/poll/${voteName}/${groupChannel}/timeline`}>
