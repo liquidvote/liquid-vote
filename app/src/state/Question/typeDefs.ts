@@ -50,6 +50,9 @@ export const QUESTION = gql`
                     representativeHandle
                     representativeAvatar
                     representativeName
+                    position
+                    forWeight
+                    againstWeight
                 }
                 representeeVotes {
                     isDirect
@@ -82,6 +85,8 @@ export const QUESTIONS = gql`
                     representativeAvatar
                     representativeName
                     position
+                    forWeight
+                    againstWeight
 
                     createdOn
                     lastEditOn

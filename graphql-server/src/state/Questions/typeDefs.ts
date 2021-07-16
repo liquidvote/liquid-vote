@@ -53,6 +53,13 @@ export const QuestionTypeDefs = gql`
             group: String,
             channels: [String]
         ): [Question]
+        QuestionVoters(
+            questionText: String,
+            choiceText: String,
+            group: String,
+            channel: String,
+            typeOfVoter: String
+        ): [Vote]
     }
 
     extend type Mutation {

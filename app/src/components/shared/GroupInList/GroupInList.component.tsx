@@ -36,17 +36,17 @@ export const GroupInList: FunctionComponent<{
             data: editGroupMemberChannelRelation_data,
         }] = useMutation(EDIT_GROUP_MEMBER_CHANNEL_RELATION);
 
-        const [isRepresenting, setIsRepresenting] = React.useState(false);
-        const [isJoined, setIsJoined] = React.useState(false);
         const { allSearchParams, updateParams } = useSearchParams();
 
         const isMember =
             group?.yourMemberRelation ||
             editGroupMemberChannelRelation_data?.editGroupMemberChannelRelation?.isMember;
 
+        console.log({ group });
+
         return (
             <div className="d-flex relative border-bottom py-3 mx-n3 px-3">
-                <Link to={`/group/${group.name}/polls`}>
+                <Link to={`/group/${group.handle}/polls`}>
                     <div
                         className={`small-avatar bg`}
                         style={{
@@ -58,7 +58,7 @@ export const GroupInList: FunctionComponent<{
                 <div className="flex-fill">
                     <div className="d-flex justify-content-between align-items-center flex-wrap">
                         <div className="d-flex align-items-center mb-1 ">
-                            <Link to={`/group/${group.name}/polls`}><b>{group.name}</b></Link>
+                            <Link to={`/group/${group.handle}/polls`}><b>{group.name}</b></Link>
                             {/* <small className="mt-n1">@DanPriceSeattle</small> */}
                             <div className="ml-2">
                                 {group.privacy === "private" ? (

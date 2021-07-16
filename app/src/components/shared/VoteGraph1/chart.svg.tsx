@@ -2,6 +2,8 @@ import * as React from "react";
 import { useHistory } from "react-router-dom";
 import numeral from 'numeral';
 
+import './style.sass';
+
 export default function Chart({
     name,
     showNameInside,

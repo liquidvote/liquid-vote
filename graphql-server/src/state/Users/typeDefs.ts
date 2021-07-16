@@ -16,28 +16,31 @@ export const UserTypeDefs = gql`
         isThisUser: Boolean
         isRepresentingYou: Int
         stats: UserStats
+        yourStats:  YourUserStats
 
         representationGroups: [Group]
     }
 
     type UserStats {
         lastDirectVoteOn: String
-        representing: Int
-        representedBy: Int
+        representing: Int                       # inUse
+        representedBy: Int                      # inUse
         groupsJoined: Int
-        directVotesMade: Int
-        indirectVotesMadeByUser: Int
-        indirectVotesMadeForUser: Int
+        directVotesMade: Int                    # inUse
+        indirectVotesMadeByUser: Int            
+        indirectVotesMadeForUser: Int           # inUse
     }
 
     type YourUserStats {
-        indirectVotesMadeByYou: Int
-        indirectVotesMadeForYou: Int
-        groupsInCommon: Int
-        ForVotesInCommon: Int
-        AgainstVotesInCommon: Int
-        ForVotesInDisagreement: Int
-        AgainstVotesInDisagreement: Int
+        # groupsInCommon: Int
+        votesInCommon: Int
+        directVotesInCommon: Int
+        votesInAgreement: Int                   
+        votesInDisagreement: Int
+        directVotesInAgreement: Int             # inUse
+        directVotesInDisagreement: Int          # inUse
+        indirectVotesMadeByYou: Int             # inUse
+        indirectVotesMadeForYou: Int            # inUse
     }
 
     type UserRepresentativeGroupRelation {
@@ -55,11 +58,14 @@ export const UserTypeDefs = gql`
         User(handle: String): User
         UserRepresenting(handle: String, groupHandle: String): [User] # Users that this user is representing
         UserRepresentedBy(handle: String, groupHandle: String): [User] # Users that this user is represented by
-        UserDirectVotes(handle: String): JSON
         UserGroups(
             handle: String,
             representative: String
-        ): [Group]
+        ): [Group],
+        UserVotes(
+            handle: String,
+            type: String
+        ):  [Vote]
     }
 
     extend type Mutation {

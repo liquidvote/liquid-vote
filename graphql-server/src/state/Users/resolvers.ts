@@ -10,17 +10,16 @@ export const UserResolvers = {
             return {
                 ...User?.LiquidUser,
                 isThisUser: !!AuthUser && AuthUser?.Auth0User?.sub === User?.Auth0User?.sub,
-                ...(!!AuthUser && AuthUser?.Auth0User?.sub !== User?.Auth0User?.sub) && {
-                    sameDirectVotes: 0,
-                    differentDirectVotes: 0,
-                },
                 isRepresentingYou: (await mongoDB.collection("UserRepresentations")
                     .find({
                         "representativeId": ObjectID(User._id),
                         "representeeId": ObjectID(AuthUser?._id),
                         "isRepresentingYou": true
                     }).count()) || 0,
-                stats: await getUserStats({ userId: User._id, mongoDB })
+                stats: await getUserStats({ userId: User._id, mongoDB }),
+                ...!!AuthUser && (AuthUser._id.toString() !== User._id.toString()) && {
+                    yourStats: await getYourUserStats({ userId: User._id, AuthUser, mongoDB }),
+                }
             };
         },
 
@@ -139,14 +138,6 @@ export const UserResolvers = {
             return representativesAndGroups;
         },
 
-        UserDirectVotes: async (_source, { handle }, { mongoDB, s3, AuthUser }) => {
-
-            const User = await mongoDB.collection("Users")
-                .findOne({ 'LiquidUser.handle': handle });
-
-            return [];
-        },
-
         UserGroups: async (_source, { handle, representative }, { mongoDB, s3, AuthUser }) => {
 
             const User = await mongoDB.collection("Users")
@@ -212,6 +203,281 @@ export const UserResolvers = {
                 })));
 
             return Groups;
+        },
+        UserVotes: async (_source, { handle, type = 'directVotesMade' }, { mongoDB, s3, AuthUser }) => {
+
+            console.log({
+                type
+            });
+
+            const User = await mongoDB.collection("Users")
+                .findOne({ 'LiquidUser.handle': handle });
+
+            const votesInCommonGeneralAggregationLogic = (
+                [{
+                    '$match': {
+                        'user': ObjectID(User._id),
+                    }
+                }, {
+                    '$lookup': {
+                        'from': 'Votes',
+                        'let': {
+                            'userId': ObjectID(AuthUser._id),
+                            'questionText': '$questionText',
+                            'choiceText': '$choiceText',
+                            'group': '$group',
+                            'channel': '$channel'
+                        },
+                        'pipeline': [
+                            {
+                                '$match': {
+                                    '$and': [
+                                        {
+                                            '$expr': {
+                                                '$eq': [
+                                                    '$user', {
+                                                        '$toObjectId': '$$userId'
+                                                    }
+                                                ]
+                                            }
+                                        },
+                                        {
+                                            '$expr': {
+                                                '$eq': [
+                                                    '$questionText', '$$questionText'
+                                                ]
+                                            }
+                                        },
+                                        {
+                                            '$expr': {
+                                                '$eq': [
+                                                    '$group', '$$group'
+                                                ]
+                                            }
+                                        },
+                                        {
+                                            '$expr': {
+                                                '$eq': [
+                                                    '$channel', '$$channel'
+                                                ]
+                                            }
+                                        }
+                                    ]
+                                }
+                            }
+                        ],
+                        'as': 'yourVote'
+                    }
+                }, {
+                    '$match': {
+                        'yourVote': {
+                            '$gte': {
+                                '$size': 1
+                            }
+                        }
+                    }
+                }, {
+                    '$addFields': {
+                        'yourVote': {
+                            '$first': '$yourVote'
+                        }
+                    }
+                }, {
+                    '$addFields': {
+                        'bothDirect': {
+                            '$and': [
+                                {
+                                    '$eq': [
+                                        '$isDirect', true
+                                    ]
+                                }, {
+                                    '$eq': [
+                                        '$yourVote.isDirect', true
+                                    ]
+                                }
+                            ]
+                        },
+                        'InAgreement': {
+                            '$and': [
+                                {
+                                    '$eq': [
+                                        '$position', '$yourVote.position'
+                                    ]
+                                }
+                            ]
+                        },
+                        'yourVoteMadeByUser': {
+                            '$gte': [
+                                {
+                                    '$size': {
+                                        '$filter': {
+                                            'input': '$yourVote.representatives',
+                                            'as': 'r',
+                                            'cond': {
+                                                '$eq': [
+                                                    '$$r.representativeId', '$user'
+                                                ]
+                                            }
+                                        }
+                                    }
+                                }, 1
+                            ]
+                        },
+                        'yourVoteMadeForUser': {
+                            '$gte': [
+                                {
+                                    '$size': {
+                                        '$filter': {
+                                            'input': '$representatives',
+                                            'as': 'r',
+                                            'cond': {
+                                                '$eq': [
+                                                    '$$r.representativeId', '$yourVote.user'
+                                                ]
+                                            }
+                                        }
+                                    }
+                                }, 1
+                            ]
+                        }
+                    }
+                },
+                ]
+            );
+
+            const questionStatsAggregationLogic = (
+                [
+                    {
+                        $lookup: {
+                            from: 'Questions',
+                            let: {
+                                questionText: "$questionText",
+                                choiceText: "$choiceText",
+                                group: "$group",
+                                channel: "$channel"
+                            },
+                            pipeline: [
+                                {
+                                    $match: {
+                                        // "questionText": "$$questionText",
+                                        // not null
+                                        $and: [
+                                            {
+                                                '$expr': {
+                                                    '$eq': [
+                                                        '$questionText', '$$questionText'
+                                                    ]
+                                                }
+                                            },
+                                            {
+                                                '$expr': {
+                                                    '$eq': [
+                                                        '$group', '$$group'
+                                                    ]
+                                                }
+                                            },
+                                            {
+                                                '$expr': {
+                                                    '$eq': [
+                                                        '$channel', '$$channel'
+                                                    ]
+                                                }
+                                            }
+                                        ]
+                                    }
+                                }
+                            ],
+                            as: 'question'
+                        }
+                    },
+                    {
+                        $addFields: {
+                            QuestionStats: { $first: '$question.stats' }
+                        }
+                    }
+                ]
+            );
+
+            const Votes = await (async (type) => {
+                return {
+                    'directVotesMade': async () => await mongoDB.collection("Votes")
+                        // .find({ 'user': ObjectID(User?._id), 'isDirect': true })
+                        .aggregate([
+                            ...votesInCommonGeneralAggregationLogic,
+                            {
+                                '$match': {
+                                    'isDirect': true
+                                }
+                            },
+                            ...questionStatsAggregationLogic
+                        ])
+                        .toArray(),
+                    'directVotesInAgreement': async () => await mongoDB.collection("Votes")
+                        .aggregate([
+                            ...votesInCommonGeneralAggregationLogic,
+                            {
+                                '$match': {
+                                    'InAgreement': true,
+                                    'bothDirect': true
+                                }
+                            },
+                            ...questionStatsAggregationLogic
+                        ])
+                        .toArray(),
+                    'directVotesInDisagreement': async () => await mongoDB.collection("Votes")
+                        .aggregate([
+                            ...votesInCommonGeneralAggregationLogic,
+                            {
+                                '$match': {
+                                    'InAgreement': false,
+                                    'bothDirect': true
+                                }
+                            },
+                            ...questionStatsAggregationLogic
+                        ])
+                        .toArray(),
+                    'indirectVotesMadeForUser': async () => await mongoDB.collection("Votes")
+                        // .find({ 'user': ObjectID(User?._id), 'isDirect': false })
+                        .aggregate([
+                            ...votesInCommonGeneralAggregationLogic,
+                            {
+                                '$match': {
+                                    'isDirect': false
+                                }
+                            },
+                            ...questionStatsAggregationLogic
+                        ])
+                        .toArray(),
+                    'indirectVotesMadeByYou': async () => await mongoDB.collection("Votes")
+                        .aggregate([
+                            ...votesInCommonGeneralAggregationLogic,
+                            {
+                                '$match': {
+                                    'yourVoteMadeForUser': true
+                                }
+                            },
+                            ...questionStatsAggregationLogic
+                        ])
+                        .toArray(),
+                    'indirectVotesMadeForYou': async () => await mongoDB.collection("Votes")
+                        .aggregate([
+                            ...votesInCommonGeneralAggregationLogic,
+                            {
+                                '$match': {
+                                    'yourVoteMadeByUser': true
+                                }
+                            },
+                            ...questionStatsAggregationLogic
+                        ])
+                        .toArray(),
+                }[type]();
+            })(type);
+
+            console.log({
+                Votes
+            });
+
+            return Votes;
         },
     },
     Mutation: {
@@ -413,8 +679,251 @@ const getUserStats = async ({ userId, mongoDB }) => {
                 "userId": ObjectID(userId),
                 "isMember": true
             }).count(),
-        directVotesMade: 0, // TODO
-        indirectVotesMadeByUser: 0, // TODO
-        indirectVotesMadeForUser: 0, // TODO
+        directVotesMade: await mongoDB.collection("Votes")
+            .find({
+                "isDirect": true,
+                "user": ObjectID(userId)
+            }).count(),
+        indirectVotesMadeByUser: await mongoDB.collection("Votes")
+            .find({
+                "isDirect": false,
+                "representatives.representativeId": ObjectID(userId)
+            }).count(),
+        indirectVotesMadeForUser: await mongoDB.collection("Votes")
+            .find({
+                "isDirect": false,
+                "user": ObjectID(userId)
+            }).count(),
     });
+}
+
+const getYourUserStats = async ({ userId, AuthUser, mongoDB }) => {
+
+    const votesInCommon = (
+        await mongoDB.collection("Votes")
+            .aggregate([
+                {
+                    '$match': {
+                        'user': ObjectID(AuthUser._id),
+                    }
+                }, {
+                    '$lookup': {
+                        'from': 'Votes',
+                        'let': {
+                            'userId': userId,
+                            'questionText': '$questionText',
+                            'choiceText': '$choiceText',
+                            'group': '$group',
+                            'channel': '$channel'
+                        },
+                        'pipeline': [
+                            {
+                                '$match': {
+                                    '$and': [
+                                        {
+                                            '$expr': {
+                                                '$eq': [
+                                                    '$user', {
+                                                        '$toObjectId': '$$userId'
+                                                    }
+                                                ]
+                                            }
+                                        },
+                                        {
+                                            '$expr': {
+                                                '$eq': [
+                                                    '$questionText', '$$questionText'
+                                                ]
+                                            }
+                                        },
+                                        {
+                                            '$expr': {
+                                                '$eq': [
+                                                    '$group', '$$group'
+                                                ]
+                                            }
+                                        },
+                                        {
+                                            '$expr': {
+                                                '$eq': [
+                                                    '$channel', '$$channel'
+                                                ]
+                                            }
+                                        }
+                                    ]
+                                }
+                            }
+                        ],
+                        'as': 'otherVote'
+                    }
+                }, {
+                    '$match': {
+                        'otherVote': {
+                            '$gte': {
+                                '$size': 1
+                            }
+                        }
+                    }
+                }, {
+                    '$addFields': {
+                        'otherVote': {
+                            '$first': '$otherVote'
+                        }
+                    }
+                }, {
+                    '$project': {
+                        'bothDirect': {
+                            '$and': [
+                                {
+                                    '$eq': [
+                                        '$isDirect', true
+                                    ]
+                                }, {
+                                    '$eq': [
+                                        '$otherVote.isDirect', true
+                                    ]
+                                }
+                            ]
+                        },
+                        'InAgreement': {
+                            '$and': [
+                                {
+                                    '$eq': [
+                                        '$position', '$otherVote.position'
+                                    ]
+                                }
+                            ]
+                        },
+                        'otherVoteMadeByYou': {
+                            '$gte': [
+                                {
+                                    '$size': {
+                                        '$filter': {
+                                            'input': '$otherVote.representatives',
+                                            'as': 'r',
+                                            'cond': {
+                                                '$eq': [
+                                                    '$$r.representativeId', '$user'
+                                                ]
+                                            }
+                                        }
+                                    }
+                                }, 1
+                            ]
+                        },
+                        'otherVoteMadeForYou': {
+                            '$gte': [
+                                {
+                                    '$size': {
+                                        '$filter': {
+                                            'input': '$representatives',
+                                            'as': 'r',
+                                            'cond': {
+                                                '$eq': [
+                                                    '$$r.representativeId', '$otherVote.user'
+                                                ]
+                                            }
+                                        }
+                                    }
+                                }, 1
+                            ]
+                        }
+                    }
+                }, {
+                    '$group': {
+                        '_id': null,
+                        'votesInCommon': {
+                            '$sum': 1
+                        },
+                        'directVotesInCommon': {
+                            '$sum': {
+                                '$cond': [
+                                    {
+                                        '$eq': [
+                                            '$bothDirect', true
+                                        ]
+                                    }, 1, 0
+                                ]
+                            }
+                        },
+                        'directVotesInAgreement': {
+                            '$sum': {
+                                '$cond': [
+                                    {
+                                        '$and': [
+                                            {
+                                                '$eq': [
+                                                    '$InAgreement', true
+                                                ]
+                                            }, {
+                                                '$eq': [
+                                                    '$bothDirect', true
+                                                ]
+                                            }
+                                        ]
+                                    }, 1, 0
+                                ]
+                            }
+                        },
+                        'directVotesInDisagreement': {
+                            '$sum': {
+                                '$cond': [
+                                    {
+                                        '$and': [
+                                            {
+                                                '$eq': [
+                                                    '$InAgreement', false
+                                                ]
+                                            }, {
+                                                '$eq': [
+                                                    '$bothDirect', true
+                                                ]
+                                            }
+                                        ]
+                                    }, 1, 0
+                                ]
+                            }
+                        },
+                        'indirectVotesMadeByYou': {
+                            '$sum': {
+                                '$cond': [
+                                    {
+                                        '$eq': [
+                                            '$otherVoteMadeByYou', true
+                                        ]
+                                    }, 1, 0
+                                ]
+                            }
+                        },
+                        'indirectVotesMadeForYou': {
+                            '$sum': {
+                                '$cond': [
+                                    {
+                                        '$eq': [
+                                            '$otherVoteMadeForYou', true
+                                        ]
+                                    }, 1, 0
+                                ]
+                            }
+                        }
+                    }
+                }
+            ])
+            .toArray()
+    )?.[0];
+
+    // console.log({
+    //     votesInCommon
+    // });
+
+    return {
+        votesInCommon: votesInCommon?.votesInCommon || 0, // count
+        directVotesInCommon: votesInCommon?.directVotesInCommon || 0, // count it both direct
+
+        directVotesInAgreement: votesInCommon?.directVotesInAgreement || 0, // count if positions differ & both direct
+        directVotesInDisagreement: votesInCommon?.directVotesInDisagreement || 0, // count if positions differ & both direct
+
+        indirectVotesMadeByYou: votesInCommon?.indirectVotesMadeByYou || 0, // count if user made indirect vote and you represented him
+        indirectVotesMadeForYou: votesInCommon?.indirectVotesMadeForYou || 0, // count if you made an indirect vote and he represented you
+    }
 }

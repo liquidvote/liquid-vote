@@ -24,6 +24,14 @@ export const USER = gql`
             indirectVotesMadeByUser
             indirectVotesMadeForUser
         }
+        yourStats {
+            votesInCommon
+            directVotesInCommon
+            directVotesInAgreement
+            directVotesInDisagreement
+            indirectVotesMadeByYou
+            indirectVotesMadeForYou
+        }
     }
   }
 `;
@@ -92,12 +100,6 @@ export const USER_REPRESENTED_BY = gql`
   }
 `;
 
-export const USER_DIRECT_VOTES = gql`
-  query($handle: String!) {
-    UserDirectVotes(handle: $handle)
-  }
-`;
-
 export const USER_GROUPS = gql`
   query($handle: String!, $representative: String) {
     UserGroups(handle: $handle, representative: $representative) {
@@ -135,6 +137,73 @@ export const USER_GROUPS = gql`
             representations
             directVotesMade
             indirectVotesMade
+        }
+    }
+  }
+`;
+
+export const USER_VOTES = gql`
+  query($handle: String!, $type: String) {
+    UserVotes(handle: $handle, type: $type) {
+        questionText
+        # choiceText
+        groupChannel {
+            group
+            channel
+        }
+        position
+        isDirect
+        forWeight
+        againstWeight
+        representatives{
+            representativeHandle
+            representativeAvatar
+            representativeName
+            position
+            forWeight
+            againstWeight
+            createdOn
+            lastEditOn
+        }
+        createdOn
+        lastEditOn
+        # representeeVotes
+        QuestionStats {
+            lastVoteOn
+            forCount
+            forDirectCount
+            forMostRepresentingVoters {
+                handle
+                avatar
+                name
+                representeeCount
+            }
+            againstCount
+            againstMostRepresentingVoters {
+                handle
+                avatar
+                name
+                representeeCount
+            }
+            againstDirectCount
+        }
+        yourVote {
+            position
+            isDirect
+            forWeight
+            againstWeight
+            representatives{
+                representativeHandle
+                representativeAvatar
+                representativeName
+                position
+                forWeight
+                againstWeight
+                createdOn
+                lastEditOn
+            }
+            createdOn
+            lastEditOn
         }
     }
   }
