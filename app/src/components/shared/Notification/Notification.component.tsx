@@ -57,7 +57,7 @@ export const Notification: FunctionComponent<{
                                             <small className="d-flex align-items-center">
                                                 Was represented by
                                                 <div className="d-flex ml-2 pl-1 mr-1">
-                                                    {v.representatives.map((r: any) => (
+                                                    {v.representatives?.map((r: any) => (
                                                         <Link
                                                             to={`/profile/${r.representativeHandle}`}
                                                             className={`vote-avatar tiny ${r.position} ml-n2 d-none d-md-block`}
