@@ -3,7 +3,6 @@ import { Link, useParams } from "react-router-dom";
 import { DiscussionEmbed } from 'disqus-react';
 import numeral from 'numeral';
 import ReactTooltip from 'react-tooltip';
-import Modal from 'react-modal';
 import { useQuery, useMutation } from "@apollo/client";
 
 import VoteGraph1 from "@shared/VoteGraph1";
@@ -26,10 +25,12 @@ import Notification from '@shared/Notification';
 import { QUESTION } from '@state/Question/typeDefs';
 import { voteStatsMap } from '@state/Question/map';
 import { EDIT_VOTE } from '@state/Vote/typeDefs';
+import useSearchParams from "@state/Global/useSearchParams.effect";
 
 export default function Question() {
 
     let { voteName, groupChannel, section } = useParams<any>();
+    const { allSearchParams, updateParams } = useSearchParams();
 
     const groupChannel_ = (([g, c]) => ({
         group: g,
@@ -55,9 +56,6 @@ export default function Question() {
         data: editVote_data,
     }] = useMutation(EDIT_VOTE);
 
-    console.log({
-        question_data
-    });
 
     const [userVote, setUserVote] = useState(null);
 
@@ -65,10 +63,6 @@ export default function Question() {
         setUserVote(question_data?.Question?.userVote?.position || null);
     }, [question_data?.Question?.userVote?.position]);
 
-    console.log({
-        userVote,
-        v: question_data?.Question?.userVote?.position
-    });
     // const [isPollingInOtherGroup, setIsPollingInOtherGroup] = useState(false);
     // const [isShowingVotersModal, setIsShowingVotersModal] = useState(false);
     // const [usersShowing, setUsersShowing] = useState('');
@@ -104,6 +98,11 @@ export default function Question() {
             againstDirectCount: editVote_data?.editVote?.QuestionStats.againstDirectCount,
         }
     });
+
+
+    const forRepresentatives = question_data?.Question?.userVote?.representatives.filter((r: any) => r.position === 'for');
+    const againstRepresentatives = question_data?.Question?.userVote?.representatives.filter((r: any) => r.position === 'against');
+
     console.log({
         stats
     });
@@ -148,53 +147,136 @@ export default function Question() {
                 <div className="d-flex d-flex justify-content-between mt-4">
                     <div className="d-flex align-items-center">
                         <div
-                            className={`button_ ${userVote === 'for' && 'selected'}`}
+                            className={`button_ mr-1 ${userVote === 'for' && 'selected'}`}
                         >
-                            <span onClick={() => handleUserVote('for')}>
+                            <span className="mr-1" onClick={() => handleUserVote('for')}>
                                 For
                             </span>
-                            <div className="d-flex ml-3 my-n2 mr-n1">
-                                <Link to="/profile" className="vote-avatar avatar-1 for ml-n2 d-none d-md-block"></Link>
-                                <div onClick={(e) => {
-                                    setIsShowingVotersModal(true);
-                                    setUsersShowing(`Your Representatives Voting For on ${voteName}`);
-                                }} className="vote-avatar count for ml-n2">+{3}</div>
-                            </div>
+                            {
+                                !!forRepresentatives?.length && (
+                                    <div className="d-flex ml-2 my-n2 mr-n1">
+                                        <Link
+                                            to={`/profile/${forRepresentatives[0].representativeHandle}`}
+                                            className="vote-avatar for ml-n2 d-none d-md-block"
+                                            style={{
+                                                background: `url(${forRepresentatives[0].representativeAvatar}) no-repeat`,
+                                                backgroundSize: 'cover'
+                                            }}
+                                        ></Link>
+                                        <div onClick={(e) => {
+                                            updateParams({
+                                                paramsToAdd: {
+                                                    modal: "ListVoters",
+                                                    modalData: JSON.stringify({
+                                                        votersSection: 'forRepresentatives',
+                                                        questionText: question_data?.Question?.questionText,
+                                                        groupChannel
+                                                    })
+                                                }
+                                            })
+                                            // setIsShowingVotersModal(true);
+                                            // setUsersShowing(`Your Representatives Voting For on ${voteName}`);
+                                        }} className="vote-avatar count for ml-n2">{forRepresentatives.length}</div>
+                                    </div>
+                                )
+                            }
                         </div>
+
+
                         <div className="d-flex ml-2">
-                            {/* <Link to="/profile" className="vote-avatar avatar-1 for ml-n2"></Link> */}
-                            <Link to="/profile" className="vote-avatar avatar-2 for ml-n2 d-none d-md-block"></Link>
-                            <Link to="/profile" className="vote-avatar avatar-3 for ml-n2 d-none d-md-block"></Link>
+                            {question_data?.Question?.stats?.forMostRepresentingVoters?.slice(0, 2).map((v: any) => (
+                                <Link
+                                    to={`/profile/${v?.handle}`}
+                                    className="vote-avatar avatar-2 for ml-n2 d-none d-md-block"
+                                    style={{
+                                        background: `url(${v?.avatar}) no-repeat`,
+                                        backgroundSize: 'cover'
+                                    }}
+                                ></Link>
+                            ))}
+
                             <div onClick={(e) => {
-                                setIsShowingVotersModal(true);
-                                setUsersShowing(`People Voting For on ${voteName}`);
-                            }} className="vote-avatar count for ml-n2">{numeral(defaults.forCount).format('0a')}</div>
+                                updateParams({
+                                    paramsToAdd: {
+                                        modal: "ListVoters",
+                                        modalData: JSON.stringify({
+                                            votersSection: 'forDirectVotes',
+                                            questionText: question_data?.Question?.questionText,
+                                            groupChannel
+                                        })
+                                    }
+                                })
+                            }}
+                                className="vote-avatar count for ml-n2">{numeral(question_data?.Question?.stats.forDirectCount).format('0a')}
+                            </div>
+                            {/* <div onClick={(e) => {
+                                // setIsShowingVotersModal(true);
+                                // setUsersShowing(`People Voting For on ${voteName}`);
+                            }}
+                                className="vote-avatar count for ml-n2">{numeral(question_data?.Question?.stats.forCount - question_data?.Question?.stats.forDirectCount).format('0a')}
+                            </div> */}
+
                         </div>
                     </div>
                     <div className="d-flex align-items-center">
                         <div className="d-flex ml-2">
-                            <Link to="/profile" className="vote-avatar avatar-4 against ml-n2 d-none d-md-block"></Link>
-                            {/* <Link to="/profile" className="vote-avatar avatar-5 against ml-n2 d-none d-md-block"></Link> */}
-                            <Link to="/profile" className="vote-avatar avatar-6 against ml-n2 d-none d-md-block"></Link>
+                            {question_data?.Question?.stats?.againstMostRepresentingVoters?.slice(0, 2).map((v: any) => (
+                                <Link
+                                    to={`/profile/${v?.handle}`}
+                                    className="vote-avatar avatar-2 against ml-n2 d-none d-md-block"
+                                    style={{
+                                        background: `url(${v?.avatar}) no-repeat`,
+                                        backgroundSize: 'cover'
+                                    }}
+                                ></Link>
+                            ))}
                             {/* <div className="vote-avatar avatar-1 ml-n2" /> */}
                             <div onClick={(e) => {
-                                setIsShowingVotersModal(true);
-                                setUsersShowing(`People Voting Against on ${voteName}`);
-                            }} className="vote-avatar count against ml-n2">{numeral(defaults.againstCount).format('0a')}</div>
+                                updateParams({
+                                    paramsToAdd: {
+                                        modal: "ListVoters",
+                                        modalData: JSON.stringify({
+                                            votersSection: 'againstDirectVotes',
+                                            questionText: question_data?.Question?.questionText,
+                                            groupChannel
+                                        })
+                                    }
+                                })
+                            }} className="vote-avatar count against ml-n2">{numeral(question_data?.Question?.stats.againstDirectCount).format('0a')}</div>
                         </div>
                         <div
-                            className={`button_ ${userVote === 'against' && 'selected'}`}
+                            className={`button_ ml-1 ${userVote === 'against' && 'selected'}`}
                         >
                             <span onClick={() => handleUserVote('against')}>
                                 Against
                             </span>
-                            <div className="d-flex ml-3 my-n2 mr-n1">
-                                <Link to="/profile" className="vote-avatar avatar-5 against ml-n2 d-none d-md-block"></Link>
-                                <div onClick={(e) => {
-                                    setIsShowingVotersModal(true);
-                                    setUsersShowing(`Your Representatives Voting Against on ${voteName}`);
-                                }} className="vote-avatar count against ml-n2">+{1}</div>
-                            </div>
+                            {
+                                !!againstRepresentatives?.length && (
+                                    <div className="d-flex ml-3 my-n2 mr-n1">
+                                        <Link
+                                            to={`/profile/${againstRepresentatives[0].representativeHandle}`}
+                                            className="vote-avatar against ml-n2 d-none d-md-block"
+                                            style={{
+                                                background: `url(${againstRepresentatives[0].representativeAvatar}) no-repeat`,
+                                                backgroundSize: 'cover'
+                                            }}
+                                        ></Link>
+                                        {/* <Link to="/profile" className="vote-avatar avatar-5 against ml-n2 d-none d-md-block"></Link> */}
+                                        <div onClick={(e) => {
+                                            updateParams({
+                                                paramsToAdd: {
+                                                    modal: "ListVoters",
+                                                    modalData: JSON.stringify({
+                                                        votersSection: 'againstRepresentatives',
+                                                        questionText: question_data?.Question?.questionText,
+                                                        groupChannel
+                                                    })
+                                                }
+                                            })
+                                        }} className="vote-avatar count against ml-n2">{againstRepresentatives.length}</div>
+                                    </div>
+                                )
+                            }
                         </div>
                     </div>
                 </div>
@@ -234,11 +316,6 @@ export default function Question() {
                 </div>
 
                 <br />
-
-                <pre>{JSON.stringify(question_data?.Question, null, 2)}</pre>
-
-                <br />
-
 
                 <ul className="nav d-flex justify-content-around mt-1 mb-n4 mx-n3">
                     <li className="nav-item">

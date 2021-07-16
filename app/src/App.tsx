@@ -33,6 +33,8 @@ export default function App() {
                         <Route path="/create-vote" component={loadable(() => import('./components/Routes/CreateVote'))} />
                         <Route path="/create-vote/:groupName" component={loadable(() => import('./components/Routes/CreateVote'))} />
                         {/* <Route path="/create-sub-vote/:voteName" component={loadable(() => import('./components/Routes/CreateVote'))} /> */}
+                        <Route path="/profile/:handle/:section/:subsection/:subsubsection" component={loadable(() => import('./components/Routes/Profile'))} />
+                        <Route path="/profile/:handle/:section/:subsection" component={loadable(() => import('./components/Routes/Profile'))} />
                         <Route path="/profile/:handle/:section" component={loadable(() => import('./components/Routes/Profile'))} />
                         <Route path="/profile/:handle" component={loadable(() => import('./components/Routes/Profile'))} />
                         <Route path="/profile" component={loadable(() => import('./components/Routes/Profile'))} />

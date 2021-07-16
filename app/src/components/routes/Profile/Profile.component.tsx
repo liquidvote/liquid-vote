@@ -3,6 +3,7 @@ import { Link, useParams } from "react-router-dom";
 import { useQuery } from "@apollo/client";
 
 import BackArrowSVG from "@shared/Icons/BackArrow.svg";
+import GroupSmallSvg from "@shared/Icons/Group-small.svg";
 import LinkSVG from "@shared/Icons/Link.svg";
 import CalendarSVG from "@shared/Icons/Calendar.svg";
 import LocationSVG from "@shared/Icons/Location.svg";
@@ -147,34 +148,62 @@ export const Profile: FunctionComponent<{}> = ({ }) => {
                 </div>
             </div>
             <div className="profile-stats-container">
-                <Link to={`/profile-people/${profile.handle}/representing`}>
+                <Link to={`/profile-people/${profile.handle}/representing`} className="mr-2">
                     <b>{profile?.stats?.representing}</b> Representing {profile.name}
                 </Link>
-                <Link to={`/profile-people/${profile.handle}/representedBy`} className="ml-2">
+                <Link to={`/profile-people/${profile.handle}/representedBy`} className="mr-2">
                     <b>{profile?.stats?.representedBy}</b> Represented by {profile.name}
                 </Link>
+                {/* {profile?.yourStats?.groupsInCommon && (
+                    <Link to={`/profile-people/${profile.handle}/groups`} className="mr-2">
+                        <b>{profile?.yourStats?.groupsInCommon}</b> Groups in common
+                    </Link>
+                )} */}
             </div>
 
-            <ul className="nav d-flex justify-content-around mt-1 mb-n4 mx-n3">
+            <br />
+
+            {/* <div className="mt-4 mb-3 d-flex align-items-start flex-nowrap justify-content-between">
+                <div className="d-flex flex-column">
+                    <div
+                        className="d-flex flex-wrap justify-content-start"
+                    >
+                        <div data-tip="User Groups">
+                            <GroupSmallSvg />
+                        </div>
+  
+                        {selectedGroup?.channels?.map((el: any, i: any) => (
+                            <div
+                                key={'s-' + el.name}
+                                onClick={() => selectChannel(el.name)}
+                                className={`badge pointer ${selectedChannels.indexOf(el.name) === -1 && 'inverted'} ml-1 mb-1 mt-1`}
+                            >{el.name}</div>
+                        ))}
+                        <div className={`badge inverted ml-1 mb-1 mt-1`}>+3</div>
+                    </div>
+                </div>
+            </div> */}
+
+            {/* <ul className="nav d-flex justify-content-around mt-1 mb-n4 mx-n3">
                 <li className="nav-item">
                     <Link className={`nav-link ${(!section || section === 'votes') && 'active'}`} to={`/profile/${profile.handle}/votes`}>
-                        <b>{profile.directVotes}</b> Votes
+                        <b>{profile?.stats?.directVotesMade + profile?.stats?.indirectVotesMadeForUser || 0}</b> Votes
                     </Link>
                 </li>
                 <li className="nav-item">
-                    <Link className={`nav-link ${section === 'groups' && 'active'}`} to={`/profile/${profile.handle}/groups`}>
-                        <b>{profile.groups}</b> Groups
+                    <Link className={`nav-link ${section === 'timeline' && 'active'}`} to={`/profile/${profile.handle}/timeline`}>
+                        <b>0</b> Timeline
                     </Link>
                 </li>
-            </ul>
+            </ul> */}
 
-            <hr />
+            {/* <hr /> */}
 
             {/* <h3>{section}</h3> */}
 
             {(!section || section === 'votes') && <ProfileVotes />}
 
-            {(section === 'groups') && <ProfileGroups />}
+            {(section === 'timeline') && <p>Soon</p>}
         </>
     );
 }

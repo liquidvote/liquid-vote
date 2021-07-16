@@ -68,6 +68,113 @@ export const QuestionResolvers = {
                 }
             })));
         },
+        //VotersRepresentingYou
+        //DirectVoters
+        //IndirectVoters
+        // DirectVoters: async (_source, { questionText, choiceText, group, channel }, { mongoDB, s3, AuthUser }) => {
+
+        //     const DirectVotersByPosition = (await mongoDB.collection("Votes")
+        //         .aggregate([
+        //             {
+        //                 '$match': {
+        //                     // 'position': {
+        //                     //     '$in': [
+        //                     //         'for', 'against'
+        //                     //     ]
+        //                     // },
+        //                     'isDirect': true,
+        //                     "groupChannel.group": group,
+        //                     "groupChannel.channel": channel,
+        //                     "questionText": questionText,
+        //                 }
+        //             },
+        //             {
+        //                 $lookup: {
+        //                     from: 'Votes',
+        //                     let: {
+        //                         representativeId: "$user"
+        //                     },
+        //                     pipeline: [
+        //                         {
+        //                             $match: {
+        //                                 questionText,
+        //                                 // choiceText,
+        //                                 'groupChannel.group': group,
+        //                                 'groupChannel.channel': channel,
+        //                             }
+        //                         },
+        //                         { $unwind: '$representatives' },
+        //                         {
+        //                             $match: {
+        //                                 $expr: {
+        //                                     $eq: [
+        //                                         "$representatives.representativeId",
+        //                                         { "$toObjectId": "$$representativeId" }
+        //                                     ]
+        //                                 }
+        //                             }
+        //                         }
+        //                     ],
+        //                     as: 'representees'
+        //                 }
+        //             },
+        //             {
+        //                 '$project': {
+        //                     'user': 1,
+        //                     'position': 1,
+        //                     'representeeCount': {
+        //                         '$size': { "$ifNull": ["$representees", []] }
+        //                     }
+        //                 }
+        //             }, {
+        //                 '$sort': {
+        //                     'representeeCount': -1
+        //                 }
+        //             }, {
+        //                 '$lookup': {
+        //                     'from': 'Users',
+        //                     'localField': 'user',
+        //                     'foreignField': '_id',
+        //                     'as': 'user'
+        //                 }
+        //             },
+        //             {
+        //                 '$project': {
+        //                     'user': {
+        //                         '$first': '$user.LiquidUser'
+        //                     },
+        //                     'position': 1,
+        //                     'representeeCount': 1
+        //                 }
+        //             }, {
+        //                 '$group': {
+        //                     '_id': '$position',
+        //                     'voters': {
+        //                         '$push': {
+        //                             'handle': '$user.handle',
+        //                             'avatar': '$user.avatar',
+        //                             'name': '$user.name',
+        //                             'representeeCount': '$representeeCount'
+        //                         }
+        //                     },
+        //                     'count': {
+        //                         '$sum': 1
+        //                     }
+        //                 }
+        //             }
+        //         ])
+        //         .toArray()
+        //     )?.reduce((acc, curr) => ({
+        //         ...acc,
+        //         [curr._id]: curr
+        //     }), {});
+            
+        //     return null;
+        //     // return {
+        //     //     ...Vote,
+        //     //     thisUserIsAdmin: Vote.createdBy === AuthUser?.LiquidUser?.handle,
+        //     // };
+        // },
     },
     Mutation: {
         editQuestion: async (_source, {

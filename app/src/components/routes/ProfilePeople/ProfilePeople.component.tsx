@@ -73,7 +73,7 @@ export const ProfilePeople: FunctionComponent<{}> = ({ }) => {
                         <PersonInList person={el} />
                     ))}
                     {!user_representing_data?.UserRepresenting?.length && (
-                        <>{`${profile?.name} isn't represented by anyone yet.`}</>
+                        <div className="p-4 text-center">{`${profile?.name} isn't represented by anyone yet.`}</div>
                     )}
                 </div>
             )}
@@ -85,7 +85,7 @@ export const ProfilePeople: FunctionComponent<{}> = ({ }) => {
                         <PersonInList person={el} />
                     ))}
                     {!user_represented_by_data?.UserRepresentedBy?.length && (
-                        <>{`${profile?.name} isn't representing anyone yet.`}</>
+                        <div className="p-4 text-center">{`${profile?.name} isn't representing anyone yet.`}</div>
                     )}
                 </div>
             )}

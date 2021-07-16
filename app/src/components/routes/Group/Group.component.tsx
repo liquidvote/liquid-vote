@@ -3,7 +3,7 @@ import { useParams, Link } from 'react-router-dom';
 import { useQuery, useMutation } from "@apollo/client";
 import ReactTooltip from 'react-tooltip';
 
-import VoteGraph1 from "@shared/VoteGraph1";
+// import VoteGraph1 from "@shared/VoteGraph1";
 import Header from "@shared/Header";
 import LinkSVG from "@shared/Icons/Link.svg";
 import CalendarSVG from "@shared/Icons/Calendar.svg";
@@ -316,7 +316,7 @@ export const Group: FunctionComponent<{}> = ({ }) => {
                     } */}
                 </div>
             )}
-            {section === 'members' && (
+            {/* {section === 'members' && (
                 <div className="mt-n2">
                     {people.map((el, i) => (
                         <PersonInList person={el} />
@@ -329,7 +329,7 @@ export const Group: FunctionComponent<{}> = ({ }) => {
                         <GroupInList group={el} />
                     ))}
                 </div>
-            )}
+            )} */}
             {(section === 'timeline') && VoteTimeline.map((l, i) => (
                 <Notification v={{ ...l }} showChart={true} />
             ))}

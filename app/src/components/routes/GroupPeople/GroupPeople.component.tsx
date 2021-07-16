@@ -70,14 +70,13 @@ export const GroupPeople: FunctionComponent<{}> = ({ }) => {
         skip: !authUser
     });
 
-    console.log({
-        user_representing_data,
-        user_represented_by_data
-    });
-
     return (
         <>
-            <Header title={selectedGroup?.name} noBottom={true} />
+            <Header
+                title={selectedGroup?.name}
+                noBottom={true}
+                backLink={`/group/${selectedGroup?.handle}`}
+            />
             <ul className="nav d-flex justify-content-around mt-1 mb-n4 mx-n3">
                 <li className="nav-item">
                     <Link className={`nav-link ${which === 'members' && 'active'}`} to={`/group-people/${selectedGroup?.handle}/members`}>

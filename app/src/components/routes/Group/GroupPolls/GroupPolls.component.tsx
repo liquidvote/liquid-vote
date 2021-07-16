@@ -2,7 +2,6 @@ import React, { FunctionComponent, useEffect } from 'react';
 import { Link, useParams } from "react-router-dom";
 import { useQuery } from "@apollo/client";
 
-import VoteWrapper from "@shared/VoteWrapper";
 import SingleVoteInList from "@shared/SingleVoteInList";
 import MultiVoteInList from "@shared/MultiVoteInList";
 import DropPlusSVG from "@shared/Icons/Drop+.svg";

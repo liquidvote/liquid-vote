@@ -4,7 +4,7 @@ import numeral from 'numeral';
 import Modal from 'react-modal';
 import { useQuery, useMutation } from "@apollo/client";
 
-import VoteGraph1 from "@shared/VoteGraph1";
+// import VoteGraph1 from "@shared/VoteGraph1";
 import Chart from "@shared/VoteGraph1/chart.svg";
 import XSVG from "@shared/Icons/X.svg";
 import { people } from "@state/Mock/People";
@@ -43,8 +43,8 @@ export const SingleVoteInList: FunctionComponent<{
                 variables: {
                     questionText: l.questionText,
                     // choiceText
-                    group: l.groupChannel.group,
-                    channel: l.groupChannel.channel,
+                    group: l.groupChannel?.group,
+                    channel: l.groupChannel?.channel,
                     Vote: {
                         position: (vote === userVote) ? null : vote
                     },
@@ -61,10 +61,10 @@ export const SingleVoteInList: FunctionComponent<{
         const [usersShowing, setUsersShowing] = useState('');
 
         const stats = voteStatsMap({
-            forCount: l.stats.forCount,
-            againstCount: l.stats.againstCount,
-            forDirectCount: l.stats.forDirectCount,
-            againstDirectCount: l.stats.againstDirectCount,
+            forCount: l.stats?.forCount || 0,
+            againstCount: l.stats?.againstCount || 0,
+            forDirectCount: l.stats?.forDirectCount || 0,
+            againstDirectCount: l.stats?.againstDirectCount || 0,
             ...(!!editVote_data?.editVote?.QuestionStats) && {
                 forCount: editVote_data?.editVote?.QuestionStats.forCount,
                 againstCount: editVote_data?.editVote?.QuestionStats.againstCount,
@@ -89,7 +89,7 @@ export const SingleVoteInList: FunctionComponent<{
                             <div className="mb-1 d-flex align-items-center">
                                 <a
                                     className="white mb-0"
-                                    href={`/poll/${l.questionText}/${l.groupChannel.group}-${l.groupChannel.channel}`}
+                                    href={`/poll/${l.questionText}/${l.groupChannel?.group}-${l.groupChannel?.channel}`}
                                 >
                                     <div className="text-truncate" title={l.questionText}>
                                         {l.questionText}
@@ -98,8 +98,8 @@ export const SingleVoteInList: FunctionComponent<{
                                 </a>
                                 {!!showGroup && (
                                     <div className="badge m-0 ml-2">
-                                        {l.groupChannel.group}:
-                                        {l.groupChannel.channel}
+                                        {l.groupChannel?.group}:
+                                        {l.groupChannel?.channel}
                                     </div>
                                 )}
                             </div>
