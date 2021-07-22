@@ -26,6 +26,7 @@ import { QUESTION } from '@state/Question/typeDefs';
 import { voteStatsMap } from '@state/Question/map';
 import { EDIT_VOTE } from '@state/Vote/typeDefs';
 import useSearchParams from "@state/Global/useSearchParams.effect";
+import QuestionVotes from "./QuestionVotes";
 
 export default function Question() {
 
@@ -104,7 +105,8 @@ export default function Question() {
     const againstRepresentatives = question_data?.Question?.userVote?.representatives.filter((r: any) => r.position === 'against');
 
     console.log({
-        stats
+        stats,
+        s: question_data?.Question?.stats
     });
 
     return (
@@ -200,7 +202,7 @@ export default function Question() {
                                     paramsToAdd: {
                                         modal: "ListVoters",
                                         modalData: JSON.stringify({
-                                            votersSection: 'forDirectVotes',
+                                            votersSection: 'directFor',
                                             questionText: question_data?.Question?.questionText,
                                             groupChannel
                                         })
@@ -236,7 +238,7 @@ export default function Question() {
                                     paramsToAdd: {
                                         modal: "ListVoters",
                                         modalData: JSON.stringify({
-                                            votersSection: 'againstDirectVotes',
+                                            votersSection: 'directAgainst',
                                             questionText: question_data?.Question?.questionText,
                                             groupChannel
                                         })
@@ -305,7 +307,7 @@ export default function Question() {
                         )}
                         <div
                             className={`button_ small mx-1`}
-                        >Invite to Vote</div>
+                        >Invite to Vote 🧪</div>
                     </div>
                     <small data-tip="Last vote was">
                         {question_data?.Question?.stats?.lastVoteOn || '3s ago 🧪'}
@@ -325,12 +327,12 @@ export default function Question() {
                     </li>
                     <li className="nav-item">
                         <Link className={`nav-link ${section === 'votesby' && 'active'}`} to={`/poll/${voteName}/${groupChannel}/votesby`}>
-                            Votes by
+                            Votes by 🧪
                         </Link>
                     </li>
                     <li className="nav-item">
                         <Link className={`nav-link ${section === 'conversation' && 'active'}`} to={`/poll/${voteName}/${groupChannel}/conversation`}>
-                            Conversation
+                            Conversation 🧪
                         </Link>
                     </li>
                 </ul>
@@ -424,9 +426,13 @@ export default function Question() {
                     </div>
                 )}
 
-                {(!section || section === 'timeline') && VoteTimeline.map((l, i) => (
-                    <Notification v={{ ...l, poll: null }} showChart={false} />
-                ))}
+                {(!section || section === 'timeline') && (
+                    <QuestionVotes />
+                )}
+                
+                {/* // VoteTimeline.map((l, i) => (
+                //     <Notification v={{ ...l, poll: null }} showChart={false} />
+                // ))} */}
 
 
                 {(section === 'conversation') && (

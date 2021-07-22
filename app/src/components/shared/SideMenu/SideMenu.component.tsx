@@ -7,8 +7,6 @@ import HomeSvg from "@shared/Icons/Home.svg";
 import RippleDrop from "@shared/Icons/RippleDrop.svg";
 import DropPlusSVG from "@shared/Icons/Drop+.svg";
 import NotificationSvg from "@shared/Icons/Notification.svg";
-import ProfileSvg from "@shared/Icons/Profile.svg";
-import ProfilePlusSvg from "@shared/Icons/Profile+.svg";
 import TrendingSvg from "@shared/Icons/Trending.svg";
 import GroupSvg from "@shared/Icons/Group.svg";
 import LoginIcon from "@shared/Icons/LoginIcon.svg";

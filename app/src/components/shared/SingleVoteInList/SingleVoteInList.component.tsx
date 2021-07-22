@@ -7,6 +7,7 @@ import { useQuery, useMutation } from "@apollo/client";
 // import VoteGraph1 from "@shared/VoteGraph1";
 import Chart from "@shared/VoteGraph1/chart.svg";
 import XSVG from "@shared/Icons/X.svg";
+import ProfilePlus from "@shared/Icons/Profile+-small.svg";
 import { people } from "@state/Mock/People";
 import PersonInList from '@shared/PersonInList';
 import { EDIT_VOTE } from '@state/Vote/typeDefs';
@@ -195,17 +196,19 @@ export const SingleVoteInList: FunctionComponent<{
                 </div>
 
                 <div className="d-flex justify-content-center">
-                    {l.thisUserIsAdmin && (
+                    {/* {l.thisUserIsAdmin && (
                         <>
                             <div
                                 onClick={() => alert('soon')}
                                 className={`button_ small mx-1`}
                             >Edit</div>
                         </>
-                    )}
+                    )} */}
                     <div
-                        className={`button_ small mx-1`}
-                    >Invite to Vote</div>
+                        title="Invite to vote"
+                        className={`pointer mx-1`}
+                        onClick={() => alert('Invite to vote - soon')}
+                    ><ProfilePlus /> 🧪</div>
                 </div>
             </div>
         );

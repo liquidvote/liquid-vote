@@ -138,7 +138,7 @@ export const ProfileVotes: FunctionComponent<{}> = ({ }) => {
                     {
                         (() => {
                             if (type === 'directVotesMade') {
-                                return 'hasn\'t made any direct polls';
+                                return 'hasn\'t answered directly to any direct polls';
                             } else if (type === 'directVotesInAgreement') {
                                 return 'hasn\'t agreed with you on any polls';
                             } else if (type === 'directVotesInDisagreement') {
