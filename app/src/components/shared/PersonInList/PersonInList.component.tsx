@@ -29,7 +29,7 @@ export const PersonInList: FunctionComponent<{ person: any }> = ({ person }) => 
                             // onClick={() => setIsRepresenting(!isRepresenting)}
                             className={`button_ small mb-0`}
                         >
-                            Invite to Group (TODO)
+                            Invite to Group 🧪
                         </div>
                         <div
                             onClick={() => setIsRepresenting(!isRepresenting)}

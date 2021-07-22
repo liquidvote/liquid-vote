@@ -67,6 +67,58 @@ export const QUESTION = gql`
     }
 `;
 
+export const QUESTION_VOTERS = gql`
+    query(
+        $questionText: String
+        $choiceText: String
+        $group: String
+        $channel: String
+        $typeOfVoter: String
+    ) {
+        QuestionVoters (
+            questionText: $questionText
+            choiceText: $choiceText
+            group: $group
+            channel: $channel
+            typeOfVoter: $typeOfVoter
+         ) {
+            questionText
+            choiceText
+            groupChannel {
+                group
+                channel
+            }
+            position
+            isDirect
+            forWeight
+            againstWeight
+            lastEditOn
+            representatives {
+                representativeHandle
+                representativeAvatar
+                representativeName
+                position
+                forWeight
+                againstWeight
+            }
+            representeeVotes {
+                user {
+                    name
+                    avatar
+                    handle
+                }
+            }
+            representeeCount
+            user {
+                name
+                handle
+                avatar
+            }
+            representeeCount
+        }
+    }
+`;
+
 export const QUESTIONS = gql`
   query($group: String!, $channels: [String]) {
     Questions(group: $group, channels: $channels) {

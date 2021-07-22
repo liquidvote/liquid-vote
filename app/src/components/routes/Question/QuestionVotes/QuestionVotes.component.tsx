@@ -1,0 +1,220 @@
+import React, { FunctionComponent, useState } from 'react';
+import { Link, useParams } from "react-router-dom";
+import { useQuery, useMutation } from "@apollo/client";
+
+import { AUTH_USER } from "@state/AuthUser/typeDefs";
+import { USER, USER_VOTES } from "@state/User/typeDefs";
+import Notification from '@shared/Notification';
+import SortSmallSvg from "@shared/Icons/Sort-small.svg";
+
+import { QUESTION, QUESTION_VOTERS } from '@state/Question/typeDefs';
+import Popper from "@shared/Popper";
+
+import './style.sass';
+
+export const QuestionVotes: FunctionComponent<{}> = ({ }) => {
+
+    let { voteName, groupChannel, section, subsection, subsubsection } = useParams<any>();
+
+    // const {
+    //     loading: authUser_loading,
+    //     error: authUser_error,
+    //     data: authUser_data,
+    //     refetch: authUser_refetch
+    // } = useQuery(AUTH_USER);
+
+    // const authLiquidUser = authUser_data?.authUser?.LiquidUser;
+
+    const [sortBy, setSortBy] = useState('weight');
+
+    const groupChannel_ = (([g, c]) => ({
+        group: g,
+        channel: c
+    }))(groupChannel.split("-"));
+
+    const {
+        loading: question_loading,
+        error: question_error,
+        data: question_data,
+        refetch: question_refetch
+    } = useQuery(QUESTION, {
+        variables: {
+            questionText: voteName,
+            group: groupChannel_.group,
+            channel: groupChannel_.channel
+        }
+    });
+
+    const type = (() => {
+        if (!subsection || subsection === 'direct' && subsubsection === 'for') {
+            return 'directFor';
+        } else if (subsection === 'direct' && subsubsection === 'against') {
+            return 'directAgainst';
+        } else if (subsection === 'representingYou') {
+            return 'representingYou';
+        } else if (subsection === 'representedByYou') {
+            return 'representedByYou'
+        }
+        return null
+    })();
+
+    const {
+        loading: question_voters_loading,
+        error: question_voters_error,
+        data: question_voters_data,
+        refetch: question_voters_refetch
+    } = useQuery(QUESTION_VOTERS, {
+        variables: {
+            questionText: voteName,
+            group: groupChannel_.group,
+            channel: groupChannel_.channel,
+            typeOfVoter: type
+        },
+        skip: !type //!(type === 'directFor' || type === 'directAgainst')
+    });
+
+    console.log({
+        type,
+        subsection,
+        subsubsection
+    });
+
+    // const {
+    //     loading: user_votes_loading,
+    //     error: user_votes_error,
+    //     data: user_votes_data,
+    //     refetch: user_votes_refetch
+    // } = useQuery(USER_VOTES, {
+    //     variables: { handle, type }
+    // });
+
+    return (
+        <>
+
+            <ul className="nav d-flex justify-content-around mt-n3 mx-n3">
+                <li className="nav-item">
+                    <Link
+                        className={`nav-link ${(!subsection || subsection === 'direct') && 'active'}`}
+                        to={`/poll/${voteName}/${groupChannel}/timeline`}
+                    >
+                        <b>{question_data?.Question?.stats?.forCount}</b> Direct Votes
+                    </Link>
+                </li>
+                {
+                    question_data?.Question?.userVote?.position === 'delegated' && (
+                        <li className="nav-item">
+                            <Link
+                                className={`nav-link ${(subsection === 'representingYou') && 'active'}`}
+                                to={`/poll/${voteName}/${groupChannel}/timeline/representingYou`}
+                            >
+                                <b>{question_data?.Question?.userVote?.representatives.length}</b> Representing you
+                            </Link>
+                        </li>
+                    )
+                }
+                {
+                    question_data?.Question?.userVote?.position !== 'delegated' && (
+                        <li className="nav-item">
+                            <Link
+                                className={`nav-link ${(subsection === 'representedByYou') && 'active'}`}
+                                to={`/poll/${voteName}/${groupChannel}/timeline/representedByYou`}
+                            >
+                                <b>{question_data?.Question?.userVote?.representeeVotes?.length}</b> Represented by you
+                            </Link>
+                        </li>
+                    )
+                }
+                <li className="px-4 mt-1">
+                    <Popper
+                        button={<div>
+                            <SortSmallSvg />{' '}by {sortBy}
+                        </div>}
+                        popperContent={
+                            <ul className="p-0 m-0">
+                                <li className="pointer" onClick={() => setSortBy('weight')}>weight</li>
+                                <li className="pointer" onClick={() => setSortBy('time')}>time</li>
+                            </ul>
+                        }
+                    />
+                </li>
+            </ul>
+            <hr className="mt-n4" />
+
+            {
+                (!subsection || subsection === 'direct') && (
+                    <>
+                        <ul className="nav d-flex justify-content-around mt-n2 mx-n3">
+                            <li className="nav-item">
+                                <Link
+                                    className={`nav-link ${(!subsubsection || subsubsection === 'for') && 'active'}`}
+                                    to={`/poll/${voteName}/${groupChannel}/timeline/direct/for`}
+                                >
+                                    <b>{question_data?.Question?.stats?.forDirectCount}</b> For
+                                </Link>
+                            </li>
+                            <li className="nav-item">
+                                <Link
+                                    className={`nav-link ${(subsubsection === 'against') && 'active'}`}
+                                    to={`/poll/${voteName}/${groupChannel}/timeline/direct/against`}
+                                >
+                                    <b>{question_data?.Question?.stats?.forAgainstCount}</b> Against
+                                </Link>
+                            </li>
+                        </ul>
+                        <hr className="mt-n4" />
+                    </>
+                )
+            }
+
+            {/* <pre>
+                {JSON.stringify({
+                    type
+                }, null, 2)}
+            </pre>
+
+            <pre>
+                {JSON.stringify(question_voters_data, null, 2)}
+            </pre> */}
+
+
+            {question_voters_data?.QuestionVoters.length === 0 && (
+                <div className="p-4 text-center">
+                    {
+                        (() => {
+                            if (type === 'directFor') {
+                                return 'This poll hasn\'t received any votes in favor yet';
+                            } else if (type === 'directAgainst') {
+                                return 'This poll hasn\'t received any votes in against yet';
+                            } else if (type === 'representingYou') {
+                                return 'None of your [🧪] representatives has voted yet';
+                            } else if (type === 'representedByYou') {
+                                if (!!question_data?.Question?.userVote) {
+                                    return 'You haven\'t voted yet, once you do, you\'ll be representing [🧪] group members';
+                                } else {
+                                    return 'You aren\'t representing anyone yet';
+                                }
+                            }
+                            return 'type'
+                        })()
+                    }{' '}
+                    yet
+                </div>
+            )}
+
+            {question_voters_data?.QuestionVoters?.map((n, i) => (
+                <Notification
+                    key={type + i}
+                    v={{
+                        ...n,
+                        user: {
+                            ...n.user,
+                        }
+                    }}
+                    showChart={false}
+                />
+            ))}
+
+        </>
+    );
+}
+

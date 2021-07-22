@@ -2,7 +2,7 @@ import * as React from "react";
 
 export default function Profile() {
     return (
-        <svg viewBox="-3 0 24 24" className="icon">
+        <svg viewBox="-3 0 24 24" className="icon-small">
             <g
                 transform="translate(-3.6490206,1.1197873)">
                 <path
