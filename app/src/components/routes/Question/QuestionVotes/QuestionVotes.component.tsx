@@ -97,7 +97,12 @@ export const QuestionVotes: FunctionComponent<{}> = ({ }) => {
                         className={`nav-link ${(!subsection || subsection === 'direct') && 'active'}`}
                         to={`/poll/${voteName}/${groupChannel}/timeline`}
                     >
-                        <b>{question_data?.Question?.stats?.forCount}</b> Direct Votes
+                        <b>
+                            {
+                                question_data?.Question?.stats?.forCount +
+                                question_data?.Question?.stats?.againstDirectCount
+                            }
+                        </b> Direct Votes
                     </Link>
                 </li>
                 {
@@ -157,7 +162,7 @@ export const QuestionVotes: FunctionComponent<{}> = ({ }) => {
                                     className={`nav-link ${(subsubsection === 'against') && 'active'}`}
                                     to={`/poll/${voteName}/${groupChannel}/timeline/direct/against`}
                                 >
-                                    <b>{question_data?.Question?.stats?.forAgainstCount}</b> Against
+                                    <b>{question_data?.Question?.stats?.againstDirectCount}</b> Against
                                 </Link>
                             </li>
                         </ul>
@@ -189,15 +194,14 @@ export const QuestionVotes: FunctionComponent<{}> = ({ }) => {
                                 return 'None of your [🧪] representatives has voted yet';
                             } else if (type === 'representedByYou') {
                                 if (!!question_data?.Question?.userVote) {
-                                    return 'You haven\'t voted yet, once you do, you\'ll be representing [🧪] group members';
-                                } else {
                                     return 'You aren\'t representing anyone yet';
+                                } else {
+                                    return 'You haven\'t voted yet, once you do, you\'ll be representing [🧪] group members';
                                 }
                             }
                             return 'type'
                         })()
                     }{' '}
-                    yet
                 </div>
             )}
 

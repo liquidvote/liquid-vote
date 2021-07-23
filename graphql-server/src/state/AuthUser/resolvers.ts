@@ -1,15 +1,8 @@
-const authUser = {
-    name: "name placeholder",
-    avatarUrl: "avatarUrl placeholder",
-};
+
 
 export const AuthUserResolvers = {
     Query: {
-        // authUser: () => authUser,
-
         authUser: async (_source, { }, { mongoDB, s3, AuthUser }) => {
-
-            // console.log({ AuthUser });
 
             return AuthUser;
         },
