@@ -6,6 +6,7 @@ import { useQuery } from "@apollo/client";
 import PersonInList from '@shared/PersonInList';
 import { people } from "@state/Mock/People";
 import { USER, USER_REPRESENTING, USER_REPRESENTED_BY } from "@state/User/typeDefs";
+import DropAnimation from '@components/shared/DropAnimation';
 
 import './style.sass';
 
@@ -47,7 +48,11 @@ export const ProfilePeople: FunctionComponent<{}> = ({ }) => {
 
     const profile = user_data?.User;
 
-    return user_loading ? (<>Loading</>) : user_error ? (<>Error</>) : (
+    return user_loading ? (
+        <div className="d-flex justify-content-center mt-5">
+            <DropAnimation />
+        </div>
+    ) : user_error ? (<>Error</>) : (
         <>
             <Header title={profile.name} noBottom={true} />
 

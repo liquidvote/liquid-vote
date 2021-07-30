@@ -27,12 +27,12 @@ export const GroupResolvers = {
                 //     // thisUserIsAdmin: !!g.admins.find(u => u.handle === AuthUser?.LiquidUser?.handle),
                 // }))
                 yourMemberRelation: GroupMemberRelation,
-                stats: getGroupStats({
+                stats: await getGroupStats({
                     groupHandle: Group.handle,
                     groupId: Group._id,
                     mongoDB
                 }),
-                yourStats: !!AuthUser && getYourGroupStats({
+                yourStats: !!AuthUser && await getYourGroupStats({
                     groupHandle: Group.handle,
                     groupId: Group._id,
                     AuthUser,
@@ -85,18 +85,22 @@ export const GroupResolvers = {
                 .find({ 'userId': ObjectID(User?._id) })
                 .toArray();
 
-            const Groups = (
+            const Groups = await Promise.all((
                 await mongoDB.collection("Groups").find({
                     "_id": {
                         "$in": GroupsMemberRelations.map(r => ObjectID(r.groupId))
                     }
                 }).toArray()
             )
-                .map((g) => ({
+                .map(async (g) => ({
                     ...g,
                     thisUserIsAdmin: !!g.admins.find(u => u.handle === AuthUser?.LiquidUser?.handle),
-                    // memberRelation: GroupMemberRelation
-                }));
+                    stats: await getGroupStats({
+                        groupHandle: g.handle,
+                        groupId: g._id,
+                        mongoDB
+                    }),
+                })));
 
             return Groups;
         },
@@ -240,7 +244,75 @@ export const GroupResolvers = {
     },
 };
 
-const getGroupStats = async ({ groupId, groupHandle, mongoDB }) => {
+export const getGroupStats = async ({ groupId, groupHandle, mongoDB }) => {
+
+    const mostRepresentingMembers = (await mongoDB.collection("GroupMembers")
+        .aggregate([
+            {
+                '$match': {
+                    'groupId': groupId,
+                    'isMember': true
+                }
+            },
+            {
+                '$lookup': {
+                    'from': 'Votes',
+                    'let': {
+                        'representativeId': '$userId'
+                    },
+                    'pipeline': [
+                        {
+                            '$match': {
+                                'groupChannel.group': groupHandle
+                            }
+                        }, {
+                            '$unwind': '$representatives'
+                        }, {
+                            '$match': {
+                                '$expr': {
+                                    '$eq': [
+                                        '$representatives.representativeId', '$$representativeId'
+                                    ]
+                                }
+                            }
+                        }
+                    ],
+                    'as': 'representees'
+                }
+            }, {
+                '$project': {
+                    'user': '$userId',
+                    'representeeCount': {
+                        '$size': {
+                            '$ifNull': [
+                                '$representees', []
+                            ]
+                        }
+                    }
+                }
+            }, {
+                '$sort': {
+                    'representeeCount': -1
+                }
+            }, {
+                '$lookup': {
+                    'from': 'Users',
+                    'localField': 'user',
+                    'foreignField': '_id',
+                    'as': 'user'
+                }
+            }, {
+                '$replaceRoot': {
+                    'newRoot': {
+                        '$first': '$user.LiquidUser'
+                    }
+                }
+            }, {
+                '$limit' : 6
+            }
+        ])
+        .toArray()
+    )?.slice(0, 6);
 
     return ({
         lastDirectVoteOn: 0,
@@ -266,7 +338,8 @@ const getGroupStats = async ({ groupId, groupHandle, mongoDB }) => {
             .find({
                 "groupChannel.group": groupHandle,
                 "isDirect": false
-            }).count()
+            }).count(),
+        mostRepresentingMembers
     });
 }
 
@@ -301,6 +374,6 @@ const getYourGroupStats = async ({ groupId, groupHandle, AuthUser, mongoDB }) =>
                 "groupChannel.group": groupHandle,
                 "isDirect": false,
                 "user": AuthUser.LiquidUser.handle
-            }).count(),
+            }).count()
     });
 }

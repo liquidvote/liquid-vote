@@ -23,6 +23,7 @@ $theme5-colors: ("bg": #0b414d, "primary": #08f3a5, "secondary": white, "border"
 @mixin theme($theme)
     .bg
         fill: map-get($theme, "bg") !important
+        background: map-get($theme, "bg")
 
     &.AppContainer, .AppContainer, .Modal, .Modal-Header
         background: map-get($theme, "bg")
@@ -594,7 +595,7 @@ hr
             color: grey
 
     &.hasValue, &.isFocused
-        label
+        >label
             top: 7px
             font-size: 14px
 

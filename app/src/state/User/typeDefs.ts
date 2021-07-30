@@ -137,6 +137,11 @@ export const USER_GROUPS = gql`
             representations
             directVotesMade
             indirectVotesMade
+            mostRepresentingMembers {
+                name
+                avatar
+                handle
+            }
         }
     }
   }

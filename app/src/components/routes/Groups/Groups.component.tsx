@@ -7,6 +7,7 @@ import GroupInList from "@shared/GroupInList";
 import { groups } from "@state/Mock/Groups";
 import { USER_GROUPS } from "@state/User/typeDefs";
 import { AUTH_USER } from "@state/AuthUser/typeDefs";
+import DropAnimation from '@components/shared/DropAnimation';
 
 import './style.sass';
 
@@ -36,6 +37,14 @@ export const Groups: FunctionComponent<{}> = ({ }) => {
     return (
         <>
             <Header title="Your Groups" />
+
+            {
+                !authUser_data || !yourGroups_data && (
+                    <div className="d-flex justify-content-center mt-5">
+                        <DropAnimation />
+                    </div>
+                )
+            }
 
             <div>
                 {yourGroups_data?.UserGroups?.map((el: any, i: Number) => (

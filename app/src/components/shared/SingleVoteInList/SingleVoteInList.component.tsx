@@ -12,6 +12,7 @@ import { people } from "@state/Mock/People";
 import PersonInList from '@shared/PersonInList';
 import { EDIT_VOTE } from '@state/Vote/typeDefs';
 import { voteStatsMap } from '@state/Question/map';
+import useSearchParams from "@state/Global/useSearchParams.effect";
 
 import './style.sass';
 
@@ -20,14 +21,20 @@ export const SingleVoteInList: FunctionComponent<{
     introMessage?: string,
     showIntroMessage?: boolean,
     showColorLegend?: boolean,
-    showGroup?: boolean
+    showGroup?: boolean,
+    hideTitle?: boolean
 }> = ({
     l,
     introMessage,
     showIntroMessage,
     showColorLegend,
-    showGroup
+    showGroup,
+    hideTitle
 }) => {
+
+        const { allSearchParams, updateParams } = useSearchParams();
+
+        console.log({ l });
 
         const [editVote, {
             loading: editVote_loading,
@@ -35,9 +42,7 @@ export const SingleVoteInList: FunctionComponent<{
             data: editVote_data,
         }] = useMutation(EDIT_VOTE);
 
-        const [userVote, setUserVote] = React.useState(
-            l?.userVote?.position || null
-        );
+        const userVote = editVote_data?.editVote?.position || l?.userVote?.position || null;
 
         const handleUserVote = (vote: string) => {
             editVote({
@@ -50,12 +55,7 @@ export const SingleVoteInList: FunctionComponent<{
                         position: (vote === userVote) ? null : vote
                     },
                 }
-            }).then(({ data }) => {
-                setUserVote(data?.editVote?.position);
-                console.log({
-                    editVote: data?.editVote
-                })
-            });
+            })
         }
 
         const [isShowingVotersModal, setIsShowingVotersModal] = useState(false);
@@ -74,19 +74,22 @@ export const SingleVoteInList: FunctionComponent<{
             }
         });
 
+        const forRepresentatives = l?.userVote?.representatives.filter((r: any) => r.position === 'for');
+        const againstRepresentatives = l?.userVote?.representatives.filter((r: any) => r.position === 'against');
+
         return (
             <div className="position-relative">
-                {l.questionText && (
+                {(l.questionText && !hideTitle) && (
                     <small className="time-ago" data-tip="Last vote was">
                         {l?.stats?.lastVoteOn || '3s ago 🧪'}
                     </small>
                 )}
                 <div>
-                    {showIntroMessage && (
+                    {(showIntroMessage && !hideTitle) && (
                         <small className="do-you d-flex mb-n1">{introMessage || 'Do you approve'}</small>
                     )}
                     <div className="bar-wrapper">
-                        {!!l.questionText && (
+                        {(!!l.questionText && !hideTitle) && (
                             <div className="mb-1 d-flex align-items-center">
                                 <a
                                     className="white mb-0"
@@ -147,35 +150,91 @@ export const SingleVoteInList: FunctionComponent<{
                                 <span onClick={() => handleUserVote('for')}>
                                     For
                                 </span>
-                                <div className="d-flex ml-3 my-n2 mr-n1">
-                                    <Link to="/profile" className="vote-avatar tiny avatar-1 for ml-n2 d-none d-md-block"></Link>
-                                    <div onClick={() => {
-                                        setIsShowingVotersModal(true);
-                                        setUsersShowing(`Your Representatives Voting For on ${l.questionText}`);
-                                    }} className="vote-avatar tiny count for ml-n2">+{ }</div>
-                                </div>
+                                {
+                                    (
+                                        !!forRepresentatives?.length &&
+                                        l?.userVote?.position === 'delegated' &&
+                                        (!editVote_data || editVote_data?.editVote?.position === 'delegated')
+                                    ) && (
+                                        <div className="d-flex ml-3 my-n2 mr-n1">
+                                            {forRepresentatives?.slice(0, 1).map((v: any) => (
+                                                <Link
+                                                    key={`${v?.representativeHandle}`}
+                                                    to={`/profile/${v?.representativeHandle}`}
+                                                    className="vote-avatar tiny for ml-n2 d-none d-md-block"
+                                                    style={{
+                                                        background: `url(${v?.representativeAvatar}) no-repeat`,
+                                                        backgroundSize: 'cover'
+                                                    }}
+                                                ></Link>
+                                            ))}
+                                            <div
+                                                onClick={(e) => {
+                                                    updateParams({
+                                                        paramsToAdd: {
+                                                            modal: "ListVoters",
+                                                            modalData: JSON.stringify({
+                                                                votersSection: 'forRepresentatives',
+                                                                questionText: l?.questionText,
+                                                                groupChannel: l?.groupChannel
+                                                            })
+                                                        }
+                                                    })
+                                                }}
+                                                className="vote-avatar tiny count for ml-n2"
+                                            >{forRepresentatives.length}</div>
+                                        </div>
+                                    )
+                                }
                             </div>
-                            <div className="d-flex ml-1">
-                                {/* <Link to="/profile" className="vote-avatar tiny avatar-1 for ml-n2"></Link> */}
-                                <Link to="/profile" className="vote-avatar tiny avatar-2 for d-none d-md-block"></Link>
-                                <Link to="/profile" className="vote-avatar tiny avatar-3 for ml-n2 d-none d-md-block"></Link>
-                                <div onClick={(e) => {
-                                    e.preventDefault();
-                                    setIsShowingVotersModal(true);
-                                    setUsersShowing(`People Voting For on ${l.questionText}`);
-                                }} className="vote-avatar tiny count for ml-n2">{numeral(stats.forCount).format('0a')}</div>
+                            <div className="d-flex ml-2">
+
+                                {l?.stats?.forMostRepresentingVoters?.slice(0, 2).map((v: any) => (
+                                    <Link
+                                        key={`${v?.handle}`}
+                                        to={`/profile/${v?.handle}`}
+                                        className="vote-avatar tiny for ml-n1 d-none d-md-block"
+                                        style={{
+                                            background: `url(${v?.avatar}) no-repeat`,
+                                            backgroundSize: 'cover'
+                                        }}
+                                    ></Link>
+                                ))}
+
+                                <div
+                                    onClick={(e) => {
+                                        updateParams({
+                                            paramsToAdd: {
+                                                modal: "ListVoters",
+                                                modalData: JSON.stringify({
+                                                    votersSection: 'forRepresentatives',
+                                                    questionText: l?.questionText,
+                                                    groupChannel: l?.questionText
+                                                })
+                                            }
+                                        })
+                                    }}
+                                    className="vote-avatar tiny count for ml-n1"
+                                >{numeral(stats.forCount).format('0a')}</div>
                             </div>
                         </div>
                         <div className="d-flex align-items-center">
                             <div className="d-flex mr-1">
-                                <Link to="/profile" className="vote-avatar tiny avatar-4 against ml-n2 d-none d-md-block"></Link>
-                                {/* <Link to="/profile" className="vote-avatar tiny avatar-5 against ml-n2 d-none d-md-block"></Link> */}
-                                <Link to="/profile" className="vote-avatar tiny avatar-6 against ml-n2 d-none d-md-block"></Link>
-                                {/* <div className="vote-avatar tiny avatar-1 ml-n2" /> */}
+                                {l?.stats?.againstMostRepresentingVoters?.slice(0, 2).map((v: any) => (
+                                    <Link
+                                        key={`${v?.handle}`}
+                                        to={`/profile/${v?.handle}`}
+                                        className="vote-avatar tiny against ml-n1 d-none d-md-block"
+                                        style={{
+                                            background: `url(${v?.avatar}) no-repeat`,
+                                            backgroundSize: 'cover'
+                                        }}
+                                    ></Link>
+                                ))}
                                 <div onClick={() => {
                                     setIsShowingVotersModal(true);
                                     setUsersShowing(`People Voting Against on ${l.questionText}`);
-                                }} className="vote-avatar tiny count against ml-n2">{numeral(stats.againstCount).format('0a')}</div>
+                                }} className="vote-avatar tiny count against ml-n1">{numeral(stats.againstCount).format('0a')}</div>
                             </div>
                             <div
                                 className={`button_ small ${userVote === 'against' && 'selected'}`}
@@ -183,13 +242,42 @@ export const SingleVoteInList: FunctionComponent<{
                                 <span onClick={() => handleUserVote('against')}>
                                     Against
                                 </span>
-                                <div className="d-flex ml-3 my-n2 mr-n1">
-                                    <Link to="/profile" className="vote-avatar tiny avatar-5 against ml-n2 d-none d-md-block"></Link>
-                                    <div onClick={() => {
-                                        setIsShowingVotersModal(true);
-                                        setUsersShowing(`Your Representatives Voting Against on ${l.questionText}`);
-                                    }} className="vote-avatar tiny count against ml-n2">+{1}</div>
-                                </div>
+                                {
+                                    (
+                                        !!againstRepresentatives?.length &&
+                                        l?.userVote?.position === 'delegated' &&
+                                        (!editVote_data || editVote_data?.editVote?.position === 'delegated')
+                                    ) && (
+                                        <div className="d-flex ml-3 my-n2 mr-n1">
+                                            {againstRepresentatives?.slice(0, 1).map((v: any) => (
+                                                <Link
+                                                    key={`${v?.representativeHandle}`}
+                                                    to={`/profile/${v?.representativeHandle}`}
+                                                    className="vote-avatar tiny against ml-n2 d-none d-md-block"
+                                                    style={{
+                                                        background: `url(${v?.representativeAvatar}) no-repeat`,
+                                                        backgroundSize: 'cover'
+                                                    }}
+                                                ></Link>
+                                            ))}
+                                            <div
+                                                onClick={(e) => {
+                                                    updateParams({
+                                                        paramsToAdd: {
+                                                            modal: "ListVoters",
+                                                            modalData: JSON.stringify({
+                                                                votersSection: 'againstRepresentatives',
+                                                                questionText: l?.questionText,
+                                                                groupChannel: l?.groupChannel
+                                                            })
+                                                        }
+                                                    })
+                                                }}
+                                                className="vote-avatar tiny count against ml-n2"
+                                            >{againstRepresentatives.length}</div>
+                                        </div>
+                                    )
+                                }
                             </div>
                         </div>
                     </div>

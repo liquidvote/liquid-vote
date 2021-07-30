@@ -6,6 +6,7 @@ import { VoteTimeline } from "@state/Mock/Notifications";
 import { defaults } from "@state/Mock/Votes";
 
 import Notification from '@shared/Notification';
+import DropAnimation from '@components/shared/DropAnimation';
 import './style.sass';
 
 export const Feed: FunctionComponent<{}> = ({ }) => {
@@ -13,11 +14,14 @@ export const Feed: FunctionComponent<{}> = ({ }) => {
         <>
             <Header title="Notifications" />
 
-            <br />
+            <div className="d-flex justify-content-center mt-5">
+                <DropAnimation />
+            </div>
 
-            {VoteTimeline.map((l, i) => (
+
+            {/* {VoteTimeline.map((l, i) => (
                 <Notification v={{ ...defaults, ...l }} showChart={true} />
-            ))}
+            ))} */}
         </>
     );
 }

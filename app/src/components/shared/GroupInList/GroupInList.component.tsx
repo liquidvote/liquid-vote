@@ -111,13 +111,18 @@ export const GroupInList: FunctionComponent<{
                     For personal use, Airbnb, long term renting or whatever. */}
                     </small>
                     <div className="d-flex ml-2 mt-2">
-                        {/* <Link to="/profile" className="vote-avatar avatar-1 for ml-n2"></Link> */}
-                        <Link to="/profile" className="vote-avatar avatar-2 ml-n2"></Link>
-                        <Link to="/profile" className="vote-avatar avatar-3 ml-n2"></Link>
-                        <Link to="/profile" className="vote-avatar avatar-1 ml-n2"></Link>
-                        <Link to="/profile" className="vote-avatar avatar-4 ml-n2"></Link>
-                        <Link to="/profile" className="vote-avatar avatar-5 ml-n2"></Link>
-                        <div className="vote-avatar count ml-n2">{18}</div>
+                        {group?.stats?.mostRepresentingMembers?.map((m:  any)  => (
+                            <Link
+                                to={`/profile/${m.handle}`}
+                                title={`${m.name}`}
+                                className="vote-avatar avatar-2 ml-n2"
+                                style={{
+                                    background: `url(${m.avatar}) no-repeat`,
+                                    backgroundSize: 'cover'
+                                }}
+                            ></Link>
+                        ))}
+                        <div className="vote-avatar count ml-n2">{group?.stats?.members}</div>
                     </div>
                 </div>
             </div>

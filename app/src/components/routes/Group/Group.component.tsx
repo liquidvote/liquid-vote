@@ -28,6 +28,7 @@ import { EDIT_GROUP_MEMBER_CHANNEL_RELATION } from "@state/User/typeDefs";
 import { AUTH_USER } from "@state/AuthUser/typeDefs";
 import useSearchParams from "@state/Global/useSearchParams.effect";
 import GroupPolls from './GroupPolls';
+import DropAnimation from '@components/shared/DropAnimation';
 import './style.sass';
 
 export const Group: FunctionComponent<{}> = ({ }) => {
@@ -137,7 +138,11 @@ export const Group: FunctionComponent<{}> = ({ }) => {
             editGroupMemberChannelRelation_data?.editGroupMemberChannelRelation?.isMember
         );
 
-    return group_loading ? (<>Loading</>) : group_error ? (<>Error</>) : (
+    return group_loading ? (
+        <div className="d-flex justify-content-center mt-5">
+            <DropAnimation />
+        </div>
+    ) : group_error ? (<>Error</>) : (
         <>
             <Header title={selectedGroup?.name} />
 
@@ -248,7 +253,7 @@ export const Group: FunctionComponent<{}> = ({ }) => {
                     <b>16</b> Sub Groups
                 </Link> */}
             </div>
-            
+
             <div className="mt-4 mb-3 d-flex align-items-start flex-nowrap justify-content-between">
                 <div className="d-flex flex-column">
                     {/* <div data-tip="Selected channels">

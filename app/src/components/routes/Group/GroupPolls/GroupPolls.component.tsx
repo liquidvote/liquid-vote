@@ -76,12 +76,14 @@ export const GroupPolls: FunctionComponent<{
                     <div key={'polls-' + i}>
                         {v.questionType === 'multi' && (
                             <MultiVoteInList
+                                key={`multi-${v.questionText}`}
                                 v={v}
                                 i={i}
                             />
                         )}
                         {v.questionType === 'single' && (
                             <SingleVoteInList
+                                key={`single-${v.questionText}`}
                                 l={v}
                                 showGroup={true}
                                 showIntroMessage={true}

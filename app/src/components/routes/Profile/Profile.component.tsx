@@ -16,6 +16,7 @@ import VoteWrapper from "@shared/VoteWrapper";
 import { USER } from "@state/User/typeDefs";
 import { AUTH_USER } from "@state/AuthUser/typeDefs";
 import useSearchParams from "@state/Global/useSearchParams.effect";
+import DropAnimation from "@components/shared/DropAnimation";
 
 import ProfileGroups from "./ProfileGroups";
 import ProfileVotes from "./ProfileVotes";
@@ -49,7 +50,11 @@ export const Profile: FunctionComponent<{}> = ({ }) => {
         }
     }, [allSearchParams.refetch]);
 
-    return user_loading ? (<>Loading</>) : user_error ? (<>Error</>) : (
+    return user_loading ? (
+        <div className="d-flex justify-content-center mt-5">
+            <DropAnimation />
+        </div>
+    ) : user_error ? (<>Error</>) : (
         <>
             <Header title={profile.name} />
 

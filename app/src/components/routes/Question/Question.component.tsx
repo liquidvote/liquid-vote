@@ -57,12 +57,7 @@ export default function Question() {
         data: editVote_data,
     }] = useMutation(EDIT_VOTE);
 
-
-    const [userVote, setUserVote] = useState(null);
-
-    useEffect(() => {
-        setUserVote(question_data?.Question?.userVote?.position || null);
-    }, [question_data?.Question?.userVote?.position]);
+    const userVote = editVote_data?.editVote?.position || question_data?.Question?.userVote?.position || null;
 
     // const [isPollingInOtherGroup, setIsPollingInOtherGroup] = useState(false);
     // const [isShowingVotersModal, setIsShowingVotersModal] = useState(false);
@@ -79,11 +74,6 @@ export default function Question() {
                     position: (vote === userVote) ? null : vote
                 },
             }
-        }).then(({ data }) => {
-            setUserVote(data?.editVote?.position);
-            console.log({
-                editVote: data?.editVote
-            })
         });
     }
 
@@ -99,7 +89,6 @@ export default function Question() {
             againstDirectCount: editVote_data?.editVote?.QuestionStats.againstDirectCount,
         }
     });
-
 
     const forRepresentatives = question_data?.Question?.userVote?.representatives.filter((r: any) => r.position === 'for');
     const againstRepresentatives = question_data?.Question?.userVote?.representatives.filter((r: any) => r.position === 'against');
@@ -155,7 +144,11 @@ export default function Question() {
                                 For
                             </span>
                             {
-                                !!forRepresentatives?.length && (
+                                (
+                                    !!forRepresentatives?.length &&
+                                    question_data?.Question?.userVote?.position === 'delegated' &&
+                                    (!editVote_data || editVote_data?.editVote?.position === 'delegated') 
+                                )  && (
                                     <div className="d-flex ml-2 my-n2 mr-n1">
                                         <Link
                                             to={`/profile/${forRepresentatives[0].representativeHandle}`}
@@ -165,20 +158,21 @@ export default function Question() {
                                                 backgroundSize: 'cover'
                                             }}
                                         ></Link>
-                                        <div onClick={(e) => {
-                                            updateParams({
-                                                paramsToAdd: {
-                                                    modal: "ListVoters",
-                                                    modalData: JSON.stringify({
-                                                        votersSection: 'forRepresentatives',
-                                                        questionText: question_data?.Question?.questionText,
-                                                        groupChannel
-                                                    })
-                                                }
-                                            })
-                                            // setIsShowingVotersModal(true);
-                                            // setUsersShowing(`Your Representatives Voting For on ${voteName}`);
-                                        }} className="vote-avatar count for ml-n2">{forRepresentatives.length}</div>
+                                        <div
+                                            onClick={(e) => {
+                                                updateParams({
+                                                    paramsToAdd: {
+                                                        modal: "ListVoters",
+                                                        modalData: JSON.stringify({
+                                                            votersSection: 'forRepresentatives',
+                                                            questionText: question_data?.Question?.questionText,
+                                                            groupChannel
+                                                        })
+                                                    }
+                                                })
+                                            }}
+                                            className="vote-avatar count for ml-n2"
+                                        >{forRepresentatives.length}</div>
                                     </div>
                                 )
                             }
@@ -189,7 +183,7 @@ export default function Question() {
                             {question_data?.Question?.stats?.forMostRepresentingVoters?.slice(0, 2).map((v: any) => (
                                 <Link
                                     to={`/profile/${v?.handle}`}
-                                    className="vote-avatar avatar-2 for ml-n2 d-none d-md-block"
+                                    className="vote-avatar for ml-n2 d-none d-md-block"
                                     style={{
                                         background: `url(${v?.avatar}) no-repeat`,
                                         backgroundSize: 'cover'
@@ -225,7 +219,7 @@ export default function Question() {
                             {question_data?.Question?.stats?.againstMostRepresentingVoters?.slice(0, 2).map((v: any) => (
                                 <Link
                                     to={`/profile/${v?.handle}`}
-                                    className="vote-avatar avatar-2 against ml-n2 d-none d-md-block"
+                                    className="vote-avatar against ml-n2 d-none d-md-block"
                                     style={{
                                         background: `url(${v?.avatar}) no-repeat`,
                                         backgroundSize: 'cover'
@@ -253,7 +247,11 @@ export default function Question() {
                                 Against
                             </span>
                             {
-                                !!againstRepresentatives?.length && (
+                                (
+                                    !!againstRepresentatives?.length &&
+                                    question_data?.Question?.userVote?.position === 'delegated' &&
+                                    (!editVote_data || editVote_data?.editVote?.position === 'delegated') 
+                                ) && (
                                     <div className="d-flex ml-3 my-n2 mr-n1">
                                         <Link
                                             to={`/profile/${againstRepresentatives[0].representativeHandle}`}
@@ -429,7 +427,7 @@ export default function Question() {
                 {(!section || section === 'timeline') && (
                     <QuestionVotes />
                 )}
-                
+
                 {/* // VoteTimeline.map((l, i) => (
                 //     <Notification v={{ ...l, poll: null }} showChart={false} />
                 // ))} */}
