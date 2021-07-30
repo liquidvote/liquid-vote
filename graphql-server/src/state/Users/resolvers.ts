@@ -1,5 +1,7 @@
 import { ObjectID } from 'mongodb';
 
+import { getGroupStats } from '../Groups/resolvers';
+
 export const UserResolvers = {
     Query: {
         User: async (_source, { handle }, { mongoDB, s3, AuthUser }) => {
@@ -21,6 +23,24 @@ export const UserResolvers = {
                     yourStats: await getYourUserStats({ userId: User._id, AuthUser, mongoDB }),
                 }
             };
+        },
+
+        SearchUsers: async (_source, { text }, { mongoDB, s3, AuthUser }) => {
+
+            const Users = await mongoDB.collection("Users")
+                .find({
+                    $or: [
+                        { 'LiquidUser.handle': { $regex: text, $options: "i" } },
+                        { 'LiquidUser.name': { $regex: text, $options: "i" } },
+                    ],
+                }).toArray();
+
+            console.log({
+                text,
+                Users
+            });
+
+            return Users?.map(u => u.LiquidUser) || [];
         },
 
         UserRepresenting: async (_source, { handle, groupHandle }, { mongoDB, s3, AuthUser }) => {
@@ -181,6 +201,11 @@ export const UserResolvers = {
                 .map(async (g) => ({
                     ...g,
                     thisUserIsAdmin: !!g.admins.find(u => u.handle === AuthUser?.LiquidUser?.handle),
+                    stats: await getGroupStats({
+                        groupHandle: g.handle,
+                        groupId: g._id,
+                        mongoDB
+                    }),
                     userMemberRelation: UserGroupMemberRelations?.find(
                         r => r.groupId.toString() === g._id.toString()
                     ),

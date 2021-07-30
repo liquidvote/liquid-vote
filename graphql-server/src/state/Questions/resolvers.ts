@@ -49,7 +49,7 @@ export const QuestionResolvers = {
                     userVote: await mongoDB.collection("Votes").findOne({
                         questionText: q.questionText,
                         groupChannel: q.groupChannel,
-                        createdBy: AuthUser?.LiquidUser?.handle
+                        user: AuthUser?._id
                     })
                 },
                 ...(q.questionType === 'multi' && !!AuthUser) && {
@@ -71,12 +71,12 @@ export const QuestionResolvers = {
         QuestionVoters: async (_source, { questionText, group, channel, typeOfVoter }, { mongoDB, s3, AuthUser }) => {
 
 
-            console.log({
-                // questionText,
-                // group,
-                // channel,
-                typeOfVoter
-            });
+            // console.log({
+            //     // questionText,
+            //     // group,
+            //     // channel,
+            //     typeOfVoter
+            // });
 
             const Question = await mongoDB.collection("Questions")
                 .findOne({
@@ -332,9 +332,9 @@ export const QuestionResolvers = {
                 .toArray()
             ) : [];
 
-            console.log({
-                directVoters: (await directVoters()).map(v => v.representeeVotes)
-            });
+            // console.log({
+            //     directVoters: (await directVoters()).map(v => v.representeeVotes)
+            // });
 
             return [
                 ...(typeOfVoter === 'directFor' || typeOfVoter === 'directAgainst') ?

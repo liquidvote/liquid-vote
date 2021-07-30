@@ -47,7 +47,7 @@ export const PersonInList: FunctionComponent<{ person: any }> = ({ person }) => 
                     {' '}<b className="white forDirect px-1 rounded">{useMemo(() => Math.floor(Math.random() * 100), [])}</b>
                     {' '}polls and different in
                     {' '}<b className="white againstDirect px-1 rounded">{useMemo(() => Math.floor(Math.random() * 100), [])}</b>
-                    {' '}(TODO)
+                    {' '}🧪
                 </small>
             </div>
         </div>

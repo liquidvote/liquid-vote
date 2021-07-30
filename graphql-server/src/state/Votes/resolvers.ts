@@ -22,6 +22,8 @@ export const VoteResolvers = {
             mongoDB, s3, AuthUser
         }) => {
 
+            console.log({ position: Vote.position === null });
+
             const Vote_ = !!AuthUser && await mongoDB.collection("Votes")
                 .findOne({
                     questionText,
@@ -53,23 +55,52 @@ export const VoteResolvers = {
                     'user': AuthUser._id
                 }))?.ops[0] : (
                     !!AuthUser &&
+                    Vote.position === null &&
                     Vote_.user.toString() === AuthUser._id.toString()
-                ) ? (await mongoDB.collection("Votes").findOneAndUpdate(
-                    { _id: Vote_._id },
-                    {
-                        $set: {
-                            'position': Vote.position,
-                            'forWeight': Vote.position === 'for' ? 1 : 0,
-                            'againstWeight': Vote.position === 'against' ? 1 : 0,
-                            'isDirect': true,
-                            'lastEditOn': Date.now(),
+                ) ? (
+                    await mongoDB.collection("Votes").findOneAndUpdate(
+                        { _id: Vote_._id },
+                        {
+                            $set: {
+                                'position': Vote_.representatives.length === 0 ? null : 'delegated',
+                                'forWeight': Vote_.representatives.length === 0 ? 0 :
+                                    (Vote_.representatives.reduce(
+                                        (acc, curr) => acc + curr.forWeight, 0
+                                    ) / Vote_.representatives.length) || 0,
+                                'againstWeight': Vote_.representatives.length === 0 ? 0 :
+                                    (Vote_.representatives.reduce(
+                                        (acc, curr) => acc + curr.againstWeight, 0
+                                    ) / Vote_.representatives.length) || 0,
+                                'isDirect': Vote_.representatives.length === 0 ? true : false,
+                                'lastEditOn': Date.now(),
+                            },
                         },
-                    },
-                    {
-                        returnNewDocument: true,
-                        returnOriginal: false
-                    }
-                ))?.value : null;
+                        {
+                            returnNewDocument: true,
+                            returnOriginal: false
+                        }
+                    )
+                )?.value : (
+                    !!AuthUser &&
+                    Vote_.user.toString() === AuthUser._id.toString()
+                ) ? (
+                    await mongoDB.collection("Votes").findOneAndUpdate(
+                        { _id: Vote_._id },
+                        {
+                            $set: {
+                                'position': Vote.position,
+                                'forWeight': Vote.position === 'for' ? 1 : 0,
+                                'againstWeight': Vote.position === 'against' ? 1 : 0,
+                                'isDirect': true,
+                                'lastEditOn': Date.now(),
+                            },
+                        },
+                        {
+                            returnNewDocument: true,
+                            returnOriginal: false
+                        }
+                    )
+                )?.value : null;
 
             console.log({
                 savedVote
@@ -147,9 +178,6 @@ export const VoteResolvers = {
                             v => v.representativeHandle === AuthUser.LiquidUser.handle
                         );
 
-                        // Huuuum..
-                        // thinking this might not be needed..
-                        // since an aggregation would suffice
                         const representativesToUpdate = Vote_.representatives.reduce(
                             (acc, curr) => [
                                 ...acc,

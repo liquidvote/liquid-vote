@@ -29,6 +29,7 @@ export const GroupTypeDefs = gql`
         representations: Int
         directVotesMade: Int
         indirectVotesMade: Int
+        mostRepresentingMembers: [User]
     }
 
     type yourGroupStats {

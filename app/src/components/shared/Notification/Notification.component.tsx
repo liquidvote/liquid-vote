@@ -115,14 +115,15 @@ export const Notification: FunctionComponent<{
                 )}
                 {
                     showChart && (
-                        <div>
+                        <div key={`notificationVote-${v.questionText}`}>
                             <SingleVoteInList
                                 l={{
                                     ...v,
-                                    questionText: '',
+                                    hideTitle: true,
                                     userVote: v.yourVote,
                                     stats: v.QuestionStats
-                                }} />
+                                }}
+                            />
                         </div>
                     )
                 }

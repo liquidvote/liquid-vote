@@ -1,24 +1,21 @@
 var AWS = require("aws-sdk");
+
+AWS.config.loadFromPath("./aws-credentials.json");
 // Set the region
-AWS.config.update({ region: "eu-west-2" });
+AWS.config.update({ region: "eu-west-1" });
 
 // Create sendEmail params
 var params = {
+  Source: "hello@liquid-vote.com",
   Destination: {
-    /* required */
-    // CcAddresses: [
-    //     'EMAIL_ADDRESS',
-    //     /* more items */
-    // ],
-    ToAddresses: [
-      "buesimples@gmail.com",
-      /* more items */
-    ],
+    ToAddresses: ["buesimples@gmail.com"],
   },
   Message: {
-    /* required */
+    Subject: {
+      Charset: "UTF-8",
+      Data: "Hello email",
+    },
     Body: {
-      /* required */
       Html: {
         Charset: "UTF-8",
         Data: "Hello",
@@ -28,16 +25,7 @@ var params = {
         Data: "Hello",
       },
     },
-    Subject: {
-      Charset: "UTF-8",
-      Data: "Hello email",
-    },
   },
-  Source: "invites@liquid-vote.com" /* required */,
-  ReplyToAddresses: [
-    "hello@liquid-vote.com",
-    /* more items */
-  ],
 };
 
 // Create the promise and SES service object
