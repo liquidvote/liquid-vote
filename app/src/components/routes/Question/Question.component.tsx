@@ -147,8 +147,8 @@ export default function Question() {
                                 (
                                     !!forRepresentatives?.length &&
                                     question_data?.Question?.userVote?.position === 'delegated' &&
-                                    (!editVote_data || editVote_data?.editVote?.position === 'delegated') 
-                                )  && (
+                                    (!editVote_data || editVote_data?.editVote?.position === 'delegated')
+                                ) && (
                                     <div className="d-flex ml-2 my-n2 mr-n1">
                                         <Link
                                             to={`/profile/${forRepresentatives[0].representativeHandle}`}
@@ -180,7 +180,10 @@ export default function Question() {
 
 
                         <div className="d-flex ml-2">
-                            {question_data?.Question?.stats?.forMostRepresentingVoters?.slice(0, 2).map((v: any) => (
+                            {(
+                                editVote_data?.editVote?.QuestionStats?.forMostRepresentingVoters ||
+                                question_data?.Question?.stats?.forMostRepresentingVoters
+                            )?.slice(0, 2).map((v: any) => (
                                 <Link
                                     to={`/profile/${v?.handle}`}
                                     className="vote-avatar for ml-n2 d-none d-md-block"
@@ -203,29 +206,29 @@ export default function Question() {
                                     }
                                 })
                             }}
-                                className="vote-avatar count for ml-n2">{numeral(question_data?.Question?.stats.forDirectCount).format('0a')}
+                                className="vote-avatar count for ml-n2">{
+                                    numeral(stats.forCount).format('0a[.]0')
+                                }
                             </div>
-                            {/* <div onClick={(e) => {
-                                // setIsShowingVotersModal(true);
-                                // setUsersShowing(`People Voting For on ${voteName}`);
-                            }}
-                                className="vote-avatar count for ml-n2">{numeral(question_data?.Question?.stats.forCount - question_data?.Question?.stats.forDirectCount).format('0a')}
-                            </div> */}
 
                         </div>
                     </div>
                     <div className="d-flex align-items-center">
                         <div className="d-flex ml-2">
-                            {question_data?.Question?.stats?.againstMostRepresentingVoters?.slice(0, 2).map((v: any) => (
-                                <Link
-                                    to={`/profile/${v?.handle}`}
-                                    className="vote-avatar against ml-n2 d-none d-md-block"
-                                    style={{
-                                        background: `url(${v?.avatar}) no-repeat`,
-                                        backgroundSize: 'cover'
-                                    }}
-                                ></Link>
-                            ))}
+                            {
+                                (
+                                    editVote_data?.editVote?.QuestionStats?.againstMostRepresentingVoters ||
+                                    question_data?.Question?.stats?.againstMostRepresentingVoters
+                                )?.slice(0, 2).map((v: any) => (
+                                    <Link
+                                        to={`/profile/${v?.handle}`}
+                                        className="vote-avatar against ml-n2 d-none d-md-block"
+                                        style={{
+                                            background: `url(${v?.avatar}) no-repeat`,
+                                            backgroundSize: 'cover'
+                                        }}
+                                    ></Link>
+                                ))}
                             {/* <div className="vote-avatar avatar-1 ml-n2" /> */}
                             <div onClick={(e) => {
                                 updateParams({
@@ -238,7 +241,9 @@ export default function Question() {
                                         })
                                     }
                                 })
-                            }} className="vote-avatar count against ml-n2">{numeral(question_data?.Question?.stats.againstDirectCount).format('0a')}</div>
+                            }} className="vote-avatar count against ml-n2">{
+                                    numeral(stats.againstCount).format('0a[.]0')
+                                }</div>
                         </div>
                         <div
                             className={`button_ ml-1 ${userVote === 'against' && 'selected'}`}
@@ -250,7 +255,7 @@ export default function Question() {
                                 (
                                     !!againstRepresentatives?.length &&
                                     question_data?.Question?.userVote?.position === 'delegated' &&
-                                    (!editVote_data || editVote_data?.editVote?.position === 'delegated') 
+                                    (!editVote_data || editVote_data?.editVote?.position === 'delegated')
                                 ) && (
                                     <div className="d-flex ml-3 my-n2 mr-n1">
                                         <Link

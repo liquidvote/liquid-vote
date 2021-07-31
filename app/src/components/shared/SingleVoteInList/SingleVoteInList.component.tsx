@@ -189,7 +189,10 @@ export const SingleVoteInList: FunctionComponent<{
                             </div>
                             <div className="d-flex ml-2">
 
-                                {l?.stats?.forMostRepresentingVoters?.slice(0, 2).map((v: any) => (
+                                {(
+                                    editVote_data?.editVote?.QuestionStats?.forMostRepresentingVoters ||
+                                    l?.stats?.forMostRepresentingVoters
+                                )?.slice(0, 2).map((v: any) => (
                                     <Link
                                         key={`${v?.handle}`}
                                         to={`/profile/${v?.handle}`}
@@ -215,12 +218,15 @@ export const SingleVoteInList: FunctionComponent<{
                                         })
                                     }}
                                     className="vote-avatar tiny count for ml-n1"
-                                >{numeral(stats.forCount).format('0a')}</div>
+                                >{numeral(stats.forCount).format('0a[.]0')}</div>
                             </div>
                         </div>
                         <div className="d-flex align-items-center">
                             <div className="d-flex mr-1">
-                                {l?.stats?.againstMostRepresentingVoters?.slice(0, 2).map((v: any) => (
+                                {(
+                                    editVote_data?.editVote?.QuestionStats?.againstMostRepresentingVoters ||
+                                    l?.stats?.againstMostRepresentingVoters
+                                )?.slice(0, 2).map((v: any) => (
                                     <Link
                                         key={`${v?.handle}`}
                                         to={`/profile/${v?.handle}`}
@@ -234,7 +240,7 @@ export const SingleVoteInList: FunctionComponent<{
                                 <div onClick={() => {
                                     setIsShowingVotersModal(true);
                                     setUsersShowing(`People Voting Against on ${l.questionText}`);
-                                }} className="vote-avatar tiny count against ml-n1">{numeral(stats.againstCount).format('0a')}</div>
+                                }} className="vote-avatar tiny count against ml-n1">{numeral(stats.againstCount).format('0a[.]0')}</div>
                             </div>
                             <div
                                 className={`button_ small ${userVote === 'against' && 'selected'}`}
