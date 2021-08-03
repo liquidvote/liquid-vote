@@ -76,6 +76,5 @@ export const GroupTypeDefs = gql`
 
     extend type Mutation {
         editGroup(handle: String, Group: JSON): JSON
-        editGroupChannel(handle: String, Channel: JSON): JSON
     }
 `;

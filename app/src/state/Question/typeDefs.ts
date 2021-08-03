@@ -14,7 +14,28 @@ export const QUESTION = gql`
             questionText
             questionType
             startText
-            # choices
+            choices {
+                text
+                stats {
+                    lastVoteOn
+                    forCount
+                    forDirectCount
+                    forMostRepresentingVoters {
+                        handle
+                        avatar
+                        name
+                        representeeCount
+                    }
+                    againstCount
+                    againstMostRepresentingVoters {
+                        handle
+                        avatar
+                        name
+                        representeeCount
+                    }
+                    againstDirectCount
+                }
+            }
             groupChannel{
                 group
                 channel
@@ -73,14 +94,16 @@ export const QUESTION_VOTERS = gql`
         $choiceText: String
         $group: String
         $channel: String
-        $typeOfVoter: String
+        $typeOfVoter: String,
+        $sortBy: String
     ) {
         QuestionVoters (
             questionText: $questionText
             choiceText: $choiceText
             group: $group
             channel: $channel
-            typeOfVoter: $typeOfVoter
+            typeOfVoter: $typeOfVoter,
+            sortBy: $sortBy
          ) {
             questionText
             choiceText

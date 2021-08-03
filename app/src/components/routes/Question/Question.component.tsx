@@ -27,6 +27,8 @@ import { voteStatsMap } from '@state/Question/map';
 import { EDIT_VOTE } from '@state/Vote/typeDefs';
 import useSearchParams from "@state/Global/useSearchParams.effect";
 import QuestionVotes from "./QuestionVotes";
+import DropAnimation from "@components/shared/DropAnimation";
+import { timeAgo } from '@state/TimeAgo';
 
 export default function Question() {
 
@@ -98,7 +100,11 @@ export default function Question() {
         s: question_data?.Question?.stats
     });
 
-    return (
+    return question_loading ? (
+        <div className="d-flex justify-content-center mt-5">
+            <DropAnimation />
+        </div>
+    ) : question_error ? (<>Error</>) : (
         <>
             <ReactTooltip place="bottom" type="dark" effect="solid" />
 
@@ -158,21 +164,10 @@ export default function Question() {
                                                 backgroundSize: 'cover'
                                             }}
                                         ></Link>
-                                        <div
-                                            onClick={(e) => {
-                                                updateParams({
-                                                    paramsToAdd: {
-                                                        modal: "ListVoters",
-                                                        modalData: JSON.stringify({
-                                                            votersSection: 'forRepresentatives',
-                                                            questionText: question_data?.Question?.questionText,
-                                                            groupChannel
-                                                        })
-                                                    }
-                                                })
-                                            }}
-                                            className="vote-avatar count for ml-n2"
-                                        >{forRepresentatives.length}</div>
+                                        <Link
+                                            to={`/poll/${voteName}/${groupChannel}/timeline/representingYou`}
+                                            className="vote-avatar text-decoration-none count for ml-n2"
+                                        >{forRepresentatives.length}</Link>
                                     </div>
                                 )
                             }
@@ -194,23 +189,12 @@ export default function Question() {
                                 ></Link>
                             ))}
 
-                            <div onClick={(e) => {
-                                updateParams({
-                                    paramsToAdd: {
-                                        modal: "ListVoters",
-                                        modalData: JSON.stringify({
-                                            votersSection: 'directFor',
-                                            questionText: question_data?.Question?.questionText,
-                                            groupChannel
-                                        })
-                                    }
-                                })
-                            }}
-                                className="vote-avatar count for ml-n2">{
+                            <Link
+                                to={`/poll/${voteName}/${groupChannel}/timeline/direct/for`}
+                                className="vote-avatar text-decoration-none count for ml-n2">{
                                     numeral(stats.forCount).format('0a[.]0')
                                 }
-                            </div>
-
+                            </Link>
                         </div>
                     </div>
                     <div className="d-flex align-items-center">
@@ -230,20 +214,13 @@ export default function Question() {
                                     ></Link>
                                 ))}
                             {/* <div className="vote-avatar avatar-1 ml-n2" /> */}
-                            <div onClick={(e) => {
-                                updateParams({
-                                    paramsToAdd: {
-                                        modal: "ListVoters",
-                                        modalData: JSON.stringify({
-                                            votersSection: 'directAgainst',
-                                            questionText: question_data?.Question?.questionText,
-                                            groupChannel
-                                        })
-                                    }
-                                })
-                            }} className="vote-avatar count against ml-n2">{
+
+                            <Link
+                                to={`/poll/${voteName}/${groupChannel}/timeline/direct/against`}
+                                className="vote-avatar text-decoration-none count against ml-n2">{
                                     numeral(stats.againstCount).format('0a[.]0')
-                                }</div>
+                                }
+                            </Link>
                         </div>
                         <div
                             className={`button_ ml-1 ${userVote === 'against' && 'selected'}`}
@@ -266,19 +243,10 @@ export default function Question() {
                                                 backgroundSize: 'cover'
                                             }}
                                         ></Link>
-                                        {/* <Link to="/profile" className="vote-avatar avatar-5 against ml-n2 d-none d-md-block"></Link> */}
-                                        <div onClick={(e) => {
-                                            updateParams({
-                                                paramsToAdd: {
-                                                    modal: "ListVoters",
-                                                    modalData: JSON.stringify({
-                                                        votersSection: 'againstRepresentatives',
-                                                        questionText: question_data?.Question?.questionText,
-                                                        groupChannel
-                                                    })
-                                                }
-                                            })
-                                        }} className="vote-avatar count against ml-n2">{againstRepresentatives.length}</div>
+                                        <Link
+                                            to={`/poll/${voteName}/${groupChannel}/timeline/representingYou`}
+                                            className="vote-avatar text-decoration-none count against ml-n2"
+                                        >{againstRepresentatives.length}</Link>
                                     </div>
                                 )
                             }
@@ -312,8 +280,9 @@ export default function Question() {
                             className={`button_ small mx-1`}
                         >Invite to Vote 🧪</div>
                     </div>
-                    <small data-tip="Last vote was">
-                        {question_data?.Question?.stats?.lastVoteOn || '3s ago 🧪'}
+                    <small data-tip="Created on">
+                    {/* <small className="time-ago" data-tip="Last vote was"> */}
+                        {timeAgo.format(new Date(Number(question_data?.Question?.createdOn)))}
                     </small>
                     {/* <div onClick={() => setIsPollingInOtherGroup(true)} className="button_ small mb-0 mw-25">
                         poll this in another group

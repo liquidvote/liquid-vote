@@ -36,6 +36,16 @@ export const USER = gql`
   }
 `;
 
+export const SEARCH_USERS = gql`
+  query($text: String!) {
+    SearchUsers(text: $text) {
+        handle,
+        name,
+        avatar
+    }
+  }
+`;
+
 export const USER_REPRESENTING = gql`
   query($handle: String!, $groupHandle: String) {
     UserRepresenting(handle: $handle, groupHandle: $groupHandle) {

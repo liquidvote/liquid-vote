@@ -35,11 +35,6 @@ export const UserResolvers = {
                     ],
                 }).toArray();
 
-            console.log({
-                text,
-                Users
-            });
-
             return Users?.map(u => u.LiquidUser) || [];
         },
 
@@ -230,10 +225,6 @@ export const UserResolvers = {
             return Groups;
         },
         UserVotes: async (_source, { handle, type = 'directVotesMade' }, { mongoDB, s3, AuthUser }) => {
-
-            console.log({
-                type
-            });
 
             const User = await mongoDB.collection("Users")
                 .findOne({ 'LiquidUser.handle': handle });
@@ -498,10 +489,6 @@ export const UserResolvers = {
                 }[type]();
             })(type);
 
-            console.log({
-                Votes
-            });
-
             return Votes;
         },
     },
@@ -541,14 +528,6 @@ export const UserResolvers = {
 
             const isUser = !!AuthUser && AuthUser?.LiquidUser?.handle === UserHandle;
 
-            // console.log('edit relation!', {
-            //     UserHandle,
-            //     GroupHandle,
-            //     Channels,
-            //     IsMember,
-            //     isUser: AuthUser?.LiquidUser?.handle === UserHandle
-            // });
-
             const Group = await mongoDB.collection("Groups")
                 .findOne({ 'handle': GroupHandle });
 
@@ -557,15 +536,6 @@ export const UserResolvers = {
                     'userId': ObjectID(AuthUser._id),
                     'groupId': ObjectID(Group._id)
                 });
-
-            // console.log({
-            //     isUser,
-            //     GroupsMemberRelation:  GroupsMemberRelation._id,
-            //     doIsMember: typeof IsMember !== 'undefined',
-            //     IsMember,
-            //     doChannels: typeof Channels !== 'undefined',
-            //     Channels
-            // })
 
             const updatedOrCreated = (isUser && !!GroupsMemberRelation) ? (
                 await mongoDB.collection("GroupMembers").findOneAndUpdate(
@@ -619,17 +589,6 @@ export const UserResolvers = {
                     representeeId: ObjectID(Representee?._id),
                     groupId: ObjectID(Group_?._id),
                 });
-
-            // console.log({
-            //     RepresenteeHandle,
-            //     RepresentativeHandle,
-            //     Group,
-            //     IsRepresentingYou,
-
-            //     Representee: Representee._id,
-            //     Representative: Representative._id,
-            //     Group_: Group_._id
-            // })
 
             const updatedOrCreated = (isUser && !!RepresentativeGroupRelation) ? (
                 await mongoDB.collection("UserRepresentations").findOneAndUpdate(
@@ -936,10 +895,6 @@ const getYourUserStats = async ({ userId, AuthUser, mongoDB }) => {
             ])
             .toArray()
     )?.[0];
-
-    // console.log({
-    //     votesInCommon
-    // });
 
     return {
         votesInCommon: votesInCommon?.votesInCommon || 0, // count

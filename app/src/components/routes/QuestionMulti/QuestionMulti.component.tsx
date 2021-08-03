@@ -1,11 +1,12 @@
-import React, { FunctionComponent, useState } from 'react';
+import React, { FunctionComponent, useState, useEffect } from 'react';
 import { Link, useParams } from "react-router-dom";
 import { DiscussionEmbed } from 'disqus-react';
 import numeral from 'numeral';
 import ReactTooltip from 'react-tooltip';
-import Modal from 'react-modal';
+import { useQuery, useMutation } from "@apollo/client";
 
 import VoteGraph1 from "@shared/VoteGraph1";
+import Chart from "@shared/VoteGraph1/chart.svg";
 import Header from "@shared/Header";
 import DropPlusSVG from "@shared/Icons/Drop+.svg";
 import XSVG from "@shared/Icons/X.svg";
@@ -13,209 +14,181 @@ import {
     defaults,
     byGroups,
     votesBy,
-    valores
+    onSubTopics
 } from "@state/Mock/Votes";
 import SubVote from '@shared/SubVote';
-import GroupSvg from "@shared/Icons/Group.svg";
+import GroupSmallSvg from "@shared/Icons/Group-small.svg";
 import { people } from "@state/Mock/People";
 import PersonInList from '@shared/PersonInList';
 import { VoteTimeline } from "@state/Mock/Notifications";
 import Notification from '@shared/Notification';
+import { QUESTION } from '@state/Question/typeDefs';
+import { voteStatsMap } from '@state/Question/map';
+import { EDIT_VOTE } from '@state/Vote/typeDefs';
+import useSearchParams from "@state/Global/useSearchParams.effect";
+// import QuestionVotes from "./QuestionVotes";
+import DropAnimation from "@components/shared/DropAnimation";
+import { timeAgo } from '@state/TimeAgo';
+import Choice from './Choice';
 
-export default function QuestionMulti() {
+export default function Question() {
 
-    let { voteName, section } = useParams<any>();
+    let { voteName, groupChannel, section } = useParams<any>();
+    const { allSearchParams, updateParams } = useSearchParams();
 
-    console.log({ section });
+    const groupChannel_ = (([g, c]) => ({
+        group: g,
+        channel: c
+    }))(groupChannel.split("-"))
 
-    const [userVote, setUserVote] = useState(null);
-    const [isPollingInOtherGroup, setIsPollingInOtherGroup] = useState(false);
-    const [isShowingVotersModal, setIsShowingVotersModal] = useState(false);
-    const [usersShowing, setUsersShowing] = useState('');
-    const [selectedGroups, setSelectedGroups] = useState(['Algarve Flats']);
-
-    const selectGroup = (group: string) => {
-        if (selectedGroups.indexOf(group) !== -1) {
-            setSelectedGroups(selectedGroups.filter((el, i) => i !== selectedGroups.indexOf(group)))
-        } else {
-            setSelectedGroups([...selectedGroups, group])
+    const {
+        loading: question_loading,
+        error: question_error,
+        data: question_data,
+        refetch: question_refetch
+    } = useQuery(QUESTION, {
+        variables: {
+            questionText: voteName,
+            group: groupChannel_.group,
+            channel: groupChannel_.channel
         }
-    }
+    });
 
-    const openStats = (for_: any) => {
-        alert(`TODO: open stats for ${for_}`);
-    };
+    const [editVote, {
+        loading: editVote_loading,
+        error: editVote_error,
+        data: editVote_data,
+    }] = useMutation(EDIT_VOTE);
+
+    const userVote = editVote_data?.editVote?.position || question_data?.Question?.userVote?.position || null;
+
+    // const [isPollingInOtherGroup, setIsPollingInOtherGroup] = useState(false);
+    // const [isShowingVotersModal, setIsShowingVotersModal] = useState(false);
+    // const [usersShowing, setUsersShowing] = useState('');
 
     const handleUserVote = (vote: string) => {
-        if (vote === userVote) {
-            setUserVote(null)
-        } else {
-            setUserVote(vote);
-        }
+        editVote({
+            variables: {
+                questionText: question_data?.Question?.questionText,
+                // choiceText
+                group: question_data?.Question?.groupChannel.group,
+                channel: question_data?.Question?.groupChannel.channel,
+                Vote: {
+                    position: (vote === userVote) ? null : vote
+                },
+            }
+        });
     }
 
-    const stats = (({ forCount, againstCount, forDirectCount, againstDirectCount }) => {
-        const forPercentage = (!forCount && !againstCount) ? 50 : ((forCount / (forCount + againstCount)) * 100);
-        const forDirectPercentage = (forDirectCount / (forCount + againstCount)) * 100 || 50;
-        const forDelegatedPercentage = ((forCount - forDirectCount) / (forCount + againstCount)) * 100;
-        const againstPercentage = 100 - forPercentage;
-        const againstDirectPercentage = (againstDirectCount / (forCount + againstCount)) * 100 || 50;
-        const againstDelegatedPercentage = ((againstCount - againstDirectCount) / (forCount + againstCount)) * 100;
+    const stats = voteStatsMap({
+        forCount: 0,
+        againstCount: 0,
+        forDirectCount: 0,
+        againstDirectCount: 0,
+    });
 
-        return {
-            forDelegatedPercentage,
-            forDirectPercentage,
-            againstDelegatedPercentage,
-            againstDirectPercentage
-        }
-    })({
-        forCount: defaults.forCount,
-        againstCount: defaults.againstCount,
-        forDirectCount: defaults.forDirectCount,
-        againstDirectCount: defaults.againstDirectCount,
-    })
+    // voteStatsMap({
+    //     forCount: question_data?.Question?.stats.forCount,
+    //     againstCount: question_data?.Question?.stats.againstCount,
+    //     forDirectCount: question_data?.Question?.stats.forDirectCount,
+    //     againstDirectCount: question_data?.Question?.stats.againstDirectCount,
+    //     ...(!!editVote_data?.editVote?.QuestionStats) && {
+    //         forCount: editVote_data?.editVote?.QuestionStats.forCount,
+    //         againstCount: editVote_data?.editVote?.QuestionStats.againstCount,
+    //         forDirectCount: editVote_data?.editVote?.QuestionStats.forDirectCount,
+    //         againstDirectCount: editVote_data?.editVote?.QuestionStats.againstDirectCount,
+    //     }
+    // });
 
-    return (
+    const forRepresentatives = question_data?.Question?.userVote?.representatives.filter((r: any) => r.position === 'for');
+    const againstRepresentatives = question_data?.Question?.userVote?.representatives.filter((r: any) => r.position === 'against');
+
+    console.log({
+        stats,
+        s: question_data?.Question?.stats
+    });
+
+    return question_loading ? (
+        <div className="d-flex justify-content-center mt-5">
+            <DropAnimation />
+        </div>
+    ) : question_error ? (<>Error</>) : (
         <>
             <ReactTooltip place="bottom" type="dark" effect="solid" />
-            <Modal
-                isOpen={isPollingInOtherGroup}
-                // onAfterOpen={afterOpenModal}
-                onRequestClose={() => setIsPollingInOtherGroup(false)}
-                // style={customStyles}
-                contentLabel="Example Modal"
-                className="Modal"
-                overlayClassName="Overlay"
-            >
-                <div className="d-flex align-items-center mb-n2">
-                    <div onClick={() => setIsPollingInOtherGroup(false)} role="button">
-                        <XSVG />
-                    </div>
-                </div>
-
-                <hr />
-                <div>Todo: List Groups here</div>
-            </Modal>
-            <Modal
-                isOpen={isShowingVotersModal}
-                // onAfterOpen={afterOpenModal}
-                onRequestClose={() => setIsShowingVotersModal(false)}
-                // style={customStyles}
-                contentLabel="Example Modal"
-                className="Modal"
-                overlayClassName="Overlay"
-            >
-                <div className="d-flex align-items-center mb-n2">
-                    <div onClick={() => setIsShowingVotersModal(false)} role="button">
-                        <XSVG />
-                    </div>
-                    <h4 className="ml-4 mb-0">{usersShowing}</h4>
-                </div>
-
-                <hr className="mb-0" />
-
-                <div className="mt-n2">
-                    {people.map((el, i) => (
-                        <PersonInList person={el} />
-                    ))}
-                </div>
-
-                {/* <CreateVote group={groupName} /> */}
-
-            </Modal>
-
 
             <Header title="Opinion Poll" />
 
-            <h2 className="mb-0 mt-4">Multi Choice</h2>
-            <h2 className="mb-2 white"><b>{voteName}</b></h2>
+            {/* <h2 className="mb-0 mt-4">Do you approve</h2> */}
+            <h2 className="mb-2 mt-4 white"><b>{voteName}</b></h2>
 
             <div>
-                {/* <h4 onClick={() => openStats("Vote")}>Opinions</h4> */}
-                <div className="bar-container-horizontal">
-                    {valores.map((l, i) => (
-                        <SubVote
-                            l={{ ...l, name: '-' }}
-                            i={i}
-                            showQuestionMarkInName={false}
-                        />
-                    ))}
-                    <div className="d-flex justify-content-center mt-3" data-tip="Create Sub Poll">
-                        <Link to="#" onClick={() => alert("allows anyone to create a sub poll")} className="button_ icon-contain inverted">
-                            <DropPlusSVG />
-                        </Link>
-                    </div>
-                </div>
-
+                {question_data?.Question?.choices?.map(c => (
+                    <Choice
+                        choice={c}
+                        voteName={voteName}
+                        groupChannel={groupChannel}
+                    />
+                ))}
 
                 <div className="mt-4 d-flex align-items-start flex-nowrap justify-content-between">
                     <div className="d-flex flex-nowrap">
-                        <div data-tip="Selected groups"><GroupSvg /></div>
+                        <div data-tip="Selected groups"><GroupSmallSvg /></div>
                         <div className="d-flex flex-wrap justify-content-start">
-                            <div className="badge ml-1 mb-1 mt-1">
-                                Aldeia d'Abrigada: Geral
-                            </div>
-                            {/* <div onClick={() => selectGroup('Algarve Flats')} className={`badge ${selectedGroups.indexOf('Algarve Flats') === -1 && 'inverted'} ml-1 mb-1 mt-1`}>Algarve Flats</div>
-                            <div onClick={() => selectGroup('Moon Investors')} className={`badge ${selectedGroups.indexOf('Moon Investors') === -1 && 'inverted'} ml-1 mb-1 mt-1`}>Moon Investors</div>
-                            <div onClick={() => selectGroup('💩s')} className={`badge ${selectedGroups.indexOf('💩s') === -1 && 'inverted'} ml-1 mb-1 mt-1`}>💩s</div>
-                            <div onClick={() => selectGroup('Shoreditch Neighborhood')} className={`badge ${selectedGroups.indexOf('Shoreditch Neighborhood') === -1 && 'inverted'} ml-1 mb-1 mt-1`}>Shoreditch Neighborhood</div> */}
-                            {/*
-                            <div onClick={() => selectGroup('Moon Investors')} className={`badge ${selectedGroups.indexOf('Moon Investors') === -1 && 'inverted'} ml-1 mb-1 mt-1`}>Moon Investors</div>
-                            <div onClick={() => selectGroup('Moon Investors')} className={`badge ${selectedGroups.indexOf('Moon Investors') === -1 && 'inverted'} ml-1 mb-1 mt-1`}>Moon Investors</div>
-                            */}
-                            {/* <div className={`badge inverted ml-1 mb-1 mt-1`}>+3</div> */}
+                            <Link
+                                to={`/group/${question_data?.Question?.groupChannel.group}`}
+                                className="badge ml-1 mb-1 mt-1"
+                            >
+                                {question_data?.Question?.groupChannel.group}:
+                                {question_data?.Question?.groupChannel.channel}
+                            </Link>
                         </div>
                     </div>
-                    <div onClick={() => setIsPollingInOtherGroup(true)} className="button_ small mb-0 mw-25">
-                        poll this in another group
+                    <div className="d-flex justify-content-center">
+                        {question_data?.Question?.thisUserIsAdmin && (
+                            <>
+                                <div
+                                    onClick={() => alert('soon')}
+                                    className={`button_ small mx-1`}
+                                >Edit</div>
+                            </>
+                        )}
+                        <div
+                            className={`button_ small mx-1`}
+                        >Invite to Vote 🧪</div>
                     </div>
+                    <small data-tip="Created on">
+                        {/* <small className="time-ago" data-tip="Last vote was"> */}
+                        {timeAgo.format(new Date(Number(question_data?.Question?.createdOn)))}
+                    </small>
+                    {/* <div onClick={() => setIsPollingInOtherGroup(true)} className="button_ small mb-0 mw-25">
+                        poll this in another group
+                    </div> */}
                 </div>
 
                 <br />
 
                 <ul className="nav d-flex justify-content-around mt-1 mb-n4 mx-n3">
                     <li className="nav-item">
-                        <Link className={`nav-link ${(!section || section === 'timeline') && 'active'}`} to={`/multipoll/${voteName}/timeline`}>
+                        <Link className={`nav-link ${(!section || section === 'timeline') && 'active'}`} to={`/poll/${voteName}/${groupChannel}/timeline`}>
                             Timeline
                         </Link>
                     </li>
-                    {/* <li className="nav-item">
-                        <Link className={`nav-link ${(section === 'subpolls') && 'active'}`} to={`/poll/${voteName}/subpolls`}>
-                            <b>18</b> Sub Polls
-                        </Link>
-                    </li> */}
                     <li className="nav-item">
-                        <Link className={`nav-link ${section === 'votesby' && 'active'}`} to={`/multipoll/${voteName}/votesby`}>
-                            Votes by
+                        <Link className={`nav-link ${section === 'votesby' && 'active'}`} to={`/poll/${voteName}/${groupChannel}/votesby`}>
+                            Votes by 🧪
                         </Link>
                     </li>
-                    {/* <li className="nav-item">
-                        <Link className={`nav-link ${section === 'conversation' && 'active'}`} to={`/poll/${voteName}/conversation`}>
-                            Conversation
+                    <li className="nav-item">
+                        <Link className={`nav-link ${section === 'conversation' && 'active'}`} to={`/poll/${voteName}/${groupChannel}/conversation`}>
+                            Conversation 🧪
                         </Link>
-                    </li> */}
+                    </li>
                 </ul>
 
                 <br />
                 <br />
 
-                {/* <h3>Sub polls</h3> */}
-                {/* {section === 'subpolls' && (
-                    <div className="bar-container-horizontal">
-                        {valores.map((l, i) => (
-                            <SubVote
-                                l={{ ...l, name: voteName }}
-                                i={i}
-                            />
-                        ))}
-                        <div className="d-flex justify-content-center mt-3" data-tip="Create Sub Poll">
-                            <Link to="#" onClick={() => alert("allows anyone to create a sub poll")} className="button_ icon-contain inverted">
-                                <DropPlusSVG />
-                            </Link>
-                        </div>
-                    </div>
-                )} */}
-
+                <pre>{JSON.stringify(question_data?.Question, null, 2)}</pre>
 
                 {(section === 'votesby') && (
                     <div>
@@ -303,9 +276,13 @@ export default function QuestionMulti() {
                     </div>
                 )}
 
-                {(!section || section === 'timeline') && VoteTimeline.map((l, i) => (
-                    <Notification v={{ ...l, poll: null }} showChart={false} />
-                ))}
+                {/* {(!section || section === 'timeline') && (
+                    <QuestionVotes />
+                )} */}
+
+                {/* // VoteTimeline.map((l, i) => (
+                //     <Notification v={{ ...l, poll: null }} showChart={false} />
+                // ))} */}
 
 
                 {(section === 'conversation') && (

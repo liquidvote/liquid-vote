@@ -68,25 +68,11 @@ export const QuestionVotes: FunctionComponent<{}> = ({ }) => {
             questionText: voteName,
             group: groupChannel_.group,
             channel: groupChannel_.channel,
-            typeOfVoter: type
+            typeOfVoter: type,
+            sortBy
         },
-        skip: !type //!(type === 'directFor' || type === 'directAgainst')
+        skip: !type
     });
-
-    console.log({
-        type,
-        subsection,
-        subsubsection
-    });
-
-    // const {
-    //     loading: user_votes_loading,
-    //     error: user_votes_error,
-    //     data: user_votes_data,
-    //     refetch: user_votes_refetch
-    // } = useQuery(USER_VOTES, {
-    //     variables: { handle, type }
-    // });
 
     return (
         <>
@@ -99,7 +85,7 @@ export const QuestionVotes: FunctionComponent<{}> = ({ }) => {
                     >
                         <b>
                             {
-                                question_data?.Question?.stats?.forCount +
+                                question_data?.Question?.stats?.forDirectCount +
                                 question_data?.Question?.stats?.againstDirectCount
                             }
                         </b> Direct Votes

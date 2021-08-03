@@ -13,12 +13,6 @@ export const GroupResolvers = {
                     'groupId': ObjectID(Group._id)
                 })) : {};
 
-            // console.log({
-            //     GroupMemberRelation,
-            //     AuthUserId: AuthUser?._id,
-            //     GroupID: Group?._id
-            // })
-
             return {
                 ...Group,
                 thisUserIsAdmin: !!Group.admins.find(u => u.handle === AuthUser?.LiquidUser?.handle),
@@ -65,8 +59,6 @@ export const GroupResolvers = {
         },
         GroupQuestions: async (_source, { handle, channels }, { mongoDB, s3, AuthUser }) => {
 
-            console.log('GroupQuestions');
-
             const Questions = await mongoDB.collection("Questions")
                 .find({ 'groupChannel.group': handle })
                 .toArray();
@@ -108,11 +100,6 @@ export const GroupResolvers = {
     Mutation: {
         editGroup: async (_source, { Group, handle }, { mongoDB, s3, AuthUser }) => {
 
-            // console.log({
-            //     Group,
-            //     handle
-            // })
-
             const Group_ = await mongoDB.collection("Groups")
                 .findOne({ 'handle': handle });
 
@@ -146,7 +133,9 @@ export const GroupResolvers = {
                             'lastEditOn': Date.now(),
                             'admins': Group.admins,
                             'privacy': Group.privacy,
-                            // 'channels': Group.channels,
+                            'channels': Group.channels.map(c => ({
+                                name: c.name
+                            }))
                         },
                     },
                     {
@@ -180,67 +169,7 @@ export const GroupResolvers = {
                 ...savedGroup,
                 thisUserIsAdmin: true
             };
-        },
-        editGroupChannel: async (_source, { Channel, handle }, { mongoDB, s3, AuthUser }) => {
-
-            // console.log({
-            //     Channel,
-            //     handle
-            // })
-
-            const Group_ = await mongoDB.collection("Groups")
-                .findOne({ 'handle': handle });
-
-            const isChannelNew = !Group_.channels.find(c => c.name === Channel.name);
-
-            // const savedGroup = (
-            //         AuthUser &&
-            //         Group_.admins.find(u => u.handle === AuthUser.LiquidUser.handle)
-            //     ) ? await mongoDB.collection("Groups").updateOne(
-            //         { _id: Group_._id },
-            //         {
-            //             $set: {
-            //                 channels: Group_.channels
-            //             },
-            //         }
-            //     ) : null;
-
-            if (
-                Group_.admins.find(u => u.handle === AuthUser.LiquidUser.handle)
-                && isChannelNew
-            ) {
-                // const GroupsMemberRelation = await mongoDB
-                //     .collection("GroupMembers")
-                //     .insertOne({
-                //         groupId: savedGroup._id,
-                //         userId: AuthUser._id,
-                //         createdOn: Date.now(),
-                //         lastEditOn: Date.now(),
-                //     })?.ops[0];
-
-                // await mongoDB.collection("Groups").updateOne(
-                //     { _id: Group_._id },
-                //     {
-                //         $set: {
-                //             'name': Group.name,
-                //             'bio': Group.bio,
-                //             'externalLink': Group.externalLink,
-                //             'avatar': Group.avatar,
-                //             'cover': Group.cover,
-                //             'lastEditOn': Date.now(),
-                //             'admins': Group.admins,
-                //             'privacy': Group.privacy,
-                //         },
-                //     }
-                // )
-
-            }
-
-            return {
-                // ...savedGroup,
-                // thisUserIsAdmin: true
-            };
-        },
+        }
     },
 };
 

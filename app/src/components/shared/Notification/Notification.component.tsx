@@ -76,7 +76,7 @@ export const Notification: FunctionComponent<{
                                     </>
 
                                 </p>
-                                {v.representeeVotes && (
+                                {v.representeeVotes?.length > 0 && (
                                     <small className="d-flex align-items-center">
                                         Representing
                                         <div className="d-flex ml-2 pl-1 mr-1">
@@ -117,9 +117,9 @@ export const Notification: FunctionComponent<{
                     showChart && (
                         <div key={`notificationVote-${v.questionText}`}>
                             <SingleVoteInList
+                                hideTitle={true}
                                 l={{
                                     ...v,
-                                    hideTitle: true,
                                     userVote: v.yourVote,
                                     stats: v.QuestionStats
                                 }}
