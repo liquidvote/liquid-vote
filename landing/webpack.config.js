@@ -59,7 +59,7 @@ if (isProd) {
 } else {
   config.devServer = {
     publicPath: "/",
-    port: 8080,
+    port: 8000,
     open: true,
     hot: true,
     compress: true,
@@ -69,10 +69,10 @@ if (isProd) {
       disableDotRule: true,
     },
     watchOptions: {
-        aggregateTimeout: 300,
-        poll: 1500,
-        ignored: 'node_modules/**'
-    }
+      aggregateTimeout: 300,
+      poll: 1500,
+      ignored: "node_modules/**",
+    },
   };
 }
 

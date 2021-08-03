@@ -12,13 +12,11 @@
     "esModuleInterop": true,
     "baseUrl": "./",
     "paths": {
-        "@env": ["environments/index"],
-        "@components/*": ["src/components/*"],
-        "@assets/*": ["src/assets/*"]
+      "@env": ["environments/index"],
+      "@components/*": ["src/components/*"],
+      "@assets/*": ["src/assets/*"],
+      "@shared/*": ["src/components/shared/*"]
     }
   },
-  "include": [
-    "src",
-    "custom.d.ts"
-  ]
+  "include": ["src", "custom.d.ts"]
 }
