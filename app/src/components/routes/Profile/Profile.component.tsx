@@ -13,10 +13,11 @@ import Header from "@shared/Header";
 import VoteGraph1 from "@shared/VoteGraph1";
 import { profileVotes } from "@state/Mock/Votes";
 import VoteWrapper from "@shared/VoteWrapper";
-import { USER } from "@state/User/typeDefs";
+import { USER, USER_GROUPS } from "@state/User/typeDefs";
 import { AUTH_USER } from "@state/AuthUser/typeDefs";
 import useSearchParams from "@state/Global/useSearchParams.effect";
 import DropAnimation from "@components/shared/DropAnimation";
+import { timeAgo } from '@state/TimeAgo';
 
 import ProfileGroups from "./ProfileGroups";
 import ProfileVotes from "./ProfileVotes";
@@ -38,6 +39,13 @@ export const Profile: FunctionComponent<{}> = ({ }) => {
     });
 
     const profile = user_data?.User;
+
+    const {
+        loading: profileGroups_loading,
+        error: profileGroups_error,
+        data: profileGroups_data,
+        refetch: profileGroups_refetch
+    } = useQuery(USER_GROUPS, { variables: { handle } });
 
     const [isRepresenting, setIsRepresenting] = React.useState(false);
 
@@ -149,7 +157,7 @@ export const Profile: FunctionComponent<{}> = ({ }) => {
                 )}
                 <div>
                     <div className="mr-1"><CalendarSVG /></div>
-                    <div>Joined {profile.joinedOn}</div>
+                    <div>Joined {timeAgo.format(new Date(Number(profile.joinedOn)))}</div>
                 </div>
             </div>
             <div className="profile-stats-container">
@@ -166,9 +174,7 @@ export const Profile: FunctionComponent<{}> = ({ }) => {
                 )} */}
             </div>
 
-            <br />
-
-            {/* <div className="mt-4 mb-3 d-flex align-items-start flex-nowrap justify-content-between">
+            <div className="mt-4 mb-3 d-flex align-items-start flex-nowrap justify-content-between">
                 <div className="d-flex flex-column">
                     <div
                         className="d-flex flex-wrap justify-content-start"
@@ -176,35 +182,18 @@ export const Profile: FunctionComponent<{}> = ({ }) => {
                         <div data-tip="User Groups">
                             <GroupSmallSvg />
                         </div>
-  
-                        {selectedGroup?.channels?.map((el: any, i: any) => (
-                            <div
+                        {profileGroups_data?.UserGroups?.map((el: any, i: any) => (
+                            <Link
+                                to={`/group/${el.handle}`}
                                 key={'s-' + el.name}
-                                onClick={() => selectChannel(el.name)}
-                                className={`badge pointer ${selectedChannels.indexOf(el.name) === -1 && 'inverted'} ml-1 mb-1 mt-1`}
-                            >{el.name}</div>
+                                className={`badge inverted ml-1 mb-1 mt-1`}
+                            >{el.name}</Link>
                         ))}
-                        <div className={`badge inverted ml-1 mb-1 mt-1`}>+3</div>
                     </div>
                 </div>
-            </div> */}
+            </div>
 
-            {/* <ul className="nav d-flex justify-content-around mt-1 mb-n4 mx-n3">
-                <li className="nav-item">
-                    <Link className={`nav-link ${(!section || section === 'votes') && 'active'}`} to={`/profile/${profile.handle}/votes`}>
-                        <b>{profile?.stats?.directVotesMade + profile?.stats?.indirectVotesMadeForUser || 0}</b> Votes
-                    </Link>
-                </li>
-                <li className="nav-item">
-                    <Link className={`nav-link ${section === 'timeline' && 'active'}`} to={`/profile/${profile.handle}/timeline`}>
-                        <b>0</b> Timeline
-                    </Link>
-                </li>
-            </ul> */}
-
-            {/* <hr /> */}
-
-            {/* <h3>{section}</h3> */}
+            <br />
 
             {(!section || section === 'votes') && <ProfileVotes />}
 

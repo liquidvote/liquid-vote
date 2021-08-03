@@ -33,8 +33,6 @@ export const QuestionResolvers = {
             channels
         }, { mongoDB, s3, AuthUser }) => {
 
-            // console.log('Questions', { group, channels });
-
             const Questions = await mongoDB.collection("Questions")
                 .find({ 'groupChannel.group': group })
                 .toArray();
@@ -68,15 +66,9 @@ export const QuestionResolvers = {
                 }
             })));
         },
-        QuestionVoters: async (_source, { questionText, group, channel, typeOfVoter }, { mongoDB, s3, AuthUser }) => {
-
-
-            // console.log({
-            //     // questionText,
-            //     // group,
-            //     // channel,
-            //     typeOfVoter
-            // });
+        QuestionVoters: async (_source, {
+            questionText, group, channel, typeOfVoter, sortBy
+        }, { mongoDB, s3, AuthUser }) => {
 
             const Question = await mongoDB.collection("Questions")
                 .findOne({
@@ -147,7 +139,11 @@ export const QuestionResolvers = {
                         }
                     }, {
                         '$sort': {
-                            'representeeCount': -1
+                            ...(sortBy === 'time') ? {
+                                'lastEditOn' : -1
+                            } : {
+                                'representeeCount': -1
+                            }
                         }
                     }, {
                         '$lookup': {
@@ -248,7 +244,11 @@ export const QuestionResolvers = {
                         }
                     }, {
                         '$sort': {
-                            'representeeCount': -1
+                            ...(sortBy === 'time') ? {
+                                'lastEditOn' : -1
+                            } : {
+                                'representeeCount': -1
+                            }
                         }
                     }
 
@@ -332,10 +332,6 @@ export const QuestionResolvers = {
                 .toArray()
             ) : [];
 
-            // console.log({
-            //     directVoters: (await directVoters()).map(v => v.representeeVotes)
-            // });
-
             return [
                 ...(typeOfVoter === 'directFor' || typeOfVoter === 'directAgainst') ?
                     await directVoters() : [],
@@ -361,7 +357,18 @@ export const QuestionResolvers = {
                     'questionType': Question.questionType,
                     'questionText': Question.questionText,
                     'startText': Question.startText,
-                    'choices': Question.choices,
+                    'choices': Question.choices
+                        .filter(c => c.text !== "")
+                        .map(c => ({
+                            ...c,
+                            'stats': {
+                                forCount: 0,
+                                forDirectCount: 0,
+                                againstCount: 0,
+                                againstDirectCount: 0,
+                                lastVoteOn: null,
+                            }
+                        })),
                     'groupChannel': Question.groupChannel,
                     'resultsOn': Question.resultsOn,
 
@@ -386,7 +393,7 @@ export const QuestionResolvers = {
                             'questionType': Question.questionType,
                             'questionText': Question.questionText,
                             'startText': Question.startText,
-                            'choices': Question.choices,
+                            'choices': Question.choices.filter(c => c.text !== ""),
                             'groupChannel': Question.groupChannel,
                             'resultsOn': Question.resultsOn,
                             'lastEditOn': Date.now(),

@@ -15,6 +15,7 @@ import { defaults, groups, subGroups } from "@state/Mock/Groups";
 import VoteWrapper from "@shared/VoteWrapper";
 import LockSVG from "@shared/Icons/Lock.svg";
 import WorldSVG from "@shared/Icons/World.svg";
+import HashTagSmallSVG from "@shared/Icons/HashTag-small.svg";
 import WorldlockSVG from "@shared/Icons/Worldlock.svg";
 import PersonInList from '@shared/PersonInList'
 import GroupInList from "@shared/GroupInList";
@@ -29,6 +30,7 @@ import { AUTH_USER } from "@state/AuthUser/typeDefs";
 import useSearchParams from "@state/Global/useSearchParams.effect";
 import GroupPolls from './GroupPolls';
 import DropAnimation from '@components/shared/DropAnimation';
+import { timeAgo } from '@state/TimeAgo';
 import './style.sass';
 
 export const Group: FunctionComponent<{}> = ({ }) => {
@@ -111,11 +113,6 @@ export const Group: FunctionComponent<{}> = ({ }) => {
     }
 
     useEffect(() => {
-        console.log({
-            c: selectedGroup?.yourMemberRelation,
-            is: !!selectedGroup?.yourMemberRelation?.channels
-        });
-
         if (!!selectedGroup?.yourMemberRelation?.channels) {
             setSelectedChannels(
                 selectedGroup?.yourMemberRelation?.channels
@@ -230,7 +227,7 @@ export const Group: FunctionComponent<{}> = ({ }) => {
                 )}
                 <div>
                     <div className="mr-1"><CalendarSVG /></div>
-                    <div>Joined {selectedGroup?.createdOn}</div>
+                    <div>Group created {timeAgo.format(new Date(Number(selectedGroup?.createdOn)))}</div>
                 </div>
             </div>
             <div className="profile-stats-container">
@@ -264,7 +261,7 @@ export const Group: FunctionComponent<{}> = ({ }) => {
                         className="d-flex flex-wrap justify-content-start"
                     >
                         <div data-tip="Selected channels">
-                            <GroupSmallSvg />
+                            <HashTagSmallSVG />
                         </div>
                         <div
                             className={`ml-1 badge pointer ${selectedChannels?.length === selectedGroup.channels?.length ? '' : 'inverted'} ml-1 mb-1 mt-1`}

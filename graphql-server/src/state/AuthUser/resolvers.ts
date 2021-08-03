@@ -13,8 +13,6 @@ export const AuthUserResolvers = {
             const AuthUser = await mongoDB.collection("Users")
                 .findOne({ 'Auth0User.sub': Auth0User.sub });
 
-            // console.log({ authUserLoggedIn: AuthUser });
-
             if (!AuthUser) {
 
                 const created = await mongoDB.collection("Users").insertOne({

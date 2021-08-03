@@ -50,7 +50,7 @@ export const GroupInList: FunctionComponent<{
                     <div
                         className={`small-avatar bg`}
                         style={{
-                            background: group.avatar && `url(${group.avatar}) no-repeat`,
+                            background: group.cover && `url(${group.cover}) no-repeat`,
                             backgroundSize: 'cover'
                         }}
                     ></div>

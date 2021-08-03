@@ -5,6 +5,7 @@ import { useQuery, useMutation } from "@apollo/client";
 import TextInput from "@shared/Inputs/TextInput";
 import DropDownInput from "@shared/Inputs/DropDownInput";
 import AdminsInput from "@shared/Inputs/AdminsInput";
+import ChannelsInput from "@shared/Inputs/ChannelsInput";
 import useSearchParams from "@state/Global/useSearchParams.effect";
 import { GROUP, EDIT_GROUP } from "@state/Group/typeDefs";
 import { AUTH_USER } from "@state/AuthUser/typeDefs";
@@ -19,6 +20,7 @@ interface IFormValues {
     cover: string
     bio: string
     externalLink: string,
+    channels: any,
     admins: any
     privacy: string
 }
@@ -75,6 +77,7 @@ export const EditGroup: FunctionComponent<{}> = ({ }) => {
         setValue('externalLink', group_data?.Group.externalLink);
         // setValue('avatar', group_data?.Group.avatar);
         setValue('cover', group_data?.Group.cover);
+        setValue('channels', group_data?.Group.channels || ['general']);
         setValue('admins', group_data?.Group.admins || [{
             handle: authUser?.LiquidUser?.handle,
             name: authUser?.LiquidUser?.name,
@@ -181,6 +184,20 @@ export const EditGroup: FunctionComponent<{}> = ({ }) => {
 
                 <div className="my-3">
                     {((name: keyof IFormValues) => (
+                        <ChannelsInput
+                            name={name}
+                            register={register(name, {
+                                required: true
+                            })}
+                            value={watch(name)}
+                            error={errors[name]}
+                            setValue={setValue}
+                        />
+                    ))('channels')}
+                </div>
+
+                <div className="my-3">
+                    {((name: keyof IFormValues) => (
                         <AdminsInput
                             name={name}
                             register={register(name, {
@@ -188,6 +205,7 @@ export const EditGroup: FunctionComponent<{}> = ({ }) => {
                             })}
                             value={watch(name)}
                             error={errors[name]}
+                            setValue={setValue}
                         />
                     ))('admins')}
                 </div>

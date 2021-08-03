@@ -39,7 +39,7 @@ export const SideMenu: FunctionComponent<{}> = ({ }) => {
             <Link to="/home">
                 <RippleDrop />
             </Link>
-            <Link to="home" data-tip="Home">
+            <Link to="/home" data-tip="Home">
                 <HomeSvg />
             </Link>
             {isAuthenticated && user && (

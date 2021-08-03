@@ -28,7 +28,11 @@ export const MultiVoteInList: FunctionComponent<{ v: any, i: number }> = ({ v, i
             </div>
 
             <div className="d-flex align-items-center flex-wrap mb-2">
-                <a className="white" href={`/multipoll/${v.questionText}`}>
+                <a
+                    className="white"
+                    // href={`/multipoll/${v.questionText}`}
+                    href={`/multipoll/${v.questionText}/${v.groupChannel?.group}-${v.groupChannel?.channel}`}
+                >
                     <div
                         className="text-truncate mw-180-px-sm mr-2"
                         title={v.questionText}
@@ -108,6 +112,8 @@ export const MultiVoteInList: FunctionComponent<{ v: any, i: number }> = ({ v, i
                     </div>
                 ))}
             </div>
+
+            <pre>{JSON.stringify(v.choices, null, 2)}</pre>
         </div>
     );
 }

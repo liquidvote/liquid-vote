@@ -58,7 +58,8 @@ export const QuestionTypeDefs = gql`
             choiceText: String,
             group: String,
             channel: String,
-            typeOfVoter: String
+            typeOfVoter: String,
+            sortBy: String
         ): [Vote]
     }
 

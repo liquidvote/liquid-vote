@@ -4,6 +4,7 @@ import TextareaAutosize from 'react-textarea-autosize';
 import { useParams, Link } from 'react-router-dom';
 import ReactTooltip from 'react-tooltip';
 import { useQuery, useMutation } from "@apollo/client";
+import { useHistory } from "react-router-dom";
 
 import ButtonPicker from "@shared/Inputs/ButtonPicker";
 import useSearchParams from "@state/Global/useSearchParams.effect";
@@ -36,6 +37,8 @@ const startTextOptions = [
 
 export const EditQuestion: FunctionComponent<{}> = ({ }) => {
 
+    const history = useHistory();
+
     const { allSearchParams, updateParams } = useSearchParams();
     const modalData = JSON.parse(allSearchParams.modalData);
 
@@ -58,6 +61,20 @@ export const EditQuestion: FunctionComponent<{}> = ({ }) => {
         error: editQuestion_error,
         data: editQuestion_data,
     }] = useMutation(EDIT_QUESTION);
+
+    useEffect(() => {
+        if (!!editQuestion_data?.editQuestion) {
+
+            const savedQuestion = editQuestion_data?.editQuestion;
+
+            history.push(`/poll/${savedQuestion.questionText}/${savedQuestion.groupChannel.group}-${savedQuestion.groupChannel.channel}`);
+
+            console.log({
+                editQuestion_data
+            });
+        }
+    }, [editQuestion_data]);
+
 
     const {
         handleSubmit, register, formState: { errors, isValid }, watch, setValue
@@ -104,16 +121,6 @@ export const EditQuestion: FunctionComponent<{}> = ({ }) => {
             }
         });
     }
-    // const onSubmit = (values: any) => alert(JSON.stringify(values, null, 2));
-
-    // useEffect(() => {
-    //     if (editUser_data) {
-    //         updateParams({
-    //             keysToRemove: ['modal', 'modalData'],
-    //             paramsToAdd: { refetch: 'user' }
-    //         });
-    //     }
-    // }, [editUser_data])
 
     useEffect(() => {
         ReactTooltip.rebuild();
@@ -215,8 +222,8 @@ export const EditQuestion: FunctionComponent<{}> = ({ }) => {
                             label="Group Channel to poll in"
                             register={register(name, {
                                 validate: {
-                                    group: (v: any) => !!v.group || 'please select a group and channel',
-                                    channel: (v: any) => !!v.channel || 'please select a channel',
+                                    group: (v: any) => typeof v.group !=='undefined' || 'please select a group and channel',
+                                    channel: (v: any) => typeof v.channel !=='undefined' || 'please select a channel',
                                 }
                             })}
                             value={watch(name)}
@@ -230,7 +237,7 @@ export const EditQuestion: FunctionComponent<{}> = ({ }) => {
                     {((name: keyof IFormValues) => (
                         <DropDownInput
                             name={name}
-                            label="Show results"
+                            label="Show results 🧪"
                             register={register(name, {
                                 required: true
                             })}
@@ -258,11 +265,11 @@ export const EditQuestion: FunctionComponent<{}> = ({ }) => {
                 </div>
 
                 <br />
-                <br />
+                {/* <br />
 
                 <pre style={{ color: 'white' }}>
                     {JSON.stringify(watchAllFields, null, 2)}
-                </pre>
+                </pre> */}
 
             </div>
         </form>

@@ -22,7 +22,9 @@ export const VoteResolvers = {
             mongoDB, s3, AuthUser
         }) => {
 
-            console.log({ position: Vote.position === null });
+            console.log({
+                questionText, choiceText
+            });
 
             const Vote_ = !!AuthUser && await mongoDB.collection("Votes")
                 .findOne({
@@ -102,10 +104,6 @@ export const VoteResolvers = {
                     )
                 )?.value : null;
 
-            console.log({
-                savedVote
-            })
-
             const representeesAndVote = !!AuthUser && (await mongoDB.collection("UserRepresentations")
                 .aggregate([{
                     $match: {
@@ -140,10 +138,6 @@ export const VoteResolvers = {
                 }])
                 .toArray()
             );
-
-            console.log({
-                representeesAndVote
-            })
 
             const updatedRepresenteesVotes = !!representeesAndVote && await Promise.all(representeesAndVote?.map(async (r) => {
                 return !r.Vote.length ?

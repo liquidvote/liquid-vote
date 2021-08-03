@@ -1,15 +1,13 @@
-import React, { FunctionComponent, useState } from 'react';
+import React, { FunctionComponent, useEffect } from 'react';
 import { Link } from "react-router-dom";
 import numeral from 'numeral';
-import Modal from 'react-modal';
 import { useQuery, useMutation } from "@apollo/client";
+import { timeAgo } from '@state/TimeAgo';
+import ReactTooltip from 'react-tooltip';
 
 // import VoteGraph1 from "@shared/VoteGraph1";
 import Chart from "@shared/VoteGraph1/chart.svg";
-import XSVG from "@shared/Icons/X.svg";
 import ProfilePlus from "@shared/Icons/Profile+-small.svg";
-import { people } from "@state/Mock/People";
-import PersonInList from '@shared/PersonInList';
 import { EDIT_VOTE } from '@state/Vote/typeDefs';
 import { voteStatsMap } from '@state/Question/map';
 import useSearchParams from "@state/Global/useSearchParams.effect";
@@ -32,9 +30,11 @@ export const SingleVoteInList: FunctionComponent<{
     hideTitle
 }) => {
 
-        const { allSearchParams, updateParams } = useSearchParams();
+        // useEffect(() => {
+        //     ReactTooltip.rebuild();
+        // }, [l?.stats?.lastVoteOn]);
 
-        console.log({ l });
+        const { allSearchParams, updateParams } = useSearchParams();
 
         const [editVote, {
             loading: editVote_loading,
@@ -58,9 +58,6 @@ export const SingleVoteInList: FunctionComponent<{
             })
         }
 
-        const [isShowingVotersModal, setIsShowingVotersModal] = useState(false);
-        const [usersShowing, setUsersShowing] = useState('');
-
         const stats = voteStatsMap({
             forCount: l.stats?.forCount || 0,
             againstCount: l.stats?.againstCount || 0,
@@ -81,7 +78,7 @@ export const SingleVoteInList: FunctionComponent<{
             <div className="position-relative">
                 {(l.questionText && !hideTitle) && (
                     <small className="time-ago" data-tip="Last vote was">
-                        {l?.stats?.lastVoteOn || '3s ago 🧪'}
+                        {timeAgo.format(new Date(Number(l?.stats?.lastVoteOn)))}
                     </small>
                 )}
                 <div>
@@ -168,21 +165,10 @@ export const SingleVoteInList: FunctionComponent<{
                                                     }}
                                                 ></Link>
                                             ))}
-                                            <div
-                                                onClick={(e) => {
-                                                    updateParams({
-                                                        paramsToAdd: {
-                                                            modal: "ListVoters",
-                                                            modalData: JSON.stringify({
-                                                                votersSection: 'forRepresentatives',
-                                                                questionText: l?.questionText,
-                                                                groupChannel: l?.groupChannel
-                                                            })
-                                                        }
-                                                    })
-                                                }}
-                                                className="vote-avatar tiny count for ml-n2"
-                                            >{forRepresentatives.length}</div>
+                                            <Link
+                                                to={`/poll/${l?.questionText}/${l?.groupChannel.group}-${l?.groupChannel.channel}/timeline/representingYou`}
+                                                className="vote-avatar tiny text-decoration-none count for ml-n2"
+                                            >{forRepresentatives.length}</Link>
                                         </div>
                                     )
                                 }
@@ -204,21 +190,12 @@ export const SingleVoteInList: FunctionComponent<{
                                     ></Link>
                                 ))}
 
-                                <div
-                                    onClick={(e) => {
-                                        updateParams({
-                                            paramsToAdd: {
-                                                modal: "ListVoters",
-                                                modalData: JSON.stringify({
-                                                    votersSection: 'forRepresentatives',
-                                                    questionText: l?.questionText,
-                                                    groupChannel: l?.questionText
-                                                })
-                                            }
-                                        })
-                                    }}
-                                    className="vote-avatar tiny count for ml-n1"
-                                >{numeral(stats.forCount).format('0a[.]0')}</div>
+                                <Link
+                                    to={`/poll/${l?.questionText}/${l?.groupChannel.group}-${l?.groupChannel.channel}/timeline/direct/for`}
+                                    className="vote-avatar tiny text-decoration-none count for ml-n2">{
+                                        numeral(stats.forCount).format('0a[.]0')
+                                    }
+                                </Link>
                             </div>
                         </div>
                         <div className="d-flex align-items-center">
@@ -237,10 +214,12 @@ export const SingleVoteInList: FunctionComponent<{
                                         }}
                                     ></Link>
                                 ))}
-                                <div onClick={() => {
-                                    setIsShowingVotersModal(true);
-                                    setUsersShowing(`People Voting Against on ${l.questionText}`);
-                                }} className="vote-avatar tiny count against ml-n1">{numeral(stats.againstCount).format('0a[.]0')}</div>
+                                <Link
+                                    to={`/poll/${l?.questionText}/${l?.groupChannel.group}-${l?.groupChannel.channel}/timeline/direct/against`}
+                                    className="vote-avatar tiny text-decoration-none count against ml-n2">{
+                                        numeral(stats.againstCount).format('0a[.]0')
+                                    }
+                                </Link>
                             </div>
                             <div
                                 className={`button_ small ${userVote === 'against' && 'selected'}`}
@@ -266,21 +245,10 @@ export const SingleVoteInList: FunctionComponent<{
                                                     }}
                                                 ></Link>
                                             ))}
-                                            <div
-                                                onClick={(e) => {
-                                                    updateParams({
-                                                        paramsToAdd: {
-                                                            modal: "ListVoters",
-                                                            modalData: JSON.stringify({
-                                                                votersSection: 'againstRepresentatives',
-                                                                questionText: l?.questionText,
-                                                                groupChannel: l?.groupChannel
-                                                            })
-                                                        }
-                                                    })
-                                                }}
-                                                className="vote-avatar tiny count against ml-n2"
-                                            >{againstRepresentatives.length}</div>
+                                            <Link
+                                                to={`/poll/${l?.questionText}/${l?.groupChannel.group}-${l?.groupChannel.channel}/timeline/representingYou`}
+                                                className="vote-avatar tiny text-decoration-none count for ml-n2"
+                                            >{againstRepresentatives.length}</Link>
                                         </div>
                                     )
                                 }

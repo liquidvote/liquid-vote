@@ -62,8 +62,15 @@ export const GroupChannelPicker: FunctionComponent<Props> = ({
         data: group_data,
         refetch: group_refetch
     } = useQuery(GROUP, {
-        variables: { handle: value?.group }
+        variables: { handle: value?.group },
+        skip: !value?.group
     });
+
+    // console.log({
+    //     yourGroups_data,
+    //     group_data,
+    //     value
+    // });
 
     const [isFocused, setIsFocused] = useState(false);
 
@@ -74,7 +81,7 @@ export const GroupChannelPicker: FunctionComponent<Props> = ({
                 group: e?.target?.value,
                 channel: value.channel
             },
-            { shouldValidate: true }
+            // { shouldValidate: true }
         );
     }
 
@@ -85,9 +92,9 @@ export const GroupChannelPicker: FunctionComponent<Props> = ({
                 group: value.group,
                 channel: e?.target?.value
             },
-            {
-                shouldValidate: true
-            }
+            // {
+            //     shouldValidate: true
+            // }
         );
     }
 
@@ -147,46 +154,16 @@ export const GroupChannelPicker: FunctionComponent<Props> = ({
                             ))}
                             <option value="">--</option>
                         </select>
-                        {/* <div
-                            className="badge ml-1 mb-1 mt-1"
-                        >{selectedGroup?.name}</div> */}
-                        {/* <div
-                            className="badge ml-1 mb-1 mt-1 inverted"
-                        >select a channel</div>
-                        <select
-                            className="badge select ml-1 mb-1 mt-1 inverted"
-                            name="cars"
-                        >
-                            <option value="volvo">Volvo asd a ada da das da das as  d asd</option>
-                            <option value="saab">Saab</option>
-                            <option value="mercedes">Mercedes</option>
-                            <option value="audi">Audi</option>
-                        </select> */}
-                        {/* <div
-                            className="badge ml-1 mb-1 mt-1"
-                        >{selectedGroup.name}</div> */}
-                        {/* <div className="badge inverted ml-1 mb-1 mt-1" role="button">+4</div> */}
-                        {/* <div onClick={() => { }} className="button_ small mb-0">
-                            poll in another group
-                        </div> */}
-                        {/* {!!watchAllFields.voteText?.length && (
-                            <small role="button">
-                                Poll was made in 5 other groups already
-                            </small>
-                        )} */}
                     </div>
-
-                    {/* <div>
-                        <button
-                            className="button_"
-                            type="submit"
-                            disabled={!watchAllFields.voteText?.length}
-                        >Launch Poll</button>
-                    </div> */}
                 </div>
 
             </div>
             {error && <div className="error">{(error as any).message}</div>}
+
+
+            {/* <pre>
+                {JSON.stringify(group_data?.Group, null, 2)}
+            </pre> */}
         </div>
     );
 };
