@@ -1,5 +1,10 @@
 import React from "react";
-import { BrowserRouter as Router, Switch, Route, Link } from "react-router-dom";
+import {
+  BrowserRouter as Router,
+  Switch,
+  Route,
+  Redirect,
+} from "react-router-dom";
 import loadable from "@loadable/component";
 
 import twitterIcon from "@assets/twitter.svg";
@@ -17,6 +22,9 @@ export default function App() {
           <div className="col-12">
             <Navi />
             <Switch>
+              <Route exact path="/">
+                <Redirect to="/Home" />
+              </Route>
               <Route
                 path="/Home"
                 component={loadable(() => import("./components/routes/Home"))}
