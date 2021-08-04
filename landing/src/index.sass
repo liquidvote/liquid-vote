@@ -30,6 +30,11 @@ $theme5-colors: ("bg": #0b414d, "primary": #08f3a5, "secondary": white, "border"
 
     hr, .border-bottom
         border-bottom: 1px solid map-get($theme, "border") !important
+
+    .box-team
+        background: map-get($theme, "secondary" )
+        p
+            color: map-get($theme, "bg")
     
     .cta-container, .box
         background: map-get($theme, "border" )
@@ -323,6 +328,12 @@ hr
         display: flex
         align-items: center
 
+.navbar
+    .button_
+        margin-left: 15px
+    .navbar-collapse
+        justify-content: flex-end
+
 .feat-box
     text-align: center
     padding: 20px 10px    
@@ -332,6 +343,16 @@ hr
 
 .box
     height: 60%
+
+.box-team
+   height: 100%
+   text-align: center
+   .author
+       padding: 0
+   hr
+       margin: 30px auto
+       padding: 0
+       width: 50%
 
 .navbar-brand
     svg
@@ -351,13 +372,13 @@ hr
 // .cta p
 //   font-size: 0.9rem
 
-.cta-container, .box, .author
+.cta-container, .box, .author, .box-team
     // background-color: hsl(217, 28%, 15%)
     border-radius: 7px
     position: relative
     // left: 0
     // bottom: 150px
-    padding: 4% 9%
+    padding: 9% 9%
     
     .button_
         display: inline-block

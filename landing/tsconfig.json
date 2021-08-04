@@ -15,7 +15,8 @@
       "@env": ["environments/index"],
       "@components/*": ["src/components/*"],
       "@assets/*": ["src/assets/*"],
-      "@shared/*": ["src/components/shared/*"]
+      "@shared/*": ["src/components/shared/*"],
+      "@routes/*": ["src/components/routes/*"]
     }
   },
   "include": ["src", "custom.d.ts"]
