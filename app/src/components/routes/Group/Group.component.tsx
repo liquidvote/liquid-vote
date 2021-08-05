@@ -29,6 +29,7 @@ import { EDIT_GROUP_MEMBER_CHANNEL_RELATION } from "@state/User/typeDefs";
 import { AUTH_USER } from "@state/AuthUser/typeDefs";
 import useSearchParams from "@state/Global/useSearchParams.effect";
 import GroupPolls from './GroupPolls';
+import GroupVotes from './GroupVotes';
 import DropAnimation from '@components/shared/DropAnimation';
 import { timeAgo } from '@state/TimeAgo';
 import './style.sass';
@@ -217,7 +218,7 @@ export const Group: FunctionComponent<{}> = ({ }) => {
                     <div>
                         <div className="mr-1"><LinkSVG /></div>
                         <a
-                            href={selectedGroup?.externalLink}
+                            href={`//${selectedGroup?.externalLink}`}
                             target="_blank"
                             rel="noreferrer"
                         >
@@ -286,7 +287,7 @@ export const Group: FunctionComponent<{}> = ({ }) => {
                     </Link>
                 </li>
                 <li className="nav-item">
-                    <Link className={`nav-link ${section === 'timeline' && 'active'}`} to={`/group/${selectedGroup?.handle}/timeline`}>
+                    <Link className={`nav-link ${section === 'votes' && 'active'}`} to={`/group/${selectedGroup?.handle}/votes`}>
                         Timeline
                     </Link>
                 </li>
@@ -297,44 +298,11 @@ export const Group: FunctionComponent<{}> = ({ }) => {
             {(!section || section === 'polls') && (
                 <div>
                     <GroupPolls selectedChannels={selectedChannels} />
-
-                    {/* {selectedGroup?.votes?.filter(
-                        v => v.subgroups.reduce(
-                            (acc, sg) => selectedChannels.includes(sg) || acc,
-                            false
-                        )
-                    )
-                        .map((v, i) => (
-                            <>
-                                {v.type === 'multi' && (
-                                    <MultiVoteInList v={v} i={i} />
-                                )}
-                                {v.type === 'single' && (
-                                    <VoteWrapper l={v} showGroup={true} showIntroMessage={true} />
-                                )}
-                                <hr />
-                            </>
-                        ))
-                    } */}
                 </div>
             )}
-            {/* {section === 'members' && (
-                <div className="mt-n2">
-                    {people.map((el, i) => (
-                        <PersonInList person={el} />
-                    ))}
-                </div>
+            {(section === 'votes') &&  (
+                <GroupVotes selectedChannels={selectedChannels}  />
             )}
-            {section === 'subgroups' && (
-                <div className="mt-n2">
-                    {selectedGroup.subGroups?.map((el, i) => (
-                        <GroupInList group={el} />
-                    ))}
-                </div>
-            )} */}
-            {(section === 'timeline') && VoteTimeline.map((l, i) => (
-                <Notification v={{ ...l }} showChart={true} />
-            ))}
 
         </>
     );

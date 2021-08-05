@@ -3,13 +3,14 @@ import { Link, useParams } from "react-router-dom";
 import { useQuery, useMutation } from "@apollo/client";
 
 import { AUTH_USER } from "@state/AuthUser/typeDefs";
-import { USER, USER_VOTES } from "@state/User/typeDefs";
+import { GROUP } from "@state/Group/typeDefs";
+import { VOTES } from "@state/Vote/typeDefs";
 import Notification from '@shared/Notification';
 import { VoteTimeline } from "@state/Mock/Notifications";
 
 import './style.sass';
 
-export const ProfileVotes: FunctionComponent<{}> = ({ }) => {
+export const GroupVotes: FunctionComponent<{ selectedChannels: any }> = ({ selectedChannels }) => {
 
     let { section, subsection, subsubsection, handle } = useParams<any>();
 
@@ -23,20 +24,13 @@ export const ProfileVotes: FunctionComponent<{}> = ({ }) => {
     const authLiquidUser = authUser_data?.authUser?.LiquidUser;
 
     const {
-        loading: user_loading,
-        error: user_error,
-        data: user_data,
-        refetch: user_refetch
-    } = useQuery(USER, {
+        loading: group_loading,
+        error: group_error,
+        data: group_data,
+        refetch: group_refetch
+    } = useQuery(GROUP, {
         variables: { handle }
     });
-
-    const profile = user_data?.User;
-
-    console.log({
-        authLiquidUser,
-        profile
-    })
 
     const type = (() => {
         if ((!subsection || subsection === 'direct') && !subsubsection) {
@@ -56,17 +50,19 @@ export const ProfileVotes: FunctionComponent<{}> = ({ }) => {
     })();
 
     const {
-        loading: user_votes_loading,
-        error: user_votes_error,
-        data: user_votes_data,
-        refetch: user_votes_refetch
-    } = useQuery(USER_VOTES, {
-        variables: { handle, type }
+        loading: votes_loading,
+        error: votes_error,
+        data: votes_data,
+        refetch: votes_refetch
+    } = useQuery(VOTES, {
+        variables: { handle, handleType: 'group', type }
     });
 
     console.log({
+        yourStats: group_data?.Group?.yourStats,
         type,
-        user_votes_data
+        subsection,
+        subsubsection
     });
 
     return (
@@ -74,34 +70,34 @@ export const ProfileVotes: FunctionComponent<{}> = ({ }) => {
 
             <ul className="nav d-flex justify-content-around mt-n2 mx-n3">
                 <li className="nav-item">
-                    <Link className={`nav-link ${(!subsection || subsection === 'direct') && 'active'}`} to={`/profile/${handle}/votes/direct`}>
-                        <b>{profile?.stats?.directVotesMade}</b> Direct Votes
+                    <Link className={`nav-link ${(!subsection || subsection === 'direct') && 'active'}`} to={`/group/${handle}/votes/direct`}>
+                        <b>{group_data.Group?.stats?.directVotesMade}</b> Direct Votes
                     </Link>
                 </li>
                 <li className="nav-item">
-                    <Link className={`nav-link ${subsection === 'represented' && 'active'}`} to={`/profile/${handle}/votes/represented`}>
-                        <b>{profile?.stats?.indirectVotesMadeForUser}</b> Represented Votes
+                    <Link className={`nav-link ${subsection === 'represented' && 'active'}`} to={`/group/${handle}/votes/represented`}>
+                        <b>{group_data?.Group?.yourStats?.indirectVotesMadeForYou}</b> Represented Votes
                     </Link>
                 </li>
             </ul>
             <hr className="mt-n4" />
 
-            {!!authLiquidUser && profile.handle !== authLiquidUser.handle && (!subsection || subsection === 'direct') && (
+            {!!authLiquidUser && group_data?.Group?.handle !== authLiquidUser.handle && (!subsection || subsection === 'direct') && (
                 <>
                     <ul className="nav d-flex justify-content-around mt-n2 mx-n3">
                         <li className="nav-item">
-                            <Link className={`nav-link ${!subsubsection && 'active'}`} to={`/profile/${handle}/votes/direct`}>
-                                <b>{profile?.stats?.directVotesMade}</b> All
+                            <Link className={`nav-link ${!subsubsection && 'active'}`} to={`/group/${handle}/votes/direct`}>
+                                <b>{group_data?.Group?.stats?.directVotesMade}</b> All
                             </Link>
                         </li>
                         <li className="nav-item">
-                            <Link className={`nav-link ${subsubsection === 'same' && 'active'}`} to={`/profile/${handle}/votes/direct/same`}>
-                                <b className="white forDirect px-1 rounded" >{profile?.yourStats?.directVotesInAgreement}</b> Same
+                            <Link className={`nav-link ${subsubsection === 'same' && 'active'}`} to={`/group/${handle}/votes/direct/same`}>
+                                <b className="white forDirect px-1 rounded" >{group_data?.Group?.yourStats?.directVotesInAgreement}</b> Same
                             </Link>
                         </li>
                         <li className="nav-item">
-                            <Link className={`nav-link ${subsubsection === 'different' && 'active'}`} to={`/profile/${handle}/votes/direct/different`}>
-                                <b className="white againstDirect px-1 rounded" >{profile?.yourStats?.directVotesInDisagreement}</b> Different
+                            <Link className={`nav-link ${subsubsection === 'different' && 'active'}`} to={`/group/${handle}/votes/direct/different`}>
+                                <b className="white againstDirect px-1 rounded" >{group_data?.Group?.yourStats?.directVotesInDisagreement}</b> Different
                             </Link>
                         </li>
                     </ul>
@@ -109,22 +105,22 @@ export const ProfileVotes: FunctionComponent<{}> = ({ }) => {
                 </>
             )}
 
-            {!!authLiquidUser && profile.handle !== authLiquidUser.handle && subsection === 'represented' && (
+            {!!authLiquidUser && group_data?.Group?.handle !== authLiquidUser.handle && subsection === 'represented' && (
                 <>
                     <ul className="nav d-flex justify-content-around mt-n2 mx-n3">
                         <li className="nav-item">
-                            <Link className={`nav-link ${!subsubsection && 'active'}`} to={`/profile/${handle}/votes/represented`}>
-                                <b>{profile?.stats?.indirectVotesMadeForUser}</b> By others
+                            <Link className={`nav-link ${!subsubsection && 'active'}`} to={`/group/${handle}/votes/represented`}>
+                                <b>{group_data?.Group?.stats?.indirectVotesMadeForUser}</b> By others
                             </Link>
                         </li>
                         <li className="nav-item">
-                            <Link className={`nav-link ${subsubsection === 'byyou' && 'active'}`} to={`/profile/${handle}/votes/represented/byyou`}>
-                                <b>{profile?.yourStats?.indirectVotesMadeByYou}</b> By you
+                            <Link className={`nav-link ${subsubsection === 'byyou' && 'active'}`} to={`/group/${handle}/votes/represented/byyou`}>
+                                <b>{group_data?.Group?.yourStats?.indirectVotesMadeByYou}</b> By you
                             </Link>
                         </li>
                         <li className="nav-item">
-                            <Link className={`nav-link ${subsubsection === 'foryou' && 'active'}`} to={`/profile/${handle}/votes/represented/foryou`}>
-                                <b>{profile?.yourStats?.indirectVotesMadeForYou}</b> For you
+                            <Link className={`nav-link ${subsubsection === 'foryou' && 'active'}`} to={`/group/${handle}/votes/represented/foryou`}>
+                                <b>{group_data?.Group?.yourStats?.indirectVotesMadeForYou}</b> For you
                             </Link>
                         </li>
                     </ul>
@@ -132,9 +128,9 @@ export const ProfileVotes: FunctionComponent<{}> = ({ }) => {
                 </>
             )}
 
-            {user_votes_data?.UserVotes.length === 0 && (
+            {votes_data?.Votes.length === 0 && (
                 <div className="p-4 text-center">
-                    {user_data?.User?.name}{' '}
+                    {group_data.Group?.name}{' '}
                     {
                         (() => {
                             if (type === 'directVotesMade') {
@@ -166,12 +162,19 @@ export const ProfileVotes: FunctionComponent<{}> = ({ }) => {
                     {' '}<b className="white againstDirect px-1 rounded">{useMemo(() => Math.floor(Math.random() * 100), [])}</b>
             </small> */}
 
-            {user_votes_data?.UserVotes.map((n, i) => (
+            {votes_data?.Votes.map((n, i) => (
+                // <pre>{JSON.stringify(n, null, 2)}</pre>
                 <Notification
-                    key={'notification-uservote' + n.questionText + type + n.choiceText}
+                    key={'notification-groupvote' + type + n.questionText + n.choiceText + n.user.name + i}
                     v={{
                         ...n,
-                        user: profile
+                        // user: profile,
+                        // who: {
+                        //     name: "Dan Price",
+                        //     avatarClass: 1,
+                        //     representing: 12000,
+                        //     representsYou: true,
+                        // }
                     }}
                     showChart={true}
                 />

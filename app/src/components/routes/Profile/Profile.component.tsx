@@ -196,8 +196,6 @@ export const Profile: FunctionComponent<{}> = ({ }) => {
             <br />
 
             {(!section || section === 'votes') && <ProfileVotes />}
-
-            {(section === 'timeline') && <p>Soon</p>}
         </>
     );
 }

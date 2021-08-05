@@ -176,8 +176,9 @@ export default function Question() {
 
                         <div className="d-flex ml-2">
                             {(
-                                editVote_data?.editVote?.QuestionStats?.forMostRepresentingVoters ||
-                                question_data?.Question?.stats?.forMostRepresentingVoters
+                                !!editVote_data ?
+                                    editVote_data?.editVote?.QuestionStats?.forMostRepresentingVoters :
+                                    question_data?.Question?.stats?.forMostRepresentingVoters
                             )?.slice(0, 2).map((v: any) => (
                                 <Link
                                     to={`/profile/${v?.handle}`}
@@ -201,8 +202,9 @@ export default function Question() {
                         <div className="d-flex ml-2">
                             {
                                 (
-                                    editVote_data?.editVote?.QuestionStats?.againstMostRepresentingVoters ||
-                                    question_data?.Question?.stats?.againstMostRepresentingVoters
+                                    !!editVote_data ?
+                                        editVote_data?.editVote?.QuestionStats?.againstMostRepresentingVoters :
+                                        question_data?.Question?.stats?.againstMostRepresentingVoters
                                 )?.slice(0, 2).map((v: any) => (
                                     <Link
                                         to={`/profile/${v?.handle}`}

@@ -29,7 +29,7 @@ import useSearchParams from "@state/Global/useSearchParams.effect";
 // import QuestionVotes from "./QuestionVotes";
 import DropAnimation from "@components/shared/DropAnimation";
 import { timeAgo } from '@state/TimeAgo';
-import Choice from './Choice';
+import Choice from '@shared/Choice';
 
 export default function Question() {
 
@@ -123,11 +123,15 @@ export default function Question() {
 
             <div>
                 {question_data?.Question?.choices?.map(c => (
-                    <Choice
-                        choice={c}
-                        voteName={voteName}
-                        groupChannel={groupChannel}
-                    />
+                    <div className="my-3">
+                        <Choice
+                            choiceText={c.text}
+                            voteName={voteName}
+                            groupChannel={groupChannel}
+                            stats={c.stats}
+                            userVote={c.userVote}
+                        />
+                    </div>
                 ))}
 
                 <div className="mt-4 d-flex align-items-start flex-nowrap justify-content-between">

@@ -37,6 +37,8 @@ export const GroupTypeDefs = gql`
         representing: Int
         representedBy: Int
         directVotesMade: Int
+        directVotesInAgreement: Int
+        directVotesInDisagreement: Int
         indirectVotesMadeByYou: Int
         indirectVotesMadeForYou: Int
     }

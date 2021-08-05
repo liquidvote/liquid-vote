@@ -50,6 +50,8 @@ export const GROUP = gql`
             directVotesMade
             indirectVotesMadeByYou
             indirectVotesMadeForYou
+            directVotesInAgreement
+            directVotesInDisagreement
         }
     }
   }
