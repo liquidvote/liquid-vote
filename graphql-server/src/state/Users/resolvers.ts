@@ -414,6 +414,84 @@ export const UserResolvers = {
                 ]
             );
 
+            const representeeVotesAggregationLogic = (
+                [
+                    {
+                        '$lookup': {
+                            'from': 'Votes',
+                            'let': {
+                                'representativeId': { '$toObjectId' : '$user' },
+                                'questionText': '$questionText',
+                                'choiceText': '$choiceText',
+                                'group': '$groupChannel.group',
+                                'channel': '$groupChannel.channel'
+                            },
+                            'pipeline': [
+                                {
+                                    '$match': {
+                                        '$and': [
+                                            {
+                                                '$expr': {
+                                                    '$eq': [
+                                                        '$questionText', '$$questionText'
+                                                    ]
+                                                }
+                                            },
+                                            {
+                                                '$expr': {
+                                                    '$eq': [
+                                                        '$choiceText', '$$choiceText'
+                                                    ]
+                                                }
+                                            },
+                                            {
+                                                '$expr': {
+                                                    '$eq': [
+                                                        '$groupChannel.group', '$$group'
+                                                    ]
+                                                }
+                                            },
+                                            {
+                                                '$expr': {
+                                                    '$eq': [
+                                                        '$groupChannel.channel', '$$channel'
+                                                    ]
+                                                }
+                                            }
+                                        ]
+                                    }
+                                }, {
+                                    '$unwind': '$representatives'
+                                }, {
+                                    '$match': {
+                                        '$expr': {
+                                            '$eq': [
+                                                '$representatives.representativeId', {
+                                                    '$toObjectId': '$$representativeId'
+                                                }
+                                            ]
+                                        }
+                                    }
+                                }, {
+                                    '$lookup': {
+                                        'from': 'Users',
+                                        'localField': 'user',
+                                        'foreignField': '_id',
+                                        'as': 'user'
+                                    }
+                                },
+                                {
+                                    '$addFields': {
+                                        'user': { '$first': '$user.LiquidUser' }
+                                    }
+                                }
+                            ],
+                            'as': 'representeeVotes'
+                        }
+                    }
+                ]
+            );
+
             const Votes = await (async (type) => {
                 return {
                     'directVotesMade': async () => await mongoDB.collection("Votes")
@@ -425,6 +503,7 @@ export const UserResolvers = {
                                     'isDirect': true
                                 }
                             },
+                            ...representeeVotesAggregationLogic,
                             ...questionStatsAggregationLogic
                         ])
                         .toArray(),
@@ -437,6 +516,7 @@ export const UserResolvers = {
                                     'bothDirect': true
                                 }
                             },
+                            ...representeeVotesAggregationLogic,
                             ...questionStatsAggregationLogic
                         ])
                         .toArray(),
@@ -449,6 +529,7 @@ export const UserResolvers = {
                                     'bothDirect': true
                                 }
                             },
+                            ...representeeVotesAggregationLogic,
                             ...questionStatsAggregationLogic
                         ])
                         .toArray(),
@@ -461,6 +542,7 @@ export const UserResolvers = {
                                     'isDirect': false
                                 }
                             },
+                            ...representeeVotesAggregationLogic,
                             ...questionStatsAggregationLogic
                         ])
                         .toArray(),
@@ -472,6 +554,7 @@ export const UserResolvers = {
                                     'yourVoteMadeForUser': true
                                 }
                             },
+                            ...representeeVotesAggregationLogic,
                             ...questionStatsAggregationLogic
                         ])
                         .toArray(),
@@ -483,6 +566,7 @@ export const UserResolvers = {
                                     'yourVoteMadeByUser': true
                                 }
                             },
+                            ...representeeVotesAggregationLogic,
                             ...questionStatsAggregationLogic
                         ])
                         .toArray(),

@@ -35,6 +35,27 @@ export const QUESTION = gql`
                     }
                     againstDirectCount
                 }
+                userVote {
+                    position
+                    forWeight
+                    againstWeight
+                    representatives {
+                        representativeHandle
+                        representativeAvatar
+                        representativeName
+                        position
+                        forWeight
+                        againstWeight
+                    }
+                    representeeVotes {
+                        isDirect
+                        position
+                        user {
+                            handle
+                            name
+                        }
+                    }
+                }
             }
             groupChannel{
                 group

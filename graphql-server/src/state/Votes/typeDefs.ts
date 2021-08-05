@@ -44,6 +44,11 @@ export const VoteTypeDefs = gql`
             group: String,
             channel: String
         ): Vote
+        Votes(
+            handle: String,
+            handleType: String,
+            type: String,
+        ):  [Vote]
     }
 
     extend type Mutation {

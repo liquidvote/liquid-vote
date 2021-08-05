@@ -44,16 +44,16 @@ export const Choice: FunctionComponent<{ choice: any, voteName: string, groupCha
         againstCount: choice?.stats?.againstCount || 0,
         forDirectCount: choice?.stats?.forDirectCount || 0,
         againstDirectCount: choice?.stats?.againstDirectCount || 0,
-        // ...(!!editVote_data?.editVote?.QuestionStats) && {
-        //     forCount: editVote_data?.editVote?.QuestionStats.forCount,
-        //     againstCount: editVote_data?.editVote?.QuestionStats.againstCount,
-        //     forDirectCount: editVote_data?.editVote?.QuestionStats.forDirectCount,
-        //     againstDirectCount: editVote_data?.editVote?.QuestionStats.againstDirectCount,
-        // }
+        ...(!!editVote_data?.editVote?.QuestionStats) && {
+            forCount: editVote_data?.editVote?.QuestionStats.forCount,
+            againstCount: editVote_data?.editVote?.QuestionStats.againstCount,
+            forDirectCount: editVote_data?.editVote?.QuestionStats.forDirectCount,
+            againstDirectCount: editVote_data?.editVote?.QuestionStats.againstDirectCount,
+        }
     });
 
-    const forRepresentatives = choice?.userVote?.representatives.filter((r: any) => r.position === 'for');
-    const againstRepresentatives = choice?.userVote?.representatives.filter((r: any) => r.position === 'against');
+    const forRepresentatives = choice?.userVote?.representatives?.filter((r: any) => r.position === 'for');
+    const againstRepresentatives = choice?.userVote?.representatives?.filter((r: any) => r.position === 'against');
 
     return (
         <div className="my-4">
@@ -118,35 +118,37 @@ export const Choice: FunctionComponent<{ choice: any, voteName: string, groupCha
                     </div>
 
 
-                    {/* <div className="d-flex ml-2">
-                            {(
-                                editVote_data?.editVote?.QuestionStats?.forMostRepresentingVoters ||
+                    <div className="d-flex ml-2">
+                        {(
+                            !!editVote_data ?
+                                editVote_data?.editVote?.QuestionStats?.forMostRepresentingVoters :
                                 choice.stats?.forMostRepresentingVoters
-                            )?.slice(0, 2).map((v: any) => (
-                                <Link
-                                    to={`/profile/${v?.handle}`}
-                                    className="vote-avatar for ml-n2 d-none d-md-block"
-                                    style={{
-                                        background: `url(${v?.avatar}) no-repeat`,
-                                        backgroundSize: 'cover'
-                                    }}
-                                ></Link>
-                            ))}
-
+                        )?.slice(0, 2).map((v: any) => (
                             <Link
-                                to={`/poll/${voteName}/${groupChannel}/timeline/direct/for`}
-                                className="vote-avatar text-decoration-none count for ml-n2">{
-                                    numeral(stats.forCount).format('0a[.]0')
-                                }
-                            </Link>
-                        </div> */}
+                                to={`/profile/${v?.handle}`}
+                                className="vote-avatar for ml-n2 d-none d-md-block"
+                                style={{
+                                    background: `url(${v?.avatar}) no-repeat`,
+                                    backgroundSize: 'cover'
+                                }}
+                            ></Link>
+                        ))}
+
+                        <Link
+                            to={`/poll/${voteName}/${groupChannel}/timeline/direct/for`}
+                            className="vote-avatar text-decoration-none count for ml-n2">{
+                                numeral(stats.forCount).format('0a[.]0')
+                            }
+                        </Link>
+                    </div>
                 </div>
                 <div className="d-flex align-items-center">
                     <div className="d-flex ml-2">
                         {
                             (
-                                editVote_data?.editVote?.QuestionStats?.againstMostRepresentingVoters ||
-                                choice.stats?.againstMostRepresentingVoters
+                                !!editVote_data ?
+                                    editVote_data?.editVote?.QuestionStats?.againstMostRepresentingVoters :
+                                    choice.stats?.againstMostRepresentingVoters
                             )?.slice(0, 2).map((v: any) => (
                                 <Link
                                     to={`/profile/${v?.handle}`}

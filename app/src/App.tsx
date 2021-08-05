@@ -47,6 +47,8 @@ export default function App() {
                         <Route path="/trending" component={loadable(() => import('./components/Routes/Trending'))} />
                         <Route path="/feed" component={loadable(() => import('./components/Routes/Feed'))} />
                         <Route path="/groups" component={loadable(() => import('./components/Routes/Groups'))} />
+                        <Route path="/group/:handle/:section/:subsection/:subsubsection" component={loadable(() => import('./components/Routes/Group'))} />
+                        <Route path="/group/:handle/:section/:subsection" component={loadable(() => import('./components/Routes/Group'))} />
                         <Route path="/group/:handle/:section" component={loadable(() => import('./components/Routes/Group'))} />
                         <Route path="/group/:handle" component={loadable(() => import('./components/Routes/Group'))} />
                         <Route path="/group-people/:handle/:which" component={loadable(() => import('./components/Routes/GroupPeople'))} />

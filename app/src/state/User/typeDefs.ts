@@ -182,7 +182,15 @@ export const USER_VOTES = gql`
         }
         createdOn
         lastEditOn
-        # representeeVotes
+        representeeVotes {
+            isDirect
+            position
+            user {
+                handle
+                name
+                avatar
+            }
+        }
         QuestionStats {
             lastVoteOn
             forCount

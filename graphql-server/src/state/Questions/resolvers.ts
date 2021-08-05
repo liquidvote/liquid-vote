@@ -11,8 +11,6 @@ export const QuestionResolvers = {
                     'groupChannel.channel': channel
                 });
 
-            // TODO: get User Vote
-
             return {
                 ...Question,
                 ...(Question?.questionType === 'single' && !!AuthUser) && {
@@ -24,6 +22,20 @@ export const QuestionResolvers = {
                             user: AuthUser?._id
                         })
                     }
+                },
+                ...(Question?.questionType === 'multi' && !!AuthUser) && {
+                    // stats: Question?.stats,
+                    choices: await Promise.all(Question?.choices?.map(async (c) => ({
+                        ...c,
+                        userVote: {
+                            ...await mongoDB.collection("Votes").findOne({
+                                questionText: Question?.questionText,
+                                choiceText: c.text,
+                                groupChannel: Question?.groupChannel,
+                                user: AuthUser?._id
+                            })
+                        }
+                    }))),
                 },
                 thisUserIsAdmin: Question?.createdBy === AuthUser?.LiquidUser?.handle,
             };
@@ -51,17 +63,14 @@ export const QuestionResolvers = {
                     })
                 },
                 ...(q.questionType === 'multi' && !!AuthUser) && {
-                    choices: Promise.all(q.choices.map(async (c) => ({
+                    choices: await Promise.all(q.choices.map(async (c) => ({
                         ...c,
-                        stats: {
-                            ...q.stats,
-                            userVote: await mongoDB.collection("Votes").findOne({
-                                questionText: q.questionText,
-                                groupChannel: q.groupChannel,
-                                choiceText: q.choiceText,
-                                createdBy: AuthUser?.LiquidUser?.handle
-                            })
-                        },
+                        userVote: await mongoDB.collection("Votes").findOne({
+                            questionText: q.questionText,
+                            groupChannel: q.groupChannel,
+                            choiceText: c.text,
+                            createdBy: AuthUser?.LiquidUser?.handle
+                        })
                     })))
                 }
             })));
@@ -140,7 +149,7 @@ export const QuestionResolvers = {
                     }, {
                         '$sort': {
                             ...(sortBy === 'time') ? {
-                                'lastEditOn' : -1
+                                'lastEditOn': -1
                             } : {
                                 'representeeCount': -1
                             }
@@ -245,7 +254,7 @@ export const QuestionResolvers = {
                     }, {
                         '$sort': {
                             ...(sortBy === 'time') ? {
-                                'lastEditOn' : -1
+                                'lastEditOn': -1
                             } : {
                                 'representeeCount': -1
                             }
@@ -437,6 +446,7 @@ export const updateQuestionVotingStats = async ({
                     "groupChannel.group": group,
                     "groupChannel.channel": channel,
                     "questionText": questionText,
+                    "choiceText": choiceText
                 },
             },
             {
@@ -500,6 +510,7 @@ export const updateQuestionVotingStats = async ({
                     "groupChannel.group": group,
                     "groupChannel.channel": channel,
                     "questionText": questionText,
+                    "choiceText": choiceText,
                 }
             },
             {
@@ -586,15 +597,34 @@ export const updateQuestionVotingStats = async ({
     const updatedQuestion = (await mongoDB.collection("Questions").findOneAndUpdate(
         { _id: Question_._id },
         {
-            $set: {
-                'stats.forCount': VoteCounts?.forVotes || 0,
-                'stats.forDirectCount': VoteCounts?.forDirectVotes || 0,
-                'stats.againstCount': VoteCounts?.againstVotes || 0,
-                'stats.againstDirectCount': VoteCounts?.againstDirectVotes || 0,
-                'stats.lastVoteOn': VoteCounts?.lastVoteOn,
-                'stats.forMostRepresentingVoters': DirectVotersByPosition?.for?.voters,
-                'stats.againstMostRepresentingVoters': DirectVotersByPosition?.against?.voters,
-            },
+            ...(!choiceText) ? {
+                $set: {
+                    'stats.forCount': VoteCounts?.forVotes || 0,
+                    'stats.forDirectCount': VoteCounts?.forDirectVotes || 0,
+                    'stats.againstCount': VoteCounts?.againstVotes || 0,
+                    'stats.againstDirectCount': VoteCounts?.againstDirectVotes || 0,
+                    'stats.lastVoteOn': VoteCounts?.lastVoteOn,
+                    'stats.forMostRepresentingVoters': DirectVotersByPosition?.for?.voters,
+                    'stats.againstMostRepresentingVoters': DirectVotersByPosition?.against?.voters,
+                },
+            } : {
+                $set: {
+                    'choices': Question_.choices.map(c => ({
+                        ...c,
+                        ...(c.text === choiceText) && {
+                            stats: {
+                                'forCount': VoteCounts?.forVotes || 0,
+                                'forDirectCount': VoteCounts?.forDirectVotes || 0,
+                                'againstCount': VoteCounts?.againstVotes || 0,
+                                'againstDirectCount': VoteCounts?.againstDirectVotes || 0,
+                                'lastVoteOn': VoteCounts?.lastVoteOn,
+                                'forMostRepresentingVoters': DirectVotersByPosition?.for?.voters,
+                                'againstMostRepresentingVoters': DirectVotersByPosition?.against?.voters,
+                            }
+                        }
+                    }))
+                },
+            }
         },
         {
             returnNewDocument: true,
@@ -602,5 +632,7 @@ export const updateQuestionVotingStats = async ({
         }
     ))?.value
 
-    return updatedQuestion?.stats;
+    return !choiceText ?
+        updatedQuestion?.stats :
+        updatedQuestion?.choices.find(c => c.text === choiceText)?.stats;
 }
