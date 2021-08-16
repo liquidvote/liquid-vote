@@ -26,7 +26,7 @@ import { QUESTION } from '@state/Question/typeDefs';
 import { voteStatsMap } from '@state/Question/map';
 import { EDIT_VOTE } from '@state/Vote/typeDefs';
 import useSearchParams from "@state/Global/useSearchParams.effect";
-// import QuestionVotes from "./QuestionVotes";
+import QuestionVotes from "../Question/QuestionVotes";
 import DropAnimation from "@components/shared/DropAnimation";
 import { timeAgo } from '@state/TimeAgo';
 import Choice from '@shared/Choice';
@@ -62,52 +62,6 @@ export default function Question() {
 
     const userVote = editVote_data?.editVote?.position || question_data?.Question?.userVote?.position || null;
 
-    // const [isPollingInOtherGroup, setIsPollingInOtherGroup] = useState(false);
-    // const [isShowingVotersModal, setIsShowingVotersModal] = useState(false);
-    // const [usersShowing, setUsersShowing] = useState('');
-
-    const handleUserVote = (vote: string) => {
-        editVote({
-            variables: {
-                questionText: question_data?.Question?.questionText,
-                // choiceText
-                group: question_data?.Question?.groupChannel.group,
-                channel: question_data?.Question?.groupChannel.channel,
-                Vote: {
-                    position: (vote === userVote) ? null : vote
-                },
-            }
-        });
-    }
-
-    const stats = voteStatsMap({
-        forCount: 0,
-        againstCount: 0,
-        forDirectCount: 0,
-        againstDirectCount: 0,
-    });
-
-    // voteStatsMap({
-    //     forCount: question_data?.Question?.stats.forCount,
-    //     againstCount: question_data?.Question?.stats.againstCount,
-    //     forDirectCount: question_data?.Question?.stats.forDirectCount,
-    //     againstDirectCount: question_data?.Question?.stats.againstDirectCount,
-    //     ...(!!editVote_data?.editVote?.QuestionStats) && {
-    //         forCount: editVote_data?.editVote?.QuestionStats.forCount,
-    //         againstCount: editVote_data?.editVote?.QuestionStats.againstCount,
-    //         forDirectCount: editVote_data?.editVote?.QuestionStats.forDirectCount,
-    //         againstDirectCount: editVote_data?.editVote?.QuestionStats.againstDirectCount,
-    //     }
-    // });
-
-    const forRepresentatives = question_data?.Question?.userVote?.representatives.filter((r: any) => r.position === 'for');
-    const againstRepresentatives = question_data?.Question?.userVote?.representatives.filter((r: any) => r.position === 'against');
-
-    console.log({
-        stats,
-        s: question_data?.Question?.stats
-    });
-
     return question_loading ? (
         <div className="d-flex justify-content-center mt-5">
             <DropAnimation />
@@ -142,8 +96,7 @@ export default function Question() {
                                 to={`/group/${question_data?.Question?.groupChannel.group}`}
                                 className="badge ml-1 mb-1 mt-1"
                             >
-                                {question_data?.Question?.groupChannel.group}:
-                                {question_data?.Question?.groupChannel.channel}
+                                {question_data?.Question?.groupChannel.group}
                             </Link>
                         </div>
                     </div>
@@ -173,17 +126,17 @@ export default function Question() {
 
                 <ul className="nav d-flex justify-content-around mt-1 mb-n4 mx-n3">
                     <li className="nav-item">
-                        <Link className={`nav-link ${(!section || section === 'timeline') && 'active'}`} to={`/poll/${voteName}/${groupChannel}/timeline`}>
+                        <Link className={`nav-link ${(!section || section === 'timeline') && 'active'}`} to={`/multipoll/${voteName}/${groupChannel}/timeline`}>
                             Timeline
                         </Link>
                     </li>
                     <li className="nav-item">
-                        <Link className={`nav-link ${section === 'votesby' && 'active'}`} to={`/poll/${voteName}/${groupChannel}/votesby`}>
+                        <Link className={`nav-link ${section === 'votesby' && 'active'}`} to={`/multipoll/${voteName}/${groupChannel}/votesby`}>
                             Votes by 🧪
                         </Link>
                     </li>
                     <li className="nav-item">
-                        <Link className={`nav-link ${section === 'conversation' && 'active'}`} to={`/poll/${voteName}/${groupChannel}/conversation`}>
+                        <Link className={`nav-link ${section === 'conversation' && 'active'}`} to={`/multipoll/${voteName}/${groupChannel}/conversation`}>
                             Conversation 🧪
                         </Link>
                     </li>
@@ -192,7 +145,7 @@ export default function Question() {
                 <br />
                 <br />
 
-                <pre>{JSON.stringify(question_data?.Question, null, 2)}</pre>
+                {/* <pre>{JSON.stringify(question_data?.Question, null, 2)}</pre> */}
 
                 {(section === 'votesby') && (
                     <div>
@@ -280,9 +233,9 @@ export default function Question() {
                     </div>
                 )}
 
-                {/* {(!section || section === 'timeline') && (
+                {(!section || section === 'timeline') && (
                     <QuestionVotes />
-                )} */}
+                )}
 
                 {/* // VoteTimeline.map((l, i) => (
                 //     <Notification v={{ ...l, poll: null }} showChart={false} />

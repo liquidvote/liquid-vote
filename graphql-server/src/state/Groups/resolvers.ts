@@ -261,7 +261,8 @@ export const getGroupStats = async ({ groupId, groupHandle, mongoDB }) => {
         directVotesMade: await mongoDB.collection("Votes")
             .find({
                 "groupChannel.group": groupHandle,
-                "isDirect": true
+                "isDirect": true,
+                'position': { $ne: null },
             }).count(),
         indirectVotesMade: await mongoDB.collection("Votes")
             .find({
@@ -274,12 +275,17 @@ export const getGroupStats = async ({ groupId, groupHandle, mongoDB }) => {
 
 const getYourGroupStats = async ({ groupId, groupHandle, AuthUser, mongoDB }) => {
 
+    console.log({
+        id: AuthUser._id
+    })
+
     const votesInCommon = (
         await mongoDB.collection("Votes")
             .aggregate([
                 {
                     '$match': {
                         'groupChannel.group': groupHandle,
+                        'position': { $ne: null }
                     }
                 }, {
                     '$lookup': {
@@ -354,6 +360,9 @@ const getYourGroupStats = async ({ groupId, groupHandle, AuthUser, mongoDB }) =>
                     }
                 }, {
                     '$project': {
+                        'byYou': {
+                            '$eq': ['$user', ObjectID(AuthUser?._id)]
+                        },
                         'bothDirect': {
                             '$and': [
                                 {
@@ -385,7 +394,7 @@ const getYourGroupStats = async ({ groupId, groupHandle, AuthUser, mongoDB }) =>
                                             'as': 'r',
                                             'cond': {
                                                 '$eq': [
-                                                    '$$r.representativeId', '$user'
+                                                    '$$r.representativeId', ObjectID(AuthUser?._id)
                                                 ]
                                             }
                                         }
@@ -402,7 +411,7 @@ const getYourGroupStats = async ({ groupId, groupHandle, AuthUser, mongoDB }) =>
                                             'as': 'r',
                                             'cond': {
                                                 '$eq': [
-                                                    '$$r.representativeId', '$otherVote.user'
+                                                    '$$r.representativeId', ObjectID(AuthUser?._id)
                                                 ]
                                             }
                                         }
@@ -421,8 +430,16 @@ const getYourGroupStats = async ({ groupId, groupHandle, AuthUser, mongoDB }) =>
                             '$sum': {
                                 '$cond': [
                                     {
-                                        '$eq': [
-                                            '$bothDirect', true
+                                        '$and': [
+                                            {
+                                                '$eq': [
+                                                    '$bothDirect', true
+                                                ]
+                                            }, {
+                                                '$eq': [
+                                                    '$byYou', false
+                                                ]
+                                            }
                                         ]
                                     }, 1, 0
                                 ]
@@ -440,6 +457,10 @@ const getYourGroupStats = async ({ groupId, groupHandle, AuthUser, mongoDB }) =>
                                             }, {
                                                 '$eq': [
                                                     '$bothDirect', true
+                                                ]
+                                            }, {
+                                                '$eq': [
+                                                    '$byYou', false
                                                 ]
                                             }
                                         ]
@@ -459,6 +480,10 @@ const getYourGroupStats = async ({ groupId, groupHandle, AuthUser, mongoDB }) =>
                                             }, {
                                                 '$eq': [
                                                     '$bothDirect', true
+                                                ]
+                                            }, {
+                                                '$eq': [
+                                                    '$byYou', false
                                                 ]
                                             }
                                         ]
@@ -494,9 +519,9 @@ const getYourGroupStats = async ({ groupId, groupHandle, AuthUser, mongoDB }) =>
             .toArray()
     )?.[0];
 
-    console.log({
-        votesInCommon
-    });
+    // console.log({
+    //     votesInCommon
+    // });
 
     return ({
         lastDirectVoteOn: 0,
@@ -514,22 +539,10 @@ const getYourGroupStats = async ({ groupId, groupHandle, AuthUser, mongoDB }) =>
             .find({
                 "groupChannel.group": groupHandle,
                 "isDirect": true,
+                'position': { $ne: null },
                 "user": ObjectID(AuthUser._id)
             }).count(),
-        // indirectVotesMadeByYou: await mongoDB.collection("Votes")
-        //     .find({
-        //         "groupChannel.group": groupHandle,
-        //         "isDirect": false,
-        //         "representatives.representativeId": ObjectID(AuthUser._id)
-        //     }).count(),
-        // indirectVotesMadeForYou: await mongoDB.collection("Votes")
-        //     .find({
-        //         "groupChannel.group": groupHandle,
-        //         "isDirect": false,
-        //         "user": ObjectID(AuthUser._id)
-        //     }).count(),
 
-            
         votesInCommon: votesInCommon?.votesInCommon || 0, // count
         directVotesInCommon: votesInCommon?.directVotesInCommon || 0, // count it both direct
 

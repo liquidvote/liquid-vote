@@ -40,7 +40,9 @@ export const GroupVotes: FunctionComponent<{ selectedChannels: any }> = ({ selec
         } else if (subsubsection === 'different') {
             return 'directVotesInDisagreement';
         } else if (subsection === 'represented' && !subsubsection) {
-            return 'indirectVotesMadeForUser'
+            return 'indirectVotesMade'
+        } else if (subsection === 'direct' && subsubsection === 'byYou') {
+            return 'directVotesMadeByYou';
         } else if (subsection === 'represented' && subsubsection === 'byyou') {
             return 'indirectVotesMadeByYou';
         } else if (subsection === 'represented' && subsubsection === 'foryou') {
@@ -62,7 +64,8 @@ export const GroupVotes: FunctionComponent<{ selectedChannels: any }> = ({ selec
         yourStats: group_data?.Group?.yourStats,
         type,
         subsection,
-        subsubsection
+        subsubsection,
+        votes_data: votes_data?.Votes.length,
     });
 
     return (
@@ -76,7 +79,7 @@ export const GroupVotes: FunctionComponent<{ selectedChannels: any }> = ({ selec
                 </li>
                 <li className="nav-item">
                     <Link className={`nav-link ${subsection === 'represented' && 'active'}`} to={`/group/${handle}/votes/represented`}>
-                        <b>{group_data?.Group?.yourStats?.indirectVotesMadeForYou}</b> Represented Votes
+                        <b>{group_data?.Group?.stats?.indirectVotesMade}</b> Represented Votes
                     </Link>
                 </li>
             </ul>
@@ -100,6 +103,11 @@ export const GroupVotes: FunctionComponent<{ selectedChannels: any }> = ({ selec
                                 <b className="white againstDirect px-1 rounded" >{group_data?.Group?.yourStats?.directVotesInDisagreement}</b> Different
                             </Link>
                         </li>
+                        <li className="nav-item">
+                            <Link className={`nav-link ${subsubsection === 'byYou' && 'active'}`} to={`/group/${handle}/votes/direct/byYou`}>
+                                <b >{group_data?.Group?.yourStats?.directVotesMade}</b> by You
+                            </Link>
+                        </li>
                     </ul>
                     <hr className="mt-n4" />
                 </>
@@ -110,17 +118,17 @@ export const GroupVotes: FunctionComponent<{ selectedChannels: any }> = ({ selec
                     <ul className="nav d-flex justify-content-around mt-n2 mx-n3">
                         <li className="nav-item">
                             <Link className={`nav-link ${!subsubsection && 'active'}`} to={`/group/${handle}/votes/represented`}>
-                                <b>{group_data?.Group?.stats?.indirectVotesMadeForUser}</b> By others
+                                <b>{group_data?.Group?.stats?.indirectVotesMade}</b> All
                             </Link>
                         </li>
                         <li className="nav-item">
                             <Link className={`nav-link ${subsubsection === 'byyou' && 'active'}`} to={`/group/${handle}/votes/represented/byyou`}>
-                                <b>{group_data?.Group?.yourStats?.indirectVotesMadeByYou}</b> By you
+                                <b>{group_data?.Group?.yourStats?.indirectVotesMadeByYou}</b> By you - indirectVotesMadeByYou
                             </Link>
                         </li>
                         <li className="nav-item">
                             <Link className={`nav-link ${subsubsection === 'foryou' && 'active'}`} to={`/group/${handle}/votes/represented/foryou`}>
-                                <b>{group_data?.Group?.yourStats?.indirectVotesMadeForYou}</b> For you
+                                <b>{group_data?.Group?.yourStats?.indirectVotesMadeForYou}</b> For you - indirectVotesMadeForYou
                             </Link>
                         </li>
                     </ul>
@@ -130,26 +138,28 @@ export const GroupVotes: FunctionComponent<{ selectedChannels: any }> = ({ selec
 
             {votes_data?.Votes.length === 0 && (
                 <div className="p-4 text-center">
-                    {group_data.Group?.name}{' '}
+                    {/* {group_data.Group?.name}{' '} */}
                     {
                         (() => {
                             if (type === 'directVotesMade') {
-                                return 'hasn\'t answered directly to any direct polls';
+                                return 'no one answered directly to any direct polls';
                             } else if (type === 'directVotesInAgreement') {
-                                return 'hasn\'t agreed with you on any polls';
+                                return 'no one agreed with you on any polls';
                             } else if (type === 'directVotesInDisagreement') {
-                                return 'hasn\'t disagreed with you on any polls';
+                                return 'no one disagreed with you on any polls';
                             } else if (type === 'indirectVotesMadeForUser') {
-                                return 'hasn\'t been represented on any polls'
+                                return 'no one has been represented on any polls'
                             } else if (type === 'indirectVotesMadeByYou') {
-                                return 'hasn\'t been represented by you on any polls';
+                                return 'no one has been represented by you on any polls';
                             } else if (type === 'indirectVotesMadeForYou') {
-                                return 'hasn\'t represented you on any polls';
+                                return 'no one has been represented you on any polls';
+                            } else if (type === 'directVotesMadeByYou') {
+                                return 'you haven\'t made any votes';
                             }
-                            return 'type'
+                            return 'MISSING TYPE'
                         })()
                     }{' '}
-                    yet
+                    in this group ({group_data.Group?.name}) yet
                 </div>
             )}
 
@@ -164,21 +174,24 @@ export const GroupVotes: FunctionComponent<{ selectedChannels: any }> = ({ selec
 
             {votes_data?.Votes.map((n, i) => (
                 // <pre>{JSON.stringify(n, null, 2)}</pre>
-                <Notification
-                    key={'notification-groupvote' + type + n.questionText + n.choiceText + n.user.name + i}
-                    v={{
-                        ...n,
-                        // user: profile,
-                        // who: {
-                        //     name: "Dan Price",
-                        //     avatarClass: 1,
-                        //     representing: 12000,
-                        //     representsYou: true,
-                        // }
-                    }}
-                    showChart={true}
-                />
+                <>
+                    {i}
+                    <Notification
+                        key={'notification-groupvote' + type + n.questionText + n.choiceText + n.user.name + i}
+                        v={{
+                            ...n
+                        }}
+                        showChart={true}
+                    />
+                </>
             ))}
+
+            <br />
+            <br />
+            <pre style={{ color: "white" }}>
+                {JSON.stringify(group_data?.Group?.stats, null, 2)}
+                {JSON.stringify(group_data?.Group?.yourStats, null, 2)}
+            </pre>
         </>
     );
 }

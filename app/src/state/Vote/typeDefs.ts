@@ -19,7 +19,7 @@ export const VOTES = gql`
   query($handle: String!, $handleType: String!, $type: String) {
     Votes(handle: $handle, handleType: $handleType, type: $type) {
         questionText
-        # choiceText
+        choiceText
         groupChannel {
             group
             channel

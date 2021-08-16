@@ -252,12 +252,8 @@ export const Group: FunctionComponent<{}> = ({ }) => {
                 </Link> */}
             </div>
 
-            <div className="mt-4 mb-3 d-flex align-items-start flex-nowrap justify-content-between">
+            {/* <div className="mt-4 mb-3 d-flex align-items-start flex-nowrap justify-content-between">
                 <div className="d-flex flex-column">
-                    {/* <div data-tip="Selected channels">
-                        <GroupSmallSvg />
-                        <b className="ml-1">{selectedGroup.channels?.length || 0}</b> Channels
-                    </div> */}
                     <div
                         className="d-flex flex-wrap justify-content-start"
                     >
@@ -275,23 +271,25 @@ export const Group: FunctionComponent<{}> = ({ }) => {
                                 className={`badge pointer ${selectedChannels.indexOf(el.name) === -1 && 'inverted'} ml-1 mb-1 mt-1`}
                             >{el.name}</div>
                         ))}
-                        {/* <div className={`badge inverted ml-1 mb-1 mt-1`}>+3</div> */}
                     </div>
                 </div>
-            </div>
+            </div> */}
 
             <ul className="nav d-flex flex-nowrap justify-content-around align-items-center mt-1 mb-n4 mx-n3">
                 <li className="nav-item">
                     <Link className={`nav-link ${(!section || section === 'polls') && 'active'}`} to={`/group/${selectedGroup?.handle}/polls`}>
-                        <b>{selectedGroup?.votes?.length}</b> Polls
+                        <b>{selectedGroup?.stats?.questions}</b>{' '}Polls
                     </Link>
                 </li>
                 <li className="nav-item">
                     <Link className={`nav-link ${section === 'votes' && 'active'}`} to={`/group/${selectedGroup?.handle}/votes`}>
-                        Timeline
+                        <b>{selectedGroup?.stats?.directVotesMade}</b>{' '}
+                        Votes
                     </Link>
                 </li>
             </ul>
+
+            {/* <pre style={{ color: 'white' }}>{JSON.stringify(selectedGroup, null, 2)}</pre> */}
 
             <hr />
 

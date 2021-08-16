@@ -19,150 +19,176 @@ export const VoteResolvers = {
             const User = handleType === 'user' && await mongoDB.collection("Users")
                 .findOne({ 'LiquidUser.handle': handle });
 
-            // const Group = handleType === 'group' && await mongoDB.collection("Groups")
-            //     .findOne({ 'handle': handle });
+            console.log({
+                type
+            });
 
             const votesInCommonGeneralAggregationLogic = (
-                [{
-                    '$match': {
-                        ...(handleType === 'user') && {
-                            'user': ObjectID(User._id)
-                        },
-                        ...(handleType === 'group') && {
-                            'groupChannel.group': handle
+                [
+                    {
+                        '$match': {
+                            ...(handleType === 'user') && {
+                                'user': ObjectID(User._id)
+                            },
+                            ...(handleType === 'group') && {
+                                'groupChannel.group': handle
+                            },
+                            // ...(handleType === '')
+                            'position': { $ne: null }
                         }
-                    }
-                }, {
-                    '$lookup': {
-                        'from': 'Votes',
-                        'let': {
-                            'userId': ObjectID(AuthUser._id),
-                            'questionText': '$questionText',
-                            'choiceText': '$choiceText',
-                            'group': '$groupChannel.group',
-                            'channel': '$groupChannel.channel'
-                        },
-                        'pipeline': [
-                            {
-                                '$match': {
-                                    '$and': [
-                                        {
-                                            '$expr': {
-                                                '$eq': [
-                                                    '$user', {
-                                                        '$toObjectId': '$$userId'
+                    }, {
+                        '$lookup': {
+                            'from': 'Votes',
+                            'let': {
+                                'userId': ObjectID(AuthUser?._id),
+                                'questionText': '$questionText',
+                                'choiceText': '$choiceText',
+                                'group': '$groupChannel.group',
+                                'channel': '$groupChannel.channel'
+                            },
+                            'pipeline': [
+                                {
+                                    '$match': {
+                                        '$and': [
+                                            {
+                                                '$expr': {
+                                                    '$eq': [
+                                                        '$user', {
+                                                            '$toObjectId': '$$userId'
+                                                        }
+                                                    ]
+                                                }
+                                            },
+                                            {
+                                                '$expr': {
+                                                    '$eq': [
+                                                        '$questionText', '$$questionText'
+                                                    ]
+                                                }
+                                            },
+                                            {
+                                                '$expr': {
+                                                    '$eq': [
+                                                        '$choiceText', '$$choiceText'
+                                                    ]
+                                                }
+                                            },
+                                            ...(handleType === 'group') ? [
+                                                {
+                                                    '$expr': {
+                                                        '$eq': [
+                                                            '$groupChannel.group', '$$group'
+                                                        ]
                                                     }
-                                                ]
-                                            }
-                                        },
-                                        {
-                                            '$expr': {
-                                                '$eq': [
-                                                    '$questionText', '$$questionText'
-                                                ]
-                                            }
-                                        },
-                                        {
-                                            '$expr': {
-                                                '$eq': [
-                                                    '$choiceText', '$$choiceText'
-                                                ]
-                                            }
-                                        },
-                                        {
-                                            '$expr': {
-                                                '$eq': [
-                                                    '$groupChannel.group', '$$group'
-                                                ]
-                                            }
-                                        },
-                                        {
-                                            '$expr': {
-                                                '$eq': [
-                                                    '$groupChannel.channel', '$$channel'
-                                                ]
-                                            }
-                                        }
-                                    ]
+                                                },
+                                                {
+                                                    '$expr': {
+                                                        '$eq': [
+                                                            '$groupChannel.channel', '$$channel'
+                                                        ]
+                                                    }
+                                                }
+                                            ] : []
+                                        ]
+                                    }
                                 }
-                            }
-                        ],
-                        'as': 'yourVote'
-                    }
-                }, {
-                    '$match': {
-                        'yourVote': {
-                            '$gte': {
-                                '$size': 1
+                            ],
+                            'as': 'yourVote'
+                        }
+                    },
+                    // {
+                    //     '$match': {
+                    //         'yourVote': {
+                    //             '$gte': {
+                    //                 '$size': 1
+                    //             }
+                    //         }
+                    //     }
+                    // },
+                    {
+                        '$addFields': {
+                            'yourVote': {
+                                '$first': '$yourVote'
                             }
                         }
-                    }
-                }, {
-                    '$addFields': {
-                        'yourVote': {
-                            '$first': '$yourVote'
-                        }
-                    }
-                }, {
-                    '$addFields': {
-                        'bothDirect': {
-                            '$and': [
-                                {
-                                    '$eq': [
-                                        '$isDirect', true
-                                    ]
-                                }, {
-                                    '$eq': [
-                                        '$yourVote.isDirect', true
-                                    ]
+                    }, {
+                        '$addFields': {
+                            'byYou': {
+                                '$eq': ['$user', ObjectID(AuthUser?._id)]
+                            },
+                            'bothDirect': {
+                                '$and': [
+                                    {
+                                        '$eq': [
+                                            '$isDirect', true
+                                        ]
+                                    }, {
+                                        '$eq': [
+                                            '$yourVote.isDirect', true
+                                        ]
+                                    }
+                                ]
+                            },
+                            'InAgreement': {
+                                '$and': [
+                                    {
+                                        '$eq': [
+                                            '$position', '$yourVote.position'
+                                        ]
+                                    }
+                                ]
+                            },
+                            'yourVoteMadeByUser': {
+                                $cond: {
+                                    if: {
+                                        '$or': [
+                                            { $not: ["$yourVote"] },
+                                            { $eq: ["$yourVote.isDirect", true] }
+                                        ]
+                                    },
+                                    then: false,
+                                    else: {
+                                        '$gte': [
+                                            {
+                                                '$size': {
+                                                    '$filter': {
+                                                        'input': '$yourVote.representatives',
+                                                        'as': 'r',
+                                                        'cond': {
+                                                            '$and': [
+                                                                {
+                                                                    '$eq': [
+                                                                        '$$r.representativeId', '$user'
+                                                                    ]
+                                                                }
+                                                            ]
+                                                        }
+                                                    }
+                                                }
+                                            }, 1
+                                        ]
+                                    }
                                 }
-                            ]
-                        },
-                        'InAgreement': {
-                            '$and': [
-                                {
-                                    '$eq': [
-                                        '$position', '$yourVote.position'
-                                    ]
-                                }
-                            ]
-                        },
-                        'yourVoteMadeByUser': {
-                            '$gte': [
-                                {
-                                    '$size': {
-                                        '$filter': {
-                                            'input': '$yourVote.representatives',
-                                            'as': 'r',
-                                            'cond': {
-                                                '$eq': [
-                                                    '$$r.representativeId', '$user'
-                                                ]
+                            },
+                            'yourVoteMadeForUser': {
+                                '$gte': [
+                                    {
+                                        '$size': {
+                                            '$filter': {
+                                                'input': '$representatives',
+                                                'as': 'r',
+                                                'cond': {
+                                                    '$eq': [
+                                                        '$$r.representativeId', ObjectID(AuthUser?._id)
+                                                    ]
+                                                }
                                             }
                                         }
-                                    }
-                                }, 1
-                            ]
-                        },
-                        'yourVoteMadeForUser': {
-                            '$gte': [
-                                {
-                                    '$size': {
-                                        '$filter': {
-                                            'input': '$representatives',
-                                            'as': 'r',
-                                            'cond': {
-                                                '$eq': [
-                                                    '$$r.representativeId', '$yourVote.user'
-                                                ]
-                                            }
-                                        }
-                                    }
-                                }, 1
-                            ]
+                                    }, 1
+                                ]
+                            }
                         }
-                    }
-                },
+                    },
                 ]
             );
 
@@ -172,7 +198,7 @@ export const VoteResolvers = {
                         '$lookup': {
                             'from': 'Votes',
                             'let': {
-                                'representativeId': { '$toObjectId' : '$user' },
+                                'representativeId': { '$toObjectId': '$user' },
                                 'questionText': '$questionText',
                                 'choiceText': '$choiceText',
                                 'group': '$groupChannel.group',
@@ -213,15 +239,36 @@ export const VoteResolvers = {
                                             }
                                         ]
                                     }
-                                }, {
-                                    '$unwind': '$representatives'
-                                }, {
+                                },
+
+                                // {
+                                //     '$unwind': '$representatives'
+                                // },
+
+                                {
                                     '$match': {
+                                        // '$expr': {
+                                        //     '$eq': [
+                                        //         '$representatives.representativeId', {
+                                        //             '$toObjectId': '$$representativeId'
+                                        //         }
+                                        //     ]
+                                        // }
                                         '$expr': {
-                                            '$eq': [
-                                                '$representatives.representativeId', {
-                                                    '$toObjectId': '$$representativeId'
-                                                }
+                                            '$gte': [
+                                                {
+                                                    '$size': {
+                                                        '$filter': {
+                                                            'input': '$representatives',
+                                                            'as': 'r',
+                                                            'cond': {
+                                                                '$eq': [
+                                                                    '$$r.representativeId', '$$representativeId'
+                                                                ]
+                                                            }
+                                                        }
+                                                    }
+                                                }, 1
                                             ]
                                         }
                                     }
@@ -232,8 +279,7 @@ export const VoteResolvers = {
                                         'foreignField': '_id',
                                         'as': 'user'
                                     }
-                                },
-                                {
+                                }, {
                                     '$addFields': {
                                         'user': { '$first': '$user.LiquidUser' }
                                     }
@@ -242,6 +288,13 @@ export const VoteResolvers = {
                             'as': 'representeeVotes'
                         }
                     }
+                ]
+            );
+
+            const representeeVotesAsList = (
+                [
+                    { '$unwind': '$representeeVotes' },
+                    { '$replaceRoot': { newRoot: '$representeeVotes' } }
                 ]
             );
 
@@ -292,9 +345,41 @@ export const VoteResolvers = {
                     },
                     {
                         $addFields: {
-                            QuestionStats: { $first: '$question.stats' }
+                            QuestionStats: {
+                                $cond: {
+                                    if: {
+                                        $not: ["$choiceText"]
+                                    },
+                                    then: { $first: '$question.stats' },
+                                    else: {
+                                        $let: {
+                                            vars: {
+                                                choice: {
+                                                    $first: {
+                                                        '$filter': {
+                                                            'input': { $first: '$question.choices' },
+                                                            'as': 'c',
+                                                            'cond': {
+                                                                '$eq': [
+                                                                    '$$c.text', '$choiceText'
+                                                                ]
+                                                            }
+                                                        }
+                                                    }
+                                                }
+                                            },
+                                            in: "$$choice.stats"
+                                        }
+                                    }
+                                }
+                            }
                         }
-                    },
+                    }
+                ]
+            );
+
+            const userObjectAggregationLogic = (
+                [
                     ...(handleType !== 'user') ? [{
                         '$lookup': {
                             'from': 'Users',
@@ -324,7 +409,8 @@ export const VoteResolvers = {
                                 }
                             },
                             ...representeeVotesAggregationLogic,
-                            ...questionStatsAggregationLogic
+                            ...questionStatsAggregationLogic,
+                            ...userObjectAggregationLogic
                         ])
                         .toArray(),
                     'directVotesInAgreement': async () => await mongoDB.collection("Votes")
@@ -333,11 +419,13 @@ export const VoteResolvers = {
                             {
                                 '$match': {
                                     'InAgreement': true,
-                                    'bothDirect': true
+                                    'bothDirect': true,
+                                    'byYou': false
                                 }
                             },
                             ...representeeVotesAggregationLogic,
-                            ...questionStatsAggregationLogic
+                            ...questionStatsAggregationLogic,
+                            ...userObjectAggregationLogic
                         ])
                         .toArray(),
                     'directVotesInDisagreement': async () => await mongoDB.collection("Votes")
@@ -346,14 +434,25 @@ export const VoteResolvers = {
                             {
                                 '$match': {
                                     'InAgreement': false,
-                                    'bothDirect': true
+                                    'bothDirect': true,
+                                    'byYou': false
                                 }
                             },
                             ...representeeVotesAggregationLogic,
+                            ...questionStatsAggregationLogic,
+                            ...userObjectAggregationLogic
+                        ])
+                        .toArray(),
+                    'indirectVotesMade': async () => await mongoDB.collection("Votes")
+                        // .find({ 'user': ObjectID(User?._id), 'isDirect': false })
+                        .aggregate([
+                            ...votesInCommonGeneralAggregationLogic,
+                            ...representeeVotesAggregationLogic,
+                            ...representeeVotesAsList,
                             ...questionStatsAggregationLogic
                         ])
                         .toArray(),
-                    'indirectVotesMadeForUser': async () => await mongoDB.collection("Votes")
+                    'indirectVotesMadeByUser': async () => await mongoDB.collection("Votes")
                         // .find({ 'user': ObjectID(User?._id), 'isDirect': false })
                         .aggregate([
                             ...votesInCommonGeneralAggregationLogic,
@@ -363,7 +462,8 @@ export const VoteResolvers = {
                                 }
                             },
                             ...representeeVotesAggregationLogic,
-                            ...questionStatsAggregationLogic
+                            ...questionStatsAggregationLogic,
+                            ...userObjectAggregationLogic
                         ])
                         .toArray(),
                     'indirectVotesMadeByYou': async () => await mongoDB.collection("Votes")
@@ -375,7 +475,8 @@ export const VoteResolvers = {
                                 }
                             },
                             ...representeeVotesAggregationLogic,
-                            ...questionStatsAggregationLogic
+                            ...questionStatsAggregationLogic,
+                            ...userObjectAggregationLogic
                         ])
                         .toArray(),
                     'indirectVotesMadeForYou': async () => await mongoDB.collection("Votes")
@@ -387,11 +488,31 @@ export const VoteResolvers = {
                                 }
                             },
                             ...representeeVotesAggregationLogic,
-                            ...questionStatsAggregationLogic
+                            ...questionStatsAggregationLogic,
+                            ...userObjectAggregationLogic
+                        ])
+                        .toArray(),
+                    'directVotesMadeByYou': async () => await mongoDB.collection("Votes")
+                        .aggregate([
+                            ...votesInCommonGeneralAggregationLogic,
+                            {
+                                '$match': {
+                                    'user': ObjectID(AuthUser?._id),
+                                    'isDirect': true,
+                                    'position': { $ne: null }
+                                }
+                            },
+                            ...representeeVotesAggregationLogic,
+                            ...questionStatsAggregationLogic,
+                            ...userObjectAggregationLogic
                         ])
                         .toArray(),
                 }[type]();
             })(type);
+
+            console.log({
+                VotesL: Votes.length
+            })
 
             return Votes;
         },
@@ -402,10 +523,6 @@ export const VoteResolvers = {
         }, {
             mongoDB, s3, AuthUser
         }) => {
-
-            console.log({
-                questionText, choiceText
-            });
 
             const Vote_ = !!AuthUser && await mongoDB.collection("Votes")
                 .findOne({
@@ -420,6 +537,7 @@ export const VoteResolvers = {
                 .findOne({
                     handle: group
                 });
+
 
             const savedVote = (!!AuthUser && !Vote_) ?
                 (await mongoDB.collection("Votes").insertOne({
@@ -606,11 +724,6 @@ export const VoteResolvers = {
                 mongoDB,
                 AuthUser
             });
-
-            // console.log({
-
-            // })
-
 
             return {
                 ...savedVote,
