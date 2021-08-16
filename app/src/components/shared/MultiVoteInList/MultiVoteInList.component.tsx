@@ -9,7 +9,7 @@ import './style.sass';
 import { valores } from "@state/Mock/Votes";
 import Choice from "@shared/Choice";
 
-export const MultiVoteInList: FunctionComponent<{ v: any, i: number }> = ({ v, i = 0 }) => {
+export const MultiVoteInList: FunctionComponent<{ v: any, i?: number }> = ({ v, i = 0 }) => {
 
     const [userVote, setUserVote] = React.useState(null);
     const handleUserVote = (vote: string) => {

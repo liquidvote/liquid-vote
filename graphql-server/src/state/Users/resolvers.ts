@@ -420,7 +420,7 @@ export const UserResolvers = {
                         '$lookup': {
                             'from': 'Votes',
                             'let': {
-                                'representativeId': { '$toObjectId' : '$user' },
+                                'representativeId': { '$toObjectId': '$user' },
                                 'questionText': '$questionText',
                                 'choiceText': '$choiceText',
                                 'group': '$groupChannel.group',
@@ -750,6 +750,7 @@ const getUserStats = async ({ userId, mongoDB }) => {
         directVotesMade: await mongoDB.collection("Votes")
             .find({
                 "isDirect": true,
+                'position': { $ne: null },
                 "user": ObjectID(userId)
             }).count(),
         indirectVotesMadeByUser: await mongoDB.collection("Votes")
@@ -773,6 +774,7 @@ const getYourUserStats = async ({ userId, AuthUser, mongoDB }) => {
                 {
                     '$match': {
                         'user': ObjectID(AuthUser._id),
+                        'position': { $ne: null }
                     }
                 }, {
                     '$lookup': {
@@ -880,20 +882,30 @@ const getYourUserStats = async ({ userId, AuthUser, mongoDB }) => {
                             ]
                         },
                         'otherVoteMadeForYou': {
-                            '$gte': [
+                            '$and': [
                                 {
-                                    '$size': {
-                                        '$filter': {
-                                            'input': '$representatives',
-                                            'as': 'r',
-                                            'cond': {
-                                                '$eq': [
-                                                    '$$r.representativeId', '$otherVote.user'
-                                                ]
+
+                                    '$eq': [
+                                        '$isDirect', false
+                                    ]
+                                },
+                                {
+                                    '$gte': [
+                                        {
+                                            '$size': {
+                                                '$filter': {
+                                                    'input': '$representatives',
+                                                    'as': 'r',
+                                                    'cond': {
+                                                        '$eq': [
+                                                            '$$r.representativeId', '$otherVote.user'
+                                                        ]
+                                                    }
+                                                }
                                             }
-                                        }
-                                    }
-                                }, 1
+                                        }, 1
+                                    ]
+                                }
                             ]
                         }
                     }

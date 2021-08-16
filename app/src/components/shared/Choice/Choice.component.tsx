@@ -10,9 +10,21 @@ import { voteStatsMap } from '@state/Question/map';
 import './style.sass';
 
 export const Choice: FunctionComponent<{
-    choiceText?: string, voteName: string, groupChannel: any, stats: any, userVote: any, inList?: boolean
+    choiceText?: string,
+    voteName: string,
+    groupChannel: any,
+    stats: any,
+    userVote: any,
+    inList?: boolean,
+    showPercentages?: boolean
 }> = ({
-    choiceText, voteName, groupChannel, stats, userVote, inList
+    choiceText,
+    voteName,
+    groupChannel,
+    stats,
+    userVote,
+    inList,
+    showPercentages
 }) => {
 
         const [editVote, {
@@ -21,7 +33,7 @@ export const Choice: FunctionComponent<{
             data: editVote_data,
         }] = useMutation(EDIT_VOTE);
 
-        const userVote_ = editVote_data?.editVote?.position || userVote?.position || null;
+        const userVote_ = editVote_data ? editVote_data?.editVote?.position : userVote?.position;
 
         const handleUserVote = (vote: string) => {
 
@@ -75,6 +87,23 @@ export const Choice: FunctionComponent<{
                         userDelegatedVotes={null}
                     />
                 </div>
+
+                {showPercentages && (
+                    <div className="d-flex color-legend my-3">
+                        <div>
+                            <small>Direct For</small><div className="color forDirect count">{stats_?.forDirectPercentage.toFixed(0)}%</div>
+                        </div>
+                        <div>
+                            <small>Delegated For</small><div className="color for count">{stats_?.forDelegatedPercentage.toFixed(0)}%</div>
+                        </div>
+                        <div>
+                            <small>Direct Against</small><div className="color againstDirect count">{stats_?.againstDirectPercentage.toFixed(0)}%</div>
+                        </div>
+                        <div>
+                            <small>Delegated Against</small><div className="color against count">{stats_?.againstDelegatedPercentage.toFixed(0)}%</div>
+                        </div>
+                    </div>
+                )}
 
                 <div className="d-flex d-flex justify-content-between mt-1">
                     <div className="d-flex align-items-center">

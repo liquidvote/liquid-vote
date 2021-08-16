@@ -4,6 +4,7 @@ import GroupSvg from "@shared/Icons/Group.svg";
 
 import VoteWrapper from "@shared/VoteWrapper";
 import SingleVoteInList from "@shared/SingleVoteInList";
+import Choice from "@shared/Choice";
 import './style.sass';
 import { timeAgo } from '@state/TimeAgo';
 
@@ -14,13 +15,6 @@ export const Notification: FunctionComponent<{
     v,
     showChart = false
 }) => {
-
-        // Types
-        //  Voted
-        //  Changed Vote
-        //  Removed Vote
-        //
-        //  Joined Group ?
 
         return (
             <>
@@ -71,11 +65,12 @@ export const Notification: FunctionComponent<{
                                     <>
                                         <small className="mr-1">on</small>
                                         <Link
-                                            to={`/poll/${v.questionText}/${v.groupChannel?.group}-${v.groupChannel?.channel}`}
-                                        ><b className="white">{v.questionText}</b></Link>
+                                            to={`/${v.choiceText ? 'multipoll' : 'poll'}/${v.questionText}/${v.groupChannel?.group}-${v.groupChannel?.channel}`}
+                                        ><b className="white">{v.questionText}{v.choiceText ? ':' + v.choiceText : ''}</b></Link>
                                     </>
 
                                 </p>
+                                {/* <pre>{JSON.stringify(v, null, 2)}</pre> */}
                                 {v.representeeVotes?.length > 0 && (
                                     <small className="d-flex align-items-center">
                                         Representing
@@ -100,8 +95,7 @@ export const Notification: FunctionComponent<{
                                 <div className="d-flex flex-wrap justify-content-end">
                                     <div className="tiny-svg-wrapper"><GroupSvg /></div>
                                     <div className="badge ml-1 mb-1 mt-1">
-                                        {v.groupChannel?.group}:
-                                        {v.groupChannel?.channel}
+                                        {v.groupChannel?.group}
                                     </div>
                                 </div>
                             </div>
@@ -116,13 +110,13 @@ export const Notification: FunctionComponent<{
                 {
                     showChart && (
                         <div key={`notificationVote-${v.questionText}`}>
-                            <SingleVoteInList
-                                hideTitle={true}
-                                l={{
-                                    ...v,
-                                    userVote: v.yourVote,
-                                    stats: v.QuestionStats
-                                }}
+                            <Choice
+                                choiceText={v.choiceText}
+                                voteName={v.questionText}
+                                groupChannel={v.groupChannel.group+'-'+v.groupChannel.channel}
+                                stats={v.QuestionStats}
+                                userVote={v.yourVote}
+                                inList={true}
                             />
                         </div>
                     )
