@@ -16,8 +16,8 @@ export const VOTE = gql`
 `;
 
 export const VOTES = gql`
-  query($handle: String!, $handleType: String!, $type: String) {
-    Votes(handle: $handle, handleType: $handleType, type: $type) {
+  query($handle: String!, $handleType: String!, $type: String, $sortBy: String) {
+    Votes(handle: $handle, handleType: $handleType, type: $type, sortBy: $sortBy) {
         questionText
         choiceText
         groupChannel {

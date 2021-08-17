@@ -91,7 +91,9 @@ export const Notification: FunctionComponent<{
                                 )}
                             </div>
                             <div className="d-flex flex-column justify-content-end mw-25" style={{ flex: 1 }}>
-                                <small className="text-right">{timeAgo.format(new Date(Number(v?.lastEditOn)))}</small>
+                                <small className="text-right" data-tip="Voted on">
+                                    {timeAgo.format(new Date(Number(v?.lastEditOn)))}
+                                </small>
                                 <div className="d-flex flex-wrap justify-content-end">
                                     <div className="tiny-svg-wrapper"><GroupSvg /></div>
                                     <div className="badge ml-1 mb-1 mt-1">
@@ -109,7 +111,7 @@ export const Notification: FunctionComponent<{
                 )}
                 {
                     showChart && (
-                        <div key={`notificationVote-${v.questionText}`}>
+                        <div key={`notificationVote-${v.questionText}`} className="mt-1">
                             <Choice
                                 choiceText={v.choiceText}
                                 voteName={v.questionText}
