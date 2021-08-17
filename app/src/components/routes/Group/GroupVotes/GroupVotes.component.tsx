@@ -7,6 +7,7 @@ import { GROUP } from "@state/Group/typeDefs";
 import { VOTES } from "@state/Vote/typeDefs";
 import Notification from '@shared/Notification';
 import VoteSortPicker from '@components/shared/VoteSortPicker';
+import DropAnimation from "@components/shared/DropAnimation";
 
 import './style.sass';
 
@@ -190,6 +191,12 @@ export const GroupVotes: FunctionComponent<{ selectedChannels: any }> = ({ selec
                     />
                 </>
             ))}
+
+            {votes_loading && (
+                <div className="d-flex justify-content-center mt-5">
+                    <DropAnimation />
+                </div>
+            )}
 
             {/* <br />
             <br />

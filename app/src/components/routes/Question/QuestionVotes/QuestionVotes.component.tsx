@@ -10,6 +10,7 @@ import SortSmallSvg from "@shared/Icons/Sort-small.svg";
 import { QUESTION, QUESTION_VOTERS } from '@state/Question/typeDefs';
 import Popper from "@shared/Popper";
 import VoteSortPicker from '@components/shared/VoteSortPicker';
+import DropAnimation from '@components/shared/DropAnimation';
 
 import './style.sass';
 
@@ -194,6 +195,12 @@ export const QuestionVotes: FunctionComponent<{}> = ({ }) => {
                     showChart={false}
                 />
             ))}
+
+            {question_voters_loading && (
+                <div className="d-flex justify-content-center mt-5">
+                    <DropAnimation />
+                </div>
+            )}
 
         </>
     );

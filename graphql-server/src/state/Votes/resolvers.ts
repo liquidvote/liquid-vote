@@ -382,7 +382,7 @@ export const VoteResolvers = {
 
             const userObjectAggregationLogic = (
                 [
-                    ...(handleType !== 'user') ? [{
+                    {
                         '$lookup': {
                             'from': 'Users',
                             'localField': 'user',
@@ -395,7 +395,7 @@ export const VoteResolvers = {
                                 '$first': '$user.LiquidUser'
                             }
                         }
-                    }] : []
+                    }
                 ]
             );
 
@@ -472,6 +472,20 @@ export const VoteResolvers = {
                             ...questionStatsAggregationLogic
                         ])
                         .toArray(),
+                    // 'indirectVotesMadeForUser': async () => await mongoDB.collection("Votes")
+                    //     // .find({ 'user': ObjectID(User?._id), 'isDirect': false })
+                    //     .aggregate([
+                    //         ...votesInCommonGeneralAggregationLogic,
+                    //         {
+                    //             '$match': {
+                    //                 'isDirect': false,
+                    //             }
+                    //         },
+                    //         ...representeeVotesAggregationLogic,
+                    //         ...sortLogic,
+                    //         ...questionStatsAggregationLogic
+                    //     ])
+                    //     .toArray(),
                     'indirectVotesMadeByUser': async () => await mongoDB.collection("Votes")
                         // .find({ 'user': ObjectID(User?._id), 'isDirect': false })
                         .aggregate([

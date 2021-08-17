@@ -18,6 +18,7 @@ export const Notification: FunctionComponent<{
 
         return (
             <>
+                {/* <pre>{JSON.stringify(v.user, null, 2)}</pre> */}
                 <div className="d-flex relative align-items-center">
                     <Link to={`/profile/${v.user?.handle}`}>
                         <div
@@ -115,7 +116,7 @@ export const Notification: FunctionComponent<{
                             <Choice
                                 choiceText={v.choiceText}
                                 voteName={v.questionText}
-                                groupChannel={v.groupChannel.group+'-'+v.groupChannel.channel}
+                                groupChannel={v.groupChannel.group + '-' + v.groupChannel.channel}
                                 stats={v.QuestionStats}
                                 userVote={v.yourVote}
                                 inList={true}

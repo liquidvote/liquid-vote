@@ -10,6 +10,7 @@ import { VoteTimeline } from "@state/Mock/Notifications";
 import Popper from "@shared/Popper";
 import SortSmallSvg from "@shared/Icons/Sort-small.svg";
 import VoteSortPicker from '@components/shared/VoteSortPicker';
+import DropAnimation from '@components/shared/DropAnimation';
 
 import './style.sass';
 
@@ -176,12 +177,18 @@ export const ProfileVotes: FunctionComponent<{}> = ({ }) => {
                         key={'notification-uservote' + n.questionText + type + n.choiceText}
                         v={{
                             ...n,
-                            user: profile
+                            // user: profile
                         }}
                         showChart={true}
                     />
                 </>
             ))}
+
+            {user_votes_loading && (
+                <div className="d-flex justify-content-center mt-5">
+                    <DropAnimation />
+                </div>
+            )}
 
             {/* <br />
             <br />
