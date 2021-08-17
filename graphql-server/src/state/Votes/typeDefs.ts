@@ -48,6 +48,7 @@ export const VoteTypeDefs = gql`
             handle: String,
             handleType: String,
             type: String,
+            sortBy: String
         ):  [Vote]
     }
 

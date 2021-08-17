@@ -1,30 +1,19 @@
 import React, { FunctionComponent, useState, useEffect } from 'react';
 import { Link, useParams } from "react-router-dom";
 import { DiscussionEmbed } from 'disqus-react';
-import numeral from 'numeral';
 import ReactTooltip from 'react-tooltip';
 import { useQuery, useMutation } from "@apollo/client";
 
 import VoteGraph1 from "@shared/VoteGraph1";
-import Chart from "@shared/VoteGraph1/chart.svg";
 import Header from "@shared/Header";
-import DropPlusSVG from "@shared/Icons/Drop+.svg";
-import XSVG from "@shared/Icons/X.svg";
 import {
     defaults,
     byGroups,
     votesBy,
     onSubTopics
 } from "@state/Mock/Votes";
-import SubVote from '@shared/SubVote';
 import GroupSmallSvg from "@shared/Icons/Group-small.svg";
-import { people } from "@state/Mock/People";
-import PersonInList from '@shared/PersonInList';
-import { VoteTimeline } from "@state/Mock/Notifications";
-import Notification from '@shared/Notification';
 import { QUESTION } from '@state/Question/typeDefs';
-import { voteStatsMap } from '@state/Question/map';
-import { EDIT_VOTE } from '@state/Vote/typeDefs';
 import useSearchParams from "@state/Global/useSearchParams.effect";
 import QuestionVotes from "./QuestionVotes";
 import DropAnimation from "@components/shared/DropAnimation";
@@ -53,50 +42,6 @@ export default function Question() {
             channel: groupChannel_.channel
         }
     });
-
-    const [editVote, {
-        loading: editVote_loading,
-        error: editVote_error,
-        data: editVote_data,
-    }] = useMutation(EDIT_VOTE);
-
-    const userVote = editVote_data?.editVote?.position || question_data?.Question?.userVote?.position || null;
-
-    const handleUserVote = (vote: string) => {
-        editVote({
-            variables: {
-                questionText: question_data?.Question?.questionText,
-                // choiceText
-                group: question_data?.Question?.groupChannel.group,
-                channel: question_data?.Question?.groupChannel.channel,
-                Vote: {
-                    position: (vote === userVote) ? null : vote
-                },
-            }
-        });
-    }
-
-    console.log({
-        question_loading,
-        question_error,
-        question_data
-    });
-
-    const stats = voteStatsMap({
-        forCount: question_data?.Question?.stats?.forCount,
-        againstCount: question_data?.Question?.stats?.againstCount,
-        forDirectCount: question_data?.Question?.stats?.forDirectCount,
-        againstDirectCount: question_data?.Question?.stats?.againstDirectCount,
-        ...(!!editVote_data?.editVote?.QuestionStats) && {
-            forCount: editVote_data?.editVote?.QuestionStats.forCount,
-            againstCount: editVote_data?.editVote?.QuestionStats.againstCount,
-            forDirectCount: editVote_data?.editVote?.QuestionStats.forDirectCount,
-            againstDirectCount: editVote_data?.editVote?.QuestionStats.againstDirectCount,
-        }
-    });
-
-    const forRepresentatives = question_data?.Question?.userVote?.representatives.filter((r: any) => r.position === 'for');
-    const againstRepresentatives = question_data?.Question?.userVote?.representatives.filter((r: any) => r.position === 'against');
 
     return question_loading ? (
         <div className="d-flex justify-content-center mt-5">
@@ -291,11 +236,6 @@ export default function Question() {
                 {(!section || section === 'timeline') && (
                     <QuestionVotes />
                 )}
-
-                {/* // VoteTimeline.map((l, i) => (
-                //     <Notification v={{ ...l, poll: null }} showChart={false} />
-                // ))} */}
-
 
                 {(section === 'conversation') && (
                     <DiscussionEmbed

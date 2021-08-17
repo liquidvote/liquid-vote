@@ -1,0 +1,25 @@
+.popper-content-wrapper
+    position: absolute
+    display: none
+    bottom: 40px
+    left: -5px
+    color: #0b414d
+    background: #0fded5
+    width: max-content
+    padding: 9px
+    border-radius: 6px
+
+    &:before
+        content: ''
+        position: absolute
+        left: 10px
+        bottom: -10px
+        width: 0
+        height: 0
+        border-left: 10px solid transparent
+        border-right: 10px solid transparent
+        border-top: 10px solid #0fded5
+        clear: both
+
+    &.is-visible
+        display: block

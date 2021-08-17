@@ -14,13 +14,15 @@ export const VoteResolvers = {
                 thisUserIsAdmin: Vote.createdBy === AuthUser?.LiquidUser?.handle,
             };
         },
-        Votes: async (_source, { handle, handleType = 'user', type = 'directVotesMade' }, { mongoDB, s3, AuthUser }) => {
+        Votes: async (_source, { handle, handleType = 'user', type = 'directVotesMade', sortBy }, { mongoDB, s3, AuthUser }) => {
 
             const User = handleType === 'user' && await mongoDB.collection("Users")
                 .findOne({ 'LiquidUser.handle': handle });
 
             console.log({
-                type
+                type,
+                authUserId: AuthUser?._id,
+                sortBy
             });
 
             const votesInCommonGeneralAggregationLogic = (
@@ -96,15 +98,6 @@ export const VoteResolvers = {
                             'as': 'yourVote'
                         }
                     },
-                    // {
-                    //     '$match': {
-                    //         'yourVote': {
-                    //             '$gte': {
-                    //                 '$size': 1
-                    //             }
-                    //         }
-                    //     }
-                    // },
                     {
                         '$addFields': {
                             'yourVote': {
@@ -171,21 +164,27 @@ export const VoteResolvers = {
                                 }
                             },
                             'yourVoteMadeForUser': {
-                                '$gte': [
-                                    {
-                                        '$size': {
-                                            '$filter': {
-                                                'input': '$representatives',
-                                                'as': 'r',
-                                                'cond': {
-                                                    '$eq': [
-                                                        '$$r.representativeId', ObjectID(AuthUser?._id)
-                                                    ]
+                                $cond: {
+                                    if: { $eq: ["$isDirect", true] },
+                                    then: false,
+                                    else: {
+                                        '$gte': [
+                                            {
+                                                '$size': {
+                                                    '$filter': {
+                                                        'input': '$representatives',
+                                                        'as': 'r',
+                                                        'cond': {
+                                                            '$eq': [
+                                                                '$$r.representativeId', ObjectID(AuthUser?._id)
+                                                            ]
+                                                        }
+                                                    }
                                                 }
-                                            }
-                                        }
-                                    }, 1
-                                ]
+                                            }, 1
+                                        ]
+                                    }
+                                }
                             }
                         }
                     },
@@ -287,6 +286,9 @@ export const VoteResolvers = {
                             ],
                             'as': 'representeeVotes'
                         }
+                    },
+                    {
+                        '$addFields': { 'representeeCount': { $size: "$representeeVotes" } }
                     }
                 ]
             );
@@ -397,10 +399,24 @@ export const VoteResolvers = {
                 ]
             );
 
+            const sortLogic = (
+                [
+                    ...(sortBy === 'weight') ? [
+                        {
+                            '$sort': { representeeCount: -1 }
+                        }
+                    ] : [],
+                    ...(sortBy === 'time') ? [
+                        {
+                            '$sort': { lastEditOn: -1 }
+                        }
+                    ] : []
+                ]
+            )
+
             const Votes = await (async (type) => {
                 return {
                     'directVotesMade': async () => await mongoDB.collection("Votes")
-                        // .find({ 'user': ObjectID(User?._id), 'isDirect': true })
                         .aggregate([
                             ...votesInCommonGeneralAggregationLogic,
                             {
@@ -409,6 +425,7 @@ export const VoteResolvers = {
                                 }
                             },
                             ...representeeVotesAggregationLogic,
+                            ...sortLogic,
                             ...questionStatsAggregationLogic,
                             ...userObjectAggregationLogic
                         ])
@@ -424,6 +441,7 @@ export const VoteResolvers = {
                                 }
                             },
                             ...representeeVotesAggregationLogic,
+                            ...sortLogic,
                             ...questionStatsAggregationLogic,
                             ...userObjectAggregationLogic
                         ])
@@ -439,6 +457,7 @@ export const VoteResolvers = {
                                 }
                             },
                             ...representeeVotesAggregationLogic,
+                            ...sortLogic,
                             ...questionStatsAggregationLogic,
                             ...userObjectAggregationLogic
                         ])
@@ -448,6 +467,7 @@ export const VoteResolvers = {
                         .aggregate([
                             ...votesInCommonGeneralAggregationLogic,
                             ...representeeVotesAggregationLogic,
+                            ...sortLogic,
                             ...representeeVotesAsList,
                             ...questionStatsAggregationLogic
                         ])
@@ -475,6 +495,7 @@ export const VoteResolvers = {
                                 }
                             },
                             ...representeeVotesAggregationLogic,
+                            ...sortLogic,
                             ...questionStatsAggregationLogic,
                             ...userObjectAggregationLogic
                         ])
@@ -488,6 +509,7 @@ export const VoteResolvers = {
                                 }
                             },
                             ...representeeVotesAggregationLogic,
+                            ...sortLogic,
                             ...questionStatsAggregationLogic,
                             ...userObjectAggregationLogic
                         ])
@@ -503,6 +525,7 @@ export const VoteResolvers = {
                                 }
                             },
                             ...representeeVotesAggregationLogic,
+                            ...sortLogic,
                             ...questionStatsAggregationLogic,
                             ...userObjectAggregationLogic
                         ])

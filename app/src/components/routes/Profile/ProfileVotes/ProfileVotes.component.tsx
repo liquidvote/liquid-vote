@@ -1,4 +1,4 @@
-import React, { FunctionComponent, useMemo } from 'react';
+import React, { FunctionComponent, useState } from 'react';
 import { Link, useParams } from "react-router-dom";
 import { useQuery, useMutation } from "@apollo/client";
 
@@ -7,12 +7,17 @@ import { USER, USER_VOTES } from "@state/User/typeDefs";
 import { VOTES } from "@state/Vote/typeDefs";
 import Notification from '@shared/Notification';
 import { VoteTimeline } from "@state/Mock/Notifications";
+import Popper from "@shared/Popper";
+import SortSmallSvg from "@shared/Icons/Sort-small.svg";
+import VoteSortPicker from '@components/shared/VoteSortPicker';
 
 import './style.sass';
 
 export const ProfileVotes: FunctionComponent<{}> = ({ }) => {
 
     let { section, subsection, subsubsection, handle } = useParams<any>();
+
+    const [sortBy, setSortBy] = useState('weight');
 
     const {
         loading: authUser_loading,
@@ -62,7 +67,7 @@ export const ProfileVotes: FunctionComponent<{}> = ({ }) => {
         data: user_votes_data,
         refetch: user_votes_refetch
     } = useQuery(VOTES, {
-        variables: { handle, handleType: 'user', type }
+        variables: { handle, handleType: 'user', type, sortBy }
     });
 
     return (
@@ -77,6 +82,9 @@ export const ProfileVotes: FunctionComponent<{}> = ({ }) => {
                     <Link className={`nav-link ${subsection === 'represented' && 'active'}`} to={`/profile/${handle}/votes/represented`}>
                         <b>{profile?.stats?.indirectVotesMadeByUser}</b> Represented Votes
                     </Link>
+                </li>
+                <li className="px-4 mt-1">
+                    <VoteSortPicker updateSortInParent={setSortBy} />
                 </li>
             </ul>
             <hr className="mt-n4" />
@@ -114,12 +122,12 @@ export const ProfileVotes: FunctionComponent<{}> = ({ }) => {
                         </li>
                         <li className="nav-item">
                             <Link className={`nav-link ${subsubsection === 'byyou' && 'active'}`} to={`/profile/${handle}/votes/represented/byyou`}>
-                                <b>{profile?.yourStats?.indirectVotesMadeByYou}</b> By you - indirectVotesMadeByYou
+                                <b>{profile?.yourStats?.indirectVotesMadeByYou}</b> By you
                             </Link>
                         </li>
                         <li className="nav-item">
                             <Link className={`nav-link ${subsubsection === 'foryou' && 'active'}`} to={`/profile/${handle}/votes/represented/foryou`}>
-                                <b>{profile?.yourStats?.indirectVotesMadeForYou}</b> For you - indirectVotesMadeForYou
+                                <b>{profile?.yourStats?.indirectVotesMadeForYou}</b> For you
                             </Link>
                         </li>
                     </ul>
@@ -138,7 +146,7 @@ export const ProfileVotes: FunctionComponent<{}> = ({ }) => {
                                 return 'hasn\'t agreed with you on any polls';
                             } else if (type === 'directVotesInDisagreement') {
                                 return 'hasn\'t disagreed with you on any polls';
-                            } else if (type === 'indirectVotesMadeByUser') {
+                            } else if (type === 'indirectVotesMade') {
                                 return 'hasn\'t represented anyone on any polls'
                             } else if (type === 'indirectVotesMadeByYou') {
                                 return 'hasn\'t been represented by you on any polls';
@@ -175,12 +183,12 @@ export const ProfileVotes: FunctionComponent<{}> = ({ }) => {
                 </>
             ))}
 
-            <br />
+            {/* <br />
             <br />
             <pre style={{ color: "white" }}>
                 {JSON.stringify(profile?.stats, null, 2)}
                 {JSON.stringify(profile?.yourStats, null, 2)}
-            </pre>
+            </pre> */}
 
         </>
     );

@@ -1,4 +1,4 @@
-import React, { FunctionComponent, useMemo } from 'react';
+import React, { FunctionComponent, useState } from 'react';
 import { Link, useParams } from "react-router-dom";
 import { useQuery, useMutation } from "@apollo/client";
 
@@ -6,13 +6,15 @@ import { AUTH_USER } from "@state/AuthUser/typeDefs";
 import { GROUP } from "@state/Group/typeDefs";
 import { VOTES } from "@state/Vote/typeDefs";
 import Notification from '@shared/Notification';
-import { VoteTimeline } from "@state/Mock/Notifications";
+import VoteSortPicker from '@components/shared/VoteSortPicker';
 
 import './style.sass';
 
 export const GroupVotes: FunctionComponent<{ selectedChannels: any }> = ({ selectedChannels }) => {
 
     let { section, subsection, subsubsection, handle } = useParams<any>();
+
+    const [sortBy, setSortBy] = useState('representing');
 
     const {
         loading: authUser_loading,
@@ -57,7 +59,7 @@ export const GroupVotes: FunctionComponent<{ selectedChannels: any }> = ({ selec
         data: votes_data,
         refetch: votes_refetch
     } = useQuery(VOTES, {
-        variables: { handle, handleType: 'group', type }
+        variables: { handle, handleType: 'group', type, sortBy }
     });
 
     console.log({
@@ -82,6 +84,9 @@ export const GroupVotes: FunctionComponent<{ selectedChannels: any }> = ({ selec
                         <b>{group_data?.Group?.stats?.indirectVotesMade}</b> Represented Votes
                     </Link>
                 </li>
+                <li className="px-4 mt-1">
+                    <VoteSortPicker updateSortInParent={setSortBy} />
+                </li>
             </ul>
             <hr className="mt-n4" />
 
@@ -105,7 +110,7 @@ export const GroupVotes: FunctionComponent<{ selectedChannels: any }> = ({ selec
                         </li>
                         <li className="nav-item">
                             <Link className={`nav-link ${subsubsection === 'byYou' && 'active'}`} to={`/group/${handle}/votes/direct/byYou`}>
-                                <b >{group_data?.Group?.yourStats?.directVotesMade}</b> by You
+                                <b>{group_data?.Group?.yourStats?.directVotesMade}</b> by You
                             </Link>
                         </li>
                     </ul>
@@ -123,12 +128,12 @@ export const GroupVotes: FunctionComponent<{ selectedChannels: any }> = ({ selec
                         </li>
                         <li className="nav-item">
                             <Link className={`nav-link ${subsubsection === 'byyou' && 'active'}`} to={`/group/${handle}/votes/represented/byyou`}>
-                                <b>{group_data?.Group?.yourStats?.indirectVotesMadeByYou}</b> By you - indirectVotesMadeByYou
+                                <b>{group_data?.Group?.yourStats?.indirectVotesMadeByYou}</b> By you
                             </Link>
                         </li>
                         <li className="nav-item">
                             <Link className={`nav-link ${subsubsection === 'foryou' && 'active'}`} to={`/group/${handle}/votes/represented/foryou`}>
-                                <b>{group_data?.Group?.yourStats?.indirectVotesMadeForYou}</b> For you - indirectVotesMadeForYou
+                                <b>{group_data?.Group?.yourStats?.indirectVotesMadeForYou}</b> For you
                             </Link>
                         </li>
                     </ul>
@@ -147,12 +152,12 @@ export const GroupVotes: FunctionComponent<{ selectedChannels: any }> = ({ selec
                                 return 'no one agreed with you on any polls';
                             } else if (type === 'directVotesInDisagreement') {
                                 return 'no one disagreed with you on any polls';
-                            } else if (type === 'indirectVotesMadeForUser') {
+                            } else if (type === 'indirectVotesMade') {
                                 return 'no one has been represented on any polls'
                             } else if (type === 'indirectVotesMadeByYou') {
                                 return 'no one has been represented by you on any polls';
                             } else if (type === 'indirectVotesMadeForYou') {
-                                return 'no one has been represented you on any polls';
+                                return 'no one has represented you on any polls';
                             } else if (type === 'directVotesMadeByYou') {
                                 return 'you haven\'t made any votes';
                             }
@@ -186,12 +191,12 @@ export const GroupVotes: FunctionComponent<{ selectedChannels: any }> = ({ selec
                 </>
             ))}
 
-            <br />
+            {/* <br />
             <br />
             <pre style={{ color: "white" }}>
                 {JSON.stringify(group_data?.Group?.stats, null, 2)}
                 {JSON.stringify(group_data?.Group?.yourStats, null, 2)}
-            </pre>
+            </pre> */}
         </>
     );
 }

@@ -386,38 +386,59 @@ const getYourGroupStats = async ({ groupId, groupHandle, AuthUser, mongoDB }) =>
                             ]
                         },
                         'otherVoteMadeByYou': {
-                            '$gte': [
-                                {
-                                    '$size': {
-                                        '$filter': {
-                                            'input': '$otherVote.representatives',
-                                            'as': 'r',
-                                            'cond': {
-                                                '$eq': [
-                                                    '$$r.representativeId', ObjectID(AuthUser?._id)
-                                                ]
+                            $cond: {
+                                if: { $eq: ["$isDirect", true] },
+                                then: false,
+                                else: {
+                                    '$gte': [
+                                        {
+                                            '$size': {
+                                                '$filter': {
+                                                    'input': '$representatives',
+                                                    'as': 'r',
+                                                    'cond': {
+                                                        '$eq': [
+                                                            '$$r.representativeId', ObjectID(AuthUser?._id)
+                                                        ]
+                                                    }
+                                                }
                                             }
-                                        }
-                                    }
-                                }, 1
-                            ]
+                                        }, 1
+                                    ]
+                                }
+                            }
                         },
                         'otherVoteMadeForYou': {
-                            '$gte': [
-                                {
-                                    '$size': {
-                                        '$filter': {
-                                            'input': '$representatives',
-                                            'as': 'r',
-                                            'cond': {
-                                                '$eq': [
-                                                    '$$r.representativeId', ObjectID(AuthUser?._id)
-                                                ]
+                            $cond: {
+                                if: {
+                                    '$or': [
+                                        { $not: ["$otherVote"] },
+                                        { $eq: ["$otherVote.isDirect", true] }
+                                    ]
+                                },
+                                then: false,
+                                else: {
+                                    '$gte': [
+                                        {
+                                            '$size': {
+                                                '$filter': {
+                                                    'input': '$otherVote.representatives',
+                                                    'as': 'r',
+                                                    'cond': {
+                                                        '$and': [
+                                                            {
+                                                                '$eq': [
+                                                                    '$$r.representativeId', '$user'
+                                                                ]
+                                                            }
+                                                        ]
+                                                    }
+                                                }
                                             }
-                                        }
-                                    }
-                                }, 1
-                            ]
+                                        }, 1
+                                    ]
+                                }
+                            }
                         }
                     }
                 }, {

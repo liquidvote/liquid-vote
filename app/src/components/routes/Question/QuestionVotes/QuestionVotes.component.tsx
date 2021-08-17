@@ -9,6 +9,7 @@ import SortSmallSvg from "@shared/Icons/Sort-small.svg";
 
 import { QUESTION, QUESTION_VOTERS } from '@state/Question/typeDefs';
 import Popper from "@shared/Popper";
+import VoteSortPicker from '@components/shared/VoteSortPicker';
 
 import './style.sass';
 
@@ -116,17 +117,7 @@ export const QuestionVotes: FunctionComponent<{}> = ({ }) => {
                     )
                 }
                 <li className="px-4 mt-1">
-                    <Popper
-                        button={<div>
-                            <SortSmallSvg />{' '}by {sortBy}
-                        </div>}
-                        popperContent={
-                            <ul className="p-0 m-0">
-                                <li className="pointer" onClick={() => setSortBy('weight')}>weight</li>
-                                <li className="pointer" onClick={() => setSortBy('time')}>time</li>
-                            </ul>
-                        }
-                    />
+                    <VoteSortPicker updateSortInParent={setSortBy} />
                 </li>
             </ul>
             <hr className="mt-n4" />
