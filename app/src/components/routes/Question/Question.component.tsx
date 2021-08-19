@@ -112,6 +112,16 @@ export default function Question() {
                             )}
                             <div
                                 className={`button_ small mx-1`}
+                                onClick={() => updateParams({
+                                    paramsToAdd: {
+                                        modal: "InviteFor",
+                                        modalData: JSON.stringify({
+                                            InviteType: 'toVote',
+                                            // handle: profile.handle,
+                                            name: voteName
+                                        })
+                                    }
+                                })}
                             >Invite to Vote 🧪</div>
                         </div>
                         <small data-tip="Created on">

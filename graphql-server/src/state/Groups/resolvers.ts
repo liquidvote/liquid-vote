@@ -2,7 +2,7 @@ import { ObjectID } from 'mongodb';
 
 export const GroupResolvers = {
     Query: {
-        Group: async (_source, { handle }, { mongoDB, s3, AuthUser }) => {
+        Group: async (_source, { handle }, { mongoDB, AuthUser }) => {
 
             const Group = await mongoDB.collection("Groups")
                 .findOne({ 'handle': handle });
@@ -34,7 +34,7 @@ export const GroupResolvers = {
                 }),
             };
         },
-        GroupMembers: async (_source, { handle }, { mongoDB, s3, AuthUser }) => {
+        GroupMembers: async (_source, { handle }, { mongoDB, AuthUser }) => {
 
             const Group = await mongoDB.collection("Groups")
                 .findOne({ 'handle': handle });
@@ -57,7 +57,7 @@ export const GroupResolvers = {
 
             return Members;
         },
-        GroupQuestions: async (_source, { handle, channels }, { mongoDB, s3, AuthUser }) => {
+        GroupQuestions: async (_source, { handle, channels }, { mongoDB, AuthUser }) => {
 
             const Questions = await mongoDB.collection("Questions")
                 .find({ 'groupChannel.group': handle })
@@ -68,7 +68,7 @@ export const GroupResolvers = {
                 thisUserIsAdmin: q.createdBy === AuthUser?.LiquidUser?.handle,
             }));
         },
-        Groups: async (_source, { userHandle }, { mongoDB, s3, AuthUser }) => {
+        Groups: async (_source, { userHandle }, { mongoDB, AuthUser }) => {
 
             const User = await mongoDB.collection("Users")
                 .findOne({ 'LiquidUser.handle': userHandle });
@@ -98,7 +98,7 @@ export const GroupResolvers = {
         },
     },
     Mutation: {
-        editGroup: async (_source, { Group, handle }, { mongoDB, s3, AuthUser }) => {
+        editGroup: async (_source, { Group, handle }, { mongoDB, AuthUser }) => {
 
             const Group_ = await mongoDB.collection("Groups")
                 .findOne({ 'handle': handle });

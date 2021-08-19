@@ -67,6 +67,7 @@ export const UserTypeDefs = gql`
             handle: String,
             type: String
         ):  [Vote]
+        # UserRelatedUsers(groupHandle: String) : [User]
     }
 
     extend type Mutation {
