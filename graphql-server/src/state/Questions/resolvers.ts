@@ -2,7 +2,7 @@ import { ObjectID } from 'mongodb';
 
 export const QuestionResolvers = {
     Query: {
-        Question: async (_source, { questionText, group, channel }, { mongoDB, s3, AuthUser }) => {
+        Question: async (_source, { questionText, group, channel }, { mongoDB, AuthUser }) => {
 
             const Question = await mongoDB.collection("Questions")
                 .findOne({
@@ -43,7 +43,7 @@ export const QuestionResolvers = {
         Questions: async (_source, {
             group,
             channels
-        }, { mongoDB, s3, AuthUser }) => {
+        }, { mongoDB, AuthUser }) => {
 
             const Questions = await mongoDB.collection("Questions")
                 .find({ 'groupChannel.group': group })
@@ -77,7 +77,7 @@ export const QuestionResolvers = {
         },
         QuestionVoters: async (_source, {
             questionText, group, channel, typeOfVoter, sortBy
-        }, { mongoDB, s3, AuthUser }) => {
+        }, { mongoDB, AuthUser }) => {
 
             const Question = await mongoDB.collection("Questions")
                 .findOne({
@@ -355,7 +355,7 @@ export const QuestionResolvers = {
         editQuestion: async (_source, {
             Question, questionText, group, channel
         }, {
-            mongoDB, s3, AuthUser
+            mongoDB, AuthUser
         }) => {
 
             const Question_ = await mongoDB.collection("Questions")

@@ -3,21 +3,22 @@ import { gql } from "apollo-server";
 export const InviteTypeDefs = gql`
 
     type Invite {
-        toWhat: String # Group | Representation | Vote
-        toWhom: String
-        fromWhom: String
+        toWhat: String # Group | Representation | Vote | GroupAdmin
+        toWhom: ToWhom
+        fromWhom: User
         isAccepted: Boolean
-        Object: InviteObject
+        group: Group
+        question: Question
+        status: String # sent | accepted | canceled
 
+        lastSentOn: String
         createdOn: String
         lastEditOn: String
     }
 
-    type InviteObject {
-        id: String
-        handle: String
-        name: String
-        avatar: String
+    type ToWhom {
+        user: User
+        email: String 
     }
 
     extend type Query {

@@ -142,7 +142,7 @@ export const Group: FunctionComponent<{}> = ({ }) => {
         </div>
     ) : group_error ? (<>Error</>) : (
         <>
-            <Header title={selectedGroup?.name} />
+            <Header title={selectedGroup?.name} iconType="group" />
 
             <div className="profile-top">
                 <div
@@ -168,7 +168,19 @@ export const Group: FunctionComponent<{}> = ({ }) => {
                     <p className="profile-handle">@{selectedGroup?.handle}</p>
                 </div>
                 <div className="d-flex mb-1 ml-n1">
-                    <div className="button_ small mb-0">
+                    <div
+                        className="button_ small mb-0"
+                        onClick={() => updateParams({
+                            paramsToAdd: {
+                                modal: "InviteFor",
+                                modalData: JSON.stringify({
+                                    InviteType: 'toGroup',
+                                    handle: selectedGroup.handle,
+                                    name: selectedGroup.name
+                                })
+                            }
+                        })}
+                    >
                         Invite
                     </div>
                     {
@@ -298,8 +310,8 @@ export const Group: FunctionComponent<{}> = ({ }) => {
                     <GroupPolls selectedChannels={selectedChannels} />
                 </div>
             )}
-            {(section === 'votes') &&  (
-                <GroupVotes selectedChannels={selectedChannels}  />
+            {(section === 'votes') && (
+                <GroupVotes selectedChannels={selectedChannels} />
             )}
 
         </>

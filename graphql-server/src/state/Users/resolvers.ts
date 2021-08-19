@@ -4,7 +4,7 @@ import { getGroupStats } from '../Groups/resolvers';
 
 export const UserResolvers = {
     Query: {
-        User: async (_source, { handle }, { mongoDB, s3, AuthUser }) => {
+        User: async (_source, { handle }, { mongoDB, AuthUser }) => {
 
             const User = await mongoDB.collection("Users")
                 .findOne({ 'LiquidUser.handle': handle });
@@ -25,20 +25,21 @@ export const UserResolvers = {
             };
         },
 
-        SearchUsers: async (_source, { text }, { mongoDB, s3, AuthUser }) => {
+        SearchUsers: async (_source, { text }, { mongoDB, AuthUser }) => {
 
             const Users = await mongoDB.collection("Users")
                 .find({
                     $or: [
                         { 'LiquidUser.handle': { $regex: text, $options: "i" } },
                         { 'LiquidUser.name': { $regex: text, $options: "i" } },
+                        { 'LiquidUser.email': text },
                     ],
                 }).toArray();
 
             return Users?.map(u => u.LiquidUser) || [];
         },
 
-        UserRepresenting: async (_source, { handle, groupHandle }, { mongoDB, s3, AuthUser }) => {
+        UserRepresenting: async (_source, { handle, groupHandle }, { mongoDB, AuthUser }) => {
 
             const User = await mongoDB.collection("Users")
                 .findOne({ 'LiquidUser.handle': handle });
@@ -97,7 +98,7 @@ export const UserResolvers = {
         UserRepresentedBy: async (
             _source,
             { handle, groupHandle },
-            { mongoDB, s3, AuthUser }
+            { mongoDB, AuthUser }
         ) => {
             const User = await mongoDB.collection("Users")
                 .findOne({ 'LiquidUser.handle': handle });
@@ -153,7 +154,7 @@ export const UserResolvers = {
             return representativesAndGroups;
         },
 
-        UserGroups: async (_source, { handle, representative }, { mongoDB, s3, AuthUser }) => {
+        UserGroups: async (_source, { handle, representative }, { mongoDB, AuthUser }) => {
 
             const User = await mongoDB.collection("Users")
                 .findOne({ 'LiquidUser.handle': handle });
@@ -224,7 +225,7 @@ export const UserResolvers = {
 
             return Groups;
         },
-        UserVotes: async (_source, { handle, type = 'directVotesMade' }, { mongoDB, s3, AuthUser }) => {
+        UserVotes: async (_source, { handle, type = 'directVotesMade' }, { mongoDB, AuthUser }) => {
 
             const User = await mongoDB.collection("Users")
                 .findOne({ 'LiquidUser.handle': handle });
@@ -577,7 +578,7 @@ export const UserResolvers = {
         },
     },
     Mutation: {
-        editUser: async (_source, { User }, { mongoDB, s3, AuthUser }) => {
+        editUser: async (_source, { User }, { mongoDB, AuthUser }) => {
 
             const updated = (AuthUser && User) ? (
                 await mongoDB.collection("Users").findOneAndUpdate(
@@ -608,7 +609,7 @@ export const UserResolvers = {
             GroupHandle,
             Channels,
             IsMember
-        }, { mongoDB, s3, AuthUser }) => {
+        }, { mongoDB, AuthUser }) => {
 
             const isUser = !!AuthUser && AuthUser?.LiquidUser?.handle === UserHandle;
 
@@ -654,7 +655,7 @@ export const UserResolvers = {
             RepresentativeHandle,
             Group,
             IsRepresentingYou
-        }, { mongoDB, s3, AuthUser }) => {
+        }, { mongoDB, AuthUser }) => {
 
             const isUser = AuthUser?.LiquidUser?.handle === RepresenteeHandle;
 

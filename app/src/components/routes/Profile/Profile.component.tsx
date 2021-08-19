@@ -90,8 +90,12 @@ export const Profile: FunctionComponent<{}> = ({ }) => {
                             <div
                                 onClick={() => updateParams({
                                     paramsToAdd: {
-                                        modal: "InviteForRepresentation",
-                                        modalData: JSON.stringify({ userHandle: profile.handle })
+                                        modal: "InviteFor",
+                                        modalData: JSON.stringify({
+                                            InviteType: 'toGroup',
+                                            handle: profile.handle,
+                                            name: profile.name
+                                        })
                                     }
                                 })}
                                 className={`button_ small mr-1`}

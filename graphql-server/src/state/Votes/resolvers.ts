@@ -4,7 +4,7 @@ import { updateQuestionVotingStats } from '../Questions/resolvers';
 
 export const VoteResolvers = {
     Query: {
-        Vote: async (_source, { questionText, group, channel }, { mongoDB, s3, AuthUser }) => {
+        Vote: async (_source, { questionText, group, channel }, { mongoDB, AuthUser }) => {
 
             const Vote = await mongoDB.collection("Votes")
                 .findOne({ questionText, group, channel });
@@ -14,7 +14,7 @@ export const VoteResolvers = {
                 thisUserIsAdmin: Vote.createdBy === AuthUser?.LiquidUser?.handle,
             };
         },
-        Votes: async (_source, { handle, handleType = 'user', type = 'directVotesMade', sortBy }, { mongoDB, s3, AuthUser }) => {
+        Votes: async (_source, { handle, handleType = 'user', type = 'directVotesMade', sortBy }, { mongoDB, AuthUser }) => {
 
             const User = handleType === 'user' && await mongoDB.collection("Users")
                 .findOne({ 'LiquidUser.handle': handle });
@@ -558,7 +558,7 @@ export const VoteResolvers = {
         editVote: async (_source, {
             Vote, questionText, choiceText, group, channel
         }, {
-            mongoDB, s3, AuthUser
+            mongoDB, AuthUser
         }) => {
 
             const Vote_ = !!AuthUser && await mongoDB.collection("Votes")

@@ -72,22 +72,6 @@ export const SingleVoteInList: FunctionComponent<{
                         />
                     </div>
                 </div>
-
-                <div className="d-flex justify-content-center">
-                    {/* {l.thisUserIsAdmin && (
-                        <>
-                            <div
-                                onClick={() => alert('soon')}
-                                className={`button_ small mx-1`}
-                            >Edit</div>
-                        </>
-                    )} */}
-                    <div
-                        title="Invite to vote"
-                        className={`pointer mx-1`}
-                        onClick={() => alert('Invite to vote - soon')}
-                    ><ProfilePlus /> 🧪</div>
-                </div>
             </div>
         );
     }
