@@ -93,8 +93,8 @@ export const Profile: FunctionComponent<{}> = ({ }) => {
                                         modal: "InviteFor",
                                         modalData: JSON.stringify({
                                             InviteType: 'toGroup',
-                                            handle: profile.handle,
-                                            name: profile.name
+                                            profileHandle: profile.handle,
+                                            profileName: profile.name
                                         })
                                     }
                                 })}

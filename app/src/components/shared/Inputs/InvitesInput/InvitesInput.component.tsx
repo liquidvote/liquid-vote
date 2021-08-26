@@ -8,6 +8,7 @@ import { useQuery, useMutation } from "@apollo/client";
 
 import { INVITES, EDIT_INVITE } from "@state/Invites/typeDefs";
 import { SEARCH_USERS } from "@state/User/typeDefs";
+import ProfilePlus from '@shared/Icons/Profile+-small.svg';
 
 import './style.sass';
 
@@ -20,7 +21,10 @@ type Props = {
     error?: FieldError | undefined,
     disabled?: boolean,
     autoFocus?: boolean,
-    setValue: any
+    setValue: any,
+    groupHandle?: string,
+    userHandle?: string,
+    questionText?: string
 }
 
 export const InvitesInput: FunctionComponent<Props> = ({
@@ -31,7 +35,10 @@ export const InvitesInput: FunctionComponent<Props> = ({
     error,
     disabled,
     autoFocus,
-    setValue
+    setValue,
+    groupHandle,
+    userHandle,
+    questionText
 }) => {
 
     const [editInvite, {
@@ -45,13 +52,32 @@ export const InvitesInput: FunctionComponent<Props> = ({
     const [userSearch, setUserSearch] = useState('');
 
     const {
+        loading: invites_loading,
+        error: invites_error,
+        data: invites_data,
+        refetch: invites_refetch
+    } = useQuery(INVITES, {
+        variables: {
+            groupHandle,
+            // inviterUserHandle,
+            // invitedUserHandle,
+        }
+    });
+
+    console.log({
+        invites_data
+    });
+
+    const {
         loading: searchUsers_loading,
         error: searchUsers_error,
         data: searchUsers_data,
         refetch: searchUsers_refetch
     } = useQuery(SEARCH_USERS, {
-        variables: { text: userSearch },
-        // skip: !userSearch
+        variables: {
+            text: userSearch,
+            // notInGroup: groupHandle
+        }
     });
 
     console.log({
@@ -74,19 +100,21 @@ export const InvitesInput: FunctionComponent<Props> = ({
         editInvite({
             variables: {
                 Invite: {
-                    toWhat: 'group',
+                    toWhat: {
+                        type: 'group',
+                        group: groupHandle,
+                        question: questionText,
+                        user: userHandle
+                    },
                     toWhom: {
                         user: u.handle,
-                        email: u.email
-                        group
-                        question
-                    }
+                        email: u.email,
+                    },
                 }
             }
         }).then(r => {
-            console.log({
-                r
-            })
+            setTimeout(() => invites_refetch(), 100);
+            setTimeout(() => invites_refetch(), 1000);
         });;
     }
 
@@ -102,22 +130,60 @@ export const InvitesInput: FunctionComponent<Props> = ({
             </div> */}
             <div className="inputElementWrapper">
                 <ul className="adminsInputList">
-                    {value?.map((v: any, i: Number) => (
-                        <li key={v.name + i} className="d-flex mb-2 position-relative">
-                            <div>
-                                <img className="vote-avatar" src={v.avatar} />
-                            </div>
-                            <div className="ml-2">
-                                <p className="m-0">{v.name}</p>
-                                <small>@{v.handle}</small>
-                            </div>
-                            {v.sending && (
-                                <div className="ml-auto">
-                                    <small className="badge">sending</small>
+                    {invites_data?.Invites?.map((invite: any, i: number) => {
+
+                        const invitee = invite?.toWhom?.user;
+
+                        return (
+                            <li key={invitee.name + i} className="d-flex mb-2 position-relative">
+                                <div>
+                                    <img className="vote-avatar" src={invitee.avatar} />
                                 </div>
-                            )}
-                        </li>
-                    ))}
+                                <div className="ml-2">
+                                    <p className="m-0">{invitee.name}</p>
+                                    <small>@{invitee.handle}</small>
+                                </div>
+                                <div className="ml-auto">
+                                    <small className="badge">{invite.status}</small>
+                                </div>
+                            </li>
+                        )
+                    })}
+                    {value?.
+                        filter(
+                            u => !invites_data?.Invites?.find(a => a.toWhom?.user.handle === u.handle)
+                        )
+                        .map((v: any, i: Number) => (
+                            <li key={v.name + i} className="d-flex mb-2 position-relative">
+                                <div>
+                                    {!!v.email ? (
+                                        <div className="vote-avatar border-0 p-1">
+                                            <ProfilePlus />
+                                        </div>
+                                    ) : (
+                                        <img className="vote-avatar" src={v.avatar} />
+                                    )}
+                                </div>
+                                <div className="ml-2">
+                                    {!!v.email ? (
+                                        <>
+                                            <p className="m-0">{v.email}</p>
+                                            <small>new user</small>
+                                        </>
+                                    ) : (
+                                        <>
+                                            <p className="m-0">{v.name}</p>
+                                            <small>@{v.handle}</small>
+                                        </>
+                                    )}
+                                </div>
+                                {v.sending && (
+                                    <div className="ml-auto">
+                                        <small className="badge">sending</small>
+                                    </div>
+                                )}
+                            </li>
+                        ))}
                     <li>
                         <div className={
                             `
@@ -129,7 +195,7 @@ export const InvitesInput: FunctionComponent<Props> = ({
                             `
                         }>
                             <label>
-                                User name or handle, or new user's email
+                                e-mail, username or handle
                             </label>
                             <div className="inputElementWrapper">
                                 <input
@@ -145,8 +211,32 @@ export const InvitesInput: FunctionComponent<Props> = ({
                             </div>
                             {!!searchUsers_data && (
                                 <ul className="admin-search-results w-100 bg mt-2">
+                                    {
+                                        (
+                                            /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(userSearch) &&
+                                            !searchUsers_data?.SearchUsers?.length
+                                        ) ? (
+                                            <li
+                                                className="d-flex pointer"
+                                                onClick={() => sendInvite({ email: userSearch })}
+                                            >
+                                                <div>
+                                                    <div className="vote-avatar border-0 p-1">
+                                                        <ProfilePlus />
+                                                    </div>
+                                                </div>
+                                                <div className="ml-2">
+                                                    <p className="m-0">{userSearch}</p>
+                                                    <small>new user</small>
+                                                </div>
+                                                <div className="ml-auto">
+                                                    <small className="badge inverted">send invite</small>
+                                                </div>
+                                            </li>
+                                        ) : null}
                                     {searchUsers_data?.SearchUsers?.
                                         filter(u => !value.find(a => a.handle === u.handle)).
+                                        filter(u => !invites_data?.Invites?.find(a => a.toWhom?.user.handle === u.handle)).
                                         map(
                                             u => (
                                                 <li

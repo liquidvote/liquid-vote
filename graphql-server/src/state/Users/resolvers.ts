@@ -1,6 +1,7 @@
 import { ObjectID } from 'mongodb';
 
 import { getGroupStats } from '../Groups/resolvers';
+import { updateInviteStatus } from '../Invites/resolvers';
 
 export const UserResolvers = {
     Query: {
@@ -25,16 +26,84 @@ export const UserResolvers = {
             };
         },
 
-        SearchUsers: async (_source, { text }, { mongoDB, AuthUser }) => {
+        SearchUsers: async (_source, {
+            text,
+            notInGroup,
+            inGroup
+        }, { mongoDB, AuthUser }) => {
+
+            const Group = (notInGroup || inGroup) && await mongoDB.collection("Groups")
+                .findOne({ 'handle': notInGroup || inGroup });
 
             const Users = await mongoDB.collection("Users")
-                .find({
-                    $or: [
-                        { 'LiquidUser.handle': { $regex: text, $options: "i" } },
-                        { 'LiquidUser.name': { $regex: text, $options: "i" } },
-                        { 'LiquidUser.email': text },
-                    ],
-                }).toArray();
+                .aggregate([
+                    {
+                        '$match': {
+                            '$or': [
+                                {
+                                    'LiquidUser.handle': {
+                                        '$regex': text,
+                                        '$options': 'i'
+                                    }
+                                }, {
+                                    'LiquidUser.name': {
+                                        '$regex': text,
+                                        '$options': 'i'
+                                    }
+                                }, {
+                                    'LiquidUser.email': text
+                                }
+                            ]
+                        }
+                    },
+                    ...(notInGroup || inGroup) ? [
+                        {
+                            '$lookup': {
+                                'from': 'GroupMembers',
+                                'let': {
+                                    'memberId': '$_id'
+                                },
+                                'pipeline': [
+                                    {
+                                        '$match': {
+                                            '$and': [
+                                                {
+                                                    '$expr': {
+                                                        '$eq': [
+                                                            '$userId', '$$memberId'
+                                                        ]
+                                                    }
+                                                }, {
+                                                    '$expr': {
+                                                        '$eq': [
+                                                            '$groupId', ObjectID(Group?._id)
+                                                        ]
+                                                    }
+                                                }
+                                            ]
+                                        }
+                                    }
+                                ],
+                                'as': 'groupMemberRelation'
+                            }
+                        }, {
+                            '$addFields': {
+                                'isMember': {
+                                    '$gt': [
+                                        {
+                                            '$size': '$groupMemberRelation'
+                                        }, 0
+                                    ]
+                                }
+                            }
+                        }, {
+                            '$match': {
+                                'isMember': notInGroup ? false : true
+                            }
+                        }
+                    ] : [],
+                ])
+                .toArray();
 
             return Users?.map(u => u.LiquidUser) || [];
         },
@@ -608,8 +677,17 @@ export const UserResolvers = {
             UserHandle,
             GroupHandle,
             Channels,
-            IsMember
+            IsMember,
+            InviteId
         }, { mongoDB, AuthUser }) => {
+
+            console.log({
+                UserHandle,
+                GroupHandle,
+                Channels,
+                IsMember,
+                InviteId
+            })
 
             const isUser = !!AuthUser && AuthUser?.LiquidUser?.handle === UserHandle;
 
@@ -647,6 +725,14 @@ export const UserResolvers = {
                     lastEditOn: Date.now(),
                 })
             )?.ops[0] : null;
+
+            if (InviteId) {
+                updateInviteStatus({
+                    InviteId,
+                    to: 'accepted',
+                    mongoDB
+                })
+            }
 
             return updatedOrCreated;
         },
