@@ -175,8 +175,8 @@ export const Group: FunctionComponent<{}> = ({ }) => {
                                 modal: "InviteFor",
                                 modalData: JSON.stringify({
                                     InviteType: 'toGroup',
-                                    handle: selectedGroup.handle,
-                                    name: selectedGroup.name
+                                    groupHandle: selectedGroup.handle,
+                                    groupName: selectedGroup.name
                                 })
                             }
                         })}

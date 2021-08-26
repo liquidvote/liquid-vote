@@ -20,7 +20,7 @@ export const SideMenu: FunctionComponent<{}> = ({ }) => {
 
     const { allSearchParams, updateParams } = useSearchParams();
 
-    const { user, isAuthenticated, isLoading, loginWithRedirect, logout } = useAuth0();
+    const { user, isAuthenticated, isLoading, loginWithRedirect, logout, loginWithPopup } = useAuth0();
 
     const { loading: authUser_loading, error: authUser_error, data: authUser_data, refetch: authUser_refetch } = useQuery(AUTH_USER);
 
@@ -78,7 +78,9 @@ export const SideMenu: FunctionComponent<{}> = ({ }) => {
                         popperContent={
                             <ul className="p-0 m-0">
                                 <li><Link to={`/profile/${authUser?.LiquidUser?.handle}`}>Visit Profile</Link></li>
-                                <li className="pointer" onClick={() => logout({ returnTo: window.location.origin })}>Logout</li>
+                                <li className="pointer" onClick={() => logout({
+                                    returnTo: window.location.origin
+                                })}>Logout</li>
                             </ul>
                         }
                     />
@@ -100,7 +102,13 @@ export const SideMenu: FunctionComponent<{}> = ({ }) => {
             )}
             {!isAuthenticated && (
                 <>
-                    <div className="pointer" onClick={() => loginWithRedirect({ redirectUri: window.location.origin })} data-tip="Login">
+                    <div
+                        className="pointer"
+                        onClick={() => loginWithPopup({
+                            // redirectUri: window.location.origin
+                        })}
+                        data-tip="Login"
+                    >
                         <LoginIcon />
                     </div>
                 </>

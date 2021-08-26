@@ -118,7 +118,8 @@ export default function Question() {
                                         modalData: JSON.stringify({
                                             InviteType: 'toVote',
                                             // handle: profile.handle,
-                                            name: voteName
+                                            questionText: voteName,
+                                            groupHandle: question_data?.Question?.groupChannel.group
                                         })
                                     }
                                 })}

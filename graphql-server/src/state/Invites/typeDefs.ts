@@ -3,7 +3,7 @@ import { gql } from "apollo-server";
 export const InviteTypeDefs = gql`
 
     type Invite {
-        toWhat: String # Group | Representation | Vote | GroupAdmin
+        toWhat: ToWhat
         toWhom: ToWhom
         fromWhom: User
         isAccepted: Boolean
@@ -16,6 +16,13 @@ export const InviteTypeDefs = gql`
         lastEditOn: String
     }
 
+    type ToWhat {
+        type: String # group | representation | vote | groupAdmin
+        group: Group
+        question: Question
+        user: User
+    }
+
     type ToWhom {
         user: User
         email: String 
@@ -25,7 +32,6 @@ export const InviteTypeDefs = gql`
         Invite(handle: String): Invite
         Invites(
             groupHandle: String,
-            inviterUserHandle: String,
             invitedUserHandle: String
         ): [Invite]
     }

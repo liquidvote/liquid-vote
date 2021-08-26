@@ -22,6 +22,10 @@ export const InviteFor: FunctionComponent<{}> = ({ }) => {
     const { allSearchParams, updateParams } = useSearchParams();
     const modalData = JSON.parse(allSearchParams.modalData);
 
+    console.log({
+        modalData
+    });
+
     const {
         handleSubmit, register, formState: { errors }, watch, setValue
     } = useForm<IFormValues>({
@@ -54,8 +58,8 @@ export const InviteFor: FunctionComponent<{}> = ({ }) => {
             <ModalHeader
                 title={
                     modalData.InviteType === 'representation' ? `Invite others to be represented by you` :
-                        modalData.InviteType === 'toGroup' ? `Invite others to join ${modalData.name} Group` :
-                            modalData.InviteType === 'toVote' ? `Invite others to Vote on ${modalData.name}` :
+                        modalData.InviteType === 'toGroup' ? `Invite others to join ${modalData.groupName}` :
+                            modalData.InviteType === 'toVote' ? `Invite others to Vote on ${modalData.questionText}` :
                                 ''
                 }
                 // submitText={`Invite`}
@@ -75,6 +79,9 @@ export const InviteFor: FunctionComponent<{}> = ({ }) => {
                             value={watch(name)}
                             error={errors[name]}
                             setValue={setValue}
+                            groupHandle={modalData.groupHandle}
+                            userHandle={modalData.userHandle}
+                            questionText={modalData.questionText}
                         />
                     ))('invitedUsers')}
                 </div>

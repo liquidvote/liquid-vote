@@ -3,15 +3,25 @@ import { gql, useMutation } from '@apollo/client';
 export const INVITES = gql`
   query(
       $groupHandle: String
-      $inviterUserHandle: String
       $invitedUserHandle: String
     ) {
         Invites(
             groupHandle: $groupHandle
-            inviterUserHandle: $inviterUserHandle
             invitedUserHandle: $invitedUserHandle
         ) {
-            toWhat
+            toWhat {
+                type
+                group {
+                    handle
+                    name
+                }
+                question {
+                    questionText
+                }
+                user {
+                    ...user
+                }
+            }
             toWhom {
                 user {
                     ...user
@@ -22,13 +32,6 @@ export const INVITES = gql`
                 ...user
             }
             isAccepted
-            group {
-                handle
-                name
-            }
-            question {
-                questionText
-            }
             status
             lastSentOn
             createdOn
