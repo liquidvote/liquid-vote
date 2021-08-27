@@ -182,7 +182,7 @@ export const EditGroup: FunctionComponent<{}> = ({ }) => {
                     ))('cover')}
                 </div>
 
-                <div className="my-3">
+                {/* <div className="my-3">
                     {((name: keyof IFormValues) => (
                         <ChannelsInput
                             name={name}
@@ -194,7 +194,7 @@ export const EditGroup: FunctionComponent<{}> = ({ }) => {
                             setValue={setValue}
                         />
                     ))('channels')}
-                </div>
+                </div> */}
 
                 <div className="my-3">
                     {((name: keyof IFormValues) => (

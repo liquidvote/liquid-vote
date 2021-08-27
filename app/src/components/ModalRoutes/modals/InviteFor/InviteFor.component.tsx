@@ -9,12 +9,14 @@ import { INVITES, EDIT_INVITE } from "@state/Invites/typeDefs";
 import { USER_GROUPS } from "@state/User/typeDefs";
 import { AUTH_USER } from "@state/AuthUser/typeDefs";
 import InvitesInput from '@components/shared/Inputs/InvitesInput';
+import InvitesLink from '@components/shared/Inputs/InvitesLink'
 
 import ModalHeader from "../../shared/ModalHeader";
 import './style.sass';
 
 interface IFormValues {
-    invitedUsers: any[]
+    invitedUsers: any[],
+    groups: any[]
 }
 
 export const InviteFor: FunctionComponent<{}> = ({ }) => {
@@ -22,15 +24,20 @@ export const InviteFor: FunctionComponent<{}> = ({ }) => {
     const { allSearchParams, updateParams } = useSearchParams();
     const modalData = JSON.parse(allSearchParams.modalData);
 
-    console.log({
-        modalData
-    });
+    const {
+        loading: authUser_loading,
+        error: authUser_error,
+        data: authUser_data,
+        refetch: authUser_refetch
+    } = useQuery(AUTH_USER);
+
+    const authLiquidUser = authUser_data?.authUser?.LiquidUser;
 
     const {
         handleSubmit, register, formState: { errors }, watch, setValue
     } = useForm<IFormValues>({
         mode: 'onChange',
-        defaultValues:{
+        defaultValues: {
             invitedUsers: []
         }
     });
@@ -68,11 +75,28 @@ export const InviteFor: FunctionComponent<{}> = ({ }) => {
 
             <div className="Modal-Content">
 
+                <div className="my-3 mt-4">
+                    <InvitesLink
+                        label={'Get Link'}
+
+                        groupName={modalData.groupName}
+                        groupHandle={modalData.groupHandle}
+                        fromWhomAvatar={authLiquidUser?.avatar}
+                        fromWhomName={authLiquidUser?.name}
+                        fromWhomHandle={authLiquidUser?.handle}
+
+                        // userHandle={modalData.userHandle}
+                        // questionText={modalData.questionText}
+                    />
+                </div>
+
+                <hr className="mt-0 pt-3 mb-5" />
+
                 <div className="my-3">
                     {((name: keyof IFormValues) => (
                         <InvitesInput
                             name={name}
-                            label={'Invites'}
+                            label={'E-Mail Invites'}
                             register={register(name, {
                                 required: true
                             })}
@@ -85,15 +109,6 @@ export const InviteFor: FunctionComponent<{}> = ({ }) => {
                         />
                     ))('invitedUsers')}
                 </div>
-
-                {/* <div>
-                    {yourGroups_data?.UserGroups?.map((el: any, i: Number) => (
-                        <GroupInList
-                            key={el.name + i}
-                            group={el}
-                        />
-                    ))}
-                </div> */}
 
                 <hr />
 

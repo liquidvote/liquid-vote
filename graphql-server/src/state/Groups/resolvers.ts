@@ -275,10 +275,6 @@ export const getGroupStats = async ({ groupId, groupHandle, mongoDB }) => {
 
 const getYourGroupStats = async ({ groupId, groupHandle, AuthUser, mongoDB }) => {
 
-    console.log({
-        id: AuthUser._id
-    })
-
     const votesInCommon = (
         await mongoDB.collection("Votes")
             .aggregate([

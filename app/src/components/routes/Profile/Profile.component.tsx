@@ -92,7 +92,7 @@ export const Profile: FunctionComponent<{}> = ({ }) => {
                                     paramsToAdd: {
                                         modal: "InviteFor",
                                         modalData: JSON.stringify({
-                                            InviteType: 'toGroup',
+                                            InviteType: 'representation',
                                             profileHandle: profile.handle,
                                             profileName: profile.name
                                         })

@@ -102,9 +102,9 @@ export const InviteResolvers = {
             mongoDB, AuthUser, AWS
         }) => {
 
-            console.log({
-                toWhat, toWhom, group, question
-            });
+            // console.log({
+            //     toWhat, toWhom, group, question
+            // });
 
             const toWhomUser = !!toWhom?.user && (await mongoDB.collection("Users")
                 .findOne({ 'LiquidUser.handle': toWhom?.user }));
@@ -130,7 +130,7 @@ export const InviteResolvers = {
             const savedInvite = (!!AuthUser && !Invite_) ?
                 (async () => {
 
-                    console.log('new invite', toWhom);
+                    // console.log('new invite', toWhom);
 
                     const savedInvite_ = (await mongoDB.collection("Invites").insertOne({
                         toWhat: {
@@ -202,9 +202,9 @@ const sendInviteEmail = async ({
     inviteId
 }) => {
 
-    console.log({
-        toAddress
-    });
+    // console.log({
+    //     toAddress
+    // });
 
     const sendPromise = new AWS.SES({ apiVersion: "2010-12-01" })
         .sendEmail({
@@ -271,7 +271,7 @@ const sendInviteEmail = async ({
 
     await sendPromise
         .then(function (data) {
-            console.log(data.MessageId);
+            // console.log(data.MessageId);
             return data;
         })
         .catch(function (err) {
@@ -285,7 +285,7 @@ export const updateInviteStatus = async ({
     mongoDB
 }) => {
 
-    console.log({ InviteId, to });
+    // console.log({ InviteId, to });
 
     const updatedInvite = (await mongoDB.collection("Invites").findOneAndUpdate(
         { _id: ObjectID(InviteId) },

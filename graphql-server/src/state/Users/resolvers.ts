@@ -681,13 +681,13 @@ export const UserResolvers = {
             InviteId
         }, { mongoDB, AuthUser }) => {
 
-            console.log({
-                UserHandle,
-                GroupHandle,
-                Channels,
-                IsMember,
-                InviteId
-            })
+            // console.log({
+            //     UserHandle,
+            //     GroupHandle,
+            //     Channels,
+            //     IsMember,
+            //     InviteId
+            // })
 
             const isUser = !!AuthUser && AuthUser?.LiquidUser?.handle === UserHandle;
 

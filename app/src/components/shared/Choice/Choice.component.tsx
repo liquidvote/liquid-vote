@@ -6,6 +6,8 @@ import { useQuery, useMutation } from "@apollo/client";
 import { EDIT_VOTE } from '@state/Vote/typeDefs';
 import Chart from "@shared/VoteGraph1/chart.svg";
 import { voteStatsMap } from '@state/Question/map';
+import { AUTH_USER } from "@state/AuthUser/typeDefs";
+import useSearchParams from "@state/Global/useSearchParams.effect";
 
 import './style.sass';
 
@@ -27,6 +29,17 @@ export const Choice: FunctionComponent<{
     showPercentages
 }) => {
 
+        const { allSearchParams, updateParams } = useSearchParams();
+
+        const {
+            loading: authUser_loading,
+            error: authUser_error,
+            data: authUser_data,
+            refetch: authUser_refetch
+        } = useQuery(AUTH_USER);
+
+        const authUser = authUser_data?.authUser?.LiquidUser;
+
         const [editVote, {
             loading: editVote_loading,
             error: editVote_error,
@@ -37,22 +50,35 @@ export const Choice: FunctionComponent<{
 
         const handleUserVote = (vote: string) => {
 
-            const groupChannel_ = (([g, c]) => ({
-                group: g,
-                channel: c
-            }))(groupChannel.split("-"))
+            if (!!authUser) {
+                const groupChannel_ = (([g, c]) => ({
+                    group: g,
+                    channel: c
+                }))(groupChannel.split("-"))
 
-            editVote({
-                variables: {
-                    questionText: voteName,
-                    choiceText,
-                    group: groupChannel_.group,
-                    channel: groupChannel_.channel,
-                    Vote: {
-                        position: (vote === userVote_) ? null : vote
-                    },
-                }
-            });
+                editVote({
+                    variables: {
+                        questionText: voteName,
+                        choiceText,
+                        group: groupChannel_.group,
+                        channel: groupChannel_.channel,
+                        Vote: {
+                            position: (vote === userVote_) ? null : vote
+                        },
+                    }
+                });
+            } else {
+                updateParams({
+                    paramsToAdd: {
+                        modal: "RegisterBefore",
+                        modalData: JSON.stringify({
+                            toWhat: 'vote',
+                            questionText: voteName,
+                        })
+                    }
+                })
+            }
+
         }
 
         const stats_ = voteStatsMap({

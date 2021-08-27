@@ -64,10 +64,6 @@ export const InvitesInput: FunctionComponent<Props> = ({
         }
     });
 
-    console.log({
-        invites_data
-    });
-
     const {
         loading: searchUsers_loading,
         error: searchUsers_error,
@@ -76,12 +72,8 @@ export const InvitesInput: FunctionComponent<Props> = ({
     } = useQuery(SEARCH_USERS, {
         variables: {
             text: userSearch,
-            // notInGroup: groupHandle
+            notInGroup: groupHandle
         }
-    });
-
-    console.log({
-        searchUsers_data
     });
 
     const sendInvite = (u) => {

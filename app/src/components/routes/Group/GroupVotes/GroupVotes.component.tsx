@@ -169,19 +169,9 @@ export const GroupVotes: FunctionComponent<{ selectedChannels: any }> = ({ selec
                 </div>
             )}
 
-            {/* <pre>{JSON.stringify(user_votes_data, null, 2)}</pre> */}
-
-            {/* <small>
-                Voted the same as you in
-                    {' '}<b className="white forDirect px-1 rounded">{useMemo(() => Math.floor(Math.random() * 100), [])}</b>
-                {' '}polls and different in
-                    {' '}<b className="white againstDirect px-1 rounded">{useMemo(() => Math.floor(Math.random() * 100), [])}</b>
-            </small> */}
-
             {votes_data?.Votes.map((n, i) => (
-                // <pre>{JSON.stringify(n, null, 2)}</pre>
                 <>
-                    {i}
+                    {/* {i} */}
                     <Notification
                         key={'notification-groupvote' + type + n.questionText + n.choiceText + n.user.name + i}
                         v={{
@@ -197,13 +187,6 @@ export const GroupVotes: FunctionComponent<{ selectedChannels: any }> = ({ selec
                     <DropAnimation />
                 </div>
             )}
-
-            {/* <br />
-            <br />
-            <pre style={{ color: "white" }}>
-                {JSON.stringify(group_data?.Group?.stats, null, 2)}
-                {JSON.stringify(group_data?.Group?.yourStats, null, 2)}
-            </pre> */}
         </>
     );
 }

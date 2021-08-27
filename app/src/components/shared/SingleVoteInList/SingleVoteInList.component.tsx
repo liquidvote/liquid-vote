@@ -56,8 +56,7 @@ export const SingleVoteInList: FunctionComponent<{
                                 </a>
                                 {!!showGroup && (
                                     <div className="badge m-0 ml-2">
-                                        {l.groupChannel?.group}:
-                                        {l.groupChannel?.channel}
+                                        {l.groupChannel?.group}
                                     </div>
                                 )}
                             </div>
