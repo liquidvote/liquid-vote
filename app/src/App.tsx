@@ -24,15 +24,15 @@ export default function App() {
                 <SideMenu />
                 <div className="App border-sides">
                     <Switch>
-                        <Route path="/poll/:voteName/:groupChannel/:section/:subsection/:subsubsection" component={loadable(() => import('./components/Routes/Question'))} />
-                        <Route path="/poll/:voteName/:groupChannel/:section/:subsection" component={loadable(() => import('./components/Routes/Question'))} />
-                        <Route path="/poll/:voteName/:groupChannel/:section" component={loadable(() => import('./components/Routes/Question'))} />
-                        <Route path="/poll/:voteName/:groupChannel" component={loadable(() => import('./components/Routes/Question'))} />
+                        <Route path="/poll/:voteName/:groupHandle/:section/:subsection/:subsubsection" component={loadable(() => import('./components/Routes/Question'))} />
+                        <Route path="/poll/:voteName/:groupHandle/:section/:subsection" component={loadable(() => import('./components/Routes/Question'))} />
+                        <Route path="/poll/:voteName/:groupHandle/:section" component={loadable(() => import('./components/Routes/Question'))} />
+                        <Route path="/poll/:voteName/:groupHandle" component={loadable(() => import('./components/Routes/Question'))} />
                         
-                        <Route path="/multipoll/:voteName/:groupChannel/:section/:subsection/:subsubsection" component={loadable(() => import('./components/Routes/Question'))} />
-                        <Route path="/multipoll/:voteName/:groupChannel/:section/:subsection" component={loadable(() => import('./components/Routes/Question'))} />
-                        <Route path="/multipoll/:voteName/:groupChannel/:section" component={loadable(() => import('./components/Routes/Question'))} />
-                        <Route path="/multipoll/:voteName/:groupChannel" component={loadable(() => import('./components/Routes/Question'))} />
+                        <Route path="/multipoll/:voteName/:groupHandle/:section/:subsection/:subsubsection" component={loadable(() => import('./components/Routes/Question'))} />
+                        <Route path="/multipoll/:voteName/:groupHandle/:section/:subsection" component={loadable(() => import('./components/Routes/Question'))} />
+                        <Route path="/multipoll/:voteName/:groupHandle/:section" component={loadable(() => import('./components/Routes/Question'))} />
+                        <Route path="/multipoll/:voteName/:groupHandle" component={loadable(() => import('./components/Routes/Question'))} />
                         <Route path="/grouping/:groupType/:groupFilter" component={loadable(() => import('./components/Routes/Grouping'))} />
                         <Route path="/register" component={loadable(() => import('./components/Routes/CreateProfile'))} />
                         <Route path="/create-vote" component={loadable(() => import('./components/Routes/CreateVote'))} />

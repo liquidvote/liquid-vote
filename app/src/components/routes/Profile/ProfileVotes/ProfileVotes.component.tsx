@@ -53,7 +53,7 @@ export const ProfileVotes: FunctionComponent<{}> = ({ }) => {
         } else if (subsubsection === 'different') {
             return 'directVotesInDisagreement';
         } else if (subsection === 'represented' && !subsubsection) {
-            return 'indirectVotesMade'
+            return 'indirectVotes'
         } else if (subsection === 'represented' && subsubsection === 'byyou') {
             return 'indirectVotesMadeByYou';
         } else if (subsection === 'represented' && subsubsection === 'foryou') {
@@ -81,7 +81,7 @@ export const ProfileVotes: FunctionComponent<{}> = ({ }) => {
                 </li>
                 <li className="nav-item">
                     <Link className={`nav-link ${subsection === 'represented' && 'active'}`} to={`/profile/${handle}/votes/represented`}>
-                        <b>{profile?.stats?.indirectVotesMadeByUser}</b> Represented Votes
+                        <b>{profile?.stats?.indirectVotesMadeForUser}</b> Represented Votes
                     </Link>
                 </li>
                 <li className="px-4 mt-1">
@@ -118,7 +118,7 @@ export const ProfileVotes: FunctionComponent<{}> = ({ }) => {
                     <ul className="nav d-flex justify-content-around mt-n2 mx-n3">
                         <li className="nav-item">
                             <Link className={`nav-link ${!subsubsection && 'active'}`} to={`/profile/${handle}/votes/represented`}>
-                                <b>{profile?.stats?.indirectVotesMadeByUser}</b> All
+                                <b>{profile?.stats?.indirectVotesMadeByUser}</b> By anyone
                             </Link>
                         </li>
                         <li className="nav-item">
@@ -147,8 +147,8 @@ export const ProfileVotes: FunctionComponent<{}> = ({ }) => {
                                 return 'hasn\'t agreed with you on any polls';
                             } else if (type === 'directVotesInDisagreement') {
                                 return 'hasn\'t disagreed with you on any polls';
-                            } else if (type === 'indirectVotesMade') {
-                                return 'hasn\'t represented anyone on any polls'
+                            } else if (type === 'indirectVotes') {
+                                return 'hasn\'t been represented on any polls'
                             } else if (type === 'indirectVotesMadeByYou') {
                                 return 'hasn\'t been represented by you on any polls';
                             } else if (type === 'indirectVotesMadeForYou') {
@@ -190,12 +190,12 @@ export const ProfileVotes: FunctionComponent<{}> = ({ }) => {
                 </div>
             )}
 
-            {/* <br />
+            <br />
             <br />
             <pre style={{ color: "white" }}>
                 {JSON.stringify(profile?.stats, null, 2)}
                 {JSON.stringify(profile?.yourStats, null, 2)}
-            </pre> */}
+            </pre>
 
         </>
     );

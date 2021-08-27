@@ -67,7 +67,7 @@ export const EditQuestion: FunctionComponent<{}> = ({ }) => {
 
             const savedQuestion = editQuestion_data?.editQuestion;
 
-            history.push(`/poll/${savedQuestion.questionText}/${savedQuestion.groupChannel.group}-${savedQuestion.groupChannel.channel}`);
+            history.push(`/poll/${savedQuestion.questionText}/${savedQuestion.groupChannel.group}`);
 
             console.log({
                 editQuestion_data
@@ -130,7 +130,7 @@ export const EditQuestion: FunctionComponent<{}> = ({ }) => {
         <form onSubmit={handleSubmit(onSubmit)} className="voteForm">
 
             <ModalHeader
-                title={modalData.questionHandle === "new" ? "Launch Question" : "Edit Question"}
+                title={modalData.questionHandle === "new" ? "Launch Poll" : "Edit Poll"}
                 submitText={modalData.questionHandle === "new" ? "Launch" : "Save"}
             />
 
@@ -219,11 +219,11 @@ export const EditQuestion: FunctionComponent<{}> = ({ }) => {
                     {((name: keyof IFormValues) => (
                         <GroupChannelPicker
                             name={name}
-                            label="Group Channel to poll in"
+                            label="Group to Poll in"
                             register={register(name, {
                                 validate: {
                                     group: (v: any) => typeof v.group !=='undefined' || 'please select a group and channel',
-                                    channel: (v: any) => typeof v.channel !=='undefined' || 'please select a channel',
+                                    // channel: (v: any) => typeof v.channel !=='undefined' || 'please select a channel',
                                 }
                             })}
                             value={watch(name)}

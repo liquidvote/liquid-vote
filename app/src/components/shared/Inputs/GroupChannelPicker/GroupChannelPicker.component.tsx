@@ -56,15 +56,15 @@ export const GroupChannelPicker: FunctionComponent<Props> = ({
         skip: !authUser_data?.authUser
     });
 
-    const {
-        loading: group_loading,
-        error: group_error,
-        data: group_data,
-        refetch: group_refetch
-    } = useQuery(GROUP, {
-        variables: { handle: value?.group },
-        skip: !value?.group
-    });
+    // const {
+    //     loading: group_loading,
+    //     error: group_error,
+    //     data: group_data,
+    //     refetch: group_refetch
+    // } = useQuery(GROUP, {
+    //     variables: { handle: value?.group },
+    //     skip: !value?.group
+    // });
 
     // console.log({
     //     yourGroups_data,
@@ -139,7 +139,7 @@ export const GroupChannelPicker: FunctionComponent<Props> = ({
                             ))}
                             <option value="">--</option>
                         </select>
-                        <select
+                        {/* <select
                             className="badge select ml-1 mb-1 mt-1 inverted"
                             onChange={handleChannelPickChange}
                             value={value?.channel}
@@ -153,7 +153,7 @@ export const GroupChannelPicker: FunctionComponent<Props> = ({
                                 >{g.name}</option>
                             ))}
                             <option value="">--</option>
-                        </select>
+                        </select> */}
                     </div>
                 </div>
 

@@ -52,26 +52,6 @@ export const GroupPolls: FunctionComponent<{
 
         return (
             <>
-
-                {group_data?.Group?.thisUserIsAdmin && (
-                    <div
-                        onClick={() => updateParams({
-                            paramsToAdd: {
-                                modal: "EditQuestion",
-                                modalData: JSON.stringify({
-                                    questionHandle: 'new',
-                                    groupHandle: handle,
-                                })
-                            }
-                        })}
-                        className="button_ mx-3 my-4"
-                    >
-                        <DropPlusSVG />
-                        <div className="ml-2">Create New Poll</div>
-                    </div>
-                )}
-
-
                 {questions_data?.Questions?.map((v: any, i: any) => (
                     <div key={'polls-' + i}>
                         {v.questionType === 'multi' && (

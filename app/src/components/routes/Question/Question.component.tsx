@@ -22,13 +22,9 @@ import Choice from '@shared/Choice';
 
 export default function Question() {
 
-    let { voteName, groupChannel, section } = useParams<any>();
+    let { voteName, groupHandle, section } = useParams<any>();
     const { allSearchParams, updateParams } = useSearchParams();
 
-    const groupChannel_ = (([g, c]) => ({
-        group: g,
-        channel: c
-    }))(groupChannel.split("-"))
 
     const {
         loading: question_loading,
@@ -38,8 +34,8 @@ export default function Question() {
     } = useQuery(QUESTION, {
         variables: {
             questionText: voteName,
-            group: groupChannel_.group,
-            channel: groupChannel_.channel
+            group: groupHandle,
+            // channel: groupChannel_.channel
         }
     });
 
@@ -71,7 +67,7 @@ export default function Question() {
                                 <Choice
                                     choiceText={c.text}
                                     voteName={voteName}
-                                    groupChannel={groupChannel}
+                                    groupHandle={groupHandle}
                                     stats={c.stats}
                                     userVote={c.userVote}
                                 />
@@ -80,7 +76,7 @@ export default function Question() {
                         <Choice
                             choiceText={question_data?.Question?.text}
                             voteName={voteName}
-                            groupChannel={groupChannel}
+                            groupHandle={groupHandle}
                             stats={question_data?.Question?.stats}
                             userVote={question_data?.Question?.userVote}
                             showPercentages={true}
@@ -94,7 +90,7 @@ export default function Question() {
                             <div data-tip="Selected groups"><GroupSmallSvg /></div>
                             <div className="d-flex flex-wrap justify-content-start">
                                 <Link
-                                    to={`/group/${question_data?.Question?.groupChannel.group}`}
+                                    to={`/group/${groupHandle}`}
                                     className="badge ml-1 mb-1 mt-1"
                                 >
                                     {question_data?.Question?.groupChannel.group}
@@ -139,17 +135,17 @@ export default function Question() {
 
                 <ul className="nav d-flex justify-content-around mt-1 mb-n4 mx-n3">
                     <li className="nav-item">
-                        <Link className={`nav-link ${(!section || section === 'timeline') && 'active'}`} to={`/poll/${voteName}/${groupChannel}/timeline`}>
+                        <Link className={`nav-link ${(!section || section === 'timeline') && 'active'}`} to={`/poll/${voteName}/${groupHandle}/timeline`}>
                             Timeline
                         </Link>
                     </li>
                     <li className="nav-item">
-                        <Link className={`nav-link ${section === 'votesby' && 'active'}`} to={`/poll/${voteName}/${groupChannel}/votesby`}>
+                        <Link className={`nav-link ${section === 'votesby' && 'active'}`} to={`/poll/${voteName}/${groupHandle}/votesby`}>
                             Votes by 🧪
                         </Link>
                     </li>
                     <li className="nav-item">
-                        <Link className={`nav-link ${section === 'conversation' && 'active'}`} to={`/poll/${voteName}/${groupChannel}/conversation`}>
+                        <Link className={`nav-link ${section === 'conversation' && 'active'}`} to={`/poll/${voteName}/${groupHandle}/conversation`}>
                             Conversation 🧪
                         </Link>
                     </li>
