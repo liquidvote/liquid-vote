@@ -4,7 +4,7 @@ export const QUESTION = gql`
   query(
       $questionText: String!,
       $group: String!,
-      $channel: String!
+      $channel: String
     ) {
         Question(
             questionText: $questionText,

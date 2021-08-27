@@ -14,7 +14,7 @@ import './style.sass';
 export const Choice: FunctionComponent<{
     choiceText?: string,
     voteName: string,
-    groupChannel: any,
+    groupHandle: string,
     stats: any,
     userVote: any,
     inList?: boolean,
@@ -22,7 +22,7 @@ export const Choice: FunctionComponent<{
 }> = ({
     choiceText,
     voteName,
-    groupChannel,
+    groupHandle,
     stats,
     userVote,
     inList,
@@ -51,17 +51,11 @@ export const Choice: FunctionComponent<{
         const handleUserVote = (vote: string) => {
 
             if (!!authUser) {
-                const groupChannel_ = (([g, c]) => ({
-                    group: g,
-                    channel: c
-                }))(groupChannel.split("-"))
-
                 editVote({
                     variables: {
                         questionText: voteName,
                         choiceText,
-                        group: groupChannel_.group,
-                        channel: groupChannel_.channel,
+                        group: groupHandle,
                         Vote: {
                             position: (vote === userVote_) ? null : vote
                         },
@@ -155,7 +149,7 @@ export const Choice: FunctionComponent<{
                                             }}
                                         ></Link>
                                         <Link
-                                            to={`/${choiceText ? 'multipoll' : 'poll'}/${voteName}/${groupChannel}/timeline/representingYou`}
+                                            to={`/${choiceText ? 'multipoll' : 'poll'}/${voteName}/${groupHandle}/timeline/representingYou`}
                                             className={`vote-avatar text-decoration-none count for ml-n2 ${inList && 'tiny'}`}
                                         >{forRepresentatives.length}</Link>
                                     </div>
@@ -181,7 +175,7 @@ export const Choice: FunctionComponent<{
                             ))}
 
                             <Link
-                                to={`/${choiceText ? 'multipoll' : 'poll'}/${voteName}/${groupChannel}/timeline/direct/for`}
+                                to={`/${choiceText ? 'multipoll' : 'poll'}/${voteName}/${groupHandle}/timeline/direct/for`}
                                 className={`vote-avatar text-decoration-none count for ml-n2 ${inList && 'tiny'}`}
                             >
                                 {numeral(stats_.forCount).format('0a[.]0')}
@@ -207,7 +201,7 @@ export const Choice: FunctionComponent<{
                                 ))}
 
                             <Link
-                                to={`/${choiceText ? 'multipoll' : 'poll'}/${voteName}/${groupChannel}/timeline/direct/against`}
+                                to={`/${choiceText ? 'multipoll' : 'poll'}/${voteName}/${groupHandle}/timeline/direct/against`}
                                 className={`vote-avatar text-decoration-none count against ml-n2 ${inList && 'tiny'}`}>
                                 {numeral(stats_.againstCount).format('0a[.]0')}
                             </Link>
@@ -231,7 +225,7 @@ export const Choice: FunctionComponent<{
                                             }}
                                         ></Link>
                                         <Link
-                                            to={`/${choiceText ? 'multipoll' : 'poll'}/${voteName}/${groupChannel}/timeline/representingYou`}
+                                            to={`/${choiceText ? 'multipoll' : 'poll'}/${voteName}/${groupHandle}/timeline/representingYou`}
                                             className={`vote-avatar text-decoration-none count against ml-n2 ${inList && 'tiny'}`}
                                         >{againstRepresentatives.length}</Link>
                                     </div>

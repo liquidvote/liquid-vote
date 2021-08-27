@@ -68,7 +68,7 @@ export const GroupVotes: FunctionComponent<{ selectedChannels: any }> = ({ selec
         type,
         subsection,
         subsubsection,
-        votes_data: votes_data?.Votes.length,
+        Votes: votes_data?.Votes,
     });
 
     return (
@@ -124,7 +124,7 @@ export const GroupVotes: FunctionComponent<{ selectedChannels: any }> = ({ selec
                     <ul className="nav d-flex justify-content-around mt-n2 mx-n3">
                         <li className="nav-item">
                             <Link className={`nav-link ${!subsubsection && 'active'}`} to={`/group/${handle}/votes/represented`}>
-                                <b>{group_data?.Group?.stats?.indirectVotesMade}</b> All
+                                <b>{group_data?.Group?.stats?.indirectVotesMade}</b> By anyone
                             </Link>
                         </li>
                         <li className="nav-item">

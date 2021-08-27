@@ -46,7 +46,7 @@ export const VoteResolvers = {
                                 'questionText': '$questionText',
                                 'choiceText': '$choiceText',
                                 'group': '$groupChannel.group',
-                                'channel': '$groupChannel.channel'
+                                // 'channel': '$groupChannel.channel'
                             },
                             'pipeline': [
                                 {
@@ -83,13 +83,13 @@ export const VoteResolvers = {
                                                         ]
                                                     }
                                                 },
-                                                {
-                                                    '$expr': {
-                                                        '$eq': [
-                                                            '$groupChannel.channel', '$$channel'
-                                                        ]
-                                                    }
-                                                }
+                                                // {
+                                                //     '$expr': {
+                                                //         '$eq': [
+                                                //             '$groupChannel.channel', '$$channel'
+                                                //         ]
+                                                //     }
+                                                // }
                                             ] : []
                                         ]
                                     }
@@ -201,7 +201,7 @@ export const VoteResolvers = {
                                 'questionText': '$questionText',
                                 'choiceText': '$choiceText',
                                 'group': '$groupChannel.group',
-                                'channel': '$groupChannel.channel'
+                                // 'channel': '$groupChannel.channel'
                             },
                             'pipeline': [
                                 {
@@ -229,13 +229,13 @@ export const VoteResolvers = {
                                                     ]
                                                 }
                                             },
-                                            {
-                                                '$expr': {
-                                                    '$eq': [
-                                                        '$groupChannel.channel', '$$channel'
-                                                    ]
-                                                }
-                                            }
+                                            // {
+                                            //     '$expr': {
+                                            //         '$eq': [
+                                            //             '$groupChannel.channel', '$$channel'
+                                            //         ]
+                                            //     }
+                                            // }
                                         ]
                                     }
                                 },
@@ -308,8 +308,8 @@ export const VoteResolvers = {
                             let: {
                                 questionText: "$questionText",
                                 choiceText: "$choiceText",
-                                group: "$group",
-                                channel: "$channel"
+                                group: "$groupChannel.group",
+                                // channel: "$channel"
                             },
                             pipeline: [
                                 {
@@ -327,17 +327,17 @@ export const VoteResolvers = {
                                             {
                                                 '$expr': {
                                                     '$eq': [
-                                                        '$group', '$$group'
+                                                        '$groupChannel.group', '$$group'
                                                     ]
                                                 }
                                             },
-                                            {
-                                                '$expr': {
-                                                    '$eq': [
-                                                        '$channel', '$$channel'
-                                                    ]
-                                                }
-                                            }
+                                            // {
+                                            //     '$expr': {
+                                            //         '$eq': [
+                                            //             '$channel', '$$channel'
+                                            //         ]
+                                            //     }
+                                            // }
                                         ]
                                     }
                                 }
@@ -472,20 +472,20 @@ export const VoteResolvers = {
                             ...questionStatsAggregationLogic
                         ])
                         .toArray(),
-                    // 'indirectVotesMadeForUser': async () => await mongoDB.collection("Votes")
-                    //     // .find({ 'user': ObjectID(User?._id), 'isDirect': false })
-                    //     .aggregate([
-                    //         ...votesInCommonGeneralAggregationLogic,
-                    //         {
-                    //             '$match': {
-                    //                 'isDirect': false,
-                    //             }
-                    //         },
-                    //         ...representeeVotesAggregationLogic,
-                    //         ...sortLogic,
-                    //         ...questionStatsAggregationLogic
-                    //     ])
-                    //     .toArray(),
+                    'indirectVotes': async () => await mongoDB.collection("Votes")
+                        // .find({ 'user': ObjectID(User?._id), 'isDirect': false })
+                        .aggregate([
+                            ...votesInCommonGeneralAggregationLogic,
+                            {
+                                '$match': {
+                                    'isDirect': false,
+                                }
+                            },
+                            ...representeeVotesAggregationLogic,
+                            ...sortLogic,
+                            ...questionStatsAggregationLogic
+                        ])
+                        .toArray(),
                     'indirectVotesMadeByUser': async () => await mongoDB.collection("Votes")
                         // .find({ 'user': ObjectID(User?._id), 'isDirect': false })
                         .aggregate([
@@ -561,12 +561,18 @@ export const VoteResolvers = {
             mongoDB, AuthUser
         }) => {
 
+            console.log({
+                Vote,
+                questionText,
+                choiceText
+            })
+
             const Vote_ = !!AuthUser && await mongoDB.collection("Votes")
                 .findOne({
                     questionText,
                     choiceText,
                     'groupChannel.group': group,
-                    'groupChannel.channel': channel,
+                    // 'groupChannel.channel': channel,
                     user: ObjectID(AuthUser?._id)
                 });
 
@@ -580,7 +586,7 @@ export const VoteResolvers = {
                 (await mongoDB.collection("Votes").insertOne({
                     'questionText': questionText,
                     'choiceText': choiceText,
-                    'groupChannel': { group, channel },
+                    'groupChannel': { group },
                     'position': Vote.position,
                     'forWeight': Vote.position === 'for' ? 1 : 0,
                     'againstWeight': Vote.position === 'against' ? 1 : 0,
@@ -659,7 +665,7 @@ export const VoteResolvers = {
                                     questionText,
                                     choiceText,
                                     'groupChannel.group': group,
-                                    'groupChannel.channel': channel,
+                                    // 'groupChannel.channel': channel,
                                     $expr: {
                                         $eq: [
                                             "$user",
@@ -680,8 +686,8 @@ export const VoteResolvers = {
                     (await mongoDB.collection("Votes").insertOne({
                         'questionText': questionText,
                         'choiceText': choiceText,
-                        'groupChannel': { group, channel },
-                        'position': Vote.position,
+                        'groupChannel': { group },
+                        'position': 'delegated',
                         'forWeight': Vote.position === 'for' ? 1 : 0,
                         'againstWeight': Vote.position === 'against' ? 1 : 0,
                         'isDirect': false,
@@ -699,7 +705,7 @@ export const VoteResolvers = {
                         'lastEditOn': Date.now(),
                         'createdOn': Date.now(),
                         'createdBy': AuthUser.LiquidUser.handle,
-                        'user': r.representeeId // ⚠️ huuuuum - id, should be handle. but handle not great
+                        'user': r.representeeId 
                     }))?.ops[0] : (async () => {
 
                         const Vote_ = r.Vote[0];
@@ -757,7 +763,7 @@ export const VoteResolvers = {
                 questionText,
                 choiceText,
                 group,
-                channel,
+                // channel,
                 mongoDB,
                 AuthUser
             });

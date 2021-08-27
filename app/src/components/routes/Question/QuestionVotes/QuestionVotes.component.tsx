@@ -16,7 +16,7 @@ import './style.sass';
 
 export const QuestionVotes: FunctionComponent<{}> = ({ }) => {
 
-    let { voteName, groupChannel, section, subsection, subsubsection } = useParams<any>();
+    let { voteName, groupHandle, section, subsection, subsubsection } = useParams<any>();
 
     // const {
     //     loading: authUser_loading,
@@ -29,10 +29,6 @@ export const QuestionVotes: FunctionComponent<{}> = ({ }) => {
 
     const [sortBy, setSortBy] = useState('weight');
 
-    const groupChannel_ = (([g, c]) => ({
-        group: g,
-        channel: c
-    }))(groupChannel.split("-"));
 
     const {
         loading: question_loading,
@@ -42,8 +38,8 @@ export const QuestionVotes: FunctionComponent<{}> = ({ }) => {
     } = useQuery(QUESTION, {
         variables: {
             questionText: voteName,
-            group: groupChannel_.group,
-            channel: groupChannel_.channel
+            group: groupHandle,
+            // channel: groupChannel_.channel
         }
     });
 
@@ -68,8 +64,8 @@ export const QuestionVotes: FunctionComponent<{}> = ({ }) => {
     } = useQuery(QUESTION_VOTERS, {
         variables: {
             questionText: voteName,
-            group: groupChannel_.group,
-            channel: groupChannel_.channel,
+            group: groupHandle,
+            // channel: groupChannel_.channel,
             typeOfVoter: type,
             sortBy
         },
@@ -83,7 +79,7 @@ export const QuestionVotes: FunctionComponent<{}> = ({ }) => {
                 <li className="nav-item">
                     <Link
                         className={`nav-link ${(!subsection || subsection === 'direct') && 'active'}`}
-                        to={`/poll/${voteName}/${groupChannel}/timeline`}
+                        to={`/poll/${voteName}/${groupHandle}/timeline`}
                     >
                         <b>
                             {
@@ -98,7 +94,7 @@ export const QuestionVotes: FunctionComponent<{}> = ({ }) => {
                         <li className="nav-item">
                             <Link
                                 className={`nav-link ${(subsection === 'representingYou') && 'active'}`}
-                                to={`/poll/${voteName}/${groupChannel}/timeline/representingYou`}
+                                to={`/poll/${voteName}/${groupHandle}/timeline/representingYou`}
                             >
                                 <b>{question_data?.Question?.userVote?.representatives.length}</b> Representing you
                             </Link>
@@ -110,7 +106,7 @@ export const QuestionVotes: FunctionComponent<{}> = ({ }) => {
                         <li className="nav-item">
                             <Link
                                 className={`nav-link ${(subsection === 'representedByYou') && 'active'}`}
-                                to={`/poll/${voteName}/${groupChannel}/timeline/representedByYou`}
+                                to={`/poll/${voteName}/${groupHandle}/timeline/representedByYou`}
                             >
                                 <b>{question_data?.Question?.userVote?.representeeVotes?.length}</b> Represented by you
                             </Link>
@@ -130,7 +126,7 @@ export const QuestionVotes: FunctionComponent<{}> = ({ }) => {
                             <li className="nav-item">
                                 <Link
                                     className={`nav-link ${(!subsubsection || subsubsection === 'for') && 'active'}`}
-                                    to={`/poll/${voteName}/${groupChannel}/timeline/direct/for`}
+                                    to={`/poll/${voteName}/${groupHandle}/timeline/direct/for`}
                                 >
                                     <b>{question_data?.Question?.stats?.forDirectCount}</b> For
                                 </Link>
@@ -138,7 +134,7 @@ export const QuestionVotes: FunctionComponent<{}> = ({ }) => {
                             <li className="nav-item">
                                 <Link
                                     className={`nav-link ${(subsubsection === 'against') && 'active'}`}
-                                    to={`/poll/${voteName}/${groupChannel}/timeline/direct/against`}
+                                    to={`/poll/${voteName}/${groupHandle}/timeline/direct/against`}
                                 >
                                     <b>{question_data?.Question?.stats?.againstDirectCount}</b> Against
                                 </Link>

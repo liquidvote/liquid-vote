@@ -87,7 +87,7 @@ export const Profile: FunctionComponent<{}> = ({ }) => {
                     </div> */}
                     {profile.isThisUser ? (
                         <>
-                            <div
+                            {/* <div
                                 onClick={() => updateParams({
                                     paramsToAdd: {
                                         modal: "InviteFor",
@@ -101,7 +101,7 @@ export const Profile: FunctionComponent<{}> = ({ }) => {
                                 className={`button_ small mr-1`}
                             >
                                 Invite Representees
-                            </div>
+                            </div> */}
                             <div
                                 onClick={() => updateParams({
                                     paramsToAdd: {
@@ -166,10 +166,10 @@ export const Profile: FunctionComponent<{}> = ({ }) => {
             </div>
             <div className="profile-stats-container">
                 <Link to={`/profile-people/${profile.handle}/representing`} className="mr-2">
-                    <b>{profile?.stats?.representing}</b> Representing {profile.name}
+                    <b>{profile?.stats?.representing}</b> Representing
                 </Link>
                 <Link to={`/profile-people/${profile.handle}/representedBy`} className="mr-2">
-                    <b>{profile?.stats?.representedBy}</b> Represented by {profile.name}
+                    <b>{profile?.stats?.representedBy}</b> Represented by
                 </Link>
                 {/* {profile?.yourStats?.groupsInCommon && (
                     <Link to={`/profile-people/${profile.handle}/groups`} className="mr-2">

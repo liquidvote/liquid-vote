@@ -31,7 +31,7 @@ export const MultiVoteInList: FunctionComponent<{ v: any, i?: number }> = ({ v, 
             <div className="d-flex align-items-center flex-wrap mb-2">
                 <a
                     className="white"
-                    href={`/multipoll/${v.questionText}/${v.groupChannel?.group}-${v.groupChannel?.channel}`}
+                    href={`/multipoll/${v.questionText}/${v.groupChannel?.group}`}
                 >
                     <div
                         className="text-truncate mw-180-px-sm mr-2"
@@ -50,7 +50,7 @@ export const MultiVoteInList: FunctionComponent<{ v: any, i?: number }> = ({ v, 
                         <Choice
                             choiceText={c.text}
                             voteName={v.questionText}
-                            groupChannel={v.groupChannel.group + '-' + v.groupChannel.channel}
+                            groupHandle={v.groupChannel.group}
                             stats={c.stats}
                             userVote={c.userVote}
                             inList={true}

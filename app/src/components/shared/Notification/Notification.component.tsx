@@ -116,7 +116,7 @@ export const Notification: FunctionComponent<{
                             <Choice
                                 choiceText={v.choiceText}
                                 voteName={v.questionText}
-                                groupChannel={v.groupChannel.group + '-' + v.groupChannel.channel}
+                                groupHandle={v.groupChannel.group}
                                 stats={v.QuestionStats}
                                 userVote={v.yourVote}
                                 inList={true}

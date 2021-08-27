@@ -47,7 +47,7 @@ export const SingleVoteInList: FunctionComponent<{
                             <div className="mb-1 d-flex align-items-center">
                                 <a
                                     className="white mb-0"
-                                    href={`/poll/${l.questionText}/${l.groupChannel?.group}-${l.groupChannel?.channel}`}
+                                    href={`/poll/${l.questionText}/${l.groupChannel?.group}`}
                                 >
                                     <div className="text-truncate" title={l.questionText}>
                                         {l.questionText}
@@ -64,7 +64,7 @@ export const SingleVoteInList: FunctionComponent<{
 
                         <Choice
                             voteName={l.questionText}
-                            groupChannel={l.groupChannel.group + '-' + l.groupChannel.channel}
+                            groupHandle={l.groupChannel.group}
                             stats={l.stats}
                             userVote={l.userVote}
                             inList={true}
