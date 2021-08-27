@@ -110,7 +110,7 @@ export default function Question() {
                                     >Edit</div>
                                 </>
                             )}
-                            <div
+                            {/* <div
                                 className={`button_ small mx-1`}
                                 onClick={() => updateParams({
                                     paramsToAdd: {
@@ -123,7 +123,7 @@ export default function Question() {
                                         })
                                     }
                                 })}
-                            >Invite to Vote 🧪</div>
+                            >Invite to Vote 🧪</div> */}
                         </div>
                         <small data-tip="Created on">
                             {/* <small className="time-ago" data-tip="Last vote was"> */}

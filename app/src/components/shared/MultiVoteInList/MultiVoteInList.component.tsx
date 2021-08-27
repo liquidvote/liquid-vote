@@ -41,7 +41,7 @@ export const MultiVoteInList: FunctionComponent<{ v: any, i?: number }> = ({ v, 
 
                 <div
                     className="badge m-0 ml-2 text-truncate"
-                >{v.groupChannel.group}: {v.groupChannel.channel}</div>
+                >{v.groupChannel.group}</div>
             </div>
 
             <div>

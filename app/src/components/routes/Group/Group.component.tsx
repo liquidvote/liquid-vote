@@ -168,21 +168,40 @@ export const Group: FunctionComponent<{}> = ({ }) => {
                     <p className="profile-handle">@{selectedGroup?.handle}</p>
                 </div>
                 <div className="d-flex mb-1 ml-n1">
-                    <div
-                        className="button_ small mb-0"
-                        onClick={() => updateParams({
-                            paramsToAdd: {
-                                modal: "InviteFor",
-                                modalData: JSON.stringify({
-                                    InviteType: 'toGroup',
-                                    groupHandle: selectedGroup.handle,
-                                    groupName: selectedGroup.name
-                                })
-                            }
-                        })}
-                    >
-                        Invite
-                    </div>
+                    {isMember && (
+                        <>
+                            {/* <div
+                                className="button_ small mb-0"
+                                onClick={() => updateParams({
+                                    paramsToAdd: {
+                                        modal: "InviteFor",
+                                        modalData: JSON.stringify({
+                                            InviteType: 'representation',
+                                            groupHandle: selectedGroup.handle,
+                                            groupName: selectedGroup.name
+                                        })
+                                    }
+                                })}
+                            >
+                                Invite Representees
+                            </div> */}
+                            <div
+                                className="button_ small mb-0 ml-2"
+                                onClick={() => updateParams({
+                                    paramsToAdd: {
+                                        modal: "InviteFor",
+                                        modalData: JSON.stringify({
+                                            InviteType: 'toGroup',
+                                            groupHandle: selectedGroup.handle,
+                                            groupName: selectedGroup.name
+                                        })
+                                    }
+                                })}
+                            >
+                                Invite Members
+                            </div>
+                        </>
+                    )}
                     {
                         selectedGroup?.thisUserIsAdmin ? (
                             <div
@@ -198,11 +217,20 @@ export const Group: FunctionComponent<{}> = ({ }) => {
                             </div>
                         ) : (
                             <div
-                                onClick={() => editGroupMemberChannelRelation({
+                                onClick={() => !!authUser ? editGroupMemberChannelRelation({
                                     variables: {
                                         UserHandle: authUser?.LiquidUser?.handle,
                                         GroupHandle: selectedGroup?.handle,
                                         IsMember: !isMember
+                                    }
+                                }) : updateParams({
+                                    paramsToAdd: {
+                                        modal: "RegisterBefore",
+                                        modalData: JSON.stringify({
+                                            toWhat: 'joinGroup',
+                                            groupHandle: selectedGroup.handle,
+                                            groupName: selectedGroup.name
+                                        })
                                     }
                                 })}
                                 className={`button_ small ml-2 mb-0 ${isMember ? "selected" : ""}`}

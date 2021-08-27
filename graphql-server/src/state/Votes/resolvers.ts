@@ -19,11 +19,11 @@ export const VoteResolvers = {
             const User = handleType === 'user' && await mongoDB.collection("Users")
                 .findOne({ 'LiquidUser.handle': handle });
 
-            console.log({
-                type,
-                authUserId: AuthUser?._id,
-                sortBy
-            });
+            // console.log({
+            //     type,
+            //     authUserId: AuthUser?._id,
+            //     sortBy
+            // });
 
             const votesInCommonGeneralAggregationLogic = (
                 [
@@ -547,9 +547,9 @@ export const VoteResolvers = {
                 }[type]();
             })(type);
 
-            console.log({
-                VotesL: Votes.length
-            })
+            // console.log({
+            //     VotesL: Votes.length
+            // })
 
             return Votes;
         },
