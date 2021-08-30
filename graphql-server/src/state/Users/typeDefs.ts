@@ -2,6 +2,29 @@ import { gql } from "apollo-server";
 
 export const UserTypeDefs = gql`
 
+    type UserStats {
+        lastDirectVoteOn: String
+        representing: Int                       # inUse
+        representedBy: Int                      # inUse
+        groupsJoined: Int
+        directVotesMade: Int                    # inUse
+        indirectVotesMadeByUser: Int            
+        indirectVotesMadeForUser: Int           # inUse
+    }
+
+    type YourUserStats {
+        # groupsInCommon: Int
+        votesInCommon: Int
+        directVotesInCommon: Int
+        votesInAgreement: Int                   
+        votesInDisagreement: Int
+        
+        directVotesInAgreement: Int             # inUse
+        directVotesInDisagreement: Int          # inUse
+        indirectVotesMadeByYou: Int             # inUse
+        indirectVotesMadeForYou: Int            # inUse
+    }
+
     type User {
         handle: String
         name: String
@@ -19,28 +42,6 @@ export const UserTypeDefs = gql`
         yourStats:  YourUserStats
 
         representationGroups: [Group]
-    }
-
-    type UserStats {
-        lastDirectVoteOn: String
-        representing: Int                       # inUse
-        representedBy: Int                      # inUse
-        groupsJoined: Int
-        directVotesMade: Int                    # inUse
-        indirectVotesMadeByUser: Int            
-        indirectVotesMadeForUser: Int           # inUse
-    }
-
-    type YourUserStats {
-        # groupsInCommon: Int
-        votesInCommon: Int
-        directVotesInCommon: Int
-        votesInAgreement: Int                   
-        votesInDisagreement: Int
-        directVotesInAgreement: Int             # inUse
-        directVotesInDisagreement: Int          # inUse
-        indirectVotesMadeByYou: Int             # inUse
-        indirectVotesMadeForYou: Int            # inUse
     }
 
     type UserRepresentativeGroupRelation {

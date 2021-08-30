@@ -2,6 +2,28 @@ import { gql } from "apollo-server";
 
 export const GroupTypeDefs = gql`
 
+    type GroupStats {
+        lastDirectVoteOn: String
+        members: Int
+        questions: Int
+        representations: Int
+        directVotesMade: Int
+        indirectVotesMade: Int
+        mostRepresentingMembers: [User]
+    }
+
+    type yourGroupStats {
+        lastDirectVoteOn: String
+        representing: Int
+        representedBy: Int
+        directVotesMade: Int
+        
+        directVotesInAgreement: Int
+        directVotesInDisagreement: Int
+        indirectVotesMadeByYou: Int
+        indirectVotesMadeForYou: Int
+    }
+
     type Group {
         handle: String
         name: String
@@ -20,27 +42,6 @@ export const GroupTypeDefs = gql`
         representativeRelation: UserRepresentativeGroupRelation
         stats: GroupStats
         yourStats: yourGroupStats
-    }
-
-    type GroupStats {
-        lastDirectVoteOn: String
-        members: Int
-        questions: Int
-        representations: Int
-        directVotesMade: Int
-        indirectVotesMade: Int
-        mostRepresentingMembers: [User]
-    }
-
-    type yourGroupStats {
-        lastDirectVoteOn: String
-        representing: Int
-        representedBy: Int
-        directVotesMade: Int
-        directVotesInAgreement: Int
-        directVotesInDisagreement: Int
-        indirectVotesMadeByYou: Int
-        indirectVotesMadeForYou: Int
     }
 
     type Channel {

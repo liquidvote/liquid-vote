@@ -83,6 +83,8 @@ export const QUESTION = gql`
                     representeeCount
                 }
                 againstDirectCount
+                directVotes
+                indirectVotes
             }
             userVote {
                 position
