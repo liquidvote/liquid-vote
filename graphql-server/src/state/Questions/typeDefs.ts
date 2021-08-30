@@ -10,6 +10,8 @@ export const QuestionTypeDefs = gql`
         againstCount: Float                   #
         againstMostRepresentingVoters: [Voter]   #
         againstDirectCount: Float
+        directVotes: Float
+        indirectVotes: Float
     }
 
     type Choice {

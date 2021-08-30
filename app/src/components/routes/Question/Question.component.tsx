@@ -136,7 +136,7 @@ export default function Question() {
                 <ul className="nav d-flex justify-content-around mt-1 mb-n4 mx-n3">
                     <li className="nav-item">
                         <Link className={`nav-link ${(!section || section === 'timeline') && 'active'}`} to={`/poll/${voteName}/${groupHandle}/timeline`}>
-                            Timeline
+                            Votes
                         </Link>
                     </li>
                     <li className="nav-item">

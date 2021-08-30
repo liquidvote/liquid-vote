@@ -612,6 +612,10 @@ export const updateQuestionVotingStats = async ({
                 'stats.lastVoteOn': questionVoteCounts?.lastVoteOn,
                 'stats.forMostRepresentingVoters': questionDirectVotersByPosition?.for?.voters,
                 'stats.againstMostRepresentingVoters': questionDirectVotersByPosition?.against?.voters,
+                'stats.directVotes': questionVoteCounts?.forDirectVotes + questionVoteCounts?.againstDirectVotes || 0,
+                'stats.indirectVotes':
+                    (questionVoteCounts?.forVotes - questionVoteCounts?.forDirectVotes) +
+                    (questionVoteCounts?.againstVotes - questionVoteCounts?.againstDirectVotes) || 0,
                 ...(!!choiceText) && {
                     'choices': Question_.choices.map(c => ({
                         ...c,
@@ -624,6 +628,10 @@ export const updateQuestionVotingStats = async ({
                                 'lastVoteOn': choiceVoteCounts?.lastVoteOn,
                                 'forMostRepresentingVoters': choiceDirectVotersByPosition?.for?.voters,
                                 'againstMostRepresentingVoters': choiceDirectVotersByPosition?.against?.voters,
+                                'stats.directVotes': choiceDirectVotersByPosition?.forDirectVotes + choiceDirectVotersByPosition?.againstDirectVotes || 0,
+                                'stats.indirectVotes':
+                                    (choiceDirectVotersByPosition?.forVotes - choiceDirectVotersByPosition?.forDirectVotes) +
+                                    (choiceDirectVotersByPosition?.againstVotes - choiceDirectVotersByPosition?.againstDirectVotes) || 0,
                             }
                         }
                     }))
