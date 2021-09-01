@@ -18,7 +18,8 @@ export const Choice: FunctionComponent<{
     stats: any,
     userVote: any,
     inList?: boolean,
-    showPercentages?: boolean
+    showPercentages?: boolean,
+    maxVoteCount?: number
 }> = ({
     choiceText,
     voteName,
@@ -26,7 +27,8 @@ export const Choice: FunctionComponent<{
     stats,
     userVote,
     inList,
-    showPercentages
+    showPercentages,
+    maxVoteCount
 }) => {
 
         const { allSearchParams, updateParams } = useSearchParams();
@@ -93,7 +95,12 @@ export const Choice: FunctionComponent<{
 
         return (
             <div>
-                <div className="d-flex d-flex align-items-center mb-1">
+                <div className="d-flex d-flex align-items-center mb-1" style={{
+                    ...(maxVoteCount) && {
+                        'maxWidth':
+                            ((stats?.directVotes + stats?.indirectVotes | 0) / maxVoteCount) * 30 + 70 + '%'
+                    }
+                }}>
                     {!!choiceText && (
                         <div className={`white mr-2 ${inList && 'small'}`}><b>{choiceText}</b></div>
                     )}

@@ -11,14 +11,10 @@ import Choice from "@shared/Choice";
 
 export const MultiVoteInList: FunctionComponent<{ v: any, i?: number }> = ({ v, i = 0 }) => {
 
-    const [userVote, setUserVote] = React.useState(null);
-    const handleUserVote = (vote: string) => {
-        if (vote === userVote) {
-            setUserVote(null)
-        } else {
-            setUserVote(vote);
-        }
-    }
+    const sortedChoices = [...v.choices]?.
+        sort((a, b) => (b?.stats?.directVotes + b?.stats?.indirectVotes) - (a?.stats?.directVotes + a?.stats?.indirectVotes));
+    
+    const maxVoteCount = sortedChoices?.[0]?.stats?.directVotes + sortedChoices?.[0]?.stats?.indirectVotes;
 
     return (
         <div className="position-relative">
@@ -45,18 +41,23 @@ export const MultiVoteInList: FunctionComponent<{ v: any, i?: number }> = ({ v, 
             </div>
 
             <div>
-                {v.choices.map((c, i) => (
-                    <div className="my-3">
-                        <Choice
-                            choiceText={c.text}
-                            voteName={v.questionText}
-                            groupHandle={v.groupChannel.group}
-                            stats={c.stats}
-                            userVote={c.userVote}
-                            inList={true}
-                        />
-                    </div>
-                ))}
+                {sortedChoices?.
+                    sort((a, b) => (b?.stats?.directVotes + b?.stats?.indirectVotes) - (a?.stats?.directVotes + a?.stats?.indirectVotes))
+                    .map((c, i) => (
+                        <div className="my-3">
+                            <Choice
+                                choiceText={c.text}
+                                voteName={v.questionText}
+                                groupHandle={v.groupChannel.group}
+                                stats={c.stats}
+                                userVote={c.userVote}
+                                inList={true}
+                                maxVoteCount={maxVoteCount}
+                            />
+                        </div>
+                    ))}
+
+                <pre style={{ 'color': 'white' }}>{JSON.stringify(v.choices, null, 2)}</pre>
             </div>
 
             {/* <pre>{JSON.stringify(v.choices, null, 2)}</pre> */}

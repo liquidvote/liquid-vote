@@ -1,0 +1,37 @@
+org: lecoiso
+app: liquid-vote
+service: graphql
+provider:
+  name: aws
+  runtime: nodejs14.x
+  lambdaHashingVersion: 20201221
+functions:
+  graphql:
+    # this is formatted as <FILENAME>.<HANDLER>
+    handler: src/index.graphqlHandler
+    events:
+      - http:
+          path: /
+          method: post
+          cors: true
+      - http:
+          path: /
+          method: get
+          cors: true
+
+plugins:
+  - serverless-plugin-typescript
+  - serverless-offline
+  - serverless-domain-manager
+package:
+  patterns:
+    - credentials/*
+    - src/**
+  excludeDevDependencies: true
+custom:
+  serverless-offline:
+    noPrependStageInUrl: true
+  customDomain:
+    domainName: graphql.liquid-vote.com
+    stage: live
+    basePath: ""

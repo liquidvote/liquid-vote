@@ -628,10 +628,10 @@ export const updateQuestionVotingStats = async ({
                                 'lastVoteOn': choiceVoteCounts?.lastVoteOn,
                                 'forMostRepresentingVoters': choiceDirectVotersByPosition?.for?.voters,
                                 'againstMostRepresentingVoters': choiceDirectVotersByPosition?.against?.voters,
-                                'stats.directVotes': choiceDirectVotersByPosition?.forDirectVotes + choiceDirectVotersByPosition?.againstDirectVotes || 0,
-                                'stats.indirectVotes':
-                                    (choiceDirectVotersByPosition?.forVotes - choiceDirectVotersByPosition?.forDirectVotes) +
-                                    (choiceDirectVotersByPosition?.againstVotes - choiceDirectVotersByPosition?.againstDirectVotes) || 0,
+                                'directVotes': choiceVoteCounts?.forDirectVotes + choiceVoteCounts?.againstDirectVotes || 0,
+                                'indirectVotes':
+                                    (choiceVoteCounts?.forVotes - choiceVoteCounts?.forDirectVotes) +
+                                    (choiceVoteCounts?.againstVotes - choiceVoteCounts?.againstDirectVotes) || 0,
                             }
                         }
                     }))

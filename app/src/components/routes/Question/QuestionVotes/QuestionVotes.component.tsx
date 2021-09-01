@@ -128,18 +128,20 @@ export const QuestionVotes: FunctionComponent<{}> = ({ }) => {
                 <>
                     <ul className="nav d-flex justify-content-around mt-n2 mx-n3">
                         <li className="nav-item">
-                            <Link className={`nav-link ${!subsubsection && 'active'}`} to={`/profile/${handle}/votes/represented`}>
+                            <Link className={`nav-link ${!subsubsection && 'active'}`} to={`/poll/${voteName}/${groupHandle}/timeline/represented`}>
                                 <b>{question_data?.Question?.stats?.indirectVotes}</b> By anyone
                             </Link>
                         </li>
                         <li className="nav-item">
-                            <Link className={`nav-link ${subsubsection === 'byyou' && 'active'}`} to={`/profile/${handle}/votes/represented/byyou`}>
-                                <b>{profile?.yourStats?.indirectVotesMadeByYou}</b> By you
+                            <Link className={`nav-link ${subsubsection === 'byyou' && 'active'}`} to={`/poll/${voteName}/${groupHandle}/timeline/represented/byyou`}>
+                                {/* <b>{profile?.yourStats?.indirectVotesMadeByYou}</b> */}
+                                By you
                             </Link>
                         </li>
                         <li className="nav-item">
-                            <Link className={`nav-link ${subsubsection === 'foryou' && 'active'}`} to={`/profile/${handle}/votes/represented/foryou`}>
-                                <b>{profile?.yourStats?.indirectVotesMadeForYou}</b> For you
+                            <Link className={`nav-link ${subsubsection === 'foryou' && 'active'}`} to={`/poll/${voteName}/${groupHandle}/timeline/represented/foryou`}>
+                                {/* <b>{profile?.yourStats?.indirectVotesMadeForYou}</b> */}
+                                For you
                             </Link>
                         </li>
                     </ul>
@@ -201,6 +203,8 @@ export const QuestionVotes: FunctionComponent<{}> = ({ }) => {
                     <DropAnimation />
                 </div>
             )}
+
+            <pre>{JSON.stringify(question_data?.Question?.stats, null, 2)}</pre>
 
         </>
     );

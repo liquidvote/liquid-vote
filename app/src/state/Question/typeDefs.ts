@@ -34,6 +34,8 @@ export const QUESTION = gql`
                         representeeCount
                     }
                     againstDirectCount
+                    directVotes
+                    indirectVotes
                 }
                 userVote {
                     position
@@ -242,6 +244,8 @@ export const QUESTIONS = gql`
             representeeCount
         }
         againstDirectCount
+        directVotes
+        indirectVotes
     }
 `;
 
