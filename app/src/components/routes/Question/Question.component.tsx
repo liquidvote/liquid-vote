@@ -25,7 +25,6 @@ export default function Question() {
     let { voteName, groupHandle, section } = useParams<any>();
     const { allSearchParams, updateParams } = useSearchParams();
 
-
     const {
         loading: question_loading,
         error: question_error,
@@ -38,6 +37,11 @@ export default function Question() {
             // channel: groupChannel_.channel
         }
     });
+
+    const sortedChoices = question_data?.Question?.questionType === 'multi' ? [...question_data?.Question?.choices]?.
+        sort((a, b) => (b?.stats?.directVotes + b?.stats?.indirectVotes) - (a?.stats?.directVotes + a?.stats?.indirectVotes)) : [];
+
+    const maxVoteCount = question_data?.Question?.questionType === 'multi' && sortedChoices?.[0]?.stats?.directVotes + sortedChoices?.[0]?.stats?.indirectVotes;
 
     return question_loading ? (
         <div className="d-flex justify-content-center mt-5">
@@ -62,7 +66,7 @@ export default function Question() {
 
                 {
                     question_data?.Question?.questionType === 'multi' ?
-                        question_data?.Question?.choices?.map(c => (
+                        sortedChoices?.map(c => (
                             <div className="my-3">
                                 <Choice
                                     choiceText={c.text}
@@ -70,6 +74,7 @@ export default function Question() {
                                     groupHandle={groupHandle}
                                     stats={c.stats}
                                     userVote={c.userVote}
+                                    maxVoteCount={maxVoteCount}
                                 />
                             </div>
                         )) :
