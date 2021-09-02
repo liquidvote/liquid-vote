@@ -54,65 +54,6 @@ const QueryTypeDefs = gql`
     }
 `;
 
-// mongoClient.connect(async (err) => {
-//     const mongoDB = mongoClient.db("LiquidVote");
-
-//     const server = new ApolloServer({
-//         typeDefs: [
-//             QueryTypeDefs,
-//             BookTypeDefs,
-//             AuthUserTypeDefs,
-//             UserTypeDefs,
-//             GroupTypeDefs,
-//             QuestionTypeDefs,
-//             VoteTypeDefs,
-//             InviteTypeDefs
-//         ],
-//         resolvers: {
-//             ...BookResolvers,
-//             ...AuthUserResolvers,
-//             ...UserResolvers,
-//             ...GroupResolvers,
-//             ...QuestionResolvers,
-//             ...VoteResolvers,
-//             ...InviteResolvers,
-//             Query: {
-//                 ...BookResolvers.Query,
-//                 ...AuthUserResolvers.Query,
-//                 ...UserResolvers.Query,
-//                 ...GroupResolvers.Query,
-//                 ...QuestionResolvers.Query,
-//                 ...VoteResolvers.Query,
-//                 ...InviteResolvers.Query
-//             },
-//             Mutation: {
-//                 // ...BookResolvers.Mutation,
-//                 ...AuthUserResolvers.Mutation,
-//                 ...UserResolvers.Mutation,
-//                 ...GroupResolvers.Mutation,
-//                 ...QuestionResolvers.Mutation,
-//                 ...VoteResolvers.Mutation,
-//                 ...InviteResolvers.Mutation
-//             }
-//         },
-//         context: async ({ req }) => {
-//             const token = req.headers.authorization || null;
-
-//             const AuthUser = token && await mongoDB.collection("Users")
-//                 .findOne({ 'Auth0User.sub': token });
-
-//             // console.log({ ContextAuthUser: AuthUser });
-
-//             return { AuthUser, mongoDB, AWS };
-//         },
-//     });
-
-//     // The `listen` method launches a web server.
-//     server.listen().then(({ url }) => {
-//         console.log(`🚀  Server ready at ${url}`);
-//     });
-// });
-
 const createHandler = async () => {
     const DBConnection = (await getDBConnection());
     const server = new ApolloServer({

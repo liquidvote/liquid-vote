@@ -2,14 +2,17 @@
   "scripts": {
     "check-types": "tsc",
     "start": "npm run serve:dev",
-    "build": "cross-env NODE_ENV=production webpack --color --progress",
+    "build:staging": "cross-env NODE_ENV=staging webpack --color --progress",
+    "build:production": "cross-env NODE_ENV=production webpack --color --progress",
     "serve:local": "cross-env NODE_ENV=local webpack-dev-server --color --progress",
     "serve:dev": "cross-env NODE_ENV=development webpack-dev-server --color --progress",
     "serve:production": "cross-env NODE_ENV=production webpack-dev-server --color --progress",
-    "predeploystaging": "npm run build",
-    "predeployproduction": "npm run build",
+    "serve:dist": "http-server -S -C cert.pem",
+    "predeploystaging": "npm run build:staging",
+    "predeployproduction": "npm run build:production",
     "deploystaging": "aws s3 sync ./dist s3://liquid-vote-app-prototype-3 --profile pedro",
-    "deployproduction": "aws s3 sync ./dist s3://app.liquid-vote.com --profile pedro"
+    "deployproduction": "aws s3 sync ./dist s3://app.liquid-vote.com --profile pedro",
+    "cleanS3": "aws s3 rm s3://app.liquid-vote.com --recursive --profile pedro"
   },
   "dependencies": {
     "@apollo/client": "^3.3.19",

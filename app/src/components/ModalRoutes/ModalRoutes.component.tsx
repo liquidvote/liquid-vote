@@ -36,7 +36,7 @@ export const ModalRoutes: FunctionComponent<{}> = ({ }) => {
                             <>Error</>
                         }
                         onError={(err) => {
-                            console.log({ err });
+                            console.log({ err, allSearchParams });
                             updateParams({ keysToRemove: ['modal', 'modalData'] })
                         }}
                     >

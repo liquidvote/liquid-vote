@@ -12,10 +12,12 @@ const config = {
   entry: {
     index: "./src/index.tsx",
   },
+  devtool: isProd ? 'source-map' : 'inline-source-map',
   output: {
     path: `${__dirname}/dist`,
     publicPath: "/",
     filename: "[name].js",
+    chunkFilename: '[id].chunk.[chunkhash].js',
   },
   resolve: {
     extensions: [".js", ".jsx", ".ts", ".tsx"],
@@ -55,10 +57,12 @@ const config = {
 
 if (isProd) {
   config.optimization = {
+    minimize: true,
     minimizer: [new TerserWebpackPlugin()],
   };
 } else {
   config.devServer = {
+    https: true,
     publicPath: "/",
     port: 8080,
     open: true,
