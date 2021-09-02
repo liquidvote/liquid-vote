@@ -4,6 +4,7 @@ import React, {
     useState
 } from 'react';
 import { useQuery, useMutation } from "@apollo/client";
+import env from '@env';
 
 import { INVITES, EDIT_INVITE } from "@state/Invites/typeDefs";
 import { SEARCH_USERS } from "@state/User/typeDefs";
@@ -32,7 +33,7 @@ export const InvitesLink: FunctionComponent<Props> = ({
 
     const [isFocused, setIsFocused] = useState(false);
 
-    const link = `http://localhost:8080/group/${groupHandle}?${new URLSearchParams({
+    const link = `${env.website}/group/${groupHandle}?${new URLSearchParams({
         modal: 'AcceptInvite',
         modalData: JSON.stringify({
             toWhat: 'group',

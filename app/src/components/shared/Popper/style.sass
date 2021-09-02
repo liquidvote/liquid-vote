@@ -21,5 +21,15 @@
         border-top: 10px solid #0fded5
         clear: both
 
+
+    &.rightOnSmall
+        @media (max-width: 768px)
+            right: -5px
+            left: initial
+
+            &:before
+                right: 10px
+                left: initial
+
     &.is-visible
         display: block
