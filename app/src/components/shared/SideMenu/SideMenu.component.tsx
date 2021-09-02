@@ -36,7 +36,7 @@ export const SideMenu: FunctionComponent<{}> = ({ }) => {
 
     return (
         <div className="sideMenu">
-            <Link to="/home">
+            <Link to="/home" className="hide-on-smaller-sideMenu">
                 <RippleDrop />
             </Link>
             <Link to="/home" data-tip="Home">
@@ -46,9 +46,6 @@ export const SideMenu: FunctionComponent<{}> = ({ }) => {
                 <>
                     <Link to="/feed" data-tip="Notifications">
                         <NotificationSvg />
-                    </Link>
-                    <Link to="/trending" data-tip="Trending" className="d-block d-md-none">
-                        <TrendingSvg />
                     </Link>
                     <Link to="/groups" data-tip="Your Groups">
                         <GroupSvg />
@@ -61,16 +58,19 @@ export const SideMenu: FunctionComponent<{}> = ({ }) => {
             <Link to="/feed">
                 <AnalyticsSvg />
             </Link> */}
-            <br />
-            <br />
-            <br />
-            <br />
+            <div className="hide-on-smaller-sideMenu">
+                <br />
+                <br />
+                <br />
+                <br />
+            </div>
             {isAuthenticated && user && (
                 <>
                     <Popper
+                        rightOnSmall={true}
                         button={<div>
                             <img
-                                className="vote-avatar mb-3"
+                                className="vote-avatar"
                                 src={authUser?.LiquidUser?.avatar}
                                 alt={authUser?.LiquidUser?.name}
                             />
@@ -86,7 +86,7 @@ export const SideMenu: FunctionComponent<{}> = ({ }) => {
                     />
                     <div
                         data-tip="Create Poll"
-                        className="button_ inverted icon-contain"
+                        className="button_ inverted icon-contain hide-on-smaller-sideMenu mt-3"
                         onClick={() => updateParams({
                             paramsToAdd: {
                                 modal: "EditQuestion",

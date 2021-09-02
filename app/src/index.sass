@@ -315,6 +315,25 @@ hr
     align-items: center
     padding-top: 10px
 
+    @media (max-width: 768px)
+        position: fixed
+        bottom: 0
+        width: 100vw
+        height: 50px
+        flex-direction: row
+        z-index: 2
+        background: #0b414d
+        justify-content: space-around
+        align-items: center
+        padding: 0
+        border-top: 1px solid rgba(0, 0, 0, 0.3)
+
+        .icon
+            margin-bottom: 0 !important
+
+        .hide-on-smaller-sideMenu
+            display: none
+
     .icon
         margin-bottom: 20px
 

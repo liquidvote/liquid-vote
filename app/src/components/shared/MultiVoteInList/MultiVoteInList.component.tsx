@@ -57,7 +57,7 @@ export const MultiVoteInList: FunctionComponent<{ v: any, i?: number }> = ({ v, 
                         </div>
                     ))}
 
-                <pre style={{ 'color': 'white' }}>{JSON.stringify(v.choices, null, 2)}</pre>
+                {/* <pre style={{ 'color': 'white' }}>{JSON.stringify(v.choices, null, 2)}</pre> */}
             </div>
 
             {/* <pre>{JSON.stringify(v.choices, null, 2)}</pre> */}
