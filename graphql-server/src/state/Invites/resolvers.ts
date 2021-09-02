@@ -1,4 +1,4 @@
-import { ObjectID } from 'mongodb';
+import { ObjectId } from 'mongodb';
 
 export const InviteResolvers = {
     Query: {
@@ -42,13 +42,13 @@ export const InviteResolvers = {
                         '$match': {
                             '$or': [
                                 ...(Group) ? [
-                                    { 'toWhat.group': ObjectID(Group?._id) }
+                                    { 'toWhat.group': new ObjectId(Group?._id) }
                                 ] : [],
                                 ...(fromWhomUser) ? [
-                                    { 'fromWhom': ObjectID(fromWhomUser?._id) }
+                                    { 'fromWhom': new ObjectId(fromWhomUser?._id) }
                                 ] : [],
                                 ...(toWhomUser) ? [
-                                    { 'toWhom.user': ObjectID(toWhomUser?._id) }
+                                    { 'toWhom.user': new ObjectId(toWhomUser?._id) }
                                 ] : [],
                             ]
                         }
@@ -288,7 +288,7 @@ export const updateInviteStatus = async ({
     // console.log({ InviteId, to });
 
     const updatedInvite = (await mongoDB.collection("Invites").findOneAndUpdate(
-        { _id: ObjectID(InviteId) },
+        { _id: new ObjectId(InviteId) },
         {
             $set: {
                 ...(to === 'accepted') && { isAccepted: true },
