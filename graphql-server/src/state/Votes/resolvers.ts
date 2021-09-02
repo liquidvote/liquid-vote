@@ -1,4 +1,4 @@
-import { ObjectID } from 'mongodb';
+import { ObjectId } from 'mongodb';
 
 import { updateQuestionVotingStats } from '../Questions/resolvers';
 
@@ -30,7 +30,7 @@ export const VoteResolvers = {
                     {
                         '$match': {
                             ...(handleType === 'user') && {
-                                'user': ObjectID(User._id)
+                                'user': new ObjectId(User._id)
                             },
                             ...(handleType === 'group') && {
                                 'groupChannel.group': handle
@@ -42,7 +42,7 @@ export const VoteResolvers = {
                         '$lookup': {
                             'from': 'Votes',
                             'let': {
-                                'userId': ObjectID(AuthUser?._id),
+                                'userId': new ObjectId(AuthUser?._id),
                                 'questionText': '$questionText',
                                 'choiceText': '$choiceText',
                                 'group': '$groupChannel.group',
@@ -107,7 +107,7 @@ export const VoteResolvers = {
                     }, {
                         '$addFields': {
                             'byYou': {
-                                '$eq': ['$user', ObjectID(AuthUser?._id)]
+                                '$eq': ['$user', new ObjectId(AuthUser?._id)]
                             },
                             'bothDirect': {
                                 '$and': [
@@ -176,7 +176,7 @@ export const VoteResolvers = {
                                                         'as': 'r',
                                                         'cond': {
                                                             '$eq': [
-                                                                '$$r.representativeId', ObjectID(AuthUser?._id)
+                                                                '$$r.representativeId', new ObjectId(AuthUser?._id)
                                                             ]
                                                         }
                                                     }
@@ -463,7 +463,7 @@ export const VoteResolvers = {
                         ])
                         .toArray(),
                     'indirectVotesMade': async () => await mongoDB.collection("Votes")
-                        // .find({ 'user': ObjectID(User?._id), 'isDirect': false })
+                        // .find({ 'user': new ObjectId(User?._id), 'isDirect': false })
                         .aggregate([
                             ...votesInCommonGeneralAggregationLogic,
                             ...representeeVotesAggregationLogic,
@@ -473,7 +473,7 @@ export const VoteResolvers = {
                         ])
                         .toArray(),
                     'indirectVotes': async () => await mongoDB.collection("Votes")
-                        // .find({ 'user': ObjectID(User?._id), 'isDirect': false })
+                        // .find({ 'user': new ObjectId(User?._id), 'isDirect': false })
                         .aggregate([
                             ...votesInCommonGeneralAggregationLogic,
                             {
@@ -487,7 +487,7 @@ export const VoteResolvers = {
                         ])
                         .toArray(),
                     'indirectVotesMadeByUser': async () => await mongoDB.collection("Votes")
-                        // .find({ 'user': ObjectID(User?._id), 'isDirect': false })
+                        // .find({ 'user': new ObjectId(User?._id), 'isDirect': false })
                         .aggregate([
                             ...votesInCommonGeneralAggregationLogic,
                             {
@@ -533,7 +533,7 @@ export const VoteResolvers = {
                             ...votesInCommonGeneralAggregationLogic,
                             {
                                 '$match': {
-                                    'user': ObjectID(AuthUser?._id),
+                                    'user': new ObjectId(AuthUser?._id),
                                     'isDirect': true,
                                     'position': { $ne: null }
                                 }
@@ -573,7 +573,7 @@ export const VoteResolvers = {
                     choiceText,
                     'groupChannel.group': group,
                     // 'groupChannel.channel': channel,
-                    user: ObjectID(AuthUser?._id)
+                    user: new ObjectId(AuthUser?._id)
                 });
 
             const Group_ = !!AuthUser && await mongoDB.collection("Groups")
@@ -649,8 +649,8 @@ export const VoteResolvers = {
             const representeesAndVote = !!AuthUser && (await mongoDB.collection("UserRepresentations")
                 .aggregate([{
                     $match: {
-                        representativeId: ObjectID(AuthUser._id),
-                        groupId: ObjectID(Group_._id),
+                        representativeId: new ObjectId(AuthUser._id),
+                        groupId: new ObjectId(Group_._id),
                         isRepresentingYou: true
                     }
                 }, {

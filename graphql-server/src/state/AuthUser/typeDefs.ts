@@ -1,4 +1,4 @@
-import { gql } from "apollo-server";
+import { gql } from "apollo-server-lambda";
 
 export const AuthUserTypeDefs = gql`
     extend type Query {

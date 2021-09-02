@@ -1,4 +1,4 @@
-import { ApolloServer, gql } from "apollo-server-lambda";//"apollo-server";
+import { ApolloServer, gql } from "apollo-server-lambda";
 const MongoClient = require("mongodb").MongoClient;
 // const AWS = require("aws-sdk");
 

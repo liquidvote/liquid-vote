@@ -4,33 +4,31 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "start": "sls offline",
+    "start": "npx sls offline",
     "test": "echo \"Error: no test specified\" && exit 1",
     "build": "tsc --build",
     "deploy": "npm run deploy:dev",
-    "deploy:dev": "sls deploy --stage dev",
-    "deploy:live": "sls deploy --stage live",
-    "remove:dev": "sls remove --stage dev",
-    "remove:live": "sls remove --stage live",
-    "logs": "sls logs -f graphql -t -s live"
+    "deploy:dev": "npx sls deploy --stage dev",
+    "deploy:live": "npx sls deploy --stage live",
+    "remove:dev": "npx sls remove --stage dev",
+    "remove:live": "npx sls remove --stage live",
+    "logs": "npx sls logs -f graphql -t -s live"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "apollo-datasource-rest": "^0.14.0",
-    "apollo-server": "^2.24.1",
+    "apollo-datasource-rest": "^3.2.0",
     "apollo-server-lambda": "^2",
-    "graphql": "^15.5.0",
-    "mongodb": "^3.6.9",
-    "serverless": "^2.56.0",
-    "typescript": "^4.2.4"
+    "graphql": "^15.5.2",
+    "mongodb": "^4.1.1"
   },
   "devDependencies": {
-    "nodemon": "^2.0.7",
+    "serverless": "^2.57.0",
     "serverless-domain-manager": "^5.1.5",
     "serverless-offline": "^8.0.0",
-    "serverless-plugin-typescript": "^1.2.0",
-    "ts-node": "^10.0.0"
+    "serverless-plugin-typescript": "^2.0.0",
+    "ts-node": "^10.2.1",
+    "typescript": "^4.4.2"
   }
 }

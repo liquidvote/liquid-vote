@@ -1,4 +1,4 @@
-import { ObjectID } from 'mongodb';
+import { ObjectId } from 'mongodb';
 
 export const QuestionResolvers = {
     Query: {
@@ -180,7 +180,7 @@ export const QuestionResolvers = {
                             "groupChannel.group": group,
                             // "groupChannel.channel": channel,
                             "questionText": questionText,
-                            'user': new ObjectID(AuthUser._id)
+                            'user': new ObjectId(AuthUser._id)
                         }
                     }, {
                         '$unwind': {
@@ -272,7 +272,7 @@ export const QuestionResolvers = {
                             "groupChannel.group": group,
                             // "groupChannel.channel": channel,
                             "questionText": questionText,
-                            'user': new ObjectID(AuthUser._id)
+                            'user': new ObjectId(AuthUser._id)
                         }
                     }, {
                         '$lookup': {

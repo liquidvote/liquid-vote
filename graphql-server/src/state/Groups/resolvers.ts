@@ -1,4 +1,4 @@
-import { ObjectID } from 'mongodb';
+import { ObjectId } from 'mongodb';
 
 export const GroupResolvers = {
     Query: {
@@ -9,8 +9,8 @@ export const GroupResolvers = {
 
             const GroupMemberRelation = AuthUser ? (await mongoDB.collection("GroupMembers")
                 .findOne({
-                    'userId': ObjectID(AuthUser._id),
-                    'groupId': ObjectID(Group._id)
+                    'userId': new ObjectId(AuthUser._id),
+                    'groupId': new ObjectId(Group._id)
                 })) : {};
 
             return {
@@ -42,7 +42,7 @@ export const GroupResolvers = {
             const GroupMemberRelations = (
                 await mongoDB.collection("GroupMembers")
                     .find({
-                        'groupId': ObjectID(Group._id),
+                        'groupId': new ObjectId(Group._id),
                         'isMember': true
                     }).toArray()
             );
@@ -50,7 +50,7 @@ export const GroupResolvers = {
             const Members = (
                 await mongoDB.collection("Users").find({
                     "_id": {
-                        "$in": GroupMemberRelations.map(r => ObjectID(r.userId))
+                        "$in": GroupMemberRelations.map(r => new ObjectId(r.userId))
                     }
                 }).toArray()
             )?.map(u => u?.LiquidUser);
@@ -74,13 +74,13 @@ export const GroupResolvers = {
                 .findOne({ 'LiquidUser.handle': userHandle });
 
             const GroupsMemberRelations = await mongoDB.collection("GroupMembers")
-                .find({ 'userId': ObjectID(User?._id) })
+                .find({ 'userId': new ObjectId(User?._id) })
                 .toArray();
 
             const Groups = await Promise.all((
                 await mongoDB.collection("Groups").find({
                     "_id": {
-                        "$in": GroupsMemberRelations.map(r => ObjectID(r.groupId))
+                        "$in": GroupsMemberRelations.map(r => new ObjectId(r.groupId))
                     }
                 }).toArray()
             )
@@ -148,8 +148,8 @@ export const GroupResolvers = {
 
                 // const GroupMemberRelation = await mongoDB.collection("GroupMembers")
                 //     .find({
-                //         'userId': ObjectID(AuthUser._id),
-                //         'groupId': ObjectID(Group_._id)
+                //         'userId': new ObjectId(AuthUser._id),
+                //         'groupId': new ObjectId(Group_._id)
                 //     })
                 //     .toArray();
 
@@ -247,7 +247,7 @@ export const getGroupStats = async ({ groupId, groupHandle, mongoDB }) => {
         lastDirectVoteOn: 0,
         members: await mongoDB.collection("GroupMembers")
             .find({
-                "groupId": ObjectID(groupId),
+                "groupId": new ObjectId(groupId),
                 "isMember": true
             }).count(),
         questions: await mongoDB.collection("Questions")
@@ -256,7 +256,7 @@ export const getGroupStats = async ({ groupId, groupHandle, mongoDB }) => {
             }).count(),
         representations: await mongoDB.collection("UserRepresentations")
             .find({
-                "groupId": ObjectID(groupId),
+                "groupId": new ObjectId(groupId),
             }).count(),
         directVotesMade: await mongoDB.collection("Votes")
             .find({
@@ -287,7 +287,7 @@ const getYourGroupStats = async ({ groupId, groupHandle, AuthUser, mongoDB }) =>
                     '$lookup': {
                         'from': 'Votes',
                         'let': {
-                            'userId': ObjectID(AuthUser._id),
+                            'userId': new ObjectId(AuthUser._id),
                             'questionText': '$questionText',
                             'choiceText': '$choiceText',
                             'group': '$groupChannel.group',
@@ -357,7 +357,7 @@ const getYourGroupStats = async ({ groupId, groupHandle, AuthUser, mongoDB }) =>
                 }, {
                     '$project': {
                         'byYou': {
-                            '$eq': ['$user', ObjectID(AuthUser?._id)]
+                            '$eq': ['$user', new ObjectId(AuthUser?._id)]
                         },
                         'bothDirect': {
                             '$and': [
@@ -394,7 +394,7 @@ const getYourGroupStats = async ({ groupId, groupHandle, AuthUser, mongoDB }) =>
                                                     'as': 'r',
                                                     'cond': {
                                                         '$eq': [
-                                                            '$$r.representativeId', ObjectID(AuthUser?._id)
+                                                            '$$r.representativeId', new ObjectId(AuthUser?._id)
                                                         ]
                                                     }
                                                 }
@@ -544,20 +544,20 @@ const getYourGroupStats = async ({ groupId, groupHandle, AuthUser, mongoDB }) =>
         lastDirectVoteOn: 0,
         representing: await mongoDB.collection("UserRepresentations")
             .find({
-                "groupId": ObjectID(groupId),
-                "representeeId": ObjectID(AuthUser._id),
+                "groupId": new ObjectId(groupId),
+                "representeeId": new ObjectId(AuthUser._id),
             }).count(),
         representedBy: await mongoDB.collection("UserRepresentations")
             .find({
-                "groupId": ObjectID(groupId),
-                "representativeId": ObjectID(AuthUser._id),
+                "groupId": new ObjectId(groupId),
+                "representativeId": new ObjectId(AuthUser._id),
             }).count(),
         directVotesMade: await mongoDB.collection("Votes")
             .find({
                 "groupChannel.group": groupHandle,
                 "isDirect": true,
                 'position': { $ne: null },
-                "user": ObjectID(AuthUser._id)
+                "user": new ObjectId(AuthUser._id)
             }).count(),
 
         votesInCommon: votesInCommon?.votesInCommon || 0, // count
