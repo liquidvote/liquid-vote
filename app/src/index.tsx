@@ -23,7 +23,8 @@ const AppolloAppWrapper: FunctionComponent<{}> = ({ }) => {
 
     const client = new ApolloClient({
         link: httpLink,
-        cache: new InMemoryCache()
+        credentials: 'include',
+        cache: new InMemoryCache(),
     });
 
     useEffect(() => {
