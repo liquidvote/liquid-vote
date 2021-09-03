@@ -29,19 +29,24 @@ const AppolloAppWrapper: FunctionComponent<{}> = ({ }) => {
 
     useEffect(() => {
         if (user) {
-            const authLink = setContext((_, { headers }) => {
-                return {
-                    headers: {
-                        ...headers,
-                        authorization: user?.sub,
+            const login = async () => {
+                const authLink = await setContext((_, { headers }) => {
+                    return {
+                        headers: {
+                            ...headers,
+                            authorization: user?.sub,
+                        }
                     }
-                }
-            });
-            client.setLink(authLink.concat(httpLink));
-            client.mutate({
-                mutation: AUTH_USER_LOGGEDIN,
-                variables: { Auth0User: user }
-            });
+                });
+                await client.setLink(authLink.concat(httpLink));
+                await client.mutate({
+                    mutation: AUTH_USER_LOGGEDIN,
+                    variables: { Auth0User: user }
+                });
+
+                // TODO: Continue login logic here, currently it continues on SideMenu
+            }
+            login();
         } else {
             client.setLink(httpLink);
         }
