@@ -137,7 +137,7 @@ export const Choice: FunctionComponent<{
                         <div
                             className={`button_ justify-content-between min-w mr-1 ${userVote_ === 'for' && 'selected'} ${inList && 'small'}`}
                         >
-                            <span className="mr-1" onClick={() => handleUserVote('for')}>
+                            <span className="mr-1 clickable" onClick={() => handleUserVote('for')}>
                                 For
                             </span>
                             {
@@ -163,8 +163,6 @@ export const Choice: FunctionComponent<{
                                 )
                             }
                         </div>
-
-
                         <div className="d-flex ml-2">
                             {(
                                 !!editVote_data ?
@@ -189,6 +187,14 @@ export const Choice: FunctionComponent<{
                             </Link>
                         </div>
                     </div>
+
+                    {editVote_loading && (
+                        <img
+                            className={`vote-avatar ${inList && 'tiny'}`}
+                            src={'http://images.liquid-vote.com/system/loading.gif'}
+                        />
+                    )}
+
                     <div className="d-flex align-items-center">
                         <div className="d-flex ml-2">
                             {
@@ -239,7 +245,7 @@ export const Choice: FunctionComponent<{
                                 )
                             }
                             <span></span>
-                            <span onClick={() => handleUserVote('against')}>
+                            <span className="clickable" onClick={() => handleUserVote('against')}>
                                 Against
                             </span>
                         </div>

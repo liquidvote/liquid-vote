@@ -550,12 +550,6 @@ export const VoteResolvers = {
             mongoDB, AuthUser
         }) => {
 
-            console.log({
-                Vote,
-                questionText,
-                choiceText
-            })
-
             const Vote_ = !!AuthUser && await mongoDB.collection("Votes")
                 .findOne({
                     questionText,
@@ -569,7 +563,6 @@ export const VoteResolvers = {
                 .findOne({
                     handle: group
                 });
-
 
             const savedVote = (!!AuthUser && !Vote_) ?
                 (await mongoDB.collection("Votes").insertOne({
@@ -747,11 +740,6 @@ export const VoteResolvers = {
                 mongoDB,
                 AuthUser
             });
-
-            console.log({
-                savedVote,
-                Vote_
-            })
 
             return {
                 ...savedVote,
