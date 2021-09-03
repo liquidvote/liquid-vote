@@ -22,15 +22,31 @@ export const SideMenu: FunctionComponent<{}> = ({ }) => {
 
     const { user, isAuthenticated, isLoading, loginWithRedirect, logout, loginWithPopup } = useAuth0();
 
-    const { loading: authUser_loading, error: authUser_error, data: authUser_data, refetch: authUser_refetch } = useQuery(AUTH_USER);
+    const {
+        loading: authUser_loading,
+        error: authUser_error,
+        data: authUser_data,
+        refetch: authUser_refetch
+    } = useQuery(AUTH_USER);
 
     const { authUser } = authUser_data || {};
 
     useEffect(() => {
         if (isAuthenticated) {
-            setTimeout(() => authUser_refetch(), 100);
-            setTimeout(() => authUser_refetch(), 1000);
-            setTimeout(() => authUser_refetch(), 5000);
+
+            let count = 0;
+            const tryToGetUser = async () => {
+                const g = await authUser_refetch();
+                count = count + 1;
+
+                // console.log({ count, g });
+
+                if (!g?.data?.authUser) {
+                    setTimeout(() => tryToGetUser(), 100 + (count * 50));
+                }
+                
+            };
+            tryToGetUser();
         }
     }, [isAuthenticated]);
 
@@ -71,13 +87,18 @@ export const SideMenu: FunctionComponent<{}> = ({ }) => {
                         button={<div>
                             <img
                                 className="vote-avatar"
-                                src={authUser?.LiquidUser?.avatar}
-                                alt={authUser?.LiquidUser?.name}
+                                src={authUser?.LiquidUser?.avatar || 'http://images.liquid-vote.com/system/loading.gif'}
+                                alt={authUser?.LiquidUser?.name || 'loading'}
                             />
                         </div>}
                         popperContent={
                             <ul className="p-0 m-0">
-                                <li><Link to={`/profile/${authUser?.LiquidUser?.handle}`}>Visit Profile</Link></li>
+                                <li>
+                                    {!!authUser ?
+                                        <Link to={`/profile/${authUser?.LiquidUser?.handle}`}>Visit Profile</Link> :
+                                        'loading...'
+                                    }
+                                </li>
                                 <li className="pointer" onClick={() => logout({
                                     returnTo: window.location.origin
                                 })}>Logout</li>

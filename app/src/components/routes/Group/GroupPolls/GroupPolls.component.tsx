@@ -8,6 +8,7 @@ import DropPlusSVG from "@shared/Icons/Drop+.svg";
 import useSearchParams from "@state/Global/useSearchParams.effect";
 import { QUESTIONS } from "@state/Question/typeDefs";
 import { GROUP } from "@state/Group/typeDefs";
+import DropAnimation from "@components/shared/DropAnimation";
 
 import './style.sass';
 
@@ -72,6 +73,12 @@ export const GroupPolls: FunctionComponent<{
                         <hr />
                     </div>
                 ))}
+
+                {questions_loading && (
+                    <div className="d-flex justify-content-center mt-5">
+                        <DropAnimation />
+                    </div>
+                )}
 
             </>
         );

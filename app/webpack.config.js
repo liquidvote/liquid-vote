@@ -65,7 +65,7 @@ if (isProd) {
   };
 } else {
   config.devServer = {
-    https: true,
+    // https: true,
     // publicPath: "/",
     port: 8080,
     open: true,
