@@ -24,35 +24,35 @@ export default function App() {
                 <SideMenu />
                 <div className="App border-sides">
                     <Switch>
-                        <Route path="/poll/:voteName/:groupHandle/:section/:subsection/:subsubsection" component={loadable(() => import('./components/Routes/Question'))} />
-                        <Route path="/poll/:voteName/:groupHandle/:section/:subsection" component={loadable(() => import('./components/Routes/Question'))} />
-                        <Route path="/poll/:voteName/:groupHandle/:section" component={loadable(() => import('./components/Routes/Question'))} />
-                        <Route path="/poll/:voteName/:groupHandle" component={loadable(() => import('./components/Routes/Question'))} />
+                        <Route path="/poll/:voteName/:groupHandle/:section/:subsection/:subsubsection" component={loadable(() => import('@components/routes/Question'))} />
+                        <Route path="/poll/:voteName/:groupHandle/:section/:subsection" component={loadable(() => import('./components/routes/Question'))} />
+                        <Route path="/poll/:voteName/:groupHandle/:section" component={loadable(() => import('./components/routes/Question'))} />
+                        <Route path="/poll/:voteName/:groupHandle" component={loadable(() => import('./components/routes/Question'))} />
                         
-                        <Route path="/multipoll/:voteName/:groupHandle/:section/:subsection/:subsubsection" component={loadable(() => import('./components/Routes/Question'))} />
-                        <Route path="/multipoll/:voteName/:groupHandle/:section/:subsection" component={loadable(() => import('./components/Routes/Question'))} />
-                        <Route path="/multipoll/:voteName/:groupHandle/:section" component={loadable(() => import('./components/Routes/Question'))} />
-                        <Route path="/multipoll/:voteName/:groupHandle" component={loadable(() => import('./components/Routes/Question'))} />
-                        <Route path="/grouping/:groupType/:groupFilter" component={loadable(() => import('./components/Routes/Grouping'))} />
-                        <Route path="/register" component={loadable(() => import('./components/Routes/CreateProfile'))} />
-                        <Route path="/create-vote" component={loadable(() => import('./components/Routes/CreateVote'))} />
-                        <Route path="/create-vote/:groupName" component={loadable(() => import('./components/Routes/CreateVote'))} />
-                        {/* <Route path="/create-sub-vote/:voteName" component={loadable(() => import('./components/Routes/CreateVote'))} /> */}
-                        <Route path="/profile/:handle/:section/:subsection/:subsubsection" component={loadable(() => import('./components/Routes/Profile'))} />
-                        <Route path="/profile/:handle/:section/:subsection" component={loadable(() => import('./components/Routes/Profile'))} />
-                        <Route path="/profile/:handle/:section" component={loadable(() => import('./components/Routes/Profile'))} />
-                        <Route path="/profile/:handle" component={loadable(() => import('./components/Routes/Profile'))} />
-                        <Route path="/profile" component={loadable(() => import('./components/Routes/Profile'))} />
-                        <Route path="/profile-people/:handle/:which" component={loadable(() => import('./components/Routes/ProfilePeople'))} />
-                        <Route path="/trending" component={loadable(() => import('./components/Routes/Trending'))} />
-                        <Route path="/feed" component={loadable(() => import('./components/Routes/Feed'))} />
-                        <Route path="/groups" component={loadable(() => import('./components/Routes/Groups'))} />
-                        <Route path="/group/:handle/:section/:subsection/:subsubsection" component={loadable(() => import('./components/Routes/Group'))} />
-                        <Route path="/group/:handle/:section/:subsection" component={loadable(() => import('./components/Routes/Group'))} />
-                        <Route path="/group/:handle/:section" component={loadable(() => import('./components/Routes/Group'))} />
-                        <Route path="/group/:handle" component={loadable(() => import('./components/Routes/Group'))} />
-                        <Route path="/group-people/:handle/:which" component={loadable(() => import('./components/Routes/GroupPeople'))} />
-                        <Route path="/" component={loadable(() => import('./components/Routes/Home'))} />
+                        <Route path="/multipoll/:voteName/:groupHandle/:section/:subsection/:subsubsection" component={loadable(() => import('./components/routes/Question'))} />
+                        <Route path="/multipoll/:voteName/:groupHandle/:section/:subsection" component={loadable(() => import('./components/routes/Question'))} />
+                        <Route path="/multipoll/:voteName/:groupHandle/:section" component={loadable(() => import('./components/routes/Question'))} />
+                        <Route path="/multipoll/:voteName/:groupHandle" component={loadable(() => import('./components/routes/Question'))} />
+                        <Route path="/grouping/:groupType/:groupFilter" component={loadable(() => import('./components/routes/Grouping'))} />
+                        <Route path="/register" component={loadable(() => import('./components/routes/CreateProfile'))} />
+                        <Route path="/create-vote" component={loadable(() => import('./components/routes/CreateVote'))} />
+                        <Route path="/create-vote/:groupName" component={loadable(() => import('./components/routes/CreateVote'))} />
+                        {/* <Route path="/create-sub-vote/:voteName" component={loadable(() => import('./components/routes/CreateVote'))} /> */}
+                        <Route path="/profile/:handle/:section/:subsection/:subsubsection" component={loadable(() => import('./components/routes/Profile'))} />
+                        <Route path="/profile/:handle/:section/:subsection" component={loadable(() => import('./components/routes/Profile'))} />
+                        <Route path="/profile/:handle/:section" component={loadable(() => import('./components/routes/Profile'))} />
+                        <Route path="/profile/:handle" component={loadable(() => import('./components/routes/Profile'))} />
+                        <Route path="/profile" component={loadable(() => import('./components/routes/Profile'))} />
+                        <Route path="/profile-people/:handle/:which" component={loadable(() => import('./components/routes/ProfilePeople'))} />
+                        <Route path="/trending" component={loadable(() => import('./components/routes/Trending'))} />
+                        <Route path="/feed" component={loadable(() => import('./components/routes/Feed'))} />
+                        <Route path="/groups" component={loadable(() => import('./components/routes/Groups'))} />
+                        <Route path="/group/:handle/:section/:subsection/:subsubsection" component={loadable(() => import('./components/routes/Group'))} />
+                        <Route path="/group/:handle/:section/:subsection" component={loadable(() => import('./components/routes/Group'))} />
+                        <Route path="/group/:handle/:section" component={loadable(() => import('./components/routes/Group'))} />
+                        <Route path="/group/:handle" component={loadable(() => import('./components/routes/Group'))} />
+                        <Route path="/group-people/:handle/:which" component={loadable(() => import('./components/routes/GroupPeople'))} />
+                        <Route path="/" component={loadable(() => import('./components/routes/Home'))} />
                     </Switch>
                 </div>
                 {/* <SideInfo /> */}
