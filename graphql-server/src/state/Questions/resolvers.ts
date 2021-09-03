@@ -58,7 +58,7 @@ export const QuestionResolvers = {
                     },
                     userVote: await mongoDB.collection("Votes").findOne({
                         questionText: q.questionText,
-                        groupChannel: q.groupChannel,
+                        'groupChannel.group': group,
                         user: AuthUser?._id
                     })
                 },
@@ -67,7 +67,7 @@ export const QuestionResolvers = {
                         ...c,
                         userVote: await mongoDB.collection("Votes").findOne({
                             questionText: q.questionText,
-                            groupChannel: q.groupChannel,
+                            'groupChannel.group': group,
                             choiceText: c.text,
                             createdBy: AuthUser?.LiquidUser?.handle
                         })
@@ -408,10 +408,7 @@ export const QuestionResolvers = {
                             'lastEditOn': Date.now(),
                         },
                     },
-                    {
-                        returnNewDocument: true,
-                        returnOriginal: false
-                    }
+                    { returnDocument: 'after' }
                 ))?.value : null;
 
             return {
@@ -638,10 +635,7 @@ export const updateQuestionVotingStats = async ({
                 }
             }
         },
-        {
-            returnNewDocument: true,
-            returnOriginal: false
-        }
+        { returnDocument: 'after' }
     ))?.value
 
     return !choiceText ?

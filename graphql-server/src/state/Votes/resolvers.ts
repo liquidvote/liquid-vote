@@ -19,11 +19,10 @@ export const VoteResolvers = {
             const User = handleType === 'user' && await mongoDB.collection("Users")
                 .findOne({ 'LiquidUser.handle': handle });
 
-            // console.log({
-            //     type,
-            //     authUserId: AuthUser?._id,
-            //     sortBy
-            // });
+            console.log({
+                type,
+                sortBy
+            });
 
             const votesInCommonGeneralAggregationLogic = (
                 [
@@ -309,13 +308,10 @@ export const VoteResolvers = {
                                 questionText: "$questionText",
                                 choiceText: "$choiceText",
                                 group: "$groupChannel.group",
-                                // channel: "$channel"
                             },
                             pipeline: [
                                 {
                                     $match: {
-                                        // "questionText": "$$questionText",
-                                        // not null
                                         $and: [
                                             {
                                                 '$expr': {
@@ -330,14 +326,7 @@ export const VoteResolvers = {
                                                         '$groupChannel.group', '$$group'
                                                     ]
                                                 }
-                                            },
-                                            // {
-                                            //     '$expr': {
-                                            //         '$eq': [
-                                            //             '$channel', '$$channel'
-                                            //         ]
-                                            //     }
-                                            // }
+                                            }
                                         ]
                                     }
                                 }
@@ -556,7 +545,7 @@ export const VoteResolvers = {
     },
     Mutation: {
         editVote: async (_source, {
-            Vote, questionText, choiceText, group, channel
+            Vote, questionText, choiceText, group
         }, {
             mongoDB, AuthUser
         }) => {
@@ -619,10 +608,7 @@ export const VoteResolvers = {
                                 'lastEditOn': Date.now(),
                             },
                         },
-                        {
-                            returnNewDocument: true,
-                            returnOriginal: false
-                        }
+                        { returnDocument: 'after' }
                     )
                 )?.value : (
                     !!AuthUser &&
@@ -639,10 +625,7 @@ export const VoteResolvers = {
                                 'lastEditOn': Date.now(),
                             },
                         },
-                        {
-                            returnNewDocument: true,
-                            returnOriginal: false
-                        }
+                        { returnDocument: 'after' }
                     )
                 )?.value : null;
 
@@ -750,10 +733,7 @@ export const VoteResolvers = {
                                     'lastEditOn': Date.now(),
                                 },
                             },
-                            {
-                                returnNewDocument: true,
-                                returnOriginal: false
-                            }
+                            { returnDocument: 'after' }
                         ))?.value
                     })()
             }));
@@ -767,6 +747,11 @@ export const VoteResolvers = {
                 mongoDB,
                 AuthUser
             });
+
+            console.log({
+                savedVote,
+                Vote_
+            })
 
             return {
                 ...savedVote,

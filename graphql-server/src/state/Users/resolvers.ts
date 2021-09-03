@@ -370,6 +370,9 @@ export const UserResolvers = {
                     }
                 }, {
                     '$addFields': {
+                        'byYou': {
+                            '$eq': ['$user', new ObjectId(AuthUser?._id)]
+                        },
                         'bothDirect': {
                             '$and': [
                                 {
@@ -583,7 +586,8 @@ export const UserResolvers = {
                             {
                                 '$match': {
                                     'InAgreement': true,
-                                    'bothDirect': true
+                                    'bothDirect': true,
+                                    'byYou': false
                                 }
                             },
                             ...representeeVotesAggregationLogic,
@@ -596,7 +600,8 @@ export const UserResolvers = {
                             {
                                 '$match': {
                                     'InAgreement': false,
-                                    'bothDirect': true
+                                    'bothDirect': true,
+                                    'byYou': false
                                 }
                             },
                             ...representeeVotesAggregationLogic,
@@ -664,10 +669,7 @@ export const UserResolvers = {
                             'LiquidUser.lastEditOn': Date.now(),
                         },
                     },
-                    {
-                        returnNewDocument: true,
-                        returnOriginal: false
-                    }
+                    { returnDocument: 'after' }
                 )
             )?.value : null;
 
@@ -710,10 +712,7 @@ export const UserResolvers = {
                             'lastEditOn': Date.now(),
                         },
                     },
-                    {
-                        returnNewDocument: true,
-                        returnOriginal: false
-                    }
+                    { returnDocument: 'after' }
                 )
             )?.value : isUser ? (
                 await mongoDB.collection("GroupMembers").insertOne({
@@ -770,10 +769,7 @@ export const UserResolvers = {
                             'lastEditOn': Date.now(),
                         },
                     },
-                    {
-                        returnNewDocument: true,
-                        returnOriginal: false
-                    }
+                    { returnDocument: 'after' }
                 )
             )?.value : isUser ? (
                 await mongoDB.collection("UserRepresentations").insertOne({
@@ -870,8 +866,7 @@ const getYourUserStats = async ({ userId, AuthUser, mongoDB }) => {
                             'userId': userId,
                             'questionText': '$questionText',
                             'choiceText': '$choiceText',
-                            'group': '$group',
-                            'channel': '$channel'
+                            'group': '$groupChannel.group',
                         },
                         'pipeline': [
                             {
@@ -896,14 +891,7 @@ const getYourUserStats = async ({ userId, AuthUser, mongoDB }) => {
                                         {
                                             '$expr': {
                                                 '$eq': [
-                                                    '$group', '$$group'
-                                                ]
-                                            }
-                                        },
-                                        {
-                                            '$expr': {
-                                                '$eq': [
-                                                    '$channel', '$$channel'
+                                                    '$choiceText', '$$choiceText'
                                                 ]
                                             }
                                         }
@@ -1083,7 +1071,7 @@ const getYourUserStats = async ({ userId, AuthUser, mongoDB }) => {
         votesInCommon: votesInCommon?.votesInCommon || 0, // count
         directVotesInCommon: votesInCommon?.directVotesInCommon || 0, // count it both direct
 
-        directVotesInAgreement: votesInCommon?.directVotesInAgreement || 0, // count if positions differ & both direct
+        directVotesInAgreement: votesInCommon?.directVotesInAgreement || 0, // count if positions are the same & both direct
         directVotesInDisagreement: votesInCommon?.directVotesInDisagreement || 0, // count if positions differ & both direct
 
         indirectVotesMadeByYou: votesInCommon?.indirectVotesMadeByYou || 0, // count if user made indirect vote and you represented him

@@ -149,7 +149,7 @@ export const Choice: FunctionComponent<{
                                     <div className="d-flex ml-2 my-n2 mr-n1">
                                         <Link
                                             to={`/profile/${forRepresentatives[0].representativeHandle}`}
-                                            className={`vote-avatar for ml-n2 d-none d-md-block ${inList && 'tiny'}`}
+                                            className={`vote-avatar for ml-n2 ${inList && 'tiny'}`}
                                             style={{
                                                 background: `url(${forRepresentatives[0].representativeAvatar}) no-repeat`,
                                                 backgroundSize: 'cover'
@@ -173,7 +173,7 @@ export const Choice: FunctionComponent<{
                             )?.slice(0, 2).map((v: any) => (
                                 <Link
                                     to={`/profile/${v?.handle}`}
-                                    className={`vote-avatar for ml-n2 d-none d-md-block ${inList && 'tiny'}`}
+                                    className={`vote-avatar for ml-n2 ${inList && 'tiny'}`}
                                     style={{
                                         background: `url(${v?.avatar}) no-repeat`,
                                         backgroundSize: 'cover'
@@ -199,7 +199,7 @@ export const Choice: FunctionComponent<{
                                 )?.slice(0, 2).map((v: any) => (
                                     <Link
                                         to={`/profile/${v?.handle}`}
-                                        className={`vote-avatar against ml-n2 d-none d-md-block ${inList && 'tiny'}`}
+                                        className={`vote-avatar against ml-n2 ${inList && 'tiny'}`}
                                         style={{
                                             background: `url(${v?.avatar}) no-repeat`,
                                             backgroundSize: 'cover'
@@ -225,7 +225,7 @@ export const Choice: FunctionComponent<{
                                     <div className="d-flex mr-1 my-n2 ml-1">
                                         <Link
                                             to={`/profile/${againstRepresentatives[0].representativeHandle}`}
-                                            className={`vote-avatar against ml-n2 d-none d-md-block ${inList && 'tiny'}`}
+                                            className={`vote-avatar against ml-n2 ${inList && 'tiny'}`}
                                             style={{
                                                 background: `url(${againstRepresentatives[0].representativeAvatar}) no-repeat`,
                                                 backgroundSize: 'cover'
