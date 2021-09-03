@@ -42,8 +42,6 @@ export const GroupInList: FunctionComponent<{
             group?.yourMemberRelation ||
             editGroupMemberChannelRelation_data?.editGroupMemberChannelRelation?.isMember;
 
-        console.log({ group });
-
         return (
             <div className="d-flex relative border-bottom py-3 mx-n3 px-3">
                 <Link to={`/group/${group.handle}/polls`}>

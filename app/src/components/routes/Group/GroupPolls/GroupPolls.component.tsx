@@ -42,7 +42,7 @@ export const GroupPolls: FunctionComponent<{
             variables: { handle }
         });
 
-        // console.log({ questions_data });
+        console.log({ questions_data });
 
         useEffect(() => {
             if (allSearchParams.refetch === 'question') {

@@ -138,10 +138,7 @@ export const GroupResolvers = {
                             }))
                         },
                     },
-                    {
-                        returnNewDocument: true,
-                        returnOriginal: false
-                    }
+                    { returnDocument: 'after' }
                 ))?.value : null;
 
             if (AuthUser && handle === 'new') {

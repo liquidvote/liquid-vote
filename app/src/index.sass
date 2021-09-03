@@ -206,7 +206,7 @@ form
     white-space: nowrap
     height: fit-content
 
-    &:hover:not([disabled], .inverted)
+    &:hover:not([disabled], .inverted, .selected)
         background-color: rgba(0,0,0,0.1)
 
     &.small
@@ -541,12 +541,16 @@ hr
     align-items: center
     z-index: 1
 
+    @media (max-width: 768px)
+        bottom: 50px
+
     .Modal
         display: flex
         flex-direction: column
         position: relative
         border-radius: 20px
         width: 500px
+        max-width: 100%
         outline: none
         max-height: calc(100% - 30px)
 

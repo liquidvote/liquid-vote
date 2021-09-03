@@ -295,10 +295,7 @@ export const updateInviteStatus = async ({
                 status: to,
             }
         },
-        {
-            returnNewDocument: true,
-            returnOriginal: false
-        }
+        { returnDocument: 'after' }
     ))?.value;
 
     return updatedInvite;
