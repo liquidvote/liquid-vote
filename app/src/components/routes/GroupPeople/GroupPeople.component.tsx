@@ -8,6 +8,7 @@ import { people } from "@state/Mock/People";
 import { GROUP, EDIT_GROUP, GROUP_MEMBERS } from "@state/Group/typeDefs";
 import { AUTH_USER } from "@state/AuthUser/typeDefs";
 import { USER_REPRESENTING, USER_REPRESENTED_BY } from "@state/User/typeDefs";
+import DropAnimation from "@components/shared/DropAnimation";
 
 import './style.sass';
 
@@ -115,7 +116,7 @@ export const GroupPeople: FunctionComponent<{}> = ({ }) => {
                         <PersonInList person={el} />
                     ))}
                     {!group_members_data?.GroupMembers?.length && (
-                        <>{`This group doesn't have any members, yet!`}</>
+                        <div className="p-4 text-center">{`This group doesn't have any members, yet!`}</div>
                     )}
                 </div>
             )}
@@ -126,7 +127,7 @@ export const GroupPeople: FunctionComponent<{}> = ({ }) => {
                         <PersonInList person={el} />
                     ))}
                     {!user_represented_by_data?.UserRepresentedBy?.length && (
-                        <>{`No one is representing you in this group.`}</>
+                        <div className="p-4 text-center">{`No one is representing you in this group.`}</div>
                     )}
                 </div>
             )}
@@ -137,8 +138,14 @@ export const GroupPeople: FunctionComponent<{}> = ({ }) => {
                         <PersonInList person={el} />
                     ))}
                     {!user_representing_data?.UserRepresenting?.length && (
-                        <>{`No one is being represented by you in this group.`}</>
+                        <div className="p-4 text-center">{`No one is being represented by you in this group.`}</div>
                     )}
+                </div>
+            )}
+
+            {(user_representing_loading || group_members_loading) && (
+                <div className="d-flex justify-content-center mt-5">
+                    <DropAnimation />
                 </div>
             )}
         </>

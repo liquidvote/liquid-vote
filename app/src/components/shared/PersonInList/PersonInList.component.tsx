@@ -24,7 +24,7 @@ export const PersonInList: FunctionComponent<{ person: any }> = ({ person }) => 
                         <b>{person.name}</b>
                         <small className="mt-n1">@{person.handle}</small>
                     </Link>
-                    <div className="d-flex mb-1 ml-n1">
+                    {/* <div className="d-flex mb-1 ml-n1">
                         <div
                             // onClick={() => setIsRepresenting(!isRepresenting)}
                             className={`button_ small mb-0`}
@@ -37,7 +37,7 @@ export const PersonInList: FunctionComponent<{ person: any }> = ({ person }) => 
                         >
                             {isRepresenting ? "Represents You" : "Delegate Votes To"} (TODO)
                         </div>
-                    </div>
+                    </div> */}
                 </div>
                 <small className="d-flex mb-0">
                     {person.bio}
