@@ -115,7 +115,7 @@ export const GroupPeople: FunctionComponent<{}> = ({ }) => {
                     {group_members_data?.GroupMembers?.map((el, i) => (
                         <PersonInList person={el} />
                     ))}
-                    {!group_members_data?.GroupMembers?.length && (
+                    {(!group_members_data?.GroupMembers?.length && !group_members_loading) && (
                         <div className="p-4 text-center">{`This group doesn't have any members, yet!`}</div>
                     )}
                 </div>
@@ -126,7 +126,7 @@ export const GroupPeople: FunctionComponent<{}> = ({ }) => {
                     {user_represented_by_data?.UserRepresentedBy?.map((el, i) => (
                         <PersonInList person={el} />
                     ))}
-                    {!user_represented_by_data?.UserRepresentedBy?.length && (
+                    {(!user_represented_by_data?.UserRepresentedBy?.length && !user_represented_by_loading) && (
                         <div className="p-4 text-center">{`No one is representing you in this group.`}</div>
                     )}
                 </div>
@@ -137,13 +137,13 @@ export const GroupPeople: FunctionComponent<{}> = ({ }) => {
                     {user_representing_data?.UserRepresenting?.map((el, i) => (
                         <PersonInList person={el} />
                     ))}
-                    {!user_representing_data?.UserRepresenting?.length && (
+                    {(!user_representing_data?.UserRepresenting?.length && !user_representing_loading) && (
                         <div className="p-4 text-center">{`No one is being represented by you in this group.`}</div>
                     )}
                 </div>
             )}
 
-            {(user_representing_loading || group_members_loading) && (
+            {(group_members_loading || user_representing_loading || group_members_loading) && (
                 <div className="d-flex justify-content-center mt-5">
                     <DropAnimation />
                 </div>
