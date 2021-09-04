@@ -53,7 +53,7 @@ export const QuestionTypeDefs = gql`
         ): Question
         Questions(
             group: String,
-            channels: [String]
+            sortBy: String
         ): [Question]
         QuestionVoters(
             questionText: String,

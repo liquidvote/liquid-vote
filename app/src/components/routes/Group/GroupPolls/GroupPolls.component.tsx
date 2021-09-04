@@ -13,9 +13,9 @@ import DropAnimation from "@components/shared/DropAnimation";
 import './style.sass';
 
 export const GroupPolls: FunctionComponent<{
-    selectedChannels: any
+    sortBy: any
 }> = ({
-    selectedChannels
+    sortBy
 }) => {
 
         let { handle } = useParams<any>();
@@ -29,7 +29,7 @@ export const GroupPolls: FunctionComponent<{
         } = useQuery(QUESTIONS, {
             variables: {
                 group: handle,
-                channels: selectedChannels
+                sortBy
             }
         });
 
@@ -41,8 +41,6 @@ export const GroupPolls: FunctionComponent<{
         } = useQuery(GROUP, {
             variables: { handle }
         });
-
-        console.log({ questions_data });
 
         useEffect(() => {
             if (allSearchParams.refetch === 'question') {
@@ -73,6 +71,12 @@ export const GroupPolls: FunctionComponent<{
                         <hr />
                     </div>
                 ))}
+
+                {questions_data?.Questions?.length === 0 && (
+                    <div className="p-4 text-center">
+                        There are no polls in this group yet
+                    </div>
+                )}
 
                 {questions_loading && (
                     <div className="d-flex justify-content-center mt-5">

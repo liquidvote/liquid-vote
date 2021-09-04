@@ -32,7 +32,7 @@ export const MultiVoteInList: FunctionComponent<{ v: any, i?: number }> = ({ v, 
                     <div
                         className="text-truncate mw-180-px-sm mr-2"
                         title={v.questionText}
-                    >{v.questionText}</div>
+                    >{v.questionText}?</div>
                 </a>
 
                 <div

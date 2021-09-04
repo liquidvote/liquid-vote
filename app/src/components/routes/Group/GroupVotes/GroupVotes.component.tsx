@@ -6,16 +6,13 @@ import { AUTH_USER } from "@state/AuthUser/typeDefs";
 import { GROUP } from "@state/Group/typeDefs";
 import { VOTES } from "@state/Vote/typeDefs";
 import Notification from '@shared/Notification';
-import VoteSortPicker from '@components/shared/VoteSortPicker';
 import DropAnimation from "@components/shared/DropAnimation";
 
 import './style.sass';
 
-export const GroupVotes: FunctionComponent<{ selectedChannels: any }> = ({ selectedChannels }) => {
+export const GroupVotes: FunctionComponent<{ sortBy: any }> = ({ sortBy }) => {
 
     let { section, subsection, subsubsection, handle } = useParams<any>();
-
-    const [sortBy, setSortBy] = useState('representing');
 
     const {
         loading: authUser_loading,
@@ -84,9 +81,6 @@ export const GroupVotes: FunctionComponent<{ selectedChannels: any }> = ({ selec
                     <Link className={`nav-link ${subsection === 'represented' && 'active'}`} to={`/group/${handle}/votes/represented`}>
                         <b>{group_data?.Group?.stats?.indirectVotesMade}</b> Represented
                     </Link>
-                </li>
-                <li className="px-4 mt-1">
-                    <VoteSortPicker updateSortInParent={setSortBy} />
                 </li>
             </ul>
             <hr className="mt-n4" />

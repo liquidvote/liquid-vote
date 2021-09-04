@@ -1,6 +1,7 @@
 import React, { FunctionComponent, useEffect } from 'react';
 import { useForm } from "react-hook-form";
 import { useQuery, useMutation } from "@apollo/client";
+import { useHistory } from "react-router-dom";
 
 import TextInput from "@shared/Inputs/TextInput";
 import DropDownInput from "@shared/Inputs/DropDownInput";
@@ -27,6 +28,7 @@ interface IFormValues {
 
 export const EditGroup: FunctionComponent<{}> = ({ }) => {
 
+    const history = useHistory();
     const { allSearchParams, updateParams } = useSearchParams();
     const modalData = JSON.parse(allSearchParams.modalData);
 
@@ -87,18 +89,17 @@ export const EditGroup: FunctionComponent<{}> = ({ }) => {
     }, [group_data]);
 
     useEffect(() => {
-        if (editGroup_data) {
+        if (editGroup_data?.editGroup) {
 
             if (modalData.groupHandle === "new") {
-                alert("new group created!!")
-                console.log({ editGroup_data });
-                // TODO: navigate to new group
+                console.log("push!!", { g: editGroup_data?.editGroup });
+                history.push(`/group/${editGroup_data?.editGroup?.handle}`);
+            } else {
+                updateParams({
+                    keysToRemove: ['modal', 'modalData'],
+                    paramsToAdd: { refetch: 'group' }
+                });
             }
-
-            updateParams({
-                keysToRemove: ['modal', 'modalData'],
-                paramsToAdd: { refetch: 'group' }
-            });
         }
     }, [editGroup_data])
 

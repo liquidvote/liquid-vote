@@ -168,8 +168,8 @@ export const QUESTION_VOTERS = gql`
 `;
 
 export const QUESTIONS = gql`
-  query($group: String!, $channels: [String]) {
-    Questions(group: $group, channels: $channels) {
+  query($group: String!, $sortBy: String) {
+    Questions(group: $group, sortBy: $sortBy) {
         questionText
         questionType
         startText
