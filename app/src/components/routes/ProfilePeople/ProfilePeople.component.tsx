@@ -94,6 +94,12 @@ export const ProfilePeople: FunctionComponent<{}> = ({ }) => {
                     )}
                 </div>
             )}
+
+            {user_representing_loading && (
+                <div className="d-flex justify-content-center mt-5">
+                    <DropAnimation />
+                </div>
+            )}
         </>
     );
 }

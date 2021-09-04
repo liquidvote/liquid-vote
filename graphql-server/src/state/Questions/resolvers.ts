@@ -635,7 +635,10 @@ export const updateQuestionVotingStats = async ({
                 }
             }
         },
-        { returnDocument: 'after' }
+        {
+            returnNewDocument: true,
+            returnOriginal: false
+        }
     ))?.value
 
     return !choiceText ?
