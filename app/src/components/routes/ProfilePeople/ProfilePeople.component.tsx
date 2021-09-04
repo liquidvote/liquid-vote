@@ -77,7 +77,7 @@ export const ProfilePeople: FunctionComponent<{}> = ({ }) => {
                     {user_representing_data?.UserRepresenting?.map((el, i) => (
                         <PersonInList person={el} />
                     ))}
-                    {!user_representing_data?.UserRepresenting?.length && (
+                    {(!user_representing_data?.UserRepresenting?.length && !user_representing_loading) && (
                         <div className="p-4 text-center">{`${profile?.name} isn't represented by anyone yet.`}</div>
                     )}
                 </div>
@@ -89,13 +89,13 @@ export const ProfilePeople: FunctionComponent<{}> = ({ }) => {
                     {user_represented_by_data?.UserRepresentedBy?.map((el, i) => (
                         <PersonInList person={el} />
                     ))}
-                    {!user_represented_by_data?.UserRepresentedBy?.length && (
+                    {(!user_represented_by_data?.UserRepresentedBy?.length && !user_represented_by_loading) && (
                         <div className="p-4 text-center">{`${profile?.name} isn't representing anyone yet.`}</div>
                     )}
                 </div>
             )}
 
-            {user_representing_loading && (
+            {(user_representing_loading || user_representing_loading) && (
                 <div className="d-flex justify-content-center mt-5">
                     <DropAnimation />
                 </div>
