@@ -172,7 +172,6 @@ export const ProfileVotes: FunctionComponent<{}> = ({ }) => {
 
             {user_votes_data?.Votes.map((n, i) => (
                 <>
-                    {i}
                     <Notification
                         key={'notification-uservote' + n.questionText + type + n.choiceText}
                         v={{
