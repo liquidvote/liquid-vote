@@ -42,20 +42,56 @@ export const QuestionResolvers = {
         },
         Questions: async (_source, {
             group,
-            channels
+            sortBy
         }, { mongoDB, AuthUser }) => {
 
             const Questions = await mongoDB.collection("Questions")
-                .find({ 'groupChannel.group': group })
+                .aggregate(
+                    [
+                        {
+                            '$match': {
+                                'groupChannel.group': group
+                            }
+                        }, {
+                            '$addFields': {
+                                'stats.lastEditOrVote': {
+                                    '$cond': [
+                                        {
+                                            '$gt': [
+                                                '$lastEditOn', '$stats.lastVoteOn'
+                                            ]
+                                        }, '$lastEditOn', '$stats.lastVoteOn'
+                                    ]
+                                },
+                                'stats.totalVotes': {
+                                    '$sum': [
+                                        '$stats.directVotes', '$stats.indirectVotes'
+                                    ]
+                                },
+                                // 'thisUserIsAdmin': {
+                                //     '$eq': ['$createdBy', AuthUser?.LiquidUser?.handle]
+                                // }
+                            }
+                        },
+                        ...(sortBy === 'weight') ? [
+                            {
+                                '$sort': { 'stats.totalVotes': -1 }
+                            }
+                        ] : [],
+                        ...(sortBy === 'time') ? [
+                            {
+                                '$sort': { 'stats.lastEditOrVote': -1 }
+                            }
+                        ] : []
+                    ]
+                )
                 .toArray();
 
+            // TODO: move this logic to the aggregation, it'll run much faster
             return await Promise.all(Questions.map(async (q) => ({
                 ...q,
-                thisUserIsAdmin: q.createdBy === AuthUser?.LiquidUser?.handle,
+                // thisUserIsAdmin: q.createdBy === AuthUser?.LiquidUser?.handle,
                 ...(q.questionType === 'single' && !!AuthUser) && {
-                    stats: {
-                        ...q.stats,
-                    },
                     userVote: await mongoDB.collection("Votes").findOne({
                         questionText: q.questionText,
                         'groupChannel.group': group,

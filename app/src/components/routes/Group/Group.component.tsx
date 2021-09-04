@@ -32,12 +32,15 @@ import GroupPolls from './GroupPolls';
 import GroupVotes from './GroupVotes';
 import DropAnimation from '@components/shared/DropAnimation';
 import { timeAgo } from '@state/TimeAgo';
+import VoteSortPicker from '@components/shared/VoteSortPicker';
 import './style.sass';
 
 export const Group: FunctionComponent<{}> = ({ }) => {
 
     let { handle, section } = useParams<any>();
     const { allSearchParams, updateParams } = useSearchParams();
+
+    const [sortBy, setSortBy] = useState('representing');
 
     const {
         loading: group_loading,
@@ -74,45 +77,6 @@ export const Group: FunctionComponent<{}> = ({ }) => {
 
     const [selectedChannels, setSelectedChannels] = useState<string[]>([]);
 
-    const selectChannel = async (channel: string) => {
-
-        const updatedSelectedChannels = [
-            ...(selectedChannels.indexOf(channel) !== -1) ? selectedChannels?.filter(
-                (el: any, i: number) => i !== selectedChannels.indexOf(channel)
-            ) : [...selectedChannels, channel],
-        ]
-
-        setSelectedChannels(updatedSelectedChannels);
-        saveSetSelectedChannels({ updatedSelectedChannels });
-    }
-
-    const selectAllChannels = () => {
-
-        const updatedSelectedChannels = [
-            ...(selectedChannels.length === selectedGroup.channels.length) ?
-                [] :
-                selectedGroup?.channels?.map((s: any) => s.name)
-        ]
-
-        setSelectedChannels(updatedSelectedChannels);
-        saveSetSelectedChannels({ updatedSelectedChannels });
-    }
-
-    const saveSetSelectedChannels = (
-        { updatedSelectedChannels }:
-            { updatedSelectedChannels: any }
-    ) => {
-        if (authUser?.LiquidUser) {
-            editGroupMemberChannelRelation({
-                variables: {
-                    UserHandle: authUser.LiquidUser.handle,
-                    GroupHandle: selectedGroup.handle,
-                    Channels: updatedSelectedChannels,
-                }
-            });
-        }
-    }
-
     useEffect(() => {
         if (!!selectedGroup?.yourMemberRelation?.channels) {
             setSelectedChannels(
@@ -128,7 +92,6 @@ export const Group: FunctionComponent<{}> = ({ }) => {
     useEffect(() => {
         ReactTooltip.rebuild();
     }, [group_loading]);
-
 
     const isMember =
         !!authUser && (
@@ -287,34 +250,7 @@ export const Group: FunctionComponent<{}> = ({ }) => {
                         </>
                     )
                 }
-                {/* <Link to={`/group/${groupName}/subgroups`} className="ml-2">
-                    <b>16</b> Sub Groups
-                </Link> */}
             </div>
-
-            {/* <div className="mt-4 mb-3 d-flex align-items-start flex-nowrap justify-content-between">
-                <div className="d-flex flex-column">
-                    <div
-                        className="d-flex flex-wrap justify-content-start"
-                    >
-                        <div data-tip="Selected channels">
-                            <HashTagSmallSVG />
-                        </div>
-                        <div
-                            className={`ml-1 badge pointer ${selectedChannels?.length === selectedGroup.channels?.length ? '' : 'inverted'} ml-1 mb-1 mt-1`}
-                            onClick={() => selectAllChannels()}
-                        >All</div>
-                        {selectedGroup?.channels?.map((el: any, i: any) => (
-                            <div
-                                key={'s-' + el.name}
-                                onClick={() => selectChannel(el.name)}
-                                className={`badge pointer ${selectedChannels.indexOf(el.name) === -1 && 'inverted'} ml-1 mb-1 mt-1`}
-                            >{el.name}</div>
-                        ))}
-                    </div>
-                </div>
-            </div> */}
-
 
             {isMember && (
                 <div
@@ -330,7 +266,7 @@ export const Group: FunctionComponent<{}> = ({ }) => {
                     className="button_ mx-5 my-3 mb-4"
                 >
                     <DropPlusSVG />
-                    <div className="ml-2">Create New Poll</div>
+                    <div className="ml-2">Create a new Poll</div>
                 </div>
             )}
 
@@ -347,6 +283,9 @@ export const Group: FunctionComponent<{}> = ({ }) => {
                         Votes
                     </Link>
                 </li>
+                <li className="px-4 mt-1">
+                    <VoteSortPicker updateSortInParent={setSortBy} />
+                </li>
             </ul>
 
             {/* <pre style={{ color: 'white' }}>{JSON.stringify(selectedGroup, null, 2)}</pre> */}
@@ -355,11 +294,11 @@ export const Group: FunctionComponent<{}> = ({ }) => {
 
             {(!section || section === 'polls') && (
                 <div>
-                    <GroupPolls selectedChannels={selectedChannels} />
+                    <GroupPolls sortBy={sortBy} />
                 </div>
             )}
             {(section === 'votes') && (
-                <GroupVotes selectedChannels={selectedChannels} />
+                <GroupVotes sortBy={sortBy} />
             )}
 
         </>

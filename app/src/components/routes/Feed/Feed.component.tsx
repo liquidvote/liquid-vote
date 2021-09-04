@@ -14,9 +14,13 @@ export const Feed: FunctionComponent<{}> = ({ }) => {
         <>
             <Header title="Notifications" />
 
-            <div className="d-flex justify-content-center mt-5">
-                <DropAnimation />
+            <div className="p-4 text-center">
+                🧪 Expect great things here soon
             </div>
+
+            {/* <div className="d-flex justify-content-center mt-5">
+                <DropAnimation />
+            </div> */}
 
 
             {/* {VoteTimeline.map((l, i) => (

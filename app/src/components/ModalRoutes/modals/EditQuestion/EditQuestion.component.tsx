@@ -68,10 +68,6 @@ export const EditQuestion: FunctionComponent<{}> = ({ }) => {
             const savedQuestion = editQuestion_data?.editQuestion;
 
             history.push(`/poll/${savedQuestion.questionText}/${savedQuestion.groupChannel.group}`);
-
-            console.log({
-                editQuestion_data
-            });
         }
     }, [editQuestion_data]);
 

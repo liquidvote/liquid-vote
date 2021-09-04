@@ -28,7 +28,7 @@ export default function App() {
                         <Route path="/poll/:voteName/:groupHandle/:section/:subsection" component={loadable(() => import('./components/routes/Question'))} />
                         <Route path="/poll/:voteName/:groupHandle/:section" component={loadable(() => import('./components/routes/Question'))} />
                         <Route path="/poll/:voteName/:groupHandle" component={loadable(() => import('./components/routes/Question'))} />
-                        
+
                         <Route path="/multipoll/:voteName/:groupHandle/:section/:subsection/:subsubsection" component={loadable(() => import('./components/routes/Question'))} />
                         <Route path="/multipoll/:voteName/:groupHandle/:section/:subsection" component={loadable(() => import('./components/routes/Question'))} />
                         <Route path="/multipoll/:voteName/:groupHandle/:section" component={loadable(() => import('./components/routes/Question'))} />
@@ -54,6 +54,7 @@ export default function App() {
                         <Route path="/group-people/:handle/:which" component={loadable(() => import('./components/routes/GroupPeople'))} />
                         <Route path="/" component={loadable(() => import('./components/routes/Home'))} />
                     </Switch>
+                    <div className="p-4 d-md-none"></div>
                 </div>
                 {/* <SideInfo /> */}
                 <ModalRoutes />
