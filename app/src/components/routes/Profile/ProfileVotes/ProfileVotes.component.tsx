@@ -81,7 +81,7 @@ export const ProfileVotes: FunctionComponent<{}> = ({ }) => {
                 </li>
                 <li className="nav-item">
                     <Link className={`nav-link ${subsection === 'represented' && 'active'}`} to={`/profile/${handle}/votes/represented`}>
-                        <b>{profile?.stats?.indirectVotesMadeForUser}</b> Represented Votes
+                        <b>{profile?.stats?.indirectVotesMadeForUser}</b> Represented
                     </Link>
                 </li>
                 <li className="px-4 mt-1">
@@ -192,10 +192,10 @@ export const ProfileVotes: FunctionComponent<{}> = ({ }) => {
 
             <br />
             <br />
-            <pre style={{ color: "white" }}>
+            {/* <pre style={{ color: "white" }}>
                 {JSON.stringify(profile?.stats, null, 2)}
                 {JSON.stringify(profile?.yourStats, null, 2)}
-            </pre>
+            </pre> */}
 
         </>
     );

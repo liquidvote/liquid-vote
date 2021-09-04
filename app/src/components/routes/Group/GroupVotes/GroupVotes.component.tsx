@@ -77,12 +77,12 @@ export const GroupVotes: FunctionComponent<{ selectedChannels: any }> = ({ selec
             <ul className="nav d-flex justify-content-around mt-n2 mx-n3">
                 <li className="nav-item">
                     <Link className={`nav-link ${(!subsection || subsection === 'direct') && 'active'}`} to={`/group/${handle}/votes/direct`}>
-                        <b>{group_data.Group?.stats?.directVotesMade}</b> Direct Votes
+                        <b>{group_data.Group?.stats?.directVotesMade}</b> Direct
                     </Link>
                 </li>
                 <li className="nav-item">
                     <Link className={`nav-link ${subsection === 'represented' && 'active'}`} to={`/group/${handle}/votes/represented`}>
-                        <b>{group_data?.Group?.stats?.indirectVotesMade}</b> Represented Votes
+                        <b>{group_data?.Group?.stats?.indirectVotesMade}</b> Represented
                     </Link>
                 </li>
                 <li className="px-4 mt-1">
