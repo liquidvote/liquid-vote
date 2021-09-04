@@ -204,7 +204,7 @@ export const QuestionVotes: FunctionComponent<{}> = ({ }) => {
                 </div>
             )}
 
-            <pre>{JSON.stringify(question_data?.Question?.stats, null, 2)}</pre>
+            {/* <pre>{JSON.stringify(question_data?.Question?.stats, null, 2)}</pre> */}
 
         </>
     );

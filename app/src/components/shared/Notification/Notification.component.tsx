@@ -66,8 +66,8 @@ export const Notification: FunctionComponent<{
                                     <>
                                         <small className="mr-1">on</small>
                                         <Link
-                                            to={`/${v.choiceText ? 'multipoll' : 'poll'}/${v.questionText}/${v.groupChannel?.group}-${v.groupChannel?.channel}`}
-                                        ><b className="white">{v.questionText}{v.choiceText ? ':' + v.choiceText : ''}</b></Link>
+                                            to={`/${v.choiceText ? 'multipoll' : 'poll'}/${v.questionText}/${v.groupChannel?.group}`}
+                                        ><b className="white text-truncate">{v.questionText}{v.choiceText ? ':' + v.choiceText : ''}</b></Link>
                                     </>
 
                                 </p>
