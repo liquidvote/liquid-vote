@@ -1,14 +1,15 @@
 import React, { FunctionComponent } from 'react';
-import Header from "@shared/Header";
 import { Link, useParams } from "react-router-dom";
-import { useQuery } from "@apollo/client";
 
-import PersonInList from '@shared/PersonInList';
-import { people } from "@state/Mock/People";
-import { USER, USER_REPRESENTING, USER_REPRESENTED_BY } from "@state/User/typeDefs";
+import { useQuery } from "@apollo/client";
 import DropAnimation from '@components/shared/DropAnimation';
+import Header from "@shared/Header";
+import PersonInList from '@shared/PersonInList';
+import { USER, USER_REPRESENTED_BY, USER_REPRESENTING } from "@state/User/typeDefs";
 
 import './style.sass';
+
+
 
 export const ProfilePeople: FunctionComponent<{}> = ({ }) => {
 
