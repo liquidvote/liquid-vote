@@ -1,10 +1,9 @@
 import React, { FunctionComponent } from 'react';
-import { useQuery, useMutation } from "@apollo/client";
-import { Link, useParams } from "react-router-dom";
+import { useQuery } from "@apollo/client";
+import { useParams } from "react-router-dom";
 
 import Header from "@shared/Header";
 import GroupInList from "@shared/GroupInList";
-import { groups } from "@state/Mock/Groups";
 import { USER_GROUPS } from "@state/User/typeDefs";
 import { AUTH_USER } from "@state/AuthUser/typeDefs";
 import DropAnimation from '@components/shared/DropAnimation';

@@ -1,24 +1,23 @@
-import React, { FunctionComponent, useState, useEffect } from 'react';
-import { Link, useParams } from "react-router-dom";
+import React from 'react';
 import { DiscussionEmbed } from 'disqus-react';
+import { Link, useParams } from "react-router-dom";
 import ReactTooltip from 'react-tooltip';
-import { useQuery, useMutation } from "@apollo/client";
+import { useQuery } from "@apollo/client";
 
-import VoteGraph1 from "@shared/VoteGraph1";
-import Header from "@shared/Header";
-import {
-    defaults,
-    byGroups,
-    votesBy,
-    onSubTopics
-} from "@state/Mock/Votes";
-import GroupSmallSvg from "@shared/Icons/Group-small.svg";
-import { QUESTION } from '@state/Question/typeDefs';
-import useSearchParams from "@state/Global/useSearchParams.effect";
-import QuestionVotes from "./QuestionVotes";
 import DropAnimation from "@components/shared/DropAnimation";
-import { timeAgo } from '@state/TimeAgo';
 import Choice from '@shared/Choice';
+import Header from "@shared/Header";
+import GroupSmallSvg from "@shared/Icons/Group-small.svg";
+import VoteGraph1 from "@shared/VoteGraph1";
+import useSearchParams from "@state/Global/useSearchParams.effect";
+import {
+    byGroups,
+    votesBy
+} from "@state/Mock/Votes";
+import { QUESTION } from '@state/Question/typeDefs';
+import { timeAgo } from '@state/TimeAgo';
+
+import QuestionVotes from "./QuestionVotes";
 
 export default function Question() {
 

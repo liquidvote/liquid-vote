@@ -66,21 +66,13 @@ if (isProd) {
 } else {
   config.devServer = {
     // https: true,
-    // publicPath: "/",
     port: 8080,
     open: true,
     hot: true,
     compress: true,
-    // stats: "errors-only",
-    // overlay: true,
     historyApiFallback: {
       disableDotRule: true,
-    },
-    // watchOptions: {
-    //     aggregateTimeout: 300,
-    //     poll: 1500,
-    //     ignored: 'node_modules/**'
-    // }
+    }
   };
 }
 

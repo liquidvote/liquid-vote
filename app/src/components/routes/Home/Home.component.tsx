@@ -1,6 +1,5 @@
 import React, { FunctionComponent } from 'react';
 
-import SubVote from '@shared/SubVote';
 import VoteWrapper from "@shared/VoteWrapper";
 
 import './style.sass';

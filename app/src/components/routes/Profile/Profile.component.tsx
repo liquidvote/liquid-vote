@@ -2,27 +2,21 @@ import React, { FunctionComponent, useEffect } from "react";
 import { Link, useParams } from "react-router-dom";
 import { useQuery } from "@apollo/client";
 
-import BackArrowSVG from "@shared/Icons/BackArrow.svg";
+import DropAnimation from "@components/shared/DropAnimation";
+import Header from "@shared/Header";
+import CalendarSVG from "@shared/Icons/Calendar.svg";
 import GroupSmallSvg from "@shared/Icons/Group-small.svg";
 import LinkSVG from "@shared/Icons/Link.svg";
-import CalendarSVG from "@shared/Icons/Calendar.svg";
 import LocationSVG from "@shared/Icons/Location.svg";
-import AddNotificationSVG from "@shared/Icons/AddNotification.svg";
-import DropSVG from "@shared/Icons/Drop.svg";
-import Header from "@shared/Header";
-import VoteGraph1 from "@shared/VoteGraph1";
-import { profileVotes } from "@state/Mock/Votes";
-import VoteWrapper from "@shared/VoteWrapper";
-import { USER, USER_GROUPS } from "@state/User/typeDefs";
-import { AUTH_USER } from "@state/AuthUser/typeDefs";
 import useSearchParams from "@state/Global/useSearchParams.effect";
-import DropAnimation from "@components/shared/DropAnimation";
 import { timeAgo } from '@state/TimeAgo';
+import { USER, USER_GROUPS } from "@state/User/typeDefs";
 
-import ProfileGroups from "./ProfileGroups";
 import ProfileVotes from "./ProfileVotes";
-
 import './style.sass';
+
+
+
 
 export const Profile: FunctionComponent<{}> = ({ }) => {
 

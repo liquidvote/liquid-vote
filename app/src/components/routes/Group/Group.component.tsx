@@ -1,39 +1,28 @@
-import React, { FunctionComponent, useState, useEffect } from 'react';
-import { useParams, Link } from 'react-router-dom';
-import { useQuery, useMutation } from "@apollo/client";
+import React, { FunctionComponent, useEffect, useState } from 'react';
+import { Link, useParams } from 'react-router-dom';
 import ReactTooltip from 'react-tooltip';
+import { useMutation, useQuery } from "@apollo/client";
 
-// import VoteGraph1 from "@shared/VoteGraph1";
+import DropAnimation from '@components/shared/DropAnimation';
+import VoteSortPicker from '@components/shared/VoteSortPicker';
 import Header from "@shared/Header";
-import LinkSVG from "@shared/Icons/Link.svg";
 import CalendarSVG from "@shared/Icons/Calendar.svg";
-import LocationSVG from "@shared/Icons/Location.svg";
 import DropPlusSVG from "@shared/Icons/Drop+.svg";
-import { profileVotes, byGroups, valores } from "@state/Mock/Votes";
-import { people } from "@state/Mock/People";
-import { defaults, groups, subGroups } from "@state/Mock/Groups";
-import VoteWrapper from "@shared/VoteWrapper";
+import LinkSVG from "@shared/Icons/Link.svg";
 import LockSVG from "@shared/Icons/Lock.svg";
 import WorldSVG from "@shared/Icons/World.svg";
-import HashTagSmallSVG from "@shared/Icons/HashTag-small.svg";
-import WorldlockSVG from "@shared/Icons/Worldlock.svg";
-import PersonInList from '@shared/PersonInList'
-import GroupInList from "@shared/GroupInList";
-import CreateVote from "@shared/CreateVote";
-import { VoteTimeline } from "@state/Mock/Notifications";
-import Notification from '@shared/Notification';
-import GroupSmallSvg from "@shared/Icons/Group-small.svg";
-import MultiVoteInList from "@shared/MultiVoteInList";
-import { GROUP, EDIT_GROUP } from "@state/Group/typeDefs";
-import { EDIT_GROUP_MEMBER_CHANNEL_RELATION } from "@state/User/typeDefs";
 import { AUTH_USER } from "@state/AuthUser/typeDefs";
 import useSearchParams from "@state/Global/useSearchParams.effect";
+import { GROUP } from "@state/Group/typeDefs";
+import { timeAgo } from '@state/TimeAgo';
+import { EDIT_GROUP_MEMBER_CHANNEL_RELATION } from "@state/User/typeDefs";
+
 import GroupPolls from './GroupPolls';
 import GroupVotes from './GroupVotes';
-import DropAnimation from '@components/shared/DropAnimation';
-import { timeAgo } from '@state/TimeAgo';
-import VoteSortPicker from '@components/shared/VoteSortPicker';
 import './style.sass';
+
+
+
 
 export const Group: FunctionComponent<{}> = ({ }) => {
 

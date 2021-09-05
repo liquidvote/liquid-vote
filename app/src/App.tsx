@@ -32,10 +32,6 @@ export default function App() {
                         <Route path="/multipoll/:voteName/:groupHandle/:section/:subsection" component={loadable(() => import('./components/routes/Question'))} />
                         <Route path="/multipoll/:voteName/:groupHandle/:section" component={loadable(() => import('./components/routes/Question'))} />
                         <Route path="/multipoll/:voteName/:groupHandle" component={loadable(() => import('./components/routes/Question'))} />
-                        <Route path="/grouping/:groupType/:groupFilter" component={loadable(() => import('./components/routes/Grouping'))} />
-                        <Route path="/register" component={loadable(() => import('./components/routes/CreateProfile'))} />
-                        <Route path="/create-vote" component={loadable(() => import('./components/routes/CreateVote'))} />
-                        <Route path="/create-vote/:groupName" component={loadable(() => import('./components/routes/CreateVote'))} />
                         <Route path="/profile/:handle/:section/:subsection/:subsubsection" component={loadable(() => import('./components/routes/Profile'))} />
                         <Route path="/profile/:handle/:section/:subsection" component={loadable(() => import('./components/routes/Profile'))} />
                         <Route path="/profile/:handle/:section" component={loadable(() => import('./components/routes/Profile'))} />
