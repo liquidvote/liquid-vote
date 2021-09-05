@@ -45,8 +45,9 @@ export const VoteTypeDefs = gql`
             channel: String
         ): Vote
         Votes(
-            handle: String,
-            handleType: String,
+            questionText: String,
+            groupHandle: String,
+            userHandle: String,
             type: String,
             sortBy: String
         ):  [Vote]

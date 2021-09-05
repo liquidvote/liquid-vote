@@ -14,12 +14,21 @@ export const VoteResolvers = {
                 thisUserIsAdmin: Vote.createdBy === AuthUser?.LiquidUser?.handle,
             };
         },
-        Votes: async (_source, { handle, handleType = 'user', type = 'directVotesMade', sortBy }, { mongoDB, AuthUser }) => {
+        Votes: async (_source, {
+            questionText,
+            groupHandle,
+            userHandle,
+            type = 'directVotesMade',
+            sortBy
+        }, { mongoDB, AuthUser }) => {
 
-            const User = handleType === 'user' && await mongoDB.collection("Users")
-                .findOne({ 'LiquidUser.handle': handle });
+            const User = !!userHandle && await mongoDB.collection("Users")
+                .findOne({ 'LiquidUser.handle': userHandle });
 
             console.log({
+                questionText,
+                groupHandle,
+                userHandle,
                 type,
                 sortBy
             });
@@ -28,13 +37,15 @@ export const VoteResolvers = {
                 [
                     {
                         '$match': {
-                            ...(handleType === 'user') && {
+                            ...(!!questionText) && {
+                                'questionText': questionText
+                            },
+                            ...(!!userHandle) && {
                                 'user': new ObjectId(User._id)
                             },
-                            ...(handleType === 'group') && {
-                                'groupChannel.group': handle
+                            ...(!!groupHandle) && {
+                                'groupChannel.group': groupHandle
                             },
-                            // ...(handleType === '')
                             'position': { $ne: null }
                         }
                     }, {
@@ -45,7 +56,6 @@ export const VoteResolvers = {
                                 'questionText': '$questionText',
                                 'choiceText': '$choiceText',
                                 'group': '$groupChannel.group',
-                                // 'channel': '$groupChannel.channel'
                             },
                             'pipeline': [
                                 {
@@ -74,21 +84,14 @@ export const VoteResolvers = {
                                                     ]
                                                 }
                                             },
-                                            ...(handleType === 'group') ? [
+                                            ...(!!groupHandle) ? [
                                                 {
                                                     '$expr': {
                                                         '$eq': [
                                                             '$groupChannel.group', '$$group'
                                                         ]
                                                     }
-                                                },
-                                                // {
-                                                //     '$expr': {
-                                                //         '$eq': [
-                                                //             '$groupChannel.channel', '$$channel'
-                                                //         ]
-                                                //     }
-                                                // }
+                                                }
                                             ] : []
                                         ]
                                     }
@@ -405,6 +408,36 @@ export const VoteResolvers = {
 
             const Votes = await (async (type) => {
                 return {
+                    'directFor': async () => await mongoDB.collection("Votes")
+                        .aggregate([
+                            ...votesInCommonGeneralAggregationLogic,
+                            {
+                                '$match': {
+                                    'position': 'for',
+                                    'isDirect': true
+                                }
+                            },
+                            ...representeeVotesAggregationLogic,
+                            ...sortLogic,
+                            ...questionStatsAggregationLogic,
+                            ...userObjectAggregationLogic
+                        ])
+                        .toArray(),
+                    'directAgainst': async () => await mongoDB.collection("Votes")
+                        .aggregate([
+                            ...votesInCommonGeneralAggregationLogic,
+                            {
+                                '$match': {
+                                    'position': 'against',
+                                    'isDirect': true
+                                }
+                            },
+                            ...representeeVotesAggregationLogic,
+                            ...sortLogic,
+                            ...questionStatsAggregationLogic,
+                            ...userObjectAggregationLogic
+                        ])
+                        .toArray(),
                     'directVotesMade': async () => await mongoDB.collection("Votes")
                         .aggregate([
                             ...votesInCommonGeneralAggregationLogic,
@@ -681,7 +714,7 @@ export const VoteResolvers = {
                         'lastEditOn': Date.now(),
                         'createdOn': Date.now(),
                         'createdBy': AuthUser.LiquidUser.handle,
-                        'user': r.representeeId 
+                        'user': r.representeeId
                     }))?.ops[0] : (async () => {
 
                         const Vote_ = r.Vote[0];

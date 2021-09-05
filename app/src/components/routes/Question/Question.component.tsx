@@ -101,7 +101,7 @@ export default function Question() {
                                 </Link>
                             </div>
                         </div>
-                        <div className="d-flex justify-content-center">
+                        {/* <div className="d-flex justify-content-center">
                             {question_data?.Question?.thisUserIsAdmin && (
                                 <>
                                     <div
@@ -110,21 +110,7 @@ export default function Question() {
                                     >Edit</div>
                                 </>
                             )}
-                            {/* <div
-                                className={`button_ small mx-1`}
-                                onClick={() => updateParams({
-                                    paramsToAdd: {
-                                        modal: "InviteFor",
-                                        modalData: JSON.stringify({
-                                            InviteType: 'toVote',
-                                            // handle: profile.handle,
-                                            questionText: voteName,
-                                            groupHandle: question_data?.Question?.groupChannel.group
-                                        })
-                                    }
-                                })}
-                            >Invite to Vote 🧪</div> */}
-                        </div>
+                        </div> */}
                         <small data-tip="Created on">
                             {/* <small className="time-ago" data-tip="Last vote was"> */}
                             {timeAgo.format(new Date(Number(question_data?.Question?.createdOn)))}
