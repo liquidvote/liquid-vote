@@ -1,6 +1,8 @@
 import React, { FunctionComponent, useMemo } from 'react';
 import { Link } from "react-router-dom";
 
+import GroupSmallSvg from "@shared/Icons/Group-small.svg";
+
 import './style.sass';
 
 export const PersonInList: FunctionComponent<{ person: any }> = ({ person }) => {
@@ -42,6 +44,23 @@ export const PersonInList: FunctionComponent<{ person: any }> = ({ person }) => 
                 <small className="d-flex mb-0">
                     {person.bio}
                 </small>
+                {!!person.representationGroups && (
+                    <div
+                        className="d-flex flex-wrap justify-content-start"
+                    >
+                        <div>
+                            on:{' '}
+                        </div>
+                        {person.representationGroups?.map((el: any, i: any) => (
+                            <Link
+                                to={`/group/${el.handle}`}
+                                key={'s-' + el.name}
+                                className={`badge inverted ml-1 mb-1 mt-1`}
+                            >{el.name}</Link>
+                        ))}
+                    </div>
+
+                )}
                 <small>
                     Voted the same as you in
                     {' '}<b className="white forDirect px-1 rounded">{useMemo(() => Math.floor(Math.random() * 100), [])}</b>

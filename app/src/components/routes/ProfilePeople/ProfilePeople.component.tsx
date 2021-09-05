@@ -9,8 +9,6 @@ import { USER, USER_REPRESENTED_BY, USER_REPRESENTING } from "@state/User/typeDe
 
 import './style.sass';
 
-
-
 export const ProfilePeople: FunctionComponent<{}> = ({ }) => {
 
     let { which, handle } = useParams<any>();
@@ -42,11 +40,6 @@ export const ProfilePeople: FunctionComponent<{}> = ({ }) => {
         variables: { handle }
     });
 
-    console.log({
-        user_representing_data,
-        user_represented_by_data
-    })
-
     const profile = user_data?.User;
 
     return user_loading ? (
@@ -73,7 +66,6 @@ export const ProfilePeople: FunctionComponent<{}> = ({ }) => {
             <hr />
 
             {which === 'representedBy' && (
-                // <pre>{JSON.stringify(user_representing_data?.UserRepresenting, null, 2)}</pre>
                 <div className="mt-n2">
                     {user_representing_data?.UserRepresenting?.map((el, i) => (
                         <PersonInList person={el} />
@@ -85,7 +77,6 @@ export const ProfilePeople: FunctionComponent<{}> = ({ }) => {
             )}
 
             {which === 'representing' && (
-                // <pre>{JSON.stringify(user_represented_by_data?.UserRepresented, null, 2)}</pre>
                 <div className="mt-n2">
                     {user_represented_by_data?.UserRepresentedBy?.map((el, i) => (
                         <PersonInList person={el} />

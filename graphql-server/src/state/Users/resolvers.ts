@@ -113,7 +113,7 @@ export const UserResolvers = {
             const User = await mongoDB.collection("Users")
                 .findOne({ 'LiquidUser.handle': handle });
 
-            const group = groupHandle && await mongoDB.collection("Groups")
+            const group = !!groupHandle && await mongoDB.collection("Groups")
                 .findOne({ 'handle': groupHandle });
 
             const representeesAndGroups = (
@@ -123,7 +123,7 @@ export const UserResolvers = {
                             $match: {
                                 "representativeId": new ObjectId(User?._id),
                                 "isRepresentingYou": true,
-                                ...group && {
+                                ...!!group && {
                                     groupId: new ObjectId(group._id)
                                 }
                             }
@@ -172,7 +172,7 @@ export const UserResolvers = {
             const User = await mongoDB.collection("Users")
                 .findOne({ 'LiquidUser.handle': handle });
 
-            const group = groupHandle && await mongoDB.collection("Groups")
+            const group = !!groupHandle && await mongoDB.collection("Groups")
                 .findOne({ 'handle': groupHandle });
 
             const representativesAndGroups = (
@@ -182,7 +182,7 @@ export const UserResolvers = {
                             $match: {
                                 "representeeId": new ObjectId(User?._id),
                                 "isRepresentingYou": true,
-                                ...group && {
+                                ...!!group && {
                                     groupId: new ObjectId(group._id)
                                 }
                             }
@@ -801,7 +801,7 @@ const getUserStats = async ({ userId, mongoDB }) => {
                 }, {
                     $group: {
                         _id: {
-                            "representeeId": "$representeeId"
+                            "representativeId": "$representativeId"
                         }
                     }
                 }, {
@@ -818,7 +818,7 @@ const getUserStats = async ({ userId, mongoDB }) => {
                 }, {
                     $group: {
                         _id: {
-                            "representativeId": "$representativeId"
+                            "representeeId": "$representeeId"
                         }
                     }
                 }, {
