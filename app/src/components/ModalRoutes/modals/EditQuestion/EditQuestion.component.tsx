@@ -1,7 +1,5 @@
 import React, { FunctionComponent, useEffect } from 'react';
 import { useForm } from "react-hook-form";
-import TextareaAutosize from 'react-textarea-autosize';
-import { useParams, Link } from 'react-router-dom';
 import ReactTooltip from 'react-tooltip';
 import { useQuery, useMutation } from "@apollo/client";
 import { useHistory } from "react-router-dom";
@@ -161,19 +159,23 @@ export const EditQuestion: FunctionComponent<{}> = ({ }) => {
                 ) : null}
 
                 <div>
-                    <TextareaAutosize
+                    <input
                         autoFocus
-                        name="questionText"
-                        ref={register('questionText', {
+                        // name="questionText"
+                        {...register('questionText', {
                             validate: {
                                 single: (v: any) =>
                                     v?.length > 5 ||
                                     'please make a question',
                             }
                         })}
-                        value={watchAllFields?.questionText?.length ? watchAllFields?.questionText + "?" : ''} //+ "?"
+                        value={
+                            watchAllFields?.questionText?.length ?
+                                watchAllFields?.questionText + "?" : ''
+                        } //+ "?"
                         placeholder="Ask a question..."
                         onSelect={(e: any) => {
+                            console.log(e.key);
                             // move cursor to before "?"
                             if (e.target.value.length === e.target.selectionStart) {
                                 e.target.selectionStart = e.target.value.length - 1;
@@ -181,12 +183,24 @@ export const EditQuestion: FunctionComponent<{}> = ({ }) => {
                             }
                         }}
                         onChange={(e) => {
+                            console.log(e);
                             // remove "?" from value
                             setValue(
                                 "questionText",
                                 e.target.value.replaceAll('?', ''),
                                 // { shouldValidate: true }
                             );
+                        }}
+                        onKeyDown={e => {
+                            if (e.key === 'Enter') e.preventDefault();
+                        }}
+                        onKeyUp={e => {
+                            if (e.key === 'Backspace') {
+                                if (e.target.value.length === e.target.selectionStart) {
+                                    e.target.selectionStart = e.target.value.length - 1;
+                                    e.target.selectionEnd = e.target.value.length - 1;
+                                }
+                            }
                         }}
                     />
                     {errors?.questionText && <div className="error pl-0 mt-n2">{errors?.questionText.message}</div>}
@@ -218,7 +232,7 @@ export const EditQuestion: FunctionComponent<{}> = ({ }) => {
                             label="Group to Poll in"
                             register={register(name, {
                                 validate: {
-                                    group: (v: any) => typeof v.group !=='undefined' || 'please select a group and channel',
+                                    group: (v: any) => typeof v.group !== 'undefined' || 'please select a group and channel',
                                     // channel: (v: any) => typeof v.channel !=='undefined' || 'please select a channel',
                                 }
                             })}

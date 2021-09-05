@@ -133,7 +133,7 @@ export const Profile: FunctionComponent<{}> = ({ }) => {
             </div>
             <h2 className="profile-name">{profile.name}</h2>
             <p className="profile-handle">@{profile.handle}</p>
-            <div className="profile-description">
+            <div className="profile-description pre-wrap">
                 {profile.bio}
             </div>
             <div className="profile-icons-container d-flex">

@@ -3,6 +3,7 @@ import { useForm } from "react-hook-form";
 import { useQuery, useMutation } from "@apollo/client";
 
 import TextInput from "@shared/Inputs/TextInput";
+import TextAreaInput from "@shared/Inputs/TextAreaInput";
 import useSearchParams from "@state/Global/useSearchParams.effect";
 import { USER, EDIT_USER } from "@state/User/typeDefs";
 
@@ -115,7 +116,7 @@ export const EditProfile: FunctionComponent<{}> = ({ }) => {
 
                 <div className="my-3">
                     {((name: keyof IFormValues) => (
-                        <TextInput
+                        <TextAreaInput
                             name={name}
                             register={register(name, {
                                 required: true
