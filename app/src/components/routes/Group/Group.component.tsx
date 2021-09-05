@@ -198,7 +198,7 @@ export const Group: FunctionComponent<{}> = ({ }) => {
                     </div> */}
                 </div>
             </div>
-            <div className="profile-description">
+            <div className="profile-description pre-wrap">
                 {selectedGroup?.bio}
             </div>
             <div className="profile-icons-container d-flex">

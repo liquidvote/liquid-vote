@@ -57,7 +57,7 @@ export default function Question() {
             ) : (
                 <div className="mt-4"></div>
             )}
-            <h2 className="mb-2 white"><b>{voteName}</b>?</h2>
+            <h2 className="mb-2 white pre-wrap"><b>{voteName}</b>?</h2>
 
             <div>
 
@@ -97,7 +97,7 @@ export default function Question() {
                                     to={`/group/${groupHandle}`}
                                     className="badge ml-1 mb-1 mt-1"
                                 >
-                                    {question_data?.Question?.groupChannel.group}
+                                    {question_data?.Question?.groupChannel?.group}
                                 </Link>
                             </div>
                         </div>

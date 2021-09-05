@@ -4,6 +4,7 @@ import { useQuery, useMutation } from "@apollo/client";
 import { useHistory } from "react-router-dom";
 
 import TextInput from "@shared/Inputs/TextInput";
+import TextAreaInput from "@shared/Inputs/TextAreaInput";
 import DropDownInput from "@shared/Inputs/DropDownInput";
 import AdminsInput from "@shared/Inputs/AdminsInput";
 import ChannelsInput from "@shared/Inputs/ChannelsInput";
@@ -146,7 +147,7 @@ export const EditGroup: FunctionComponent<{}> = ({ }) => {
 
                 <div className="my-3">
                     {((name: keyof IFormValues) => (
-                        <TextInput
+                        <TextAreaInput
                             name={name}
                             register={register(name, {
                                 required: true
