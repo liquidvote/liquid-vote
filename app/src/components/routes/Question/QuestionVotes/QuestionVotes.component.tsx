@@ -81,7 +81,7 @@ export const QuestionVotes: FunctionComponent<{}> = ({ }) => {
                         className={`nav-link ${(!subsection || subsection === 'direct') && 'active'}`}
                         to={`/poll/${voteName}/${groupHandle}/timeline`}
                     >
-                        <b>{question_data?.Question?.stats?.directVotes}</b> Direct Votes
+                        <b>{question_data?.Question?.stats?.directVotes}</b> Direct
                     </Link>
                 </li>
                 <li className="nav-item">

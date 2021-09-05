@@ -28,7 +28,6 @@ export default function App() {
                         <Route path="/poll/:voteName/:groupHandle/:section/:subsection" component={loadable(() => import('./components/routes/Question'))} />
                         <Route path="/poll/:voteName/:groupHandle/:section" component={loadable(() => import('./components/routes/Question'))} />
                         <Route path="/poll/:voteName/:groupHandle" component={loadable(() => import('./components/routes/Question'))} />
-
                         <Route path="/multipoll/:voteName/:groupHandle/:section/:subsection/:subsubsection" component={loadable(() => import('./components/routes/Question'))} />
                         <Route path="/multipoll/:voteName/:groupHandle/:section/:subsection" component={loadable(() => import('./components/routes/Question'))} />
                         <Route path="/multipoll/:voteName/:groupHandle/:section" component={loadable(() => import('./components/routes/Question'))} />
@@ -37,7 +36,6 @@ export default function App() {
                         <Route path="/register" component={loadable(() => import('./components/routes/CreateProfile'))} />
                         <Route path="/create-vote" component={loadable(() => import('./components/routes/CreateVote'))} />
                         <Route path="/create-vote/:groupName" component={loadable(() => import('./components/routes/CreateVote'))} />
-                        {/* <Route path="/create-sub-vote/:voteName" component={loadable(() => import('./components/routes/CreateVote'))} /> */}
                         <Route path="/profile/:handle/:section/:subsection/:subsubsection" component={loadable(() => import('./components/routes/Profile'))} />
                         <Route path="/profile/:handle/:section/:subsection" component={loadable(() => import('./components/routes/Profile'))} />
                         <Route path="/profile/:handle/:section" component={loadable(() => import('./components/routes/Profile'))} />

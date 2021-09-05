@@ -4,7 +4,7 @@ import { Auth0Provider } from "@auth0/auth0-react";
 import { ApolloProvider, ApolloClient, createHttpLink, InMemoryCache } from '@apollo/client';
 // import { InMemoryCache } from "apollo-cache-inmemory";
 import { setContext } from '@apollo/client/link/context';
-import { persistCache } from 'apollo-cache-persist';
+import { persistCache, LocalStorageWrapper } from 'apollo3-cache-persist';
 import localforage from "localforage";
 import { useAuth0 } from "@auth0/auth0-react";
 import env from '@env';
@@ -21,10 +21,18 @@ const AppolloAppWrapper: FunctionComponent<{}> = ({ }) => {
         uri: env.graphql,
     });
 
+    const cache = new InMemoryCache();
+
+    // TODO: await before instantiating ApolloClient, else queries might run before the cache is persisted
+    persistCache({
+        cache,
+        storage: new LocalStorageWrapper(window.localStorage),
+    });
+
     const client = new ApolloClient({
         link: httpLink,
         credentials: 'include',
-        cache: new InMemoryCache(),
+        cache
     });
 
     useEffect(() => {
