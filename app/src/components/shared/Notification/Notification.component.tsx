@@ -18,7 +18,6 @@ export const Notification: FunctionComponent<{
 
         return (
             <>
-                {/* <pre>{JSON.stringify(v.user, null, 2)}</pre> */}
                 <div className="d-flex relative align-items-center">
                     <Link to={`/profile/${v.user?.handle}`}>
                         <div
@@ -31,26 +30,27 @@ export const Notification: FunctionComponent<{
                     </Link>
                     <div className="flex-fill">
                         <div className="mb-n1 flex-fill d-flex align-items-center justify-content-between">
-                            <div>
-                                <Link to={`/profile/${v.user?.handle}`}>
+                            <div className="w-75">
+                                <Link to={`/profile/${v.user?.handle}`} className="d-block mb-n1">
                                     <b className="mr-1">{v.user?.name}</b>
                                 </Link>
-                                <p className="d-flex align-items-center mt-0 mb-0">
+                                <p className="d-inline-block mt-0 mb-0">
 
                                     {
                                         v.isDirect ? (
-                                            <small className="mr-1">
+                                            <small className="mr-1 d-inline-block">
                                                 Voted{' '}
                                                 <b className={`white ${v.position?.toLowerCase()}Direct px-1 rounded`}>{v.position}</b>
                                             </small>
                                         ) : (
-                                            <small className="d-flex align-items-center">
+                                            <small className="d-flex align-items-center d-inline-block">
                                                 Was represented by
-                                                <div className="d-flex ml-2 pl-1 mr-1">
+                                                <span className="d-flex ml-2 pl-1 mr-1">
                                                     {v.representatives?.map((r: any) => (
                                                         <Link
+                                                            key={`representatives-${v?.representativeHandle}`}
                                                             to={`/profile/${r.representativeHandle}`}
-                                                            className={`vote-avatar tiny ${r.position} ml-n2 d-none d-md-block`}
+                                                            className={`vote-avatar tiny ${r.position} ml-n2`}
                                                             style={{
                                                                 background: `url(${r.representativeAvatar}) no-repeat`,
                                                                 backgroundSize: 'cover'
@@ -58,7 +58,7 @@ export const Notification: FunctionComponent<{
                                                             title={r.representativeName}
                                                         ></Link>
                                                     ))}
-                                                </div>
+                                                </span>
                                             </small>
                                         )
                                     }
@@ -67,7 +67,7 @@ export const Notification: FunctionComponent<{
                                         <small className="mr-1">on</small>
                                         <Link
                                             to={`/${v.choiceText ? 'multipoll' : 'poll'}/${v.questionText}/${v.groupChannel?.group}`}
-                                        ><b className="white text-truncate">{v.questionText}{v.choiceText ? ':' + v.choiceText : ''}</b></Link>
+                                        ><b className="white">{v.questionText}{v.choiceText ? ':' + v.choiceText : ''}</b></Link>
                                     </>
 
                                 </p>
@@ -78,8 +78,9 @@ export const Notification: FunctionComponent<{
                                         <div className="d-flex ml-2 pl-1 mr-1">
                                             {v.representeeVotes?.map((r: any) => (
                                                 <Link
+                                                    key={`representeeVotes-${r.user.handle}`}
                                                     to={`/profile/${r.user.handle}`}
-                                                    className={`vote-avatar tiny ml-n2 d-none d-md-block`}
+                                                    className={`vote-avatar tiny ml-n2`}
                                                     style={{
                                                         background: `url(${r.user.avatar}) no-repeat`,
                                                         backgroundSize: 'cover'

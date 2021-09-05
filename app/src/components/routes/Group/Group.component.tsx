@@ -224,16 +224,16 @@ export const Group: FunctionComponent<{}> = ({ }) => {
                 </div>
             </div>
             <div className="profile-stats-container">
-                <Link to={`/group-people/${selectedGroup?.handle}/members`}>
+                <Link className="mr-2" to={`/group-people/${selectedGroup?.handle}/members`}>
                     <b>{selectedGroup?.stats?.members || 0}</b> Member{selectedGroup?.members !== 1 && 's'}
                 </Link>
                 {
                     selectedGroup?.yourStats && (
                         <>
-                            <Link className="ml-2" to={`/group-people/${selectedGroup?.handle}/representingYou`}>
+                            <Link className="mr-2" to={`/group-people/${selectedGroup?.handle}/representingYou`}>
                                 <b>{selectedGroup?.yourStats.representing || 0}</b> Representing you
                             </Link>
-                            <Link className="ml-2" to={`/group-people/${selectedGroup?.handle}/representedByYou`}>
+                            <Link to={`/group-people/${selectedGroup?.handle}/representedByYou`}>
                                 <b>{selectedGroup?.yourStats.representedBy || 0}</b> Represented by you
                             </Link>
                         </>

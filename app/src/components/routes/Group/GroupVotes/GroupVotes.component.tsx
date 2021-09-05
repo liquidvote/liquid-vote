@@ -156,16 +156,13 @@ export const GroupVotes: FunctionComponent<{ sortBy: any }> = ({ sortBy }) => {
             )}
 
             {votes_data?.Votes.map((n, i) => (
-                <>
-                    {/* {i} */}
-                    <Notification
-                        key={'notification-groupvote' + type + n.questionText + n.choiceText + n.user.name + i}
-                        v={{
-                            ...n
-                        }}
-                        showChart={true}
-                    />
-                </>
+                <Notification
+                    key={'notification-groupvote' + type + n.questionText + n.choiceText + n.user.name + i}
+                    v={{
+                        ...n
+                    }}
+                    showChart={true}
+                />
             ))}
 
             {votes_loading && (

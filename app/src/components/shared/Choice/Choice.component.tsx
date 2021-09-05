@@ -170,6 +170,7 @@ export const Choice: FunctionComponent<{
                                     stats?.forMostRepresentingVoters
                             )?.slice(0, 2).map((v: any) => (
                                 <Link
+                                    key={`forMostRepresentingVoters-${v?.handle}`}
                                     to={`/profile/${v?.handle}`}
                                     className={`vote-avatar for ml-n2 ${inList && 'tiny'}`}
                                     style={{
@@ -204,6 +205,7 @@ export const Choice: FunctionComponent<{
                                         stats?.againstMostRepresentingVoters
                                 )?.slice(0, 2).map((v: any) => (
                                     <Link
+                                        key={`againstMostRepresentingVoters-${v?.handle}`}
                                         to={`/profile/${v?.handle}`}
                                         className={`vote-avatar against ml-n2 ${inList && 'tiny'}`}
                                         style={{

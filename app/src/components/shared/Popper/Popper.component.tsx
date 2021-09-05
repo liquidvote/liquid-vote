@@ -5,7 +5,7 @@ import './style.sass';
 
 export const Popper: FunctionComponent<{
     button: any, popperContent: any,
-    rightOnSmall: boolean
+    rightOnSmall?: boolean
 }> = ({
     button,
     popperContent,
