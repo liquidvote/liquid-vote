@@ -48,33 +48,36 @@ export const AcceptInvite: FunctionComponent<{}> = ({ }) => {
     });
 
     useEffect(() => {
-        if (acceptInviteOnLogin) {
+        if (acceptInviteOnLogin && !!authUser) {
             acceptInvite();
         }
     }, [authUser]);
 
     const acceptInvite = () => {
-        if (modalData?.toWhat === 'group') {
-            console.log({
-                InviteId: allSearchParams?.inviteId
-            });
-            editGroupMemberChannelRelation({
-                variables: {
-                    UserHandle: authUser?.LiquidUser.handle,
-                    GroupHandle: modalData?.groupHandle,
-                    InviteId: allSearchParams?.inviteId,
-                    IsMember: true
-                }
-            });
-            updateParams({
-                keysToRemove: ['modal', 'modalData'],
-                paramsToAdd: { refetch: 'group' }
-            });
+        if (!!authUser) {
+            if (modalData?.toWhat === 'group') {
+                editGroupMemberChannelRelation({
+                    variables: {
+                        UserHandle: authUser?.LiquidUser.handle,
+                        GroupHandle: modalData?.groupHandle,
+                        InviteId: allSearchParams?.inviteId,
+                        IsMember: true
+                    }
+                }).then(() => {
+                    updateParams({
+                        keysToRemove: ['modal', 'modalData'],
+                        paramsToAdd: { refetch: 'group' }
+                    });
+                });
+            }
+        } else {
+            setAcceptInviteOnLogin(true);
+            loginWithPopup();
         }
     };
 
     return (
-        <form>
+        <div>
             <ModalHeader
                 title={
                     modalData?.toWhat === 'representation' ? `TODO` :
@@ -86,7 +89,6 @@ export const AcceptInvite: FunctionComponent<{}> = ({ }) => {
             />
 
             <div className="Modal-Content">
-
                 <div className="d-flex flex-column justify-content-center">
                     <div className="d-flex justify-content-center align-items-center mt-4 mb-2 px-4">
                         <div
@@ -101,31 +103,24 @@ export const AcceptInvite: FunctionComponent<{}> = ({ }) => {
                         </p>
                     </div>
 
-                    {!!user ? (
-                        <div
+                    {acceptInviteOnLogin ? (
+                        <div className="mx-5 my-4 text-center">
+                            <img
+                                className="vote-avatar"
+                                src={'http://images.liquid-vote.com/system/loading.gif'}
+                            />
+                        </div>
+                    ) : (
+                        <button
                             className="button_ mx-5 my-4"
                             onClick={acceptInvite}
-                        >
-                            Join Group
-                        </div>
+                            disabled={editGroupMemberChannelRelation_loading}
+                        >Join Group</button>
 
-                    ) : (
-                        <div
-                            className="button_ mx-5 my-4"
-                            onClick={() => {
-                                setAcceptInviteOnLogin(true);
-                                loginWithPopup();
-                            }}
-                        >
-                            Join Group
-                        </div>
                     )}
-
                 </div>
-
-
             </div>
-        </form>
+        </div>
     );
 }
 

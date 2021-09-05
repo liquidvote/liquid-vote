@@ -99,7 +99,7 @@ export const Group: FunctionComponent<{}> = ({ }) => {
             editGroupMemberChannelRelation_data?.editGroupMemberChannelRelation?.isMember
         );
 
-    return group_loading ? (
+    return !selectedGroup ? (
         <div className="d-flex justify-content-center mt-5">
             <DropAnimation />
         </div>

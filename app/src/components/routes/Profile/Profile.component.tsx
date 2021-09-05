@@ -58,7 +58,7 @@ export const Profile: FunctionComponent<{}> = ({ }) => {
         }
     }, [allSearchParams.refetch]);
 
-    return user_loading ? (
+    return !profile ? (
         <div className="d-flex justify-content-center mt-5">
             <DropAnimation />
         </div>

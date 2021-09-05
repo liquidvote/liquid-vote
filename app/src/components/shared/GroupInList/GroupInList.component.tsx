@@ -109,7 +109,7 @@ export const GroupInList: FunctionComponent<{
                     For personal use, Airbnb, long term renting or whatever. */}
                     </small>
                     <div className="d-flex ml-2 mt-2">
-                        {group?.stats?.mostRepresentingMembers?.map((m:  any)  => (
+                        {group?.stats?.mostRepresentingMembers?.slice(0, 6).map((m: any) => (
                             <Link
                                 to={`/profile/${m.handle}`}
                                 title={`${m.name}`}
@@ -120,7 +120,11 @@ export const GroupInList: FunctionComponent<{
                                 }}
                             ></Link>
                         ))}
-                        <div className="vote-avatar count ml-n2">{group?.stats?.members}</div>
+                        <Link
+                            to={`/group-people/${group.handle}/members`}
+                        >
+                            <div className="vote-avatar count ml-n2">{group?.stats?.members}</div>
+                        </Link>
                     </div>
                 </div>
             </div>

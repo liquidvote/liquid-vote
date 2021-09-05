@@ -32,7 +32,7 @@ export const SideMenu: FunctionComponent<{}> = ({ }) => {
     const { authUser } = authUser_data || {};
 
     useEffect(() => {
-        if (isAuthenticated) {
+        if (!!isAuthenticated) {
 
             let count = 0;
             const tryToGetUser = async () => {
