@@ -40,11 +40,6 @@ export const ProfileVotes: FunctionComponent<{}> = ({ }) => {
 
     const profile = user_data?.User;
 
-    console.log({
-        authLiquidUser,
-        profile
-    })
-
     const type = (() => {
         if ((!subsection || subsection === 'direct') && !subsubsection) {
             return 'directVotesMade';
@@ -68,7 +63,7 @@ export const ProfileVotes: FunctionComponent<{}> = ({ }) => {
         data: user_votes_data,
         refetch: user_votes_refetch
     } = useQuery(VOTES, {
-        variables: { handle, handleType: 'user', type, sortBy }
+        variables: { userHandle: handle, type, sortBy }
     });
 
     return (

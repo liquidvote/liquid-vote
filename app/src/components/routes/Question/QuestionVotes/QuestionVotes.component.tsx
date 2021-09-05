@@ -4,6 +4,7 @@ import { useQuery, useMutation } from "@apollo/client";
 
 import { AUTH_USER } from "@state/AuthUser/typeDefs";
 import { USER, USER_VOTES } from "@state/User/typeDefs";
+import { VOTES } from "@state/Vote/typeDefs";
 import Notification from '@shared/Notification';
 import SortSmallSvg from "@shared/Icons/Sort-small.svg";
 
@@ -46,13 +47,16 @@ export const QuestionVotes: FunctionComponent<{}> = ({ }) => {
             return 'directFor';
         } else if (subsection === 'direct' && subsubsection === 'against') {
             return 'directAgainst';
-        } else if (subsection === 'represented') {
-            return 'represented';
-        } else if (subsection === 'representingYou') {
-            return 'representingYou';
-        } else if (subsection === 'representedByYou') {
-            return 'representedByYou'
+        } else if (subsection === 'represented' && !subsubsection) {
+            return 'indirectVotesMade'
+        } else if (subsection === 'direct' && subsubsection === 'byYou') {
+            return 'directVotesMadeByYou';
+        } else if (subsection === 'represented' && subsubsection === 'byyou') {
+            return 'indirectVotesMadeByYou';
+        } else if (subsection === 'represented' && subsubsection === 'foryou') {
+            return 'indirectVotesMadeForYou';
         }
+
         return null
     })();
 
@@ -65,8 +69,23 @@ export const QuestionVotes: FunctionComponent<{}> = ({ }) => {
         variables: {
             questionText: voteName,
             group: groupHandle,
-            // channel: groupChannel_.channel,
             typeOfVoter: type,
+            sortBy
+        },
+        skip: !type
+    });
+
+    const {
+        loading: votes_loading,
+        error: votes_error,
+        data: votes_data,
+        refetch: votes_refetch
+    } = useQuery(VOTES, {
+        variables: {
+            questionText: voteName,
+            groupHandle,
+            handleType: 'user',
+            type,
             sortBy
         },
         skip: !type
@@ -160,7 +179,7 @@ export const QuestionVotes: FunctionComponent<{}> = ({ }) => {
             </pre> */}
 
 
-            {question_voters_data?.QuestionVoters.length === 0 && (
+            {votes_data?.Votes.length === 0 && (
                 <div className="p-4 text-center">
                     {
                         (() => {
@@ -168,24 +187,23 @@ export const QuestionVotes: FunctionComponent<{}> = ({ }) => {
                                 return 'This poll hasn\'t received any votes in favor yet';
                             } else if (type === 'directAgainst') {
                                 return 'This poll hasn\'t received any votes against yet';
-                            } else if (type === 'represented') {
+                            } else if (type === 'indirectVotesMade') {
                                 return 'No one has been represented for this poll yet';
-                            } else if (type === 'representingYou') {
-                                return 'None of your [🧪] representatives has voted yet';
-                            } else if (type === 'representedByYou') {
-                                if (!!question_data?.Question?.userVote) {
-                                    return 'You aren\'t representing anyone yet';
-                                } else {
-                                    return 'You haven\'t voted yet, once you do, you\'ll be representing [🧪] group members';
-                                }
-                            }
+                            } else if (type === 'directVotesMadeByYou') {
+                                return 'You  haven\'t voted for this poll yet';
+                            } else if (type === 'indirectVotesMadeByYou') {
+                                return 'You haven\'t represented anyone for this poll yet';
+                            } else if (type === 'indirectVotesMadeForYou') {
+                                return 'No one has represented you for this poll yet';
+                            } 
+                            
                             return 'type'
                         })()
                     }{' '}
                 </div>
             )}
 
-            {question_voters_data?.QuestionVoters?.map((n, i) => (
+            {votes_data?.Votes?.map((n, i) => (
                 <Notification
                     key={type + i}
                     v={{
@@ -198,7 +216,7 @@ export const QuestionVotes: FunctionComponent<{}> = ({ }) => {
                 />
             ))}
 
-            {question_voters_loading && (
+            {votes_loading && (
                 <div className="d-flex justify-content-center mt-5">
                     <DropAnimation />
                 </div>

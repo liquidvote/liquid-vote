@@ -57,15 +57,7 @@ export const GroupVotes: FunctionComponent<{ sortBy: any }> = ({ sortBy }) => {
         data: votes_data,
         refetch: votes_refetch
     } = useQuery(VOTES, {
-        variables: { handle, handleType: 'group', type, sortBy }
-    });
-
-    console.log({
-        yourStats: group_data?.Group?.yourStats,
-        type,
-        subsection,
-        subsubsection,
-        Votes: votes_data?.Votes,
+        variables: { groupHandle: handle, type, sortBy }
     });
 
     return (
