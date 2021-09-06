@@ -71,7 +71,7 @@ export const Profile: FunctionComponent<{}> = ({ }) => {
                 <div
                     className="profile-avatar bg"
                     style={{
-                        background: profile.avatar && `url(${profile.avatar}) no-repeat`,
+                        background: profile.avatar && `url(${profile.avatar}) 50% 50% no-repeat`,
                         backgroundSize: 'cover'
                     }}
                 />
