@@ -19,7 +19,7 @@ const config = {
   output: {
     path: `${__dirname}/dist`,
     publicPath: "/",
-    filename: "[name].js",
+    filename: "[name].[contenthash].js",
     chunkFilename: '[id].chunk.[chunkhash].js',
   },
   resolve: {
