@@ -136,8 +136,9 @@ export const Choice: FunctionComponent<{
                     <div className="d-flex align-items-center">
                         <div
                             className={`button_ justify-content-between min-w mr-1 ${userVote_ === 'for' && 'selected'} ${inList && 'small'}`}
+                            onClick={() => handleUserVote('for')}
                         >
-                            <span className="mr-1 clickable" onClick={() => handleUserVote('for')}>
+                            <span className="mr-1">
                                 For
                             </span>
                             {
@@ -149,6 +150,7 @@ export const Choice: FunctionComponent<{
                                     <div className="d-flex ml-2 my-n2 mr-n1">
                                         <Link
                                             to={`/profile/${forRepresentatives[0].representativeHandle}`}
+                                            onClick={e => e.stopPropagation()}
                                             className={`vote-avatar for ml-n2 ${inList && 'tiny'}`}
                                             style={{
                                                 background: `url(${forRepresentatives[0].representativeAvatar}) no-repeat`,
@@ -157,6 +159,7 @@ export const Choice: FunctionComponent<{
                                         ></Link>
                                         <Link
                                             to={`/${choiceText ? 'multipoll' : 'poll'}/${voteName}/${groupHandle}/timeline/representingYou`}
+                                            onClick={e => e.stopPropagation()}
                                             className={`vote-avatar text-decoration-none count for ml-n2 ${inList && 'tiny'}`}
                                         >{forRepresentatives.length}</Link>
                                     </div>
@@ -223,6 +226,7 @@ export const Choice: FunctionComponent<{
                         </div>
                         <div
                             className={`button_ min-w justify-content-between text-right ml-1 ${userVote_ === 'against' && 'selected'} ${inList && 'small'}`}
+                            onClick={() => handleUserVote('against')}
                         >
                             {
                                 (
@@ -238,16 +242,17 @@ export const Choice: FunctionComponent<{
                                                 background: `url(${againstRepresentatives[0].representativeAvatar}) no-repeat`,
                                                 backgroundSize: 'cover'
                                             }}
+                                            onClick={e => e.stopPropagation()}
                                         ></Link>
                                         <Link
                                             to={`/${choiceText ? 'multipoll' : 'poll'}/${voteName}/${groupHandle}/timeline/representingYou`}
+                                            onClick={e => e.stopPropagation()}
                                             className={`vote-avatar text-decoration-none count against ml-n2 ${inList && 'tiny'}`}
                                         >{againstRepresentatives.length}</Link>
                                     </div>
                                 )
                             }
-                            <span></span>
-                            <span className="clickable" onClick={() => handleUserVote('against')}>
+                            <span>
                                 Against
                             </span>
                         </div>
