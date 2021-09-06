@@ -205,6 +205,7 @@ form
     background: inherit
     white-space: nowrap
     height: fit-content
+    user-select: none
 
     &:hover:not([disabled], .inverted, .selected)
         background-color: rgba(0,0,0,0.1)
@@ -650,3 +651,7 @@ hr
 
 .pre-wrap
     white-space: pre-wrap
+
+.clickable
+    user-select: none
+    cursor: pointer

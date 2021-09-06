@@ -23,11 +23,11 @@ export const Header: FunctionComponent<{
         const history = useHistory();
 
         const goBack = () => {
-            if (backLink) {
-                history.push(backLink);
-            } else {
-                history.goBack()
-            }
+            // if (backLink) {
+            //     history.push(backLink);
+            // } else {
+            //     history.goBack()
+            // }
         }
 
         return (
