@@ -18,6 +18,9 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "@aws-sdk/client-s3": "^3.29.0",
+    "@aws-sdk/s3-request-presigner": "^3.29.0",
+    "@aws-sdk/types": "^3.29.0",
     "apollo-datasource-rest": "^3.2.0",
     "apollo-server-lambda": "^2",
     "graphql": "^15.5.2",
