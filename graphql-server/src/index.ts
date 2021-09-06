@@ -1,8 +1,10 @@
 import { ApolloServer, gql } from "apollo-server-lambda";
 const MongoClient = require("mongodb").MongoClient;
 // const AWS = require("aws-sdk");
+// import { S3Client } from "@aws-sdk/client-s3";
 
 const atlasCredentials = require("../credentials/atlas-credentials.json");
+// const awsCredentials = require("../credentials/aws-credentials.json");
 import { BookTypeDefs, BookResolvers } from "./state/BooksDemo";
 import { AuthUserTypeDefs, AuthUserResolvers } from "./state/AuthUser";
 import { UserTypeDefs, UserResolvers } from "./state/Users";
@@ -10,9 +12,13 @@ import { GroupTypeDefs, GroupResolvers } from "./state/Groups";
 import { QuestionTypeDefs, QuestionResolvers } from "./state/Questions";
 import { VoteTypeDefs, VoteResolvers } from "./state/Votes";
 import { InviteTypeDefs, InviteResolvers } from "./state/Invites";
+import { S3TypeDefs, S3Resolvers } from "./state/S3";
 
 // AWS.config.loadFromPath("./credentials/aws-credentials.json");
 // AWS.config.update({ region: "eu-west-1" });
+// const s3Client = new S3Client({
+//     credentials: { ...awsCredentials }
+// });
 
 const mongoClient = new MongoClient(
     `mongodb+srv://${atlasCredentials.username}:${atlasCredentials.password}@aiaiaiaminhavida.oobyz.mongodb.net/Enron?retryWrites=true&w=majority`,
@@ -59,39 +65,39 @@ const createHandler = async () => {
     const server = new ApolloServer({
         typeDefs: [
             QueryTypeDefs,
-            BookTypeDefs,
             AuthUserTypeDefs,
             UserTypeDefs,
             GroupTypeDefs,
             QuestionTypeDefs,
             VoteTypeDefs,
-            InviteTypeDefs
+            InviteTypeDefs,
+            S3TypeDefs
         ],
         resolvers: {
-            ...BookResolvers,
             ...AuthUserResolvers,
             ...UserResolvers,
             ...GroupResolvers,
             ...QuestionResolvers,
             ...VoteResolvers,
             ...InviteResolvers,
+            ...S3Resolvers,
             Query: {
-                ...BookResolvers.Query,
                 ...AuthUserResolvers.Query,
                 ...UserResolvers.Query,
                 ...GroupResolvers.Query,
                 ...QuestionResolvers.Query,
                 ...VoteResolvers.Query,
-                ...InviteResolvers.Query
+                ...InviteResolvers.Query,
+                // ...S3Resolvers.Query
             },
             Mutation: {
-                // ...BookResolvers.Mutation,
                 ...AuthUserResolvers.Mutation,
                 ...UserResolvers.Mutation,
                 ...GroupResolvers.Mutation,
                 ...QuestionResolvers.Mutation,
                 ...VoteResolvers.Mutation,
-                ...InviteResolvers.Mutation
+                ...InviteResolvers.Mutation,
+                ...S3Resolvers.Mutation
             }
         },
         context: async ({ event }) => {
@@ -102,7 +108,7 @@ const createHandler = async () => {
 
             // console.log({ headers: event.headers, token, AuthUser });
 
-            return { AuthUser, mongoDB: DBConnection, AWS: null };
+            return { AuthUser, mongoDB: DBConnection };
         },
     });
     return server.createHandler({

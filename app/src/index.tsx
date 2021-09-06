@@ -24,10 +24,10 @@ const AppolloAppWrapper: FunctionComponent<{}> = ({ }) => {
     const cache = new InMemoryCache();
 
     // TODO: await before instantiating ApolloClient, else queries might run before the cache is persisted
-    persistCache({
-        cache,
-        storage: new LocalStorageWrapper(window.localStorage),
-    });
+    // persistCache({
+    //     cache,
+    //     storage: new LocalStorageWrapper(window.localStorage),
+    // });
 
     const client = new ApolloClient({
         link: httpLink,

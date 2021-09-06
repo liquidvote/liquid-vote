@@ -21,9 +21,6 @@ import GroupPolls from './GroupPolls';
 import GroupVotes from './GroupVotes';
 import './style.sass';
 
-
-
-
 export const Group: FunctionComponent<{}> = ({ }) => {
 
     let { handle, section } = useParams<any>();

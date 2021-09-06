@@ -25,7 +25,7 @@ $theme5-colors: ("bg": #0b414d, "primary": #08f3a5, "secondary": white, "border"
         fill: map-get($theme, "bg") !important
         background: map-get($theme, "bg")
 
-    &.AppContainer, .AppContainer, .Modal, .Modal-Header
+    &.AppContainer, .AppContainer, .Modal, .Modal-Header, .baseColors
         background: map-get($theme, "bg")
         color: map-get($theme, "primary")
 
@@ -425,7 +425,7 @@ hr
     opacity: 0.7
 
 .vote-avatar
-    background-size: cover
+    background-size: cover !important
     border-radius: 150px
     height: 30px
     width: 30px
@@ -610,7 +610,7 @@ hr
         pointer-events: none
         text-transform: capitalize
 
-    input, select, textarea
+    input, select, textarea, .input-element
         outline: none
         box-sizing: border-box
         width: 100%
