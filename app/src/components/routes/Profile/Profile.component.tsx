@@ -64,7 +64,7 @@ export const Profile: FunctionComponent<{}> = ({ }) => {
                 <div
                     className="cover"
                     style={{
-                        background: profile.cover && `url(${profile.cover}) no-repeat`,
+                        background: profile.cover && `url(${profile.cover}) 50% 50% no-repeat`,
                         backgroundSize: 'cover'
                     }}
                 />

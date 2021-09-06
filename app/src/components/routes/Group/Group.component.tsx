@@ -97,7 +97,7 @@ export const Group: FunctionComponent<{}> = ({ }) => {
                 <div
                     className="cover"
                     style={{
-                        background: selectedGroup?.cover && `url(${selectedGroup?.cover}) no-repeat`,
+                        background: selectedGroup?.cover && `url(${selectedGroup?.cover}) 50% 50% no-repeat`,
                         backgroundSize: 'cover'
                     }}
                 />
