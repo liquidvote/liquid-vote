@@ -65,7 +65,15 @@ export const EditQuestion: FunctionComponent<{}> = ({ }) => {
 
             const savedQuestion = editQuestion_data?.editQuestion;
 
-            history.push(`/poll/${savedQuestion.questionText}/${savedQuestion.groupChannel.group}`);
+            console.log({
+                savedQuestion
+            });
+
+            if (savedQuestion.questionType === 'single') {
+                history.push(`/poll/${savedQuestion.questionText}/${savedQuestion.groupChannel.group}`);
+            } else {
+                history.push(`/multipoll/${savedQuestion.questionText}/${savedQuestion.groupChannel.group}`);
+            }
         }
     }, [editQuestion_data]);
 
@@ -111,7 +119,10 @@ export const EditQuestion: FunctionComponent<{}> = ({ }) => {
                 questionText: modalData.questionHandle,
                 group: modalData.groupHandle || '',
                 channel: modalData.channelHandle || '',
-                Question: values
+                Question: {
+                    ...values,
+                    questionText: values.questionText.replaceAll('?', '')
+                }
             }
         });
     }
