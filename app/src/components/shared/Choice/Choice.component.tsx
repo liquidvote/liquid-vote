@@ -102,7 +102,7 @@ export const Choice: FunctionComponent<{
                     }
                 }}>
                     {!!choiceText && (
-                        <div className={`white mr-2 ${inList && 'small'}`}><b>{choiceText}</b></div>
+                        <div className={`white choice-text mr-2 ${inList && 'small'}`}><b>{choiceText}</b></div>
                     )}
                     <Chart
                         name={choiceText || null}
