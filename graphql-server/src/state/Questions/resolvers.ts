@@ -105,7 +105,7 @@ export const QuestionResolvers = {
                             questionText: q.questionText,
                             'groupChannel.group': group,
                             choiceText: c.text,
-                            createdBy: AuthUser?._id
+                            user: AuthUser?._id
                         })
                     })))
                 }
