@@ -839,11 +839,13 @@ const getUserStats = async ({ userId, mongoDB }) => {
         indirectVotesMadeByUser: await mongoDB.collection("Votes")
             .find({
                 "isDirect": false,
+                'position': { $ne: null },
                 "representatives.representativeId": new ObjectId(userId)
             }).count(),
         indirectVotesMadeForUser: await mongoDB.collection("Votes")
             .find({
                 "isDirect": false,
+                'position': { $ne: null },
                 "user": new ObjectId(userId)
             }).count(),
     });
