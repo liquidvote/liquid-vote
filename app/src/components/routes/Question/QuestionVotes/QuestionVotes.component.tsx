@@ -126,7 +126,7 @@ export const QuestionVotes: FunctionComponent<{}> = ({ }) => {
                                     className={`nav-link ${(!subsubsection || subsubsection === 'for') && 'active'}`}
                                     to={`/poll/${voteName}/${groupHandle}/timeline/direct/for`}
                                 >
-                                    <b>{question_data?.Question?.stats?.forDirectCount}</b> For
+                                    <b className="forDirect white px-1 rounded">{question_data?.Question?.stats?.forDirectCount}</b> For
                                 </Link>
                             </li>
                             <li className="nav-item">
@@ -134,7 +134,7 @@ export const QuestionVotes: FunctionComponent<{}> = ({ }) => {
                                     className={`nav-link ${(subsubsection === 'against') && 'active'}`}
                                     to={`/poll/${voteName}/${groupHandle}/timeline/direct/against`}
                                 >
-                                    <b>{question_data?.Question?.stats?.againstDirectCount}</b> Against
+                                    <b className="againstDirect white px-1 rounded">{question_data?.Question?.stats?.againstDirectCount}</b> Against
                                 </Link>
                             </li>
                         </ul>
@@ -213,6 +213,8 @@ export const QuestionVotes: FunctionComponent<{}> = ({ }) => {
                         }
                     }}
                     showChart={false}
+                    hideGroup={true}
+                    hideQuestionText={true}
                 />
             ))}
 
