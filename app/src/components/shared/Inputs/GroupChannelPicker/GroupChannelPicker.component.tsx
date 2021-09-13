@@ -5,10 +5,8 @@ import React, {
 } from 'react';
 import { FieldError } from 'react-hook-form';
 import { useQuery, useMutation } from "@apollo/client";
-import { GROUP, EDIT_GROUP } from "@state/Group/typeDefs";
 import { USER_GROUPS } from "@state/User/typeDefs";
 import useAuthUser from '@state/AuthUser/authUser.effect';
-
 
 import GroupSVG from "@shared/Icons/Group-small.svg";
 
@@ -50,22 +48,6 @@ export const GroupChannelPicker: FunctionComponent<Props> = ({
         variables: { handle: liquidUser?.handle },
         skip: !liquidUser
     });
-
-    // const {
-    //     loading: group_loading,
-    //     error: group_error,
-    //     data: group_data,
-    //     refetch: group_refetch
-    // } = useQuery(GROUP, {
-    //     variables: { handle: value?.group },
-    //     skip: !value?.group
-    // });
-
-    // console.log({
-    //     yourGroups_data,
-    //     group_data,
-    //     value
-    // });
 
     const [isFocused, setIsFocused] = useState(false);
 

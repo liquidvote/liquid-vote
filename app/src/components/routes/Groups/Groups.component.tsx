@@ -55,7 +55,7 @@ export const Groups: FunctionComponent<{}> = ({ }) => {
             </div>
 
 
-            {(!!authUser_data?.authUser &&  !yourGroups_loading) && (
+            {(!!liquidUser &&  !yourGroups_loading) && (
                 <div onClick={() => updateParams({
                     paramsToAdd: {
                         modal: 'EditGroup',

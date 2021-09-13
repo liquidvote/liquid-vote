@@ -13,7 +13,7 @@ import LockSVG from "@shared/Icons/Lock.svg";
 import WorldSVG from "@shared/Icons/World.svg";
 import useAuthUser from '@state/AuthUser/authUser.effect';
 import useSearchParams from "@state/Global/useSearchParams.effect";
-import { GROUP } from "@state/Group/typeDefs";
+import useGroup from '@state/Group/group.effect';
 import { timeAgo } from '@state/TimeAgo';
 import { EDIT_GROUP_MEMBER_CHANNEL_RELATION } from "@state/User/typeDefs";
 
@@ -28,14 +28,7 @@ export const Group: FunctionComponent<{}> = ({ }) => {
 
     const [sortBy, setSortBy] = useState('representing');
 
-    const {
-        loading: group_loading,
-        error: group_error,
-        data: group_data,
-        refetch: group_refetch
-    } = useQuery(GROUP, {
-        variables: { handle }
-    });
+    const { group, group_refetch } = useGroup({ handle });
 
     const [editGroupMemberChannelRelation, {
         loading: editGroupMemberChannelRelation_loading,
@@ -52,45 +45,45 @@ export const Group: FunctionComponent<{}> = ({ }) => {
         }
     }, [allSearchParams.refetch]);
 
-    const selectedGroup = group_data?.Group;
+    // const group = group_data?.Group;
 
     const [selectedChannels, setSelectedChannels] = useState<string[]>([]);
 
     useEffect(() => {
-        if (!!selectedGroup?.yourMemberRelation?.channels) {
+        if (!!group?.yourMemberRelation?.channels) {
             setSelectedChannels(
-                selectedGroup?.yourMemberRelation?.channels
+                group?.yourMemberRelation?.channels
             );
         } else {
             setSelectedChannels(
-                selectedGroup?.channels?.map((s: any) => s.name) || []
+                group?.channels?.map((s: any) => s.name) || []
             );
         }
-    }, [selectedGroup]);
+    }, [group]);
 
     useEffect(() => {
         ReactTooltip.rebuild();
-    }, [group_loading]);
+    }, [group]);
 
     const isMember =
         !!liquidUser && (
-            selectedGroup?.yourMemberRelation?.isMember ||
+            group?.yourMemberRelation?.isMember ||
             editGroupMemberChannelRelation_data?.editGroupMemberChannelRelation?.isMember
         );
 
-    return !selectedGroup ? (
+    return !group ? (
         <div className="d-flex justify-content-center mt-5">
             <DropAnimation />
         </div>
-    ) : group_error ? (<>Error</>) : (
+    ) : (
         <>
-            <Header title={selectedGroup?.name} iconType="group" />
+            <Header title={group?.name} iconType="group" />
 
             <div className="profile-top">
                 <div
                     className="cover"
                     style={{
-                        background: selectedGroup?.cover && `url(${selectedGroup?.cover}) 50% 50% no-repeat`,
+                        background: group?.cover && `url(${group?.cover}) 50% 50% no-repeat`,
                         backgroundSize: 'cover'
                     }}
                 />
@@ -98,16 +91,16 @@ export const Group: FunctionComponent<{}> = ({ }) => {
             <div className="d-flex flex-wrap mt-2 justify-content-between">
                 <div className="d-flex flex-column mb-1">
                     <h4 className="d-flex align-items-center m-0">
-                        {selectedGroup?.name}
+                        {group?.name}
                         <div className="ml-2 mt-n1">
-                            {selectedGroup?.privacy === "private" ? (
+                            {group?.privacy === "private" ? (
                                 <LockSVG />
                             ) : (
                                 <WorldSVG />
                             )}
                         </div>
                     </h4>
-                    <p className="profile-handle">@{selectedGroup?.handle}</p>
+                    <p className="profile-handle">@{group?.handle}</p>
                 </div>
                 <div className="d-flex mb-1 ml-n1">
                     {isMember && (
@@ -119,8 +112,8 @@ export const Group: FunctionComponent<{}> = ({ }) => {
                                         modal: "InviteFor",
                                         modalData: JSON.stringify({
                                             InviteType: 'representation',
-                                            groupHandle: selectedGroup.handle,
-                                            groupName: selectedGroup.name
+                                            groupHandle: group.handle,
+                                            groupName: group.name
                                         })
                                     }
                                 })}
@@ -134,8 +127,8 @@ export const Group: FunctionComponent<{}> = ({ }) => {
                                         modal: "InviteFor",
                                         modalData: JSON.stringify({
                                             InviteType: 'toGroup',
-                                            groupHandle: selectedGroup.handle,
-                                            groupName: selectedGroup.name
+                                            groupHandle: group.handle,
+                                            groupName: group.name
                                         })
                                     }
                                 })}
@@ -145,12 +138,12 @@ export const Group: FunctionComponent<{}> = ({ }) => {
                         </>
                     )}
                     {
-                        selectedGroup?.thisUserIsAdmin ? (
+                        group?.thisUserIsAdmin ? (
                             <div
                                 onClick={() => updateParams({
                                     paramsToAdd: {
                                         modal: "EditGroup",
-                                        modalData: JSON.stringify({ groupHandle: selectedGroup?.handle })
+                                        modalData: JSON.stringify({ groupHandle: group?.handle })
                                     }
                                 })}
                                 className={`button_ small ml-2 mb-0`}
@@ -162,7 +155,7 @@ export const Group: FunctionComponent<{}> = ({ }) => {
                                 onClick={() => !!liquidUser ? editGroupMemberChannelRelation({
                                     variables: {
                                         UserHandle: liquidUser?.handle,
-                                        GroupHandle: selectedGroup?.handle,
+                                        GroupHandle: group?.handle,
                                         IsMember: !isMember
                                     }
                                 }) : updateParams({
@@ -170,8 +163,8 @@ export const Group: FunctionComponent<{}> = ({ }) => {
                                         modal: "RegisterBefore",
                                         modalData: JSON.stringify({
                                             toWhat: 'joinGroup',
-                                            groupHandle: selectedGroup.handle,
-                                            groupName: selectedGroup.name
+                                            groupHandle: group.handle,
+                                            groupName: group.name
                                         })
                                     }
                                 })}
@@ -189,42 +182,42 @@ export const Group: FunctionComponent<{}> = ({ }) => {
                 </div>
             </div>
             <div className="profile-description pre-wrap">
-                {selectedGroup?.bio}
+                {group?.bio}
             </div>
             <div className="profile-icons-container d-flex">
                 {/* <div>
                     <LocationSVG />
-                    <div>{selectedGroup?.bio}</div>
+                    <div>{group?.bio}</div>
                 </div> */}
-                {selectedGroup?.externalLink && (
+                {group?.externalLink && (
                     <div>
                         <div className="mr-1"><LinkSVG /></div>
                         <a
-                            href={`//${selectedGroup?.externalLink}`}
+                            href={`//${group?.externalLink}`}
                             target="_blank"
                             rel="noreferrer"
                         >
-                            {selectedGroup?.externalLink}
+                            {group?.externalLink}
                         </a>
                     </div>
                 )}
                 <div>
                     <div className="mr-1"><CalendarSVG /></div>
-                    <div>Group created {timeAgo.format(new Date(Number(selectedGroup?.createdOn)))}</div>
+                    <div>Group created {timeAgo.format(new Date(Number(group?.createdOn)))}</div>
                 </div>
             </div>
             <div className="profile-stats-container">
-                <Link className="mr-2" to={`/group-people/${selectedGroup?.handle}/members`}>
-                    <b>{selectedGroup?.stats?.members || 0}</b> Member{selectedGroup?.members !== 1 && 's'}
+                <Link className="mr-2" to={`/group-people/${group?.handle}/members`}>
+                    <b>{group?.stats?.members || 0}</b> Member{group?.members !== 1 && 's'}
                 </Link>
                 {
-                    selectedGroup?.yourStats && (
+                    group?.yourStats && (
                         <>
-                            <Link className="mr-2" to={`/group-people/${selectedGroup?.handle}/representingYou`}>
-                                <b>{selectedGroup?.yourStats.representing || 0}</b> Representing you
+                            <Link className="mr-2" to={`/group-people/${group?.handle}/representingYou`}>
+                                <b>{group?.yourStats.representing || 0}</b> Representing you
                             </Link>
-                            <Link to={`/group-people/${selectedGroup?.handle}/representedByYou`}>
-                                <b>{selectedGroup?.yourStats.representedBy || 0}</b> Represented by you
+                            <Link to={`/group-people/${group?.handle}/representedByYou`}>
+                                <b>{group?.yourStats.representedBy || 0}</b> Represented by you
                             </Link>
                         </>
                     )
@@ -252,13 +245,13 @@ export const Group: FunctionComponent<{}> = ({ }) => {
 
             <ul className="nav d-flex flex-nowrap justify-content-around align-items-center mt-1 mb-n4 mx-n3">
                 <li className="nav-item">
-                    <Link className={`nav-link ${(!section || section === 'polls') && 'active'}`} to={`/group/${selectedGroup?.handle}/polls`}>
-                        <b>{selectedGroup?.stats?.questions}</b>{' '}Polls
+                    <Link className={`nav-link ${(!section || section === 'polls') && 'active'}`} to={`/group/${group?.handle}/polls`}>
+                        <b>{group?.stats?.questions}</b>{' '}Polls
                     </Link>
                 </li>
                 <li className="nav-item">
-                    <Link className={`nav-link ${section === 'votes' && 'active'}`} to={`/group/${selectedGroup?.handle}/votes`}>
-                        <b>{selectedGroup?.stats?.directVotesMade}</b>{' '}
+                    <Link className={`nav-link ${section === 'votes' && 'active'}`} to={`/group/${group?.handle}/votes`}>
+                        <b>{group?.stats?.directVotesMade}</b>{' '}
                         Votes
                     </Link>
                 </li>
@@ -267,7 +260,7 @@ export const Group: FunctionComponent<{}> = ({ }) => {
                 </li>
             </ul>
 
-            {/* <pre style={{ color: 'white' }}>{JSON.stringify(selectedGroup, null, 2)}</pre> */}
+            {/* <pre style={{ color: 'white' }}>{JSON.stringify(group, null, 2)}</pre> */}
 
             <hr />
 

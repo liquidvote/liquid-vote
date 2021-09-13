@@ -3,7 +3,7 @@ import { Link, useParams } from "react-router-dom";
 import { useQuery, useMutation } from "@apollo/client";
 
 import useAuthUser from '@state/AuthUser/authUser.effect';
-import { GROUP } from "@state/Group/typeDefs";
+import useGroup from '@state/Group/group.effect';
 import { VOTES } from "@state/Vote/typeDefs";
 import Notification from '@shared/Notification';
 import DropAnimation from "@components/shared/DropAnimation";
@@ -16,14 +16,7 @@ export const GroupVotes: FunctionComponent<{ sortBy: any }> = ({ sortBy }) => {
 
     const { liquidUser } = useAuthUser();
 
-    const {
-        loading: group_loading,
-        error: group_error,
-        data: group_data,
-        refetch: group_refetch
-    } = useQuery(GROUP, {
-        variables: { handle }
-    });
+    const { group } = useGroup({ handle });
 
     const type = (() => {
         if ((!subsection || subsection === 'direct') && !subsubsection) {
@@ -59,38 +52,38 @@ export const GroupVotes: FunctionComponent<{ sortBy: any }> = ({ sortBy }) => {
             <ul className="nav d-flex justify-content-around mt-n2 mx-n3">
                 <li className="nav-item">
                     <Link className={`nav-link ${(!subsection || subsection === 'direct') && 'active'}`} to={`/group/${handle}/votes/direct`}>
-                        <b>{group_data.Group?.stats?.directVotesMade}</b> Direct
+                        <b>{group?.stats?.directVotesMade}</b> Direct
                     </Link>
                 </li>
                 <li className="nav-item">
                     <Link className={`nav-link ${subsection === 'represented' && 'active'}`} to={`/group/${handle}/votes/represented`}>
-                        <b>{group_data?.Group?.stats?.indirectVotesMade}</b> Represented
+                        <b>{group?.stats?.indirectVotesMade}</b> Represented
                     </Link>
                 </li>
             </ul>
             <hr className="mt-n4" />
 
-            {!!liquidUser && group_data?.Group?.handle !== liquidUser.handle && (!subsection || subsection === 'direct') && (
+            {!!liquidUser && group?.handle !== liquidUser.handle && (!subsection || subsection === 'direct') && (
                 <>
                     <ul className="nav d-flex justify-content-around mt-n2 mx-n3">
                         <li className="nav-item">
                             <Link className={`nav-link ${!subsubsection && 'active'}`} to={`/group/${handle}/votes/direct`}>
-                                <b>{group_data?.Group?.stats?.directVotesMade}</b> All
+                                <b>{group?.stats?.directVotesMade}</b> All
                             </Link>
                         </li>
                         <li className="nav-item">
                             <Link className={`nav-link ${subsubsection === 'same' && 'active'}`} to={`/group/${handle}/votes/direct/same`}>
-                                <b className="white forDirect px-1 rounded" >{group_data?.Group?.yourStats?.directVotesInAgreement}</b> Same
+                                <b className="white forDirect px-1 rounded" >{group?.yourStats?.directVotesInAgreement}</b> Same
                             </Link>
                         </li>
                         <li className="nav-item">
                             <Link className={`nav-link ${subsubsection === 'different' && 'active'}`} to={`/group/${handle}/votes/direct/different`}>
-                                <b className="white againstDirect px-1 rounded" >{group_data?.Group?.yourStats?.directVotesInDisagreement}</b> Different
+                                <b className="white againstDirect px-1 rounded" >{group?.yourStats?.directVotesInDisagreement}</b> Different
                             </Link>
                         </li>
                         <li className="nav-item">
                             <Link className={`nav-link ${subsubsection === 'byYou' && 'active'}`} to={`/group/${handle}/votes/direct/byYou`}>
-                                <b>{group_data?.Group?.yourStats?.directVotesMade}</b> by You
+                                <b>{group?.yourStats?.directVotesMade}</b> by You
                             </Link>
                         </li>
                     </ul>
@@ -98,22 +91,22 @@ export const GroupVotes: FunctionComponent<{ sortBy: any }> = ({ sortBy }) => {
                 </>
             )}
 
-            {!!liquidUser && group_data?.Group?.handle !== liquidUser.handle && subsection === 'represented' && (
+            {!!liquidUser && group?.handle !== liquidUser.handle && subsection === 'represented' && (
                 <>
                     <ul className="nav d-flex justify-content-around mt-n2 mx-n3">
                         <li className="nav-item">
                             <Link className={`nav-link ${!subsubsection && 'active'}`} to={`/group/${handle}/votes/represented`}>
-                                <b>{group_data?.Group?.stats?.indirectVotesMade}</b> By anyone
+                                <b>{group?.stats?.indirectVotesMade}</b> By anyone
                             </Link>
                         </li>
                         <li className="nav-item">
                             <Link className={`nav-link ${subsubsection === 'byyou' && 'active'}`} to={`/group/${handle}/votes/represented/byyou`}>
-                                <b>{group_data?.Group?.yourStats?.indirectVotesMadeByYou}</b> By you
+                                <b>{group?.yourStats?.indirectVotesMadeByYou}</b> By you
                             </Link>
                         </li>
                         <li className="nav-item">
                             <Link className={`nav-link ${subsubsection === 'foryou' && 'active'}`} to={`/group/${handle}/votes/represented/foryou`}>
-                                <b>{group_data?.Group?.yourStats?.indirectVotesMadeForYou}</b> For you
+                                <b>{group?.yourStats?.indirectVotesMadeForYou}</b> For you
                             </Link>
                         </li>
                     </ul>
@@ -144,7 +137,7 @@ export const GroupVotes: FunctionComponent<{ sortBy: any }> = ({ sortBy }) => {
                             return 'MISSING TYPE'
                         })()
                     }{' '}
-                    in this group ({group_data.Group?.name}) yet
+                    in this group ({group?.name}) yet
                 </div>
             )}
 
