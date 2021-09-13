@@ -10,10 +10,10 @@ import DropDownInput from "@shared/Inputs/DropDownInput";
 import AdminsInput from "@shared/Inputs/AdminsInput";
 import ChannelsInput from "@shared/Inputs/ChannelsInput";
 import useSearchParams from "@state/Global/useSearchParams.effect";
-import { GROUP, EDIT_GROUP } from "@state/Group/typeDefs";
 import useFileUploader from "@state/S3/useFileUploader.effect";
 import DropAnimation from '@components/shared/DropAnimation';
 import useAuthUser from '@state/AuthUser/authUser.effect';
+import useGroup from '@state/Group/group.effect';
 
 import ModalHeader from "../../shared/ModalHeader";
 import './style.sass';
@@ -40,22 +40,7 @@ export const EditGroup: FunctionComponent<{}> = ({ }) => {
     const [isSubmitting, setIsSubmitting] = useState(false);
 
     const { liquidUser } = useAuthUser();
-
-    const {
-        loading: group_loading,
-        error: group_error,
-        data: group_data,
-        refetch: group_refetch
-    } = useQuery(GROUP, {
-        variables: { handle: modalData.groupHandle },
-        skip: modalData.groupHandle === "new"
-    });
-
-    const [editGroup, {
-        loading: editGroup_loading,
-        error: editGroup_error,
-        data: editGroup_data,
-    }] = useMutation(EDIT_GROUP);
+    const { group, editGroup, editedGroup } = useGroup({ handle: modalData?.groupHandle });
 
     const {
         handleSubmit, register, formState: { errors }, watch, setValue
@@ -79,27 +64,27 @@ export const EditGroup: FunctionComponent<{}> = ({ }) => {
     }
 
     useEffect(() => {
-        setValue('handle', group_data?.Group.handle);
-        setValue('name', group_data?.Group.name);
-        setValue('bio', group_data?.Group.bio);
-        setValue('externalLink', group_data?.Group.externalLink);
-        // setValue('avatar', group_data?.Group.avatar);
-        setValue('cover', group_data?.Group.cover);
-        setValue('channels', group_data?.Group.channels || ['general']);
-        setValue('admins', group_data?.Group.admins || [{
+        setValue('handle', group?.handle);
+        setValue('name', group?.name);
+        setValue('bio', group?.bio);
+        setValue('externalLink', group?.externalLink);
+        // setValue('avatar', group?.avatar);
+        setValue('cover', group?.cover);
+        setValue('channels', group?.channels || ['general']);
+        setValue('admins', group?.admins || [{
             handle: liquidUser?.handle,
             name: liquidUser?.name,
             avatar: liquidUser?.avatar,
         }]);
-        setValue('privacy', group_data?.Group.privacy);
-    }, [group_data]);
+        setValue('privacy', group?.privacy);
+    }, [group]);
 
     useEffect(() => {
-        if (!!editGroup_data?.editGroup) {
+        if (!!editedGroup) {
 
             if (modalData.groupHandle === "new") {
-                // console.log("push!!", { g: editGroup_data?.editGroup });
-                history.push(`/group/${editGroup_data?.editGroup?.handle}`);
+                // console.log("push!!", { g: editedGroup });
+                history.push(`/group/${editedGroup?.handle}`);
             } else {
                 updateParams({
                     keysToRemove: ['modal', 'modalData'],
@@ -107,7 +92,7 @@ export const EditGroup: FunctionComponent<{}> = ({ }) => {
                 });
             }
         }
-    }, [editGroup_data])
+    }, [editedGroup])
 
     return (
         <form onSubmit={handleSubmit(onSubmit)}>

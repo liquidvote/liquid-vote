@@ -6,12 +6,11 @@ import DropAnimation from "@components/shared/DropAnimation";
 import Header from "@shared/Header";
 import PersonInList from '@shared/PersonInList';
 import useAuthUser from '@state/AuthUser/authUser.effect';
-import { GROUP, GROUP_MEMBERS } from "@state/Group/typeDefs";
+import { GROUP_MEMBERS } from "@state/Group/typeDefs";
+import useGroup from '@state/Group/group.effect';
 import { USER_REPRESENTED_BY, USER_REPRESENTING } from "@state/User/typeDefs";
 
 import './style.sass';
-
-
 
 export const GroupPeople: FunctionComponent<{}> = ({ }) => {
 
@@ -19,16 +18,7 @@ export const GroupPeople: FunctionComponent<{}> = ({ }) => {
 
     const { liquidUser } = useAuthUser();
 
-    const {
-        loading: group_loading,
-        error: group_error,
-        data: group_data,
-        refetch: group_refetch
-    } = useQuery(GROUP, {
-        variables: { handle }
-    });
-
-    const selectedGroup = group_data?.Group;
+    const { group } = useGroup({ handle });
 
     const {
         loading: group_members_loading,
@@ -68,27 +58,27 @@ export const GroupPeople: FunctionComponent<{}> = ({ }) => {
     return (
         <>
             <Header
-                title={selectedGroup?.name}
+                title={group?.name}
                 noBottom={true}
-                backLink={`/group/${selectedGroup?.handle}`}
+                backLink={`/group/${group?.handle}`}
             />
             <ul className="nav d-flex justify-content-around mt-1 mb-n4 mx-n3">
                 <li className="nav-item">
-                    <Link className={`nav-link ${which === 'members' && 'active'}`} to={`/group-people/${selectedGroup?.handle}/members`}>
-                        <b>{selectedGroup?.stats?.members}</b> Members
+                    <Link className={`nav-link ${which === 'members' && 'active'}`} to={`/group-people/${group?.handle}/members`}>
+                        <b>{group?.stats?.members}</b> Members
                     </Link>
                 </li>
                 {
-                    selectedGroup?.yourStats && (
+                    group?.yourStats && (
                         <>
                             <li className="nav-item">
-                                <Link className={`nav-link ${which === 'representingYou' && 'active'}`} to={`/group-people/${selectedGroup?.handle}/representingYou`}>
-                                    <b>{selectedGroup?.yourStats.representing || 0}</b> Representing you
+                                <Link className={`nav-link ${which === 'representingYou' && 'active'}`} to={`/group-people/${group?.handle}/representingYou`}>
+                                    <b>{group?.yourStats.representing || 0}</b> Representing you
                                 </Link>
                             </li>
                             <li className="nav-item">
-                                <Link className={`nav-link ${which === 'representedByYou' && 'active'}`} to={`/group-people/${selectedGroup?.handle}/representedByYou`}>
-                                    <b>{selectedGroup?.yourStats.representedBy || 0}</b> Represented By you
+                                <Link className={`nav-link ${which === 'representedByYou' && 'active'}`} to={`/group-people/${group?.handle}/representedByYou`}>
+                                    <b>{group?.yourStats.representedBy || 0}</b> Represented By you
                                 </Link>
                             </li>
                         </>

@@ -44,7 +44,7 @@ export const MultiVoteInList: FunctionComponent<{ v: any, i?: number }> = ({ v, 
                 {sortedChoices?.
                     sort((a, b) => (b?.stats?.directVotes + b?.stats?.indirectVotes) - (a?.stats?.directVotes + a?.stats?.indirectVotes))
                     .map((c, i) => (
-                        <div className="my-3">
+                        <div className="my-3" key={v.questionText + ' ' + c.text}>
                             <Choice
                                 choiceText={c.text}
                                 voteName={v.questionText}

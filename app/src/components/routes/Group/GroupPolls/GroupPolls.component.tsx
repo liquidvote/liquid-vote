@@ -7,7 +7,6 @@ import MultiVoteInList from "@shared/MultiVoteInList";
 import DropPlusSVG from "@shared/Icons/Drop+.svg";
 import useSearchParams from "@state/Global/useSearchParams.effect";
 import { QUESTIONS } from "@state/Question/typeDefs";
-import { GROUP } from "@state/Group/typeDefs";
 import DropAnimation from "@components/shared/DropAnimation";
 
 import './style.sass';
@@ -31,15 +30,6 @@ export const GroupPolls: FunctionComponent<{
                 group: handle,
                 sortBy
             }
-        });
-
-        const {
-            loading: group_loading,
-            error: group_error,
-            data: group_data,
-            refetch: group_refetch
-        } = useQuery(GROUP, {
-            variables: { handle }
         });
 
         useEffect(() => {
