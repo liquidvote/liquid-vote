@@ -11,9 +11,9 @@ import AdminsInput from "@shared/Inputs/AdminsInput";
 import ChannelsInput from "@shared/Inputs/ChannelsInput";
 import useSearchParams from "@state/Global/useSearchParams.effect";
 import { GROUP, EDIT_GROUP } from "@state/Group/typeDefs";
-import { AUTH_USER } from "@state/AuthUser/typeDefs";
 import useFileUploader from "@state/S3/useFileUploader.effect";
 import DropAnimation from '@components/shared/DropAnimation';
+import useAuthUser from '@state/AuthUser/authUser.effect';
 
 import ModalHeader from "../../shared/ModalHeader";
 import './style.sass';
@@ -39,14 +39,7 @@ export const EditGroup: FunctionComponent<{}> = ({ }) => {
 
     const [isSubmitting, setIsSubmitting] = useState(false);
 
-    const {
-        loading: authUser_loading,
-        error: authUser_error,
-        data: authUser_data,
-        refetch: authUser_refetch
-    } = useQuery(AUTH_USER);
-
-    const authUser = authUser_data?.authUser;
+    const { liquidUser } = useAuthUser();
 
     const {
         loading: group_loading,
@@ -94,9 +87,9 @@ export const EditGroup: FunctionComponent<{}> = ({ }) => {
         setValue('cover', group_data?.Group.cover);
         setValue('channels', group_data?.Group.channels || ['general']);
         setValue('admins', group_data?.Group.admins || [{
-            handle: authUser?.LiquidUser?.handle,
-            name: authUser?.LiquidUser?.name,
-            avatar: authUser?.LiquidUser?.avatar,
+            handle: liquidUser?.handle,
+            name: liquidUser?.name,
+            avatar: liquidUser?.avatar,
         }]);
         setValue('privacy', group_data?.Group.privacy);
     }, [group_data]);

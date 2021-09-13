@@ -2,7 +2,7 @@ import React, { FunctionComponent, useState } from 'react';
 import { Link, useParams } from "react-router-dom";
 import { useQuery, useMutation } from "@apollo/client";
 
-import { AUTH_USER } from "@state/AuthUser/typeDefs";
+import useAuthUser from '@state/AuthUser/authUser.effect';
 import { USER, USER_VOTES } from "@state/User/typeDefs";
 import { VOTES } from "@state/Vote/typeDefs";
 import Notification from '@shared/Notification';
@@ -20,14 +20,7 @@ export const ProfileVotes: FunctionComponent<{}> = ({ }) => {
 
     const [sortBy, setSortBy] = useState('weight');
 
-    const {
-        loading: authUser_loading,
-        error: authUser_error,
-        data: authUser_data,
-        refetch: authUser_refetch
-    } = useQuery(AUTH_USER);
-
-    const authLiquidUser = authUser_data?.authUser?.LiquidUser;
+    const { liquidUser } = useAuthUser();
 
     const {
         loading: user_loading,
@@ -85,7 +78,7 @@ export const ProfileVotes: FunctionComponent<{}> = ({ }) => {
             </ul>
             <hr className="mt-n4" />
 
-            {!!authLiquidUser && profile.handle !== authLiquidUser.handle && (!subsection || subsection === 'direct') && (
+            {!!liquidUser && profile.handle !== liquidUser.handle && (!subsection || subsection === 'direct') && (
                 <>
                     <ul className="nav d-flex justify-content-around mt-n2 mx-n3">
                         <li className="nav-item">
@@ -108,7 +101,7 @@ export const ProfileVotes: FunctionComponent<{}> = ({ }) => {
                 </>
             )}
 
-            {!!authLiquidUser && profile.handle !== authLiquidUser.handle && subsection === 'represented' && (
+            {!!liquidUser && profile.handle !== liquidUser.handle && subsection === 'represented' && (
                 <>
                     <ul className="nav d-flex justify-content-around mt-n2 mx-n3">
                         <li className="nav-item">

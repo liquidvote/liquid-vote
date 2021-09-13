@@ -5,7 +5,7 @@ import { useParams } from "react-router-dom";
 import Header from "@shared/Header";
 import GroupInList from "@shared/GroupInList";
 import { USER_GROUPS } from "@state/User/typeDefs";
-import { AUTH_USER } from "@state/AuthUser/typeDefs";
+import useAuthUser from '@state/AuthUser/authUser.effect';
 import DropAnimation from '@components/shared/DropAnimation';
 import useSearchParams from "@state/Global/useSearchParams.effect";
 
@@ -16,12 +16,7 @@ export const Groups: FunctionComponent<{}> = ({ }) => {
     let { section, handle } = useParams<any>();
     const { allSearchParams, updateParams } = useSearchParams();
 
-    const {
-        loading: authUser_loading,
-        error: authUser_error,
-        data: authUser_data,
-        refetch: authUser_refetch
-    } = useQuery(AUTH_USER);
+    const { liquidUser } = useAuthUser();
 
     const {
         loading: yourGroups_loading,
@@ -29,8 +24,8 @@ export const Groups: FunctionComponent<{}> = ({ }) => {
         data: yourGroups_data,
         refetch: yourGroups_refetch
     } = useQuery(USER_GROUPS, {
-        variables: { handle: authUser_data?.authUser?.LiquidUser?.handle },
-        skip: !authUser_data?.authUser
+        variables: { handle: liquidUser?.handle },
+        skip: !liquidUser
     });
 
     // console.log({ authUser_data, yourGroups_data })
