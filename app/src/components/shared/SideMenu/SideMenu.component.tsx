@@ -12,7 +12,7 @@ import GroupSvg from "@shared/Icons/Group.svg";
 import LoginIcon from "@shared/Icons/LoginIcon.svg";
 import Popper from "@shared/Popper";
 import useSearchParams from "@state/Global/useSearchParams.effect";
-import { AUTH_USER } from "@state/AuthUser/typeDefs";
+import useAuthUser from '@state/AuthUser/authUser.effect';
 
 import './style.sass';
 
@@ -22,21 +22,14 @@ export const SideMenu: FunctionComponent<{}> = ({ }) => {
 
     const { user, isAuthenticated, isLoading, loginWithRedirect, logout, loginWithPopup } = useAuth0();
 
-    const {
-        loading: authUser_loading,
-        error: authUser_error,
-        data: authUser_data,
-        refetch: authUser_refetch
-    } = useQuery(AUTH_USER);
-
-    const { authUser } = authUser_data || {};
+    const { liquidUser, liquidUser_refetch } = useAuthUser();
 
     useEffect(() => {
         if (!!isAuthenticated) {
 
             let count = 0;
             const tryToGetUser = async () => {
-                const g = await authUser_refetch();
+                const g = await liquidUser_refetch();
                 count = count + 1;
 
                 // console.log({ count, g });
@@ -87,15 +80,15 @@ export const SideMenu: FunctionComponent<{}> = ({ }) => {
                         button={<div>
                             <img
                                 className="vote-avatar"
-                                src={authUser?.LiquidUser?.avatar || 'http://images.liquid-vote.com/system/loading.gif'}
-                                alt={authUser?.LiquidUser?.name || 'loading'}
+                                src={liquidUser?.avatar || 'http://images.liquid-vote.com/system/loading.gif'}
+                                alt={liquidUser?.name || 'loading'}
                             />
                         </div>}
                         popperContent={
                             <ul className="p-0 m-0">
                                 <li>
-                                    {!!authUser ?
-                                        <Link to={`/profile/${authUser?.LiquidUser?.handle}`}>Visit Profile</Link> :
+                                    {!!liquidUser ?
+                                        <Link to={`/profile/${liquidUser?.handle}`}>Visit Profile</Link> :
                                         'loading...'
                                     }
                                 </li>

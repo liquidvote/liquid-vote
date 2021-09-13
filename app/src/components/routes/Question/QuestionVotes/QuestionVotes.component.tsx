@@ -2,7 +2,7 @@ import React, { FunctionComponent, useState } from 'react';
 import { Link, useParams } from "react-router-dom";
 import { useQuery, useMutation } from "@apollo/client";
 
-import { AUTH_USER } from "@state/AuthUser/typeDefs";
+import useAuthUser from '@state/AuthUser/authUser.effect';
 import { USER, USER_VOTES } from "@state/User/typeDefs";
 import { VOTES } from "@state/Vote/typeDefs";
 import Notification from '@shared/Notification';
@@ -33,14 +33,7 @@ export const QuestionVotes: FunctionComponent<{}> = ({ }) => {
         }
     });
 
-    const {
-        loading: authUser_loading,
-        error: authUser_error,
-        data: authUser_data,
-        refetch: authUser_refetch
-    } = useQuery(AUTH_USER);
-
-    const authLiquidUser = authUser_data?.authUser?.LiquidUser;
+    const { liquidUser } = useAuthUser();
 
     const type = (() => {
         if (!subsection || subsection === 'direct' && subsubsection === 'for') {
@@ -143,7 +136,7 @@ export const QuestionVotes: FunctionComponent<{}> = ({ }) => {
                 )
             }
 
-            {!!authLiquidUser && subsection === 'represented' && (
+            {!!liquidUser && subsection === 'represented' && (
                 <>
                     <ul className="nav d-flex justify-content-around mt-n2 mx-n3">
                         <li className="nav-item">

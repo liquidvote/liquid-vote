@@ -8,7 +8,7 @@ import TextInput from "@shared/Inputs/TextInput";
 import useSearchParams from "@state/Global/useSearchParams.effect";
 import { INVITES, EDIT_INVITE } from "@state/Invites/typeDefs";
 import { USER_GROUPS } from "@state/User/typeDefs";
-import { AUTH_USER } from "@state/AuthUser/typeDefs";
+import useAuthUser from '@state/AuthUser/authUser.effect';
 import InvitesInput from '@components/shared/Inputs/InvitesInput';
 import { EDIT_GROUP_MEMBER_CHANNEL_RELATION } from "@state/User/typeDefs";
 
@@ -26,14 +26,7 @@ export const AcceptInvite: FunctionComponent<{}> = ({ }) => {
     const { user, loginWithPopup } = useAuth0();
     const [acceptInviteOnLogin, setAcceptInviteOnLogin] = useState(false);
 
-    const {
-        loading: authUser_loading,
-        error: authUser_error,
-        data: authUser_data,
-        refetch: authUser_refetch
-    } = useQuery(AUTH_USER);
-
-    const authUser = authUser_data?.authUser;
+    const { liquidUser } = useAuthUser();
 
     const [editGroupMemberChannelRelation, {
         loading: editGroupMemberChannelRelation_loading,
@@ -48,17 +41,17 @@ export const AcceptInvite: FunctionComponent<{}> = ({ }) => {
     });
 
     useEffect(() => {
-        if (acceptInviteOnLogin && !!authUser) {
+        if (acceptInviteOnLogin && !!liquidUser) {
             acceptInvite();
         }
-    }, [authUser]);
+    }, [liquidUser]);
 
     const acceptInvite = () => {
-        if (!!authUser) {
+        if (!!liquidUser) {
             if (modalData?.toWhat === 'group') {
                 editGroupMemberChannelRelation({
                     variables: {
-                        UserHandle: authUser?.LiquidUser.handle,
+                        UserHandle: liquidUser?.handle,
                         GroupHandle: modalData?.groupHandle,
                         InviteId: allSearchParams?.inviteId,
                         IsMember: true

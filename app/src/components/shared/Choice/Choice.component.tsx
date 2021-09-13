@@ -6,7 +6,7 @@ import { useQuery, useMutation } from "@apollo/client";
 import { EDIT_VOTE } from '@state/Vote/typeDefs';
 import Chart from "@shared/VoteGraph1/chart.svg";
 import { voteStatsMap } from '@state/Question/map';
-import { AUTH_USER } from "@state/AuthUser/typeDefs";
+import useAuthUser from '@state/AuthUser/authUser.effect';
 import useSearchParams from "@state/Global/useSearchParams.effect";
 
 import './style.sass';
@@ -33,14 +33,7 @@ export const Choice: FunctionComponent<{
 
         const { allSearchParams, updateParams } = useSearchParams();
 
-        const {
-            loading: authUser_loading,
-            error: authUser_error,
-            data: authUser_data,
-            refetch: authUser_refetch
-        } = useQuery(AUTH_USER);
-
-        const authUser = authUser_data?.authUser?.LiquidUser;
+        const { liquidUser } = useAuthUser();
 
         const [editVote, {
             loading: editVote_loading,
@@ -52,7 +45,7 @@ export const Choice: FunctionComponent<{
 
         const handleUserVote = (vote: string) => {
 
-            if (!!authUser) {
+            if (!!liquidUser) {
                 editVote({
                     variables: {
                         questionText: voteName,

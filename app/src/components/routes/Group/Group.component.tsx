@@ -11,7 +11,7 @@ import DropPlusSVG from "@shared/Icons/Drop+.svg";
 import LinkSVG from "@shared/Icons/Link.svg";
 import LockSVG from "@shared/Icons/Lock.svg";
 import WorldSVG from "@shared/Icons/World.svg";
-import { AUTH_USER } from "@state/AuthUser/typeDefs";
+import useAuthUser from '@state/AuthUser/authUser.effect';
 import useSearchParams from "@state/Global/useSearchParams.effect";
 import { GROUP } from "@state/Group/typeDefs";
 import { timeAgo } from '@state/TimeAgo';
@@ -43,14 +43,7 @@ export const Group: FunctionComponent<{}> = ({ }) => {
         data: editGroupMemberChannelRelation_data,
     }] = useMutation(EDIT_GROUP_MEMBER_CHANNEL_RELATION);
 
-    const {
-        loading: authUser_loading,
-        error: authUser_error,
-        data: authUser_data,
-        refetch: authUser_refetch
-    } = useQuery(AUTH_USER);
-
-    const authUser = authUser_data?.authUser;
+    const { liquidUser } = useAuthUser();
 
     useEffect(() => {
         if (allSearchParams.refetch === 'group') {
@@ -80,7 +73,7 @@ export const Group: FunctionComponent<{}> = ({ }) => {
     }, [group_loading]);
 
     const isMember =
-        !!authUser && (
+        !!liquidUser && (
             selectedGroup?.yourMemberRelation?.isMember ||
             editGroupMemberChannelRelation_data?.editGroupMemberChannelRelation?.isMember
         );
@@ -166,9 +159,9 @@ export const Group: FunctionComponent<{}> = ({ }) => {
                             </div>
                         ) : (
                             <div
-                                onClick={() => !!authUser ? editGroupMemberChannelRelation({
+                                onClick={() => !!liquidUser ? editGroupMemberChannelRelation({
                                     variables: {
-                                        UserHandle: authUser?.LiquidUser?.handle,
+                                        UserHandle: liquidUser?.handle,
                                         GroupHandle: selectedGroup?.handle,
                                         IsMember: !isMember
                                     }

@@ -5,7 +5,7 @@ import { useQuery } from "@apollo/client";
 import DropAnimation from "@components/shared/DropAnimation";
 import Header from "@shared/Header";
 import PersonInList from '@shared/PersonInList';
-import { AUTH_USER } from "@state/AuthUser/typeDefs";
+import useAuthUser from '@state/AuthUser/authUser.effect';
 import { GROUP, GROUP_MEMBERS } from "@state/Group/typeDefs";
 import { USER_REPRESENTED_BY, USER_REPRESENTING } from "@state/User/typeDefs";
 
@@ -17,14 +17,7 @@ export const GroupPeople: FunctionComponent<{}> = ({ }) => {
 
     let { handle, which } = useParams<any>();
 
-    const {
-        loading: authUser_loading,
-        error: authUser_error,
-        data: authUser_data,
-        refetch: authUser_refetch
-    } = useQuery(AUTH_USER);
-
-    const authUser = authUser_data?.authUser;
+    const { liquidUser } = useAuthUser();
 
     const {
         loading: group_loading,
@@ -53,10 +46,10 @@ export const GroupPeople: FunctionComponent<{}> = ({ }) => {
         refetch: user_representing_refetch
     } = useQuery(USER_REPRESENTING, {
         variables: {
-            handle: authUser?.LiquidUser?.handle,
+            handle: liquidUser?.handle,
             groupHandle: handle
         },
-        skip: !authUser
+        skip: !liquidUser
     });
 
     const {
@@ -66,10 +59,10 @@ export const GroupPeople: FunctionComponent<{}> = ({ }) => {
         refetch: user_represented_by_refetch
     } = useQuery(USER_REPRESENTED_BY, {
         variables: {
-            handle: authUser?.LiquidUser?.handle,
+            handle: liquidUser?.handle,
             groupHandle: handle
         },
-        skip: !authUser
+        skip: !liquidUser
     });
 
     return (

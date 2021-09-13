@@ -7,7 +7,7 @@ import TextInput from "@shared/Inputs/TextInput";
 import useSearchParams from "@state/Global/useSearchParams.effect";
 import { INVITES, EDIT_INVITE } from "@state/Invites/typeDefs";
 import { USER_GROUPS } from "@state/User/typeDefs";
-import { AUTH_USER } from "@state/AuthUser/typeDefs";
+import useAuthUser from '@state/AuthUser/authUser.effect';
 import InvitesInput from '@components/shared/Inputs/InvitesInput';
 import InvitesLink from '@components/shared/Inputs/InvitesLink'
 
@@ -24,14 +24,7 @@ export const InviteFor: FunctionComponent<{}> = ({ }) => {
     const { allSearchParams, updateParams } = useSearchParams();
     const modalData = JSON.parse(allSearchParams.modalData);
 
-    const {
-        loading: authUser_loading,
-        error: authUser_error,
-        data: authUser_data,
-        refetch: authUser_refetch
-    } = useQuery(AUTH_USER);
-
-    const authLiquidUser = authUser_data?.authUser?.LiquidUser;
+    const { liquidUser } = useAuthUser();
 
     const {
         handleSubmit, register, formState: { errors }, watch, setValue
@@ -81,9 +74,9 @@ export const InviteFor: FunctionComponent<{}> = ({ }) => {
 
                         groupName={modalData.groupName}
                         groupHandle={modalData.groupHandle}
-                        fromWhomAvatar={authLiquidUser?.avatar}
-                        fromWhomName={authLiquidUser?.name}
-                        fromWhomHandle={authLiquidUser?.handle}
+                        fromWhomAvatar={liquidUser?.avatar}
+                        fromWhomName={liquidUser?.name}
+                        fromWhomHandle={liquidUser?.handle}
 
                         // userHandle={modalData.userHandle}
                         // questionText={modalData.questionText}

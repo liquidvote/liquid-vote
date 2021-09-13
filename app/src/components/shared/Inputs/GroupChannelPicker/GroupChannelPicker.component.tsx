@@ -7,7 +7,7 @@ import { FieldError } from 'react-hook-form';
 import { useQuery, useMutation } from "@apollo/client";
 import { GROUP, EDIT_GROUP } from "@state/Group/typeDefs";
 import { USER_GROUPS } from "@state/User/typeDefs";
-import { AUTH_USER } from "@state/AuthUser/typeDefs";
+import useAuthUser from '@state/AuthUser/authUser.effect';
 
 
 import GroupSVG from "@shared/Icons/Group-small.svg";
@@ -39,12 +39,7 @@ export const GroupChannelPicker: FunctionComponent<Props> = ({
     setValue
 }) => {
 
-    const {
-        loading: authUser_loading,
-        error: authUser_error,
-        data: authUser_data,
-        refetch: authUser_refetch
-    } = useQuery(AUTH_USER);
+    const { liquidUser } = useAuthUser();
 
     const {
         loading: yourGroups_loading,
@@ -52,8 +47,8 @@ export const GroupChannelPicker: FunctionComponent<Props> = ({
         data: yourGroups_data,
         refetch: yourGroups_refetch
     } = useQuery(USER_GROUPS, {
-        variables: { handle: authUser_data?.authUser?.LiquidUser?.handle },
-        skip: !authUser_data?.authUser
+        variables: { handle: liquidUser?.handle },
+        skip: !liquidUser
     });
 
     // const {

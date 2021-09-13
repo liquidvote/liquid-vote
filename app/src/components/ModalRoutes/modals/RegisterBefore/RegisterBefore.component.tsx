@@ -8,7 +8,7 @@ import TextInput from "@shared/Inputs/TextInput";
 import useSearchParams from "@state/Global/useSearchParams.effect";
 import { USER, EDIT_USER } from "@state/User/typeDefs";
 import { USER_GROUPS } from "@state/User/typeDefs";
-import { AUTH_USER } from "@state/AuthUser/typeDefs";
+import useAuthUser from '@state/AuthUser/authUser.effect';
 
 import ModalHeader from "../../shared/ModalHeader";
 import './style.sass';
@@ -19,22 +19,15 @@ export const RegisterBefore: FunctionComponent<{}> = ({ }) => {
     const modalData = JSON.parse(allSearchParams.modalData);
     const { loginWithPopup } = useAuth0();
 
-    const {
-        loading: authUser_loading,
-        error: authUser_error,
-        data: authUser_data,
-        refetch: authUser_refetch
-    } = useQuery(AUTH_USER);
-
-    const authUser = authUser_data?.authUser;
+    const { liquidUser } = useAuthUser();
 
     useEffect(() => {
-        if (!!authUser) {
+        if (!!liquidUser) {
             updateParams({
                 keysToRemove: ['modal', 'modalData']
             });
         }
-    }, [authUser]);
+    }, [liquidUser]);
 
     return (
         <form>

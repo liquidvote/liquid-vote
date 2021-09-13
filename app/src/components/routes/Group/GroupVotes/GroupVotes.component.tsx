@@ -2,7 +2,7 @@ import React, { FunctionComponent, useState } from 'react';
 import { Link, useParams } from "react-router-dom";
 import { useQuery, useMutation } from "@apollo/client";
 
-import { AUTH_USER } from "@state/AuthUser/typeDefs";
+import useAuthUser from '@state/AuthUser/authUser.effect';
 import { GROUP } from "@state/Group/typeDefs";
 import { VOTES } from "@state/Vote/typeDefs";
 import Notification from '@shared/Notification';
@@ -14,14 +14,7 @@ export const GroupVotes: FunctionComponent<{ sortBy: any }> = ({ sortBy }) => {
 
     let { section, subsection, subsubsection, handle } = useParams<any>();
 
-    const {
-        loading: authUser_loading,
-        error: authUser_error,
-        data: authUser_data,
-        refetch: authUser_refetch
-    } = useQuery(AUTH_USER);
-
-    const authLiquidUser = authUser_data?.authUser?.LiquidUser;
+    const { liquidUser } = useAuthUser();
 
     const {
         loading: group_loading,
@@ -77,7 +70,7 @@ export const GroupVotes: FunctionComponent<{ sortBy: any }> = ({ sortBy }) => {
             </ul>
             <hr className="mt-n4" />
 
-            {!!authLiquidUser && group_data?.Group?.handle !== authLiquidUser.handle && (!subsection || subsection === 'direct') && (
+            {!!liquidUser && group_data?.Group?.handle !== liquidUser.handle && (!subsection || subsection === 'direct') && (
                 <>
                     <ul className="nav d-flex justify-content-around mt-n2 mx-n3">
                         <li className="nav-item">
@@ -105,7 +98,7 @@ export const GroupVotes: FunctionComponent<{ sortBy: any }> = ({ sortBy }) => {
                 </>
             )}
 
-            {!!authLiquidUser && group_data?.Group?.handle !== authLiquidUser.handle && subsection === 'represented' && (
+            {!!liquidUser && group_data?.Group?.handle !== liquidUser.handle && subsection === 'represented' && (
                 <>
                     <ul className="nav d-flex justify-content-around mt-n2 mx-n3">
                         <li className="nav-item">

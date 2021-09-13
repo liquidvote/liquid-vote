@@ -1,7 +1,7 @@
 import React, { FunctionComponent } from 'react';
 import { Link } from "react-router-dom";
 import { useQuery, useMutation } from "@apollo/client";
-import { AUTH_USER } from "@state/AuthUser/typeDefs";
+import useAuthUser from '@state/AuthUser/authUser.effect';
 
 import LockSVG from "@shared/Icons/Lock.svg";
 import WorldSVG from "@shared/Icons/World.svg";
@@ -21,14 +21,7 @@ export const GroupInList: FunctionComponent<{
     alternativeButton,
 }) => {
 
-        const {
-            loading: authUser_loading,
-            error: authUser_error,
-            data: authUser_data,
-            refetch: authUser_refetch
-        } = useQuery(AUTH_USER);
-
-        const authUser = authUser_data?.authUser;
+        const { liquidUser } = useAuthUser();
 
         const [editGroupMemberChannelRelation, {
             loading: editGroupMemberChannelRelation_loading,
@@ -88,7 +81,7 @@ export const GroupInList: FunctionComponent<{
                                         <div
                                             onClick={() => editGroupMemberChannelRelation({
                                                 variables: {
-                                                    UserHandle: authUser?.LiquidUser?.handle,
+                                                    UserHandle: liquidUser?.handle,
                                                     GroupHandle: group.handle,
                                                     IsMember: !group?.yourMemberRelation?.isMember
                                                 }
