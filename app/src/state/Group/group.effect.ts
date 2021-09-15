@@ -16,7 +16,21 @@ export default function useGroup({ handle }: { handle: string }) {
         loading: editGroup_loading,
         error: editGroup_error,
         data: editGroup_data,
-    }] = useMutation(EDIT_GROUP);
+    }] = useMutation(EDIT_GROUP, {
+        update: cache => {
+            cache.evict({
+                id: 'ROOT_QUERY',
+                fieldName: 'UserGroups',
+                broadcast: false,
+            });
+            cache.evict({
+                id: "ROOT_QUERY",
+                fieldName: "Group",
+                args: { handle }
+            });
+            cache.gc();
+        }
+    });
 
     return {
         group: group_data?.Group,
