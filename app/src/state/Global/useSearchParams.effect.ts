@@ -31,12 +31,13 @@ export default function useSearchParams() {
         keysToRemove?: Array<string>,
         paramsToAdd?: Object
     }) =>
-        history.push({
+        history.replace({
             pathname: location.pathname,
             search: getNewSearchParamsString({
                 keysToRemove,
                 paramsToAdd
-            })
+            }),
+
         })
 
     return {
