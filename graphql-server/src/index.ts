@@ -1,11 +1,7 @@
 import { ApolloServer, gql } from "apollo-server-lambda";
 const MongoClient = require("mongodb").MongoClient;
-// const AWS = require("aws-sdk");
-// import { S3Client } from "@aws-sdk/client-s3";
 
 const atlasCredentials = require("../credentials/atlas-credentials.json");
-// const awsCredentials = require("../credentials/aws-credentials.json");
-import { BookTypeDefs, BookResolvers } from "./state/BooksDemo";
 import { AuthUserTypeDefs, AuthUserResolvers } from "./state/AuthUser";
 import { UserTypeDefs, UserResolvers } from "./state/Users";
 import { GroupTypeDefs, GroupResolvers } from "./state/Groups";
@@ -13,12 +9,6 @@ import { QuestionTypeDefs, QuestionResolvers } from "./state/Questions";
 import { VoteTypeDefs, VoteResolvers } from "./state/Votes";
 import { InviteTypeDefs, InviteResolvers } from "./state/Invites";
 import { S3TypeDefs, S3Resolvers } from "./state/S3";
-
-// AWS.config.loadFromPath("./credentials/aws-credentials.json");
-// AWS.config.update({ region: "eu-west-1" });
-// const s3Client = new S3Client({
-//     credentials: { ...awsCredentials }
-// });
 
 const mongoClient = new MongoClient(
     `mongodb+srv://${atlasCredentials.username}:${atlasCredentials.password}@aiaiaiaminhavida.oobyz.mongodb.net/Enron?retryWrites=true&w=majority`,
@@ -40,12 +30,6 @@ const getDBConnection = async () => {
         return LiquidVoteDBCached;
     }
 }
-
-// const s3 = new AWS.S3({
-//     accessKeyId: awsCredentials.accessKeyId,
-//     secretAccessKey: awsCredentials.secretAccessKey,
-// });
-
 
 const QueryTypeDefs = gql`
     scalar JSON
