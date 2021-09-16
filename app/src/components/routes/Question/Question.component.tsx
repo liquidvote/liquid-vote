@@ -16,13 +16,19 @@ import {
 } from "@state/Mock/Votes";
 import { QUESTION } from '@state/Question/typeDefs';
 import { timeAgo } from '@state/TimeAgo';
+// import useGroup from '@state/Group/group.effect';
+import useUserRepresentedBy from "@state/User/userRepresentedBy.effect";
+import useAuthUser from '@state/AuthUser/authUser.effect';
 
 import QuestionVotes from "./QuestionVotes";
+import QuestionArguments from "./QuestionArguments";
 
 export default function Question() {
 
     let { voteName, groupHandle, section } = useParams<any>();
     const { allSearchParams, updateParams } = useSearchParams();
+
+    // const { group, group_refetch } = useGroup({ handle: groupHandle });
 
     const {
         loading: question_loading,
@@ -35,6 +41,13 @@ export default function Question() {
             group: groupHandle,
             // channel: groupChannel_.channel
         }
+    });
+
+    const { liquidUser } = useAuthUser();
+
+    const { representatives } = useUserRepresentedBy({
+        userHandle: liquidUser?.handle,
+        groupHandle: groupHandle
     });
 
     const sortedChoices = question_data?.Question?.questionType === 'multi' ? [...question_data?.Question?.choices]?.
@@ -52,12 +65,57 @@ export default function Question() {
 
             <Header title="Opinion Poll" />
 
+            <div className={`mt-3 mb-n2 d-flex ${!!representatives?.length && 'justify-content-between'} align-items-center`}>
+                <div className="d-flex">
+                    <p className="mb-0">Vote or {!!representatives?.length && 'be represented by'}</p>
+
+                    {!!representatives?.length && (
+                        <div className="d-flex ml-2 pl-1 mr-1">
+                            {representatives?.map((r: any) => (
+                                <Link
+                                    key={`representatives-${r.handle}`}
+                                    to={`/profile/${r.handle}`}
+                                    className={`vote-avatar tiny ml-n2`}
+                                    style={{
+                                        background: `url(${r.avatar}) no-repeat`,
+                                        backgroundSize: 'cover'
+                                    }}
+                                    title={r.name}
+                                ></Link>
+                            ))}
+                        </div>
+                    )}
+                </div>
+
+                <div
+                    className="button_ small mb-0 ml-2"
+                    onClick={() => updateParams({
+                        paramsToAdd: {
+                            modal: "chooseRepresentatives",
+                            modalData: JSON.stringify({
+                                groupHandle: question_data?.Question?.groupChannel.group
+                            })
+                        }
+                    })}
+                >
+                    Choose Representatives
+                </div>
+
+            </div>
+
             {question_data?.Question?.questionType === 'single' ? (
                 <h2 className="mb-0 mt-4">Do you approve</h2>
             ) : (
                 <div className="mt-4"></div>
             )}
             <h2 className="mb-2 white pre-wrap"><b>{voteName}</b>?</h2>
+
+            <p>
+                Description will go here <br></br>
+                Description will go here <br></br>
+                Description will go here <br></br>
+                Description will go here <br></br>
+            </p>
 
             <div>
 
@@ -66,7 +124,7 @@ export default function Question() {
                 {
                     question_data?.Question?.questionType === 'multi' ?
                         sortedChoices?.map(c => (
-                            <div className="my-3">
+                            <div key={c.text} className="my-3">
                                 <Choice
                                     choiceText={c.text}
                                     voteName={voteName}
@@ -125,8 +183,8 @@ export default function Question() {
 
                 <ul className="nav d-flex justify-content-around mt-1 mb-n4 mx-n3">
                     <li className="nav-item">
-                        <Link className={`nav-link ${(!section || section === 'timeline') && 'active'}`} to={`/poll/${voteName}/${groupHandle}/timeline`}>
-                            Votes
+                        <Link className={`nav-link ${(!section || section === 'arguments') && 'active'}`} to={`/poll/${voteName}/${groupHandle}/arguments`}>
+                            Arguments
                         </Link>
                     </li>
                     <li className="nav-item">
@@ -135,8 +193,8 @@ export default function Question() {
                         </Link>
                     </li>
                     <li className="nav-item">
-                        <Link className={`nav-link ${section === 'conversation' && 'active'}`} to={`/poll/${voteName}/${groupHandle}/conversation`}>
-                            Conversation 🧪
+                        <Link className={`nav-link ${(!section || section === 'timeline') && 'active'}`} to={`/poll/${voteName}/${groupHandle}/timeline`}>
+                            Votes
                         </Link>
                     </li>
                 </ul>
@@ -144,12 +202,16 @@ export default function Question() {
                 <br />
                 <br />
 
+                {(!section || section === 'arguments') && (
+                    <QuestionArguments />
+                )}
+
                 {(section === 'votesby') && (
                     <div>
                         <h5 onClick={() => openStats("Sub Groups")}>Sub Groups</h5>
                         <div className="bar-container">
                             {byGroups.yourGroup.map((l, i) => (
-                                <div className="bar-wrapper" style={{ flex: l.flexSize }}>
+                                <div key={i} className="bar-wrapper" style={{ flex: l.flexSize }}>
                                     <VoteGraph1 key={`a-${i}`} {...l} group="SubGroups" />
                                 </div>
                             ))}
@@ -159,7 +221,7 @@ export default function Question() {
                         <h4 onClick={() => openStats("Your Representatives")}>Your Representatives</h4>
                         <div className="bar-container">
                             {byGroups.yourRepresentatives.map((l, i) => (
-                                <div className="bar-wrapper" style={{ flex: l.flexSize }}>
+                                <div key={i} className="bar-wrapper" style={{ flex: l.flexSize }}>
                                     <VoteGraph1 key={`a-${i}`} {...l} group="YourRepresentatives" />
                                 </div>
                             ))}
@@ -189,7 +251,7 @@ export default function Question() {
                         <h4 onClick={() => openStats("Age Groups")}>Age Groups</h4>
                         <div className="bar-container">
                             {byGroups.age.map((l, i) => (
-                                <div className="bar-wrapper" style={{ flex: l.flexSize }}>
+                                <div key={i} className="bar-wrapper" style={{ flex: l.flexSize }}>
                                     <VoteGraph1 key={`a-${i}`} {...l} group="Age Groups" />
                                 </div>
                             ))}
@@ -199,7 +261,7 @@ export default function Question() {
                         <h4 onClick={() => openStats("Location")}>Occupations</h4>
                         <div className="bar-container">
                             {byGroups.occupation.map((l, i) => (
-                                <div className="bar-wrapper" style={{ flex: l.flexSize }}>
+                                <div key={i} className="bar-wrapper" style={{ flex: l.flexSize }}>
                                     <VoteGraph1 key={`a-${i}`} {...l} />
                                 </div>
                             ))}
@@ -212,7 +274,7 @@ export default function Question() {
                         </h4>
                         <div className="bar-container">
                             {byGroups.approvalOnOtherTopics.map((l, i) => (
-                                <div className="bar-wrapper" style={{ flex: l.flexSize }}>
+                                <div key={i} className="bar-wrapper" style={{ flex: l.flexSize }}>
                                     <VoteGraph1 key={`b-${i}`} {...l} />
                                 </div>
                             ))}
@@ -222,7 +284,7 @@ export default function Question() {
                         <h4 onClick={() => openStats("Votes By")}>Voters</h4>
                         <div className="bar-container">
                             {votesBy.map((l, i) => (
-                                <div className="bar-wrapper" style={{ flex: l.flexSize }}>
+                                <div key={i} className="bar-wrapper" style={{ flex: l.flexSize }}>
                                     <VoteGraph1 key={`c-${i}`} {...l} />
                                 </div>
                             ))}
@@ -230,7 +292,7 @@ export default function Question() {
                     </div>
                 )}
 
-                {(!section || section === 'timeline') && (
+                {(section === 'timeline') && (
                     <QuestionVotes />
                 )}
 

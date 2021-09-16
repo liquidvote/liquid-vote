@@ -21,7 +21,22 @@ const AppolloAppWrapper: FunctionComponent<{}> = ({ }) => {
         uri: env.graphql,
     });
 
-    const cache = new InMemoryCache();
+    const cache = new InMemoryCache({
+        typePolicies: {
+            Group: {
+                keyFields: ["handle"],
+            },
+            User: {
+                keyFields: ["handle"],
+            },
+            Question: {
+                keyFields: ["questionText", "groupChannel", ["group"]]
+            }
+            // Vote: {
+            //     keyFields: ["questionText", "groupChannel", ["group"], "user" ,["handle"]]
+            // },
+        },
+    });
 
     // TODO: await before instantiating ApolloClient, else queries might run before the cache is persisted
     // persistCache({

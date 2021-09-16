@@ -88,7 +88,7 @@ export const Choice: FunctionComponent<{
 
         return (
             <div>
-                <div className="d-flex d-flex align-items-center mb-1" style={{
+                <div className="d-flex d-flex flex-column mb-1" style={{
                     ...(maxVoteCount) && {
                         'maxWidth':
                             ((stats?.directVotes + stats?.indirectVotes | 0) / maxVoteCount) * 30 + 70 + '%'

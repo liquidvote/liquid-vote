@@ -18,17 +18,17 @@ export default function useGroup({ handle }: { handle: string }) {
         data: editGroup_data,
     }] = useMutation(EDIT_GROUP, {
         update: cache => {
-            cache.evict({
-                id: 'ROOT_QUERY',
-                fieldName: 'UserGroups',
-                broadcast: false,
-            });
-            cache.evict({
-                id: "ROOT_QUERY",
-                fieldName: "Group",
-                args: { handle }
-            });
-            cache.gc();
+            // cache.evict({
+            //     id: 'ROOT_QUERY',
+            //     fieldName: 'UserGroups',
+            //     broadcast: false,
+            // });
+            // cache.evict({
+            //     id: "ROOT_QUERY",
+            //     fieldName: "Group",
+            //     args: { handle }
+            // });
+            // cache.gc();
         }
     });
 
