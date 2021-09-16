@@ -14,6 +14,7 @@ import WorldSVG from "@shared/Icons/World.svg";
 import useAuthUser from '@state/AuthUser/authUser.effect';
 import useSearchParams from "@state/Global/useSearchParams.effect";
 import useGroup from '@state/Group/group.effect';
+import useUserRepresentedBy from "@state/User/userRepresentedBy.effect";
 import { timeAgo } from '@state/TimeAgo';
 import { EDIT_GROUP_MEMBER_CHANNEL_RELATION } from "@state/User/typeDefs";
 
@@ -37,6 +38,11 @@ export const Group: FunctionComponent<{}> = ({ }) => {
     }] = useMutation(EDIT_GROUP_MEMBER_CHANNEL_RELATION);
 
     const { liquidUser } = useAuthUser();
+
+    const { representatives } = useUserRepresentedBy({
+        userHandle: liquidUser?.handle,
+        groupHandle: group?.handle
+    });
 
     useEffect(() => {
         if (allSearchParams.refetch === 'group') {
@@ -88,8 +94,8 @@ export const Group: FunctionComponent<{}> = ({ }) => {
                     }}
                 />
             </div>
-            <div className="d-flex flex-wrap mt-2 justify-content-between">
-                <div className="d-flex flex-column mb-1">
+            <div className="d-flex flex-wrap mt-2 mb-n1 justify-content-between flex-nowrap">
+                <div className="d-flex flex-column mb-1 flex-nowrap flex-shrink-0">
                     <h4 className="d-flex align-items-center m-0">
                         {group?.name}
                         <div className="ml-2 mt-n1">
@@ -102,7 +108,7 @@ export const Group: FunctionComponent<{}> = ({ }) => {
                     </h4>
                     <p className="profile-handle">@{group?.handle}</p>
                 </div>
-                <div className="d-flex mb-1 ml-n1">
+                <div className="d-flex mb-n1 ml-n1 flex-wrap justify-content-end">
                     {isMember && (
                         <>
                             {/* <div
@@ -121,7 +127,20 @@ export const Group: FunctionComponent<{}> = ({ }) => {
                                 Invite Representees
                             </div> */}
                             <div
-                                className="button_ small mb-0 ml-2"
+                                className="button_ small mb-2 ml-2"
+                                onClick={() => updateParams({
+                                    paramsToAdd: {
+                                        modal: "chooseRepresentatives",
+                                        modalData: JSON.stringify({
+                                            groupHandle: group.handle
+                                        })
+                                    }
+                                })}
+                            >
+                                Choose Representatives
+                            </div>
+                            <div
+                                className="button_ small mb-2 ml-2"
                                 onClick={() => updateParams({
                                     paramsToAdd: {
                                         modal: "InviteFor",
@@ -146,7 +165,7 @@ export const Group: FunctionComponent<{}> = ({ }) => {
                                         modalData: JSON.stringify({ groupHandle: group?.handle })
                                     }
                                 })}
-                                className={`button_ small ml-2 mb-0`}
+                                className={`button_ small ml-2 mb-2`}
                             >
                                 Edit
                             </div>
