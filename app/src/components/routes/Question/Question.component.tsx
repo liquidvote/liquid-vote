@@ -91,7 +91,7 @@ export default function Question() {
                     className="button_ small mb-0 ml-2"
                     onClick={() => updateParams({
                         paramsToAdd: {
-                            modal: "chooseRepresentatives",
+                            modal: "ChooseRepresentatives",
                             modalData: JSON.stringify({
                                 groupHandle: question_data?.Question?.groupChannel.group
                             })

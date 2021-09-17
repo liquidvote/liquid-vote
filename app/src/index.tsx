@@ -47,7 +47,8 @@ const AppolloAppWrapper: FunctionComponent<{}> = ({ }) => {
     const client = new ApolloClient({
         link: httpLink,
         credentials: 'include',
-        cache
+        cache,
+        connectToDevTools: true
     });
 
     useEffect(() => {

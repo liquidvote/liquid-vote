@@ -11,6 +11,9 @@ import { USER_GROUPS } from "@state/User/typeDefs";
 import useAuthUser from '@state/AuthUser/authUser.effect';
 import InvitesInput from '@components/shared/Inputs/InvitesInput';
 import { EDIT_GROUP_MEMBER_CHANNEL_RELATION } from "@state/User/typeDefs";
+import useGroup from '@state/Group/group.effect';
+import useUser from '@state/User/user.effect';
+import DropAnimation from '@components/shared/DropAnimation';
 
 import ModalHeader from "../../shared/ModalHeader";
 import './style.sass';
@@ -23,10 +26,12 @@ export const AcceptInvite: FunctionComponent<{}> = ({ }) => {
 
     const { allSearchParams, updateParams } = useSearchParams();
     const modalData = allSearchParams.modalData && JSON.parse(allSearchParams.modalData);
-    const { user, loginWithPopup } = useAuth0();
+    const { loginWithPopup } = useAuth0();
     const [acceptInviteOnLogin, setAcceptInviteOnLogin] = useState(false);
 
     const { liquidUser } = useAuthUser();
+    const { group } = useGroup({ handle: modalData?.groupHandle });
+    const { user } = useUser({ userHandle: modalData?.by });
 
     const [editGroupMemberChannelRelation, {
         loading: editGroupMemberChannelRelation_loading,
@@ -37,7 +42,7 @@ export const AcceptInvite: FunctionComponent<{}> = ({ }) => {
     console.log({
         modalData,
         user,
-        InviteId: allSearchParams?.inviteId
+        group
     });
 
     useEffect(() => {
@@ -48,12 +53,12 @@ export const AcceptInvite: FunctionComponent<{}> = ({ }) => {
 
     const acceptInvite = () => {
         if (!!liquidUser) {
-            if (modalData?.toWhat === 'group') {
+            if (modalData?.to === 'group') {
                 editGroupMemberChannelRelation({
                     variables: {
                         UserHandle: liquidUser?.handle,
                         GroupHandle: modalData?.groupHandle,
-                        InviteId: allSearchParams?.inviteId,
+                        // InviteId: allSearchParams?.inviteId,
                         IsMember: true
                     }
                 }).then(() => {
@@ -73,45 +78,54 @@ export const AcceptInvite: FunctionComponent<{}> = ({ }) => {
         <div>
             <ModalHeader
                 title={
-                    modalData?.toWhat === 'representation' ? `TODO` :
-                        modalData?.toWhat === 'group' ? `Accept invite to join ${modalData?.groupName}` :
-                            modalData?.toWhat === 'vote' ? `TODO` :
+                    modalData?.to === 'representation' ? `TODO` :
+                        modalData?.to === 'group' ? (
+                            !!group ?
+                                `Accept invite to join ${group?.name}` :
+                                'Loading Invite'
+                        ) :
+                            modalData?.to === 'vote' ? `TODO` :
                                 ''
                 }
                 hideSubmitButton={true}
             />
 
             <div className="Modal-Content">
-                <div className="d-flex flex-column justify-content-center">
-                    <div className="d-flex justify-content-center align-items-center mt-4 mb-2 px-4">
-                        <div
-                            className="small-avatar bg"
-                            style={{
-                                background: modalData?.fromWhomAvatar && `url(${modalData?.fromWhomAvatar}) no-repeat`,
-                                backgroundSize: 'cover'
-                            }}
-                        />
-                        <p className="m-0">
-                            {modalData?.fromWhomName} is inviting you to join {modalData?.groupName}
-                        </p>
-                    </div>
-
-                    {acceptInviteOnLogin ? (
-                        <div className="mx-5 my-4 text-center">
-                            <img
-                                className="vote-avatar"
-                                src={'http://images.liquid-vote.com/system/loading.gif'}
+                {!!user ? (
+                    <div className="d-flex flex-column justify-content-center">
+                        <div className="d-flex justify-content-center align-items-center mt-4 mb-2 px-4">
+                            <div
+                                className="small-avatar bg"
+                                style={{
+                                    background: user?.avatar && `url(${user.avatar}) 50% 50% no-repeat`,
+                                    backgroundSize: 'cover'
+                                }}
                             />
+                            <p className="m-0">
+                                {user?.name} is inviting you to join {group?.name}
+                            </p>
                         </div>
-                    ) : (
-                        <button
-                            className="button_ mx-5 my-4"
-                            onClick={acceptInvite}
-                            disabled={editGroupMemberChannelRelation_loading}
-                        >Join Group</button>
 
-                    )}
-                </div>
+                        {acceptInviteOnLogin ? (
+                            <div className="mx-5 my-4 text-center">
+                                <img
+                                    className="vote-avatar"
+                                    src={'http://images.liquid-vote.com/system/loading.gif'}
+                                />
+                            </div>
+                        ) : (
+                            <button
+                                className="button_ mx-5 my-4"
+                                onClick={acceptInvite}
+                                disabled={editGroupMemberChannelRelation_loading}
+                            >Join Group</button>
+                        )}
+                    </div>
+                ) : (
+                    <div className="d-flex justify-content-center my-5">
+                        <DropAnimation />
+                    </div>
+                )}
             </div>
         </div>
     );

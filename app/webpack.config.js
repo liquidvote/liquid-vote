@@ -11,7 +11,7 @@ console.log({
 });
 
 const config = {
-  mode: isProd ? "production" : "development",
+  mode: isProd ? "production" : "none",
   entry: {
     index: "./src/index.tsx",
   },
@@ -65,7 +65,7 @@ if (isProd) {
   };
 } else {
   config.devServer = {
-    // https: true,
+    https: process.env.NODE_ENV === 'development' ? false : true,
     port: 8080,
     open: true,
     hot: true,

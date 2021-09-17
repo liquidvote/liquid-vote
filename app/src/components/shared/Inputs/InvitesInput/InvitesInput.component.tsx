@@ -47,7 +47,6 @@ export const InvitesInput: FunctionComponent<Props> = ({
         data: editInvite_data,
     }] = useMutation(EDIT_INVITE);
 
-
     const [isFocused, setIsFocused] = useState(false);
     const [userSearch, setUserSearch] = useState('');
 

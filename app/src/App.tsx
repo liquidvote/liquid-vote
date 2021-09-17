@@ -24,6 +24,10 @@ export default function App() {
                 <SideMenu />
                 <div className="App border-sides">
                     <Switch>
+                        <Route path="/invite/by/:userHandle/to/group/:handle" component={loadable(() => import('./components/routes/Group'))} />
+                        <Route path="/invite/by/:userHandle/to/group/:handle/:forRepresentation" component={loadable(() => import('./components/routes/Group'))} />
+                        <Route path="/invite/by/:userHandle/to/vote/:voteName/:groupHandle" component={loadable(() => import('./components/routes/Question'))} />
+                        
                         <Route path="/poll/:voteName/:groupHandle/:section/:subsection/:subsubsection" component={loadable(() => import('@components/routes/Question'))} />
                         <Route path="/poll/:voteName/:groupHandle/:section/:subsection" component={loadable(() => import('./components/routes/Question'))} />
                         <Route path="/poll/:voteName/:groupHandle/:section" component={loadable(() => import('./components/routes/Question'))} />

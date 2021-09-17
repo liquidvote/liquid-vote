@@ -1,5 +1,5 @@
 import React, { FunctionComponent, useEffect, useState } from 'react';
-import { Link, useParams } from 'react-router-dom';
+import { Link, useParams, useHistory } from 'react-router-dom';
 import ReactTooltip from 'react-tooltip';
 import { useMutation, useQuery } from "@apollo/client";
 
@@ -24,7 +24,8 @@ import './style.sass';
 
 export const Group: FunctionComponent<{}> = ({ }) => {
 
-    let { handle, section } = useParams<any>();
+    const history = useHistory();
+    let { handle, section, userHandle } = useParams<any>();
     const { allSearchParams, updateParams } = useSearchParams();
 
     const [sortBy, setSortBy] = useState('representing');
@@ -51,25 +52,37 @@ export const Group: FunctionComponent<{}> = ({ }) => {
         }
     }, [allSearchParams.refetch]);
 
-    // const group = group_data?.Group;
-
-    const [selectedChannels, setSelectedChannels] = useState<string[]>([]);
-
-    useEffect(() => {
-        if (!!group?.yourMemberRelation?.channels) {
-            setSelectedChannels(
-                group?.yourMemberRelation?.channels
-            );
-        } else {
-            setSelectedChannels(
-                group?.channels?.map((s: any) => s.name) || []
-            );
-        }
-    }, [group]);
-
     useEffect(() => {
         ReactTooltip.rebuild();
     }, [group]);
+
+    useEffect(() => {
+        if(!!userHandle) {
+            console.log({
+                userHandle
+            });
+
+            const link = `/group/${handle}?${new URLSearchParams({
+                modal: 'AcceptInvite',
+                modalData: JSON.stringify({
+                    // toWhat: 'group',
+                    // groupName: groupName,
+                    // groupHandle: groupHandle,
+                    // fromWhomAvatar: fromWhomAvatar,
+                    // fromWhomName: fromWhomName,
+                    // fromWhomHandle: fromWhomHandle
+
+                    to: 'group',
+                    by: userHandle,
+                    groupHandle: handle
+
+                })
+            }).toString()}`;
+
+            history.replace(link);
+
+        }
+    }, [userHandle]);
 
     const isMember =
         !!liquidUser && (
@@ -130,7 +143,7 @@ export const Group: FunctionComponent<{}> = ({ }) => {
                                 className="button_ small mb-2 ml-2"
                                 onClick={() => updateParams({
                                     paramsToAdd: {
-                                        modal: "chooseRepresentatives",
+                                        modal: "ChooseRepresentatives",
                                         modalData: JSON.stringify({
                                             groupHandle: group.handle
                                         })

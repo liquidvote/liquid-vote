@@ -83,7 +83,7 @@ export const InviteFor: FunctionComponent<{}> = ({ }) => {
                     />
                 </div>
 
-                <hr className="mt-0 pt-3 mb-5" />
+                {/* <hr className="mt-0 pt-3 mb-5" />
 
                 <div className="my-3">
                     {((name: keyof IFormValues) => (
@@ -101,7 +101,7 @@ export const InviteFor: FunctionComponent<{}> = ({ }) => {
                             questionText={modalData.questionText}
                         />
                     ))('invitedUsers')}
-                </div>
+                </div> */}
 
                 {/* <hr /> */}
 

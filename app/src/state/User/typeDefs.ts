@@ -243,15 +243,13 @@ export const EDIT_GROUP_MEMBER_CHANNEL_RELATION = gql`
       $UserHandle: String!,
       $GroupHandle: String!,
       $Channels: [String],
-      $IsMember: Boolean,
-      $InviteId: String
+      $IsMember: Boolean
     ) {
     editGroupMemberChannelRelation(
         UserHandle: $UserHandle,
         GroupHandle: $GroupHandle,
         Channels: $Channels,
-        IsMember: $IsMember,
-        InviteId: $InviteId
+        IsMember: $IsMember
     ) {
         createdOn
         lastEditOn

@@ -9,7 +9,7 @@ export default function useGroup({ handle }: { handle: string }) {
         refetch: group_refetch
     } = useQuery(GROUP, {
         variables: { handle },
-        skip: handle === "new"
+        skip: handle === "new" || !handle
     });
 
     const [editGroup, {

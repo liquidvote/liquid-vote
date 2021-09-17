@@ -503,7 +503,7 @@ hr
     height: 43px
     width: 43px
     background: url(https://pbs.twimg.com/profile_images/1257731768569917440/DXgWC7tR_400x400.jpg) no-repeat
-    background-size: cover
+    background-size: cover !important
     margin: 5px 15px 0 0px
     border-radius: 150px
 
@@ -611,6 +611,10 @@ hr
         pointer-events: none
         text-transform: capitalize
 
+        &.small
+            top: 7px
+            font-size: 14px
+
     input, select, textarea, .input-element
         outline: none
         box-sizing: border-box
@@ -655,3 +659,41 @@ hr
 .clickable
     user-select: none
     cursor: pointer
+
+.userInputList
+    outline: none
+    box-sizing: border-box
+    width: 100%
+    background-color: transparent
+    border: 1px solid rgba(0,0,0,0.3)
+    border-radius: 5px
+    padding: 11px 10px
+    padding-top: 35px
+    color: white
+
+    li
+        outline: none
+        box-sizing: border-box
+        width: 100%
+        background-color: transparent
+        border: 1px solid rgba(0,0,0,0.3)
+        border-radius: 5px
+        padding: 10px
+        color: white
+
+    .user-search-results
+        border-radius: 5px
+
+        li
+            border-radius: 0
+            border-bottom: none
+
+            &:hover
+                background-color: rgba(0,0,0,0.1)
+
+            &:first-child
+                border-radius: 5px 5px 0 0
+
+            &:last-child
+                border-radius: 0 0 5px 5px
+                border-bottom: 1px solid rgba(0,0,0,0.3)
