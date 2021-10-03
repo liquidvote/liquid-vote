@@ -21,6 +21,7 @@ export default function useUserRepresentedBy({
     });
 
     return {
-        representatives: user_represented_by_data?.UserRepresentedBy
+        representatives: user_represented_by_data?.UserRepresentedBy,
+        representatives_refetch: user_represented_by_refetch
     };
 }

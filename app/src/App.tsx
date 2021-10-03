@@ -11,7 +11,6 @@ import loadable from '@loadable/component';
 import ReactTooltip from 'react-tooltip';
 
 import SideMenu from "@shared/SideMenu";
-import SideInfo from "@shared/SideInfo";
 import ModalRoutes from "@components/ModalRoutes";
 
 export default function App() {
