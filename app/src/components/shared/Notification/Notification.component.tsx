@@ -23,8 +23,7 @@ export const Notification: FunctionComponent<{
                         <div
                             className={`small-avatar bg`}
                             style={{
-                                background: v.user?.avatar && `url(${v.user?.avatar}) no-repeat`,
-                                backgroundSize: 'cover'
+                                background: v.user?.avatar && `url(${v.user?.avatar}) 50% 50% / cover no-repeat`
                             }}
                         ></div>
                     </Link>
@@ -52,8 +51,7 @@ export const Notification: FunctionComponent<{
                                                             to={`/profile/${r.representativeHandle}`}
                                                             className={`vote-avatar tiny ${r.position} ml-n2`}
                                                             style={{
-                                                                background: `url(${r.representativeAvatar}) no-repeat`,
-                                                                backgroundSize: 'cover'
+                                                                background: `url(${r.representativeAvatar}) 50% 50% / cover no-repeat`
                                                             }}
                                                             title={r.representativeName}
                                                         ></Link>
@@ -82,8 +80,7 @@ export const Notification: FunctionComponent<{
                                                     to={`/profile/${r.user.handle}`}
                                                     className={`vote-avatar tiny ml-n2`}
                                                     style={{
-                                                        background: `url(${r.user.avatar}) no-repeat`,
-                                                        backgroundSize: 'cover'
+                                                        background: `url(${r.user.avatar}) 50% 50% / cover no-repeat`
                                                     }}
                                                     title={r.user.name}
                                                 ></Link>

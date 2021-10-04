@@ -1,4 +1,5 @@
 import React, { FunctionComponent, MouseEventHandler } from 'react';
+import { Link } from 'react-router-dom';
 
 // import './style.sass';
 
@@ -12,13 +13,15 @@ export const RepresentativeInList: FunctionComponent<{
 
     return (
         <li className="d-flex mb-2 position-relative">
-            <div>
-                <img className="vote-avatar" src={u.avatar} />
-            </div>
-            <div className="ml-2">
-                <p className="m-0">{u.name}</p>
-                <small>@{u.handle}</small>
-            </div>
+            <Link className="d-flex" to={`/profile/${u.handle}`} target="_blank">
+                <div>
+                    <img className="vote-avatar" src={u.avatar} />
+                </div>
+                <div className="ml-2">
+                    <p className="m-0">{u.name}</p>
+                    <small>@{u.handle}</small>
+                </div>
+            </Link>
             <div className="ml-auto">
                 {!!isRemoving ? (
                     <small

@@ -123,55 +123,60 @@ export const ChooseRepresentatives: FunctionComponent<{}> = ({ }) => {
                 <pre>{JSON.stringify(searchUsers, null, 2)}</pre> */}
 
                 {!!representatives ? (
-                    <div className={
-                        `InputWrapper hasValue ${isFocused && 'isFocused'} my-3`
-                    }>
-                        <label>
-                            Your Representatives
-                        </label>
-                        <div className="inputElementWrapper">
-                            <ul className="userInputList">
-                                {representatives?.map((r: any, i: number) => (
-                                    <RepresentativeInList
-                                        key={r.handle}
-                                        u={r}
-                                        isRemoving={userHandlesRemoving.includes(r.handle)}
-                                        buttonText="remove representation"
-                                        buttonFunction={() => removeRepresentation(r)}
-                                    />
-                                ))}
-                                {searchUsers?.
-                                    filter(u => userHandlesAdding.includes(u.handle))?.
-                                    map((r: any, i: number) => (
+                    <div className="my-3">
+                        <div>
+                            <label>
+                                Your Representatives
+                            </label>
+                            <div>
+                                <ul className="userInputList">
+                                    {representatives?.map((r: any, i: number) => (
                                         <RepresentativeInList
                                             key={r.handle}
                                             u={r}
-                                            isAdding={true}
+                                            isRemoving={userHandlesRemoving.includes(r.handle)}
+                                            buttonText="remove representation"
+                                            buttonFunction={() => removeRepresentation(r)}
                                         />
-                                    ))
-                                }
-                                {
-                                    (
-                                        !representatives?.length &&
-                                        !searchUsers?.filter(u => userHandlesAdding.includes(u.handle)).length
-                                    ) && (
-                                        <div className="pb-3 text-center">
-                                            No one is represening you on this group yet.
-                                        </div>
-                                    )}
-                                <li className="position-relative pt-4">
-                                    <label className="small">
-                                        Other group members
-                                    </label>
+                                    ))}
+                                    {searchUsers?.
+                                        filter(u => userHandlesAdding.includes(u.handle))?.
+                                        map((r: any, i: number) => (
+                                            <RepresentativeInList
+                                                key={r.handle}
+                                                u={r}
+                                                isAdding={true}
+                                            />
+                                        ))
+                                    }
+                                    {
+                                        (
+                                            !representatives?.length &&
+                                            !searchUsers?.filter(u => userHandlesAdding.includes(u.handle)).length
+                                        ) && (
+                                            <div className="pb-3 text-center">
+                                                No one is represening you on this group yet.
+                                            </div>
+                                        )
+                                    }
+                                </ul>
+                            </div>
+                        </div>
+                        <div className="position-relative pt-4 ">
+                            <div className="">
+                                <label>
+                                    Other group members
+                                </label>
 
+                                <div className="inputElementWrapper mx-2">
                                     <div className={
                                         `
-                                            InputWrapper
-                                            hasValue
-                                            ${isFocused && 'isFocused'}
-                                            position-relative
-                                            mt-3
-                                        `
+                                        InputWrapper
+                                        hasValue
+                                        ${isFocused && 'isFocused'}
+                                        position-relative
+                                        mt-2
+                                    `
                                     }>
                                         <label>
                                             e-mail, username or handle
@@ -188,57 +193,29 @@ export const ChooseRepresentatives: FunctionComponent<{}> = ({ }) => {
                                                 onFocus={() => setIsFocused(true)}
                                             />
                                         </div>
-                                        {!!searchUsers && (
-                                            <ul className="user-search-results w-100 bg mt-2">
-                                                {searchUsers?.
-                                                    filter(u => !userHandlesAdding.includes(u.handle))?.
-                                                    filter(u => !representatives?.find(r => r.handle === u.handle))?.
-                                                    map(
-                                                        u => (
-                                                            <RepresentativeInList
-                                                                key={u.handle}
-                                                                u={u}
-                                                                // isRemoving={userHandlesRemoving.includes(u.handle)}
-                                                                buttonText="give representation"
-                                                                buttonFunction={() => giveRepresentation(u)}
-                                                            />
-                                                            // <li
-                                                            //     key={`invite-user-${u.handle}`}
-                                                            //     className="d-flex pointer"
-                                                            // >
-                                                            //     <div>
-                                                            //         <img
-                                                            //             className="vote-avatar"
-                                                            //             src={u.avatar}
-                                                            //         />
-                                                            //     </div>
-                                                            //     <div className="ml-2">
-                                                            //         <p className="m-0">{u.name}</p>
-                                                            //         <small>@{u.handle}</small>
-                                                            //     </div>
-                                                            //     <div className="ml-auto">
-                                                            //         {userHandlesAdding.includes(u.handle) ? (
-                                                            //             <small
-                                                            //                 className="badge inverted"
-                                                            //             >adding</small>
-                                                            //         ) : (
-                                                            //             <small
-                                                            //                 className="badge"
-                                                            //                 style={{ maxWidth: 'none' }}
-                                                            //                 onClick={() => giveRepresentation(u)}
-                                                            //             >give representation</small>
-                                                            //         )}
-                                                            //     </div>
-                                                            // </li>
-                                                        )
-                                                    )
-                                                }
-                                            </ul>
-                                        )}
-                                        {/* {error && <div className="error">{(error as any).message}</div>} */}
                                     </div>
-                                </li>
-                            </ul>
+                                </div>
+                                {!!searchUsers && (
+                                        <ul className="userInputList">
+                                            {searchUsers?.
+                                                filter(u => !userHandlesAdding.includes(u.handle))?.
+                                                filter(u => !representatives?.find(r => r.handle === u.handle))?.
+                                                filter(u => liquidUser?.handle !== u.handle)?.
+                                                map(
+                                                    u => (
+                                                        <RepresentativeInList
+                                                            key={u.handle}
+                                                            u={u}
+                                                            // isRemoving={userHandlesRemoving.includes(u.handle)}
+                                                            buttonText="give representation"
+                                                            buttonFunction={() => giveRepresentation(u)}
+                                                        />
+                                                    )
+                                                )
+                                            }
+                                        </ul>
+                                    )}
+                            </div>
                         </div>
                     </div>
                 ) : (

@@ -77,8 +77,7 @@ export default function Question() {
                                     to={`/profile/${r.handle}`}
                                     className={`vote-avatar tiny ml-n2`}
                                     style={{
-                                        background: `url(${r.avatar}) no-repeat`,
-                                        backgroundSize: 'cover'
+                                        background: `url(${r.avatar}) 50% 50% / cover no-repeat`
                                     }}
                                     title={r.name}
                                 ></Link>

@@ -41,8 +41,7 @@ export const GroupInList: FunctionComponent<{
                     <div
                         className={`small-avatar bg`}
                         style={{
-                            background: group.cover && `url(${group.cover}) no-repeat`,
-                            backgroundSize: 'cover'
+                            background: group.cover && `url(${group.cover}) 50% 50% / cover no-repeat`
                         }}
                     ></div>
                 </Link>
@@ -108,8 +107,7 @@ export const GroupInList: FunctionComponent<{
                                 title={`${m.name}`}
                                 className="vote-avatar avatar-2 ml-n2"
                                 style={{
-                                    background: `url(${m.avatar}) no-repeat`,
-                                    backgroundSize: 'cover'
+                                    background: `url(${m.avatar}) 50% 50% / cover no-repeat`
                                 }}
                             ></Link>
                         ))}

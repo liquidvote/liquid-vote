@@ -146,8 +146,7 @@ export const Choice: FunctionComponent<{
                                             onClick={e => e.stopPropagation()}
                                             className={`vote-avatar for ml-n2 ${inList && 'tiny'}`}
                                             style={{
-                                                background: `url(${forRepresentatives[0].representativeAvatar}) no-repeat`,
-                                                backgroundSize: 'cover'
+                                                background: `url(${forRepresentatives[0].representativeAvatar}) 50% 50% / cover no-repeat`,
                                             }}
                                         ></Link>
                                         <Link
@@ -170,8 +169,7 @@ export const Choice: FunctionComponent<{
                                     to={`/profile/${v?.handle}`}
                                     className={`vote-avatar for ml-n2 ${inList && 'tiny'}`}
                                     style={{
-                                        background: `url(${v?.avatar}) no-repeat`,
-                                        backgroundSize: 'cover'
+                                        background: `url(${v?.avatar}) 50% 50% / cover no-repeat`
                                     }}
                                 ></Link>
                             ))}
@@ -205,8 +203,7 @@ export const Choice: FunctionComponent<{
                                         to={`/profile/${v?.handle}`}
                                         className={`vote-avatar against ml-n2 ${inList && 'tiny'}`}
                                         style={{
-                                            background: `url(${v?.avatar}) no-repeat`,
-                                            backgroundSize: 'cover'
+                                            background: `url(${v?.avatar}) 50% 50% / cover no-repeat`
                                         }}
                                     ></Link>
                                 ))}
@@ -232,8 +229,7 @@ export const Choice: FunctionComponent<{
                                             to={`/profile/${againstRepresentatives[0].representativeHandle}`}
                                             className={`vote-avatar against ml-n2 ${inList && 'tiny'}`}
                                             style={{
-                                                background: `url(${againstRepresentatives[0].representativeAvatar}) no-repeat`,
-                                                backgroundSize: 'cover'
+                                                background: `url(${againstRepresentatives[0].representativeAvatar}) 50% 50% / cover no-repeat`
                                             }}
                                             onClick={e => e.stopPropagation()}
                                         ></Link>

@@ -33,17 +33,13 @@ export const AcceptInvite: FunctionComponent<{}> = ({ }) => {
     const { group } = useGroup({ handle: modalData?.groupHandle });
     const { user } = useUser({ userHandle: modalData?.by });
 
+    const isMember = !!liquidUser && group?.yourMemberRelation?.isMember;
+
     const [editGroupMemberChannelRelation, {
         loading: editGroupMemberChannelRelation_loading,
         error: editGroupMemberChannelRelation_error,
         data: editGroupMemberChannelRelation_data,
     }] = useMutation(EDIT_GROUP_MEMBER_CHANNEL_RELATION);
-
-    console.log({
-        modalData,
-        user,
-        group
-    });
 
     useEffect(() => {
         if (acceptInviteOnLogin && !!liquidUser) {
@@ -97,8 +93,7 @@ export const AcceptInvite: FunctionComponent<{}> = ({ }) => {
                             <div
                                 className="small-avatar bg"
                                 style={{
-                                    background: user?.avatar && `url(${user.avatar}) 50% 50% no-repeat`,
-                                    backgroundSize: 'cover'
+                                    background: user?.avatar && `url(${user.avatar}) 50% 50% / cover no-repeat`
                                 }}
                             />
                             <p className="m-0">
@@ -113,12 +108,14 @@ export const AcceptInvite: FunctionComponent<{}> = ({ }) => {
                                     src={'http://images.liquid-vote.com/system/loading.gif'}
                                 />
                             </div>
-                        ) : (
+                        ) : !isMember ? (
                             <button
                                 className="button_ mx-5 my-4"
                                 onClick={acceptInvite}
                                 disabled={editGroupMemberChannelRelation_loading}
                             >Join Group</button>
+                        ) : (
+                            <p className="mx-5 my-4 text-center">But you are already a member.</p>
                         )}
                     </div>
                 ) : (

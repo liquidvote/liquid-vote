@@ -68,14 +68,18 @@ export const InviteFor: FunctionComponent<{}> = ({ }) => {
 
             <div className="Modal-Content">
 
+                <p className="text-center mt-4 mb-n4">
+                    {modalData.InviteType === 'toGroup' && `Share this link with whom you'd like to join ${modalData.groupName}`}
+                </p>
+
                 <div className="my-5">
                     <InvitesLink
                         label={'Get Link'}
 
-                        groupName={modalData.groupName}
+                        // groupName={modalData.groupName}
                         groupHandle={modalData.groupHandle}
-                        fromWhomAvatar={liquidUser?.avatar}
-                        fromWhomName={liquidUser?.name}
+                        // fromWhomAvatar={liquidUser?.avatar}
+                        // fromWhomName={liquidUser?.name}
                         fromWhomHandle={liquidUser?.handle}
 
                         // userHandle={modalData.userHandle}

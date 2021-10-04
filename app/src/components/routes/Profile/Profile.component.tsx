@@ -11,10 +11,10 @@ import LocationSVG from "@shared/Icons/Location.svg";
 import useSearchParams from "@state/Global/useSearchParams.effect";
 import { timeAgo } from '@state/TimeAgo';
 import { USER, USER_GROUPS } from "@state/User/typeDefs";
+import useAuthUser from '@state/AuthUser/authUser.effect';
 
 import ProfileVotes from "./ProfileVotes";
 import './style.sass';
-
 
 
 
@@ -22,6 +22,8 @@ export const Profile: FunctionComponent<{}> = ({ }) => {
 
     let { section, handle } = useParams<any>();
     const { allSearchParams, updateParams } = useSearchParams();
+
+    const { liquidUser } = useAuthUser();
 
     const {
         loading: user_loading,
@@ -64,15 +66,13 @@ export const Profile: FunctionComponent<{}> = ({ }) => {
                 <div
                     className="cover"
                     style={{
-                        background: profile.cover && `url(${profile.cover}) 50% 50% no-repeat`,
-                        backgroundSize: 'cover'
+                        background: profile.cover && `url(${profile.cover}) 50% 50% / cover no-repeat`
                     }}
                 />
                 <div
                     className="profile-avatar bg"
                     style={{
-                        background: profile.avatar && `url(${profile.avatar}) 50% 50% no-repeat`,
-                        backgroundSize: 'cover'
+                        background: profile.avatar && `url(${profile.avatar}) 50% 50% / cover no-repeat`
                     }}
                 />
                 <div className="profile-buttons-container">
@@ -111,7 +111,7 @@ export const Profile: FunctionComponent<{}> = ({ }) => {
                     ) : (
                         <div
                             // onClick={() => setIsRepresenting(!isRepresenting)}
-                            onClick={() => updateParams({
+                            onClick={() => !!liquidUser ? updateParams({
                                 paramsToAdd: {
                                     modal: "EditRepresentativeRelation",
                                     modalData: JSON.stringify({
@@ -119,7 +119,17 @@ export const Profile: FunctionComponent<{}> = ({ }) => {
                                         userName: profile.name
                                     })
                                 }
-                            })}
+                            }) : (
+                                updateParams({
+                                    paramsToAdd: {
+                                        modal: "RegisterBefore",
+                                        modalData: JSON.stringify({
+                                            toWhat: 'delegating',
+                                            userName: profile.name
+                                        })
+                                    }
+                                })
+                            )}
                             className={`button_ small ${profile.isRepresentingYou ? "selected" : ""}`}
                         >
                             {

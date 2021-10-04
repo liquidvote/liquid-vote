@@ -63,10 +63,12 @@ const AppolloAppWrapper: FunctionComponent<{}> = ({ }) => {
                     }
                 });
                 await client.setLink(authLink.concat(httpLink));
+                // TODO: perhaps there's a way to `resetStore` reacting to `setLink` instead of using a random setTimeout
                 await client.mutate({
                     mutation: AUTH_USER_LOGGEDIN,
                     variables: { Auth0User: user }
-                });
+                }).then(() => client.resetStore());
+                await setTimeout(async () => await client.resetStore(), 1000);
 
                 // TODO: Continue login logic here, currently it continues on SideMenu
             }

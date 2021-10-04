@@ -15,8 +15,7 @@ export const PersonInList: FunctionComponent<{ person: any }> = ({ person }) => 
                 <div
                     className="small-avatar bg"
                     style={{
-                        background: person.avatar && `url(${person.avatar}) no-repeat`,
-                        backgroundSize: 'cover'
+                        background: person.avatar && `url(${person.avatar}) 50% 50% / cover no-repeat`
                     }}
                 ></div>
             </Link>
