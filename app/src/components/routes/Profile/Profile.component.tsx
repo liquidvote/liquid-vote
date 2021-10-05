@@ -12,11 +12,10 @@ import useSearchParams from "@state/Global/useSearchParams.effect";
 import { timeAgo } from '@state/TimeAgo';
 import { USER, USER_GROUPS } from "@state/User/typeDefs";
 import useAuthUser from '@state/AuthUser/authUser.effect';
+import useUserGroups from "@state/User/userGroups.effect";
 
 import ProfileVotes from "./ProfileVotes";
 import './style.sass';
-
-
 
 export const Profile: FunctionComponent<{}> = ({ }) => {
 
@@ -37,11 +36,13 @@ export const Profile: FunctionComponent<{}> = ({ }) => {
     const profile = user_data?.User;
 
     const {
-        loading: profileGroups_loading,
-        error: profileGroups_error,
-        data: profileGroups_data,
-        refetch: profileGroups_refetch
-    } = useQuery(USER_GROUPS, { variables: { handle } });
+        userGroups,
+        // userGroups_refetch
+    } = useUserGroups({
+        userHandle: handle,
+        representative: liquidUser?.handle
+    });
+
 
     const [isRepresenting, setIsRepresenting] = React.useState(false);
 
@@ -76,26 +77,8 @@ export const Profile: FunctionComponent<{}> = ({ }) => {
                     }}
                 />
                 <div className="profile-buttons-container">
-                    {/* <div className="button_">
-                        <AddNotificationSVG />
-                    </div> */}
                     {profile.isThisUser ? (
                         <>
-                            {/* <div
-                                onClick={() => updateParams({
-                                    paramsToAdd: {
-                                        modal: "InviteFor",
-                                        modalData: JSON.stringify({
-                                            InviteType: 'representation',
-                                            profileHandle: profile.handle,
-                                            profileName: profile.name
-                                        })
-                                    }
-                                })}
-                                className={`button_ small mr-1`}
-                            >
-                                Invite Representees
-                            </div> */}
                             <div
                                 onClick={() => updateParams({
                                     paramsToAdd: {
@@ -190,7 +173,7 @@ export const Profile: FunctionComponent<{}> = ({ }) => {
                         <div data-tip="User Groups">
                             <GroupSmallSvg />
                         </div>
-                        {profileGroups_data?.UserGroups?.map((el: any, i: any) => (
+                        {userGroups?.map((el: any, i: any) => (
                             <Link
                                 to={`/group/${el.handle}`}
                                 key={'s-' + el.name}

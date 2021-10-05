@@ -24,13 +24,36 @@ const AppolloAppWrapper: FunctionComponent<{}> = ({ }) => {
     const cache = new InMemoryCache({
         typePolicies: {
             Group: {
-                keyFields: ["handle"],
+                keyFields: [
+                    "handle"
+                ],
+                fields: {
+                    representativeRelation: {
+                        read(_, { args, toReference }) {
+                            return toReference({
+                              __typename: 'UserRepresentativeGroupRelation',
+                              groupId: args?.groupId,
+                              representativeId: args?.representativeId,
+                              representeeId: args?.representeeId,
+                            });
+                          }
+                    }
+                }
             },
             User: {
                 keyFields: ["handle"],
             },
             Question: {
-                keyFields: ["questionText", "groupChannel", ["group"]]
+                keyFields: [
+                    "questionText",
+                    "groupChannel", ["group"]
+                ]
+            },
+            UserRepresentativeGroupRelation: {
+                keyFields: ["groupId", "representativeId", "representeeId"],
+            },
+            GroupMemberRelation: {
+                keyFields: ["groupId", "userId"],
             }
             // Vote: {
             //     keyFields: ["questionText", "groupChannel", ["group"], "user" ,["handle"]]
@@ -63,12 +86,12 @@ const AppolloAppWrapper: FunctionComponent<{}> = ({ }) => {
                     }
                 });
                 await client.setLink(authLink.concat(httpLink));
-                // TODO: perhaps there's a way to `resetStore` reacting to `setLink` instead of using a random setTimeout
+                // TODO: perhaps there's a way to `reFetchObservableQueries` reacting to `setLink` instead of using a random setTimeout
                 await client.mutate({
                     mutation: AUTH_USER_LOGGEDIN,
                     variables: { Auth0User: user }
-                }).then(() => client.resetStore());
-                await setTimeout(async () => await client.resetStore(), 1000);
+                }).then(() => client.reFetchObservableQueries());
+                await setTimeout(async () => await client.reFetchObservableQueries(), 1000);
 
                 // TODO: Continue login logic here, currently it continues on SideMenu
             }

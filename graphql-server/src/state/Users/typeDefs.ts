@@ -45,6 +45,7 @@ export const UserTypeDefs = gql`
     }
 
     type UserRepresentativeGroupRelation {
+        id: ID
         representativeId: String
         representeeId: String
         groupId: String
@@ -69,6 +70,10 @@ export const UserTypeDefs = gql`
             handle: String,
             representative: String
         ): [Group],
+        UserGroupsRepresentedBy(
+            handle: String,
+            representative: String
+        ): [UserRepresentativeGroupRelation],
         UserVotes(
             handle: String,
             type: String

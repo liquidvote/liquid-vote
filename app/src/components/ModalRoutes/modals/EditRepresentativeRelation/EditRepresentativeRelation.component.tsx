@@ -7,6 +7,8 @@ import TextInput from "@shared/Inputs/TextInput";
 import useSearchParams from "@state/Global/useSearchParams.effect";
 import { USER, USER_GROUPS, EDIT_USER_REPRESENTATIVE_GROUP_RELATION } from "@state/User/typeDefs";
 import useAuthUser from '@state/AuthUser/authUser.effect';
+import useUserGroups from '@state/User/userGroups.effect';
+import DropAnimation from "@components/shared/DropAnimation";
 
 import ModalHeader from "../../shared/ModalHeader";
 import './style.sass';
@@ -17,18 +19,12 @@ export const EditRepresentativeRelation: FunctionComponent<{}> = ({ }) => {
     const modalData = JSON.parse(allSearchParams.modalData);
 
     const { liquidUser } = useAuthUser();
-
     const {
-        loading: yourGroups_loading,
-        error: yourGroups_error,
-        data: yourGroups_data,
-        refetch: yourGroups_refetch
-    } = useQuery(USER_GROUPS, {
-        variables: {
-            handle: liquidUser?.handle,
-            representative: modalData.userHandle
-        },
-        skip: !liquidUser
+        userGroups: yourGroups,
+        userGroups_refetch: yourGroups_refetch
+    } = useUserGroups({
+        userHandle: liquidUser?.handle,
+        representative: modalData?.userHandle
     });
 
     const {
@@ -52,23 +48,7 @@ export const EditRepresentativeRelation: FunctionComponent<{}> = ({ }) => {
             representative_data,
             modalData
         })
-        // setValue('name', representative_data.User.name);
-        // setValue('location', representative_data.User.location);
-        // setValue('bio', representative_data.User.bio);
-        // setValue('externalLink', representative_data.User.externalLink);
-        // setValue('avatar', representative_data.User.avatar);
-        // setValue('cover', representative_data.User.cover);
-        // setValue('email', representative_data.User.email);
     }, [representative_data]);
-
-    // useEffect(() => {
-    //     if (editUser_data) {
-    //         updateParams({
-    //             keysToRemove: ['modal', 'modalData'],
-    //             paramsToAdd: { refetch: 'user' }
-    //         });
-    //     }
-    // }, [editUser_data])
 
     return (
         <form>
@@ -79,56 +59,70 @@ export const EditRepresentativeRelation: FunctionComponent<{}> = ({ }) => {
             />
 
             <div className="Modal-Content">
-
-                <h4 className="mt-4">Your Groups:</h4>
+                <label className="mt-4">Groups in common:</label>
 
                 <div>
-                    {yourGroups_data?.UserGroups?.map((g: any, i: Number) => (
-                        <GroupInList
-                            key={g.name + i}
-                            group={g}
-                            inviteButton={(
-                                !g.representativeRelation.isGroupMember ?
-                                    <div className={`button_ small mb-0 ml-1`}>
-                                        Invite
-                                    </div> :
-                                    null
-                            )}
-                            alternativeButton={(
-                                g.representativeRelation.isGroupMember ?
-                                    <div
-                                        onClick={
-                                            () => editUserRepresentativeGroupRelation({
-                                                variables: {
-                                                    RepresenteeHandle: liquidUser?.handle,
-                                                    RepresentativeHandle: representative_data?.User?.handle,
-                                                    Group: g.handle,
-                                                    IsRepresentingYou: !g.representativeRelation?.isRepresentingYou
-                                                }
-                                            })
-                                                .then((r) => {
-                                                    yourGroups_refetch();
-                                                    updateParams({ paramsToAdd: { refetch: 'user' } })
+                    {!!yourGroups && [
+                        ...yourGroups
+                    ].
+                        filter((g: any) => g.representativeRelation.isGroupMember)?.
+                        sort((a: any, b: any) => (
+                            b.stats.members - a.stats.members ||
+                            // +!!b.representativeRelation.isGroupMember - +!!a.representativeRelation.isGroupMember ||
+                            +!!b.representativeRelation.isRepresentingYou - +!!a.representativeRelation.isRepresentingYou
+                        ))?.
+                        map((g: any, i: Number) => (
+                            <GroupInList
+                                key={g.name + i}
+                                group={g}
+                                alternativeButton={(
+                                    g.representativeRelation.isGroupMember ?
+                                        <div
+                                            onClick={
+                                                () => editUserRepresentativeGroupRelation({
+                                                    variables: {
+                                                        RepresenteeHandle: liquidUser?.handle,
+                                                        RepresentativeHandle: representative_data?.User?.handle,
+                                                        Group: g.handle,
+                                                        IsRepresentingYou: !g.representativeRelation?.isRepresentingYou
+                                                    }
                                                 })
-                                        }
-                                        className={`
-                                            button_ small ml-1 mb-0
-                                            ${g.representativeRelation?.isRepresentingYou ? 'selected' : null}
-                                        `}
-                                    >
-                                        {
-                                            g.representativeRelation?.isRepresentingYou ?
-                                                `Represents you` :
-                                                `Delegate to ${representative_data?.User?.name}`
-                                        }
-                                    </div> :
-                                    null
-                            )}
-                        />
-                    ))}
+                                                    .then((r) => {
+                                                        yourGroups_refetch();
+                                                        updateParams({ paramsToAdd: { refetch: 'user' } })
+                                                    })
+                                            }
+                                            className={`
+                                        button_ small ml-1 mb-0
+                                        ${g.representativeRelation?.isRepresentingYou ? 'selected' : null}
+                                    `}
+                                        >
+                                            {
+                                                g.representativeRelation?.isRepresentingYou ?
+                                                    `Represents you` :
+                                                    `Delegate to ${representative_data?.User?.name}`
+                                            }
+                                        </div> :
+                                        null
+                                )}
+                            />
+                        ))}
                 </div>
 
-                <br />
+                {
+                    !yourGroups &&
+                    <div className="d-flex justify-content-center my-5">
+                        <DropAnimation />
+                    </div>
+                }
+
+                {
+                    yourGroups?.length === 0 &&
+                    <div className="d-flex justify-content-center my-5">
+                        You aren't in any of the same groups yet
+                    </div>
+                }
+
 
             </div>
         </form>

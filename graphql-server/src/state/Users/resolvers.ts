@@ -294,6 +294,21 @@ export const UserResolvers = {
 
             return Groups;
         },
+        // UserGroupsRepresentedBy: async (_source, { handle, representative }, { mongoDB, AuthUser }) => {
+
+        //     const Representative = await mongoDB.collection("Users")
+        //         .findOne({ 'LiquidUser.handle': representative });
+
+        //     const representativeRelations = !!AuthUser && await mongoDB.collection("UserRepresentations")
+        //         .find({
+        //             representativeId: new ObjectId(Representative?._id),
+        //             representeeId: new ObjectId(AuthUser?._id),
+        //         });
+            
+        //     // missing  stuff 
+
+        //     return representativeRelations;
+        // },
         UserVotes: async (_source, { handle, type = 'directVotesMade' }, { mongoDB, AuthUser }) => {
 
             const User = await mongoDB.collection("Users")

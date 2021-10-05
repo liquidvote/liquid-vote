@@ -71,6 +71,8 @@ export const USER_REPRESENTING = gql`
             indirectVotesMadeForUser
         }
         representationGroups {
+            groupId
+            userId
             handle
             name
         }
@@ -129,12 +131,17 @@ export const USER_GROUPS = gql`
         }
         privacy,
         yourMemberRelation {
+            groupId
+            userId
             createdOn
             lastEditOn
             isMember
             channels
         }
         representativeRelation {
+            representativeId
+            representeeId
+            groupId
             isRepresentingYou
             isGroupMember
             createdOn
@@ -272,6 +279,9 @@ export const EDIT_USER_REPRESENTATIVE_GROUP_RELATION = gql`
             Group: $Group,
             IsRepresentingYou: $IsRepresentingYou
         ) {
+            representativeId
+            representeeId
+            groupId
             isRepresentingYou
             createdOn
             lastEditOn

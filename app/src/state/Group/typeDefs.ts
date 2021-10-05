@@ -18,6 +18,8 @@ export const GROUP = gql`
         }
         thisUserIsAdmin
         yourMemberRelation {
+            groupId
+            userId
             createdOn
             lastEditOn
             isMember

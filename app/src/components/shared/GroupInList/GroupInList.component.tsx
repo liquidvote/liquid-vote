@@ -13,11 +13,9 @@ import './style.sass';
 
 export const GroupInList: FunctionComponent<{
     group: any,
-    inviteButton?: any,
     alternativeButton?: any
 }> = ({
     group,
-    inviteButton,
     alternativeButton,
 }) => {
 
@@ -39,7 +37,7 @@ export const GroupInList: FunctionComponent<{
             <div className="d-flex relative border-bottom py-3 mx-n3 px-3">
                 <Link to={`/group/${group.handle}`}>
                     <div
-                        className={`small-avatar bg`}
+                        className={`small-avatar square bg`}
                         style={{
                             background: group.cover && `url(${group.cover}) 50% 50% / cover no-repeat`
                         }}
@@ -56,40 +54,24 @@ export const GroupInList: FunctionComponent<{
                                 ) : (
                                     <WorldSVG />
                                 )}
-                                {/* <LockSVG /> */}
-                                {/* <WorldlockSVG /> */}
                             </div>
                         </div>
                         <div className="d-flex mb-1 ml-n1">
-                            {inviteButton}
                             {
                                 !alternativeButton && (
-                                    group.thisUserIsAdmin ? (
-                                        <div
-                                            onClick={() => updateParams({
-                                                paramsToAdd: {
-                                                    modal: "EditGroup",
-                                                    modalData: JSON.stringify({ groupHandle: group.handle })
-                                                }
-                                            })}
-                                            className={`button_ small ml-1 mb-0`}
-                                        >
-                                            Edit
-                                        </div>
-                                    ) : (
-                                        <div
-                                            onClick={() => editGroupMemberChannelRelation({
-                                                variables: {
-                                                    UserHandle: liquidUser?.handle,
-                                                    GroupHandle: group.handle,
-                                                    IsMember: !group?.yourMemberRelation?.isMember
-                                                }
-                                            })}
-                                            className={`button_ small ml-1 mb-0 ${isMember ? "selected" : ""}`}
-                                        >
-                                            {isMember ? "Joined" : "Join"}
-                                        </div>
-                                    )
+                                    <button
+                                        onClick={() => editGroupMemberChannelRelation({
+                                            variables: {
+                                                UserHandle: liquidUser?.handle,
+                                                GroupHandle: group.handle,
+                                                IsMember: !group?.yourMemberRelation?.isMember
+                                            }
+                                        })}
+                                        className={`button_ small ml-1 mb-0 ${isMember ? "selected" : ""}`}
+                                        disabled={group.thisUserIsAdmin}
+                                    >
+                                        {isMember ? "Joined" : "Join"}
+                                    </button>
                                 )
                             }
                             {alternativeButton ? alternativeButton : null}
@@ -97,12 +79,11 @@ export const GroupInList: FunctionComponent<{
                     </div>
                     <small className="d-flex mb-0">
                         {group.bio}
-                        {/* A community of locals and expats. That own flats in Algarve.
-                    For personal use, Airbnb, long term renting or whatever. */}
                     </small>
                     <div className="d-flex ml-2 mt-2">
                         {group?.stats?.mostRepresentingMembers?.slice(0, 6).map((m: any) => (
                             <Link
+                                key={m.handle}
                                 to={`/profile/${m.handle}`}
                                 title={`${m.name}`}
                                 className="vote-avatar avatar-2 ml-n2"
