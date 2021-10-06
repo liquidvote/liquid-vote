@@ -11,6 +11,8 @@ import DropPlusSVG from "@shared/Icons/Drop+.svg";
 import LinkSVG from "@shared/Icons/Link.svg";
 import LockSVG from "@shared/Icons/Lock.svg";
 import WorldSVG from "@shared/Icons/World.svg";
+import ProfileSmallSVG from "@shared/Icons/Profile-small.svg";
+import DropSVG from "@shared/Icons/Drop.svg";
 import useAuthUser from '@state/AuthUser/authUser.effect';
 import useSearchParams from "@state/Global/useSearchParams.effect";
 import useGroup from '@state/Group/group.effect';
@@ -57,7 +59,7 @@ export const Group: FunctionComponent<{}> = ({ }) => {
     }, [group]);
 
     useEffect(() => {
-        if(!!userHandle) {
+        if (!!userHandle) {
             const link = `/group/${handle}?${new URLSearchParams({
                 modal: 'AcceptInvite',
                 modalData: JSON.stringify({
@@ -222,6 +224,7 @@ export const Group: FunctionComponent<{}> = ({ }) => {
                             href={`//${group?.externalLink}`}
                             target="_blank"
                             rel="noreferrer"
+                            className="white"
                         >
                             {group?.externalLink}
                         </a>
@@ -232,18 +235,34 @@ export const Group: FunctionComponent<{}> = ({ }) => {
                     <div>Group created {timeAgo.format(new Date(Number(group?.createdOn)))}</div>
                 </div>
             </div>
-            <div className="profile-stats-container">
+            <div className="profile-stats-container mt-3">
+                <div className="mr-1"><ProfileSmallSVG /></div>
                 <Link className="mr-2" to={`/group-people/${group?.handle}/members`}>
-                    <b>{group?.stats?.members || 0}</b> Member{group?.members !== 1 && 's'}
+                    <b className="white">{group?.stats?.members || 0}</b> Member{group?.stats?.members !== 1 && 's'}
                 </Link>
                 {
                     group?.yourStats && (
                         <>
                             <Link className="mr-2" to={`/group-people/${group?.handle}/representingYou`}>
-                                <b>{group?.yourStats.representing || 0}</b> Representing you
+                                <b className="white">{group?.yourStats.representing || 0}</b> Representing you
                             </Link>
                             <Link to={`/group-people/${group?.handle}/representedByYou`}>
-                                <b>{group?.yourStats.representedBy || 0}</b> Represented by you
+                                <b className="white">{group?.yourStats.representedBy || 0}</b> Represented by you
+                            </Link>
+                        </>
+                    )
+                }
+            </div>
+            <div className="profile-stats-container mb-4 mt-2">
+                <div className="mr-1"><DropSVG /></div>
+                <Link className="mr-2" to={`/group-people/${group?.handle}/members`}>
+                    <b className="white">{group?.stats?.directVotesMade || 0}</b> Vote{group?.stats?.directVotesMade !== 1 && 's'}
+                </Link>
+                {
+                    group?.yourStats && (
+                        <>
+                            <Link className="mr-2" to={`/group-people/${group?.handle}/representingYou`}>
+                                <b className="white">{group?.yourStats.directVotesMade || 0}</b> Votes by you
                             </Link>
                         </>
                     )
@@ -275,12 +294,12 @@ export const Group: FunctionComponent<{}> = ({ }) => {
                         <b>{group?.stats?.questions}</b>{' '}Polls
                     </Link>
                 </li>
-                <li className="nav-item">
+                {/* <li className="nav-item">
                     <Link className={`nav-link ${section === 'votes' && 'active'}`} to={`/group/${group?.handle}/votes`}>
                         <b>{group?.stats?.directVotesMade}</b>{' '}
                         Votes
                     </Link>
-                </li>
+                </li> */}
                 <li className="px-4 mt-1">
                     <VoteSortPicker updateSortInParent={setSortBy} />
                 </li>

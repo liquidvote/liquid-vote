@@ -8,6 +8,7 @@ import CalendarSVG from "@shared/Icons/Calendar.svg";
 import GroupSmallSvg from "@shared/Icons/Group-small.svg";
 import LinkSVG from "@shared/Icons/Link.svg";
 import LocationSVG from "@shared/Icons/Location.svg";
+import ProfileSmallSVG from "@shared/Icons/Profile-small.svg";
 import useSearchParams from "@state/Global/useSearchParams.effect";
 import { timeAgo } from '@state/TimeAgo';
 import { USER, USER_GROUPS } from "@state/User/typeDefs";
@@ -141,6 +142,7 @@ export const Profile: FunctionComponent<{}> = ({ }) => {
                             href={profile.externalLink}
                             target="_blank"
                             rel="noreferrer"
+                            className="white"
                         >
                             {profile.externalLink}
                         </a>
@@ -151,12 +153,13 @@ export const Profile: FunctionComponent<{}> = ({ }) => {
                     <div>Joined {timeAgo.format(new Date(Number(profile.joinedOn)))}</div>
                 </div>
             </div>
-            <div className="profile-stats-container">
+            <div className="profile-stats-container mt-3">
+                <div className="mr-1"><ProfileSmallSVG /></div>
                 <Link to={`/profile-people/${profile.handle}/representedBy`} className="mr-2">
-                    Representing{' '}<b>{profile?.stats?.representedBy}</b>
+                    Representing{' '}<b className="white">{profile?.stats?.representedBy}</b>
                 </Link>
                 <Link to={`/profile-people/${profile.handle}/representing`} className="mr-2">
-                    Represented by{' '}<b>{profile?.stats?.representing}</b>
+                    Represented by{' '}<b className="white">{profile?.stats?.representing}</b>
                 </Link>
                 {/* {profile?.yourStats?.groupsInCommon && (
                     <Link to={`/profile-people/${profile.handle}/groups`} className="mr-2">
@@ -165,7 +168,7 @@ export const Profile: FunctionComponent<{}> = ({ }) => {
                 )} */}
             </div>
 
-            <div className="mt-4 mb-3 d-flex align-items-start flex-nowrap justify-content-between">
+            <div className="mt-2 mb-3 d-flex align-items-start flex-nowrap justify-content-between">
                 <div className="d-flex flex-column">
                     <div
                         className="d-flex flex-wrap justify-content-start"

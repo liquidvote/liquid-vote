@@ -10,7 +10,7 @@ export const UserResolvers = {
             const User = await mongoDB.collection("Users")
                 .findOne({ 'LiquidUser.handle': handle });
 
-            return {
+            return !!User ? {
                 ...User?.LiquidUser,
                 isThisUser: !!AuthUser && AuthUser?.Auth0User?.sub === User?.Auth0User?.sub,
                 isRepresentingYou: (await mongoDB.collection("UserRepresentations")
@@ -23,7 +23,7 @@ export const UserResolvers = {
                 ...!!AuthUser && (AuthUser._id.toString() !== User._id.toString()) && {
                     yourStats: await getYourUserStats({ userId: User._id, AuthUser, mongoDB }),
                 }
-            };
+            } : {};
         },
 
         SearchUsers: async (_source, {
@@ -304,7 +304,7 @@ export const UserResolvers = {
         //             representativeId: new ObjectId(Representative?._id),
         //             representeeId: new ObjectId(AuthUser?._id),
         //         });
-            
+
         //     // missing  stuff 
 
         //     return representativeRelations;

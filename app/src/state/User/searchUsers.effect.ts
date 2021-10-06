@@ -25,6 +25,7 @@ export default function useSearchUsers({
     });
 
     return {
-        searchUsers: searchUsers_data?.SearchUsers
+        searchUsers: searchUsers_data?.SearchUsers,
+        searchUsers_loading
     };
 }

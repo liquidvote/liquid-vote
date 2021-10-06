@@ -32,12 +32,12 @@ export const ChooseRepresentatives: FunctionComponent<{}> = ({ }) => {
 
     const { liquidUser } = useAuthUser();
     const { group } = useGroup({ handle: modalData?.groupHandle });
-    const { representatives, representatives_refetch } = useUserRepresentedBy({
+    const { representatives, representatives_refetch, representatives_loading } = useUserRepresentedBy({
         userHandle: liquidUser?.handle,
         groupHandle: group?.handle
     });
 
-    const { searchUsers } = useSearchUsers({
+    const { searchUsers, searchUsers_loading } = useSearchUsers({
         searchText: userSearch,
         inGroup: modalData?.groupHandle,
         resultsOnEmpty: true
@@ -128,39 +128,45 @@ export const ChooseRepresentatives: FunctionComponent<{}> = ({ }) => {
                             <label>
                                 Your Representatives
                             </label>
-                            <div>
-                                <ul className="userInputList">
-                                    {representatives?.map((r: any, i: number) => (
-                                        <RepresentativeInList
-                                            key={r.handle}
-                                            u={r}
-                                            isRemoving={userHandlesRemoving.includes(r.handle)}
-                                            buttonText="remove representation"
-                                            buttonFunction={() => removeRepresentation(r)}
-                                        />
-                                    ))}
-                                    {searchUsers?.
-                                        filter(u => userHandlesAdding.includes(u.handle))?.
-                                        map((r: any, i: number) => (
+                            {representatives_loading ? (
+                                <div className="d-flex justify-content-center my-5">
+                                    <DropAnimation />
+                                </div>
+                            ) : (
+                                <div>
+                                    <ul className="userInputList">
+                                        {representatives?.map((r: any, i: number) => (
                                             <RepresentativeInList
                                                 key={r.handle}
                                                 u={r}
-                                                isAdding={true}
+                                                isRemoving={userHandlesRemoving.includes(r.handle)}
+                                                buttonText="remove representation"
+                                                buttonFunction={() => removeRepresentation(r)}
                                             />
-                                        ))
-                                    }
-                                    {
-                                        (
-                                            !representatives?.length &&
-                                            !searchUsers?.filter(u => userHandlesAdding.includes(u.handle)).length
-                                        ) && (
-                                            <div className="pb-3 text-center">
-                                                No one is represening you on this group yet.
-                                            </div>
-                                        )
-                                    }
-                                </ul>
-                            </div>
+                                        ))}
+                                        {searchUsers?.
+                                            filter(u => userHandlesAdding.includes(u.handle))?.
+                                            map((r: any, i: number) => (
+                                                <RepresentativeInList
+                                                    key={r.handle}
+                                                    u={r}
+                                                    isAdding={true}
+                                                />
+                                            ))
+                                        }
+                                        {
+                                            (
+                                                !representatives?.length &&
+                                                !searchUsers?.filter(u => userHandlesAdding.includes(u.handle)).length
+                                            ) && (
+                                                <div className="pb-3 text-center">
+                                                    No one is represening you on this group yet.
+                                                </div>
+                                            )
+                                        }
+                                    </ul>
+                                </div>
+                            )}
                         </div>
                         <div className="position-relative pt-4 ">
                             <div className="">
@@ -195,26 +201,33 @@ export const ChooseRepresentatives: FunctionComponent<{}> = ({ }) => {
                                         </div>
                                     </div>
                                 </div>
-                                {!!searchUsers && (
-                                        <ul className="userInputList">
-                                            {searchUsers?.
-                                                filter(u => !userHandlesAdding.includes(u.handle))?.
-                                                filter(u => !representatives?.find(r => r.handle === u.handle))?.
-                                                filter(u => liquidUser?.handle !== u.handle)?.
-                                                map(
-                                                    u => (
-                                                        <RepresentativeInList
-                                                            key={u.handle}
-                                                            u={u}
-                                                            // isRemoving={userHandlesRemoving.includes(u.handle)}
-                                                            buttonText="give representation"
-                                                            buttonFunction={() => giveRepresentation(u)}
-                                                        />
-                                                    )
+                                {(searchUsers_loading || !searchUsers) ? (
+                                    <div className="d-flex justify-content-center my-5">
+                                        <DropAnimation />
+                                    </div>
+                                ) : !!searchUsers?.length ? (
+                                    <ul className="userInputList">
+                                        {searchUsers?.
+                                            filter(u => !userHandlesAdding.includes(u.handle))?.
+                                            filter(u => !representatives?.find(r => r.handle === u.handle))?.
+                                            filter(u => liquidUser?.handle !== u.handle)?.
+                                            map(
+                                                u => (
+                                                    <RepresentativeInList
+                                                        key={u.handle}
+                                                        u={u}
+                                                        // isRemoving={userHandlesRemoving.includes(u.handle)}
+                                                        buttonText="give representation"
+                                                        buttonFunction={() => giveRepresentation(u)}
+                                                    />
                                                 )
-                                            }
-                                        </ul>
-                                    )}
+                                            )
+                                        }
+                                    </ul>
+                                ) : (
+                                    <p className="my-3">no matches</p>
+                                )}
+
                             </div>
                         </div>
                     </div>

@@ -168,7 +168,7 @@ export default function Question() {
                                 </>
                             )}
                         </div> */}
-                        <small data-tip="Created on">
+                        <small data-tip="Poll launched on">
                             {/* <small className="time-ago" data-tip="Last vote was"> */}
                             {timeAgo.format(new Date(Number(question_data?.Question?.createdOn)))}
                         </small>

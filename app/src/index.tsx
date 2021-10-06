@@ -92,8 +92,6 @@ const AppolloAppWrapper: FunctionComponent<{}> = ({ }) => {
                     variables: { Auth0User: user }
                 }).then(() => client.reFetchObservableQueries());
                 await setTimeout(async () => await client.reFetchObservableQueries(), 1000);
-
-                // TODO: Continue login logic here, currently it continues on SideMenu
             }
             login();
         } else {

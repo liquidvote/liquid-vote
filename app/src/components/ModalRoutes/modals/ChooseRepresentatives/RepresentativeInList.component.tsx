@@ -32,11 +32,11 @@ export const RepresentativeInList: FunctionComponent<{
                         className="badge inverted"
                     >giving representation</small>
                 ) : !!buttonText ? (
-                    <small
-                        className="badge pointer"
+                    <div
+                        className="button_ small baseColors"
                         style={{ maxWidth: 'none' }}
                         onClick={buttonFunction}
-                    >{buttonText}</small>
+                    >{buttonText}</div>
                 ) : null}
             </div>
         </li>

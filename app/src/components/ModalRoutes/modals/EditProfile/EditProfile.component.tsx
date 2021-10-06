@@ -16,8 +16,8 @@ import './style.sass';
 
 interface IFormValues {
     name: string
-    location: string
     handle: string
+    location: string
     avatar: string | File
     cover: string | File
     bio: string
@@ -51,13 +51,22 @@ export const EditProfile: FunctionComponent<{}> = ({ }) => {
     }] = useMutation(EDIT_USER);
 
     const {
-        handleSubmit, register, formState: { errors }, watch, setValue
+        handleSubmit, register, formState: { errors }, watch, setValue, getValues, setError
     } = useForm<IFormValues>({
         mode: 'onChange'
     });
+
+    const {
+        refetch: getUserForHandle,
+        loading: UserForHandle_loading
+    } = useQuery(USER, {
+        skip: !getValues().handle || getValues().handle === user_data?.User?.handle
+        // notifyOnNetworkStatusChange: true,
+    });
+
+
     const onSubmit = async (values: any) => {
         setIsSubmitting(true);
-
 
         const User = {
             ...values,
@@ -78,6 +87,7 @@ export const EditProfile: FunctionComponent<{}> = ({ }) => {
 
     useEffect(() => {
         setValue('name', user_data?.User?.name);
+        setValue('handle', user_data?.User?.handle);
         setValue('location', user_data?.User?.location);
         setValue('bio', user_data?.User?.bio);
         setValue('externalLink', user_data?.User?.externalLink);
@@ -94,14 +104,16 @@ export const EditProfile: FunctionComponent<{}> = ({ }) => {
                 paramsToAdd: { refetch: 'user' }
             });
         }
-    }, [editUser_data])
+    }, [editUser_data]);
 
     return (
         <form onSubmit={handleSubmit(onSubmit)}>
 
             <ModalHeader title="Edit Profile" />
 
-            {!isSubmitting ? (
+            {isSubmitting}
+
+            {!isSubmitting && (modalData.userHandle === "new" || user_data?.User?.handle) ? (
                 <div className="Modal-Content">
 
                     <div className="my-3">
@@ -111,13 +123,41 @@ export const EditProfile: FunctionComponent<{}> = ({ }) => {
                                 register={register(name, {
                                     required: true,
                                     validate: {
-                                        tooBig: v => v.length < 15 || 'should be smaller than 15 characters',
+                                        tooBig: v => v.length < 25 || 'should be smaller than 25 characters',
                                     }
                                 })}
                                 value={watch(name)}
                                 error={errors[name]}
                             />
                         ))('name')}
+                    </div>
+
+                    <div className="my-3">
+                        {((name: keyof IFormValues) => (
+                            <TextInput
+                                name={name}
+                                register={register(name, {
+                                    required: true,
+                                    validate: {
+                                        tooBig: v => v.length < 15 || 'should be smaller than 15 characters',
+                                        existingHandle: async v => {
+                                            if (v?.length === 0) return 'can\'t be blank';
+                                            if (user_data?.User?.handle === v) return true;
+                                            setError("handle", { type: "loading", message: 'confirming uniqueness' });
+                                            const { data } = await getUserForHandle({ handle: v });
+                                            if(!!data?.User?.handle) {
+                                                return 'this handle is already in use';
+                                            } else {
+                                                return true;
+                                            }
+                                        }
+                                    }
+                                })}
+                                loading={UserForHandle_loading}
+                                value={watch(name)}
+                                error={errors[name]}
+                            />
+                        ))('handle')}
                     </div>
 
                     <div className="my-3">

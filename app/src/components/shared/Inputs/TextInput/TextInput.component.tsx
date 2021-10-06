@@ -16,11 +16,12 @@ type Props = {
     type?: string,
     error?: FieldError | undefined,
     disabled?: boolean,
-    autoFocus?: boolean
+    autoFocus?: boolean,
+    loading?: boolean
 }
 
 export const TextInput: FunctionComponent<Props> = ({
-    register, labelName, name, value, type = 'input', error, disabled, autoFocus
+    register, labelName, name, value, type = 'input', error, disabled, autoFocus, loading
 }) => {
 
     const [isFocused, setIsFocused] = useState(false);
@@ -32,6 +33,14 @@ export const TextInput: FunctionComponent<Props> = ({
             <label>
                 {name}
             </label>
+
+            {(loading || error?.type === 'loading') && (
+                <img
+                    className="vote-avatar loading"
+                    src={'http://images.liquid-vote.com/system/loading.gif'}
+                    alt={'loading'}
+                />
+            )}
             {/* <div className="letter-count">
 
             </div> */}
@@ -46,6 +55,7 @@ export const TextInput: FunctionComponent<Props> = ({
                     onFocus={() => setIsFocused(true)}
                 />
             </div>
+            {/* <pre>{JSON.stringify(error, null, 2)}</pre> */}
             {error && <div className="error">{(error as any).message}</div>}
         </div>
     );
