@@ -1,10 +1,11 @@
-import { ObjectID } from 'mongodb';
+import { ObjectId } from 'mongodb';
 
 import { getGroupStats } from '../Groups/resolvers';
+import { updateInviteStatus } from '../Invites/resolvers';
 
 export const UserResolvers = {
     Query: {
-        User: async (_source, { handle }, { mongoDB, s3, AuthUser }) => {
+        User: async (_source, { handle }, { mongoDB, AuthUser }) => {
 
             const User = await mongoDB.collection("Users")
                 .findOne({ 'LiquidUser.handle': handle });
@@ -14,8 +15,8 @@ export const UserResolvers = {
                 isThisUser: !!AuthUser && AuthUser?.Auth0User?.sub === User?.Auth0User?.sub,
                 isRepresentingYou: (await mongoDB.collection("UserRepresentations")
                     .find({
-                        "representativeId": ObjectID(User._id),
-                        "representeeId": ObjectID(AuthUser?._id),
+                        "representativeId": new ObjectId(User._id),
+                        "representeeId": new ObjectId(AuthUser?._id),
                         "isRepresentingYou": true
                     }).count()) || 0,
                 stats: await getUserStats({ userId: User._id, mongoDB }),
@@ -25,30 +26,94 @@ export const UserResolvers = {
             };
         },
 
-        SearchUsers: async (_source, { text }, { mongoDB, s3, AuthUser }) => {
+        SearchUsers: async (_source, {
+            text,
+            notInGroup,
+            inGroup
+        }, { mongoDB, AuthUser }) => {
+
+            const Group = (notInGroup || inGroup) && await mongoDB.collection("Groups")
+                .findOne({ 'handle': notInGroup || inGroup });
 
             const Users = await mongoDB.collection("Users")
-                .find({
-                    $or: [
-                        { 'LiquidUser.handle': { $regex: text, $options: "i" } },
-                        { 'LiquidUser.name': { $regex: text, $options: "i" } },
-                    ],
-                }).toArray();
-
-            console.log({
-                text,
-                Users
-            });
+                .aggregate([
+                    {
+                        '$match': {
+                            '$or': [
+                                {
+                                    'LiquidUser.handle': {
+                                        '$regex': text,
+                                        '$options': 'i'
+                                    }
+                                }, {
+                                    'LiquidUser.name': {
+                                        '$regex': text,
+                                        '$options': 'i'
+                                    }
+                                }, {
+                                    'LiquidUser.email': text
+                                }
+                            ]
+                        }
+                    },
+                    ...(notInGroup || inGroup) ? [
+                        {
+                            '$lookup': {
+                                'from': 'GroupMembers',
+                                'let': {
+                                    'memberId': '$_id'
+                                },
+                                'pipeline': [
+                                    {
+                                        '$match': {
+                                            '$and': [
+                                                {
+                                                    '$expr': {
+                                                        '$eq': [
+                                                            '$userId', '$$memberId'
+                                                        ]
+                                                    }
+                                                }, {
+                                                    '$expr': {
+                                                        '$eq': [
+                                                            '$groupId', new ObjectId(Group?._id)
+                                                        ]
+                                                    }
+                                                }
+                                            ]
+                                        }
+                                    }
+                                ],
+                                'as': 'groupMemberRelation'
+                            }
+                        }, {
+                            '$addFields': {
+                                'isMember': {
+                                    '$gt': [
+                                        {
+                                            '$size': '$groupMemberRelation'
+                                        }, 0
+                                    ]
+                                }
+                            }
+                        }, {
+                            '$match': {
+                                'isMember': notInGroup ? false : true
+                            }
+                        }
+                    ] : [],
+                ])
+                .toArray();
 
             return Users?.map(u => u.LiquidUser) || [];
         },
 
-        UserRepresenting: async (_source, { handle, groupHandle }, { mongoDB, s3, AuthUser }) => {
+        UserRepresenting: async (_source, { handle, groupHandle }, { mongoDB, AuthUser }) => {
 
             const User = await mongoDB.collection("Users")
                 .findOne({ 'LiquidUser.handle': handle });
 
-            const group = groupHandle && await mongoDB.collection("Groups")
+            const group = !!groupHandle && await mongoDB.collection("Groups")
                 .findOne({ 'handle': groupHandle });
 
             const representeesAndGroups = (
@@ -56,10 +121,10 @@ export const UserResolvers = {
                     [
                         {
                             $match: {
-                                "representativeId": ObjectID(User?._id),
+                                "representativeId": new ObjectId(User?._id),
                                 "isRepresentingYou": true,
-                                ...group && {
-                                    groupId: ObjectID(group._id)
+                                ...!!group && {
+                                    groupId: new ObjectId(group._id)
                                 }
                             }
                         }, {
@@ -102,12 +167,12 @@ export const UserResolvers = {
         UserRepresentedBy: async (
             _source,
             { handle, groupHandle },
-            { mongoDB, s3, AuthUser }
+            { mongoDB, AuthUser }
         ) => {
             const User = await mongoDB.collection("Users")
                 .findOne({ 'LiquidUser.handle': handle });
 
-            const group = groupHandle && await mongoDB.collection("Groups")
+            const group = !!groupHandle && await mongoDB.collection("Groups")
                 .findOne({ 'handle': groupHandle });
 
             const representativesAndGroups = (
@@ -115,10 +180,10 @@ export const UserResolvers = {
                     [
                         {
                             $match: {
-                                "representeeId": ObjectID(User?._id),
+                                "representeeId": new ObjectId(User?._id),
                                 "isRepresentingYou": true,
-                                ...group && {
-                                    groupId: ObjectID(group._id)
+                                ...!!group && {
+                                    groupId: new ObjectId(group._id)
                                 }
                             }
                         }, {
@@ -158,21 +223,21 @@ export const UserResolvers = {
             return representativesAndGroups;
         },
 
-        UserGroups: async (_source, { handle, representative }, { mongoDB, s3, AuthUser }) => {
+        UserGroups: async (_source, { handle, representative }, { mongoDB, AuthUser }) => {
 
             const User = await mongoDB.collection("Users")
                 .findOne({ 'LiquidUser.handle': handle });
 
             const UserGroupMemberRelations = await mongoDB.collection("GroupMembers")
-                .find({ 'userId': ObjectID(User?._id) })
+                .find({ 'userId': new ObjectId(User?._id) })
                 .toArray();
 
             const YourGroupMemberRelations = !!AuthUser && await mongoDB.collection("GroupMembers")
                 .find({
-                    'userId': ObjectID(AuthUser?._id),
+                    'userId': new ObjectId(AuthUser?._id),
                     'groupId': {
                         "$in": UserGroupMemberRelations.map(
-                            r => ObjectID(r.groupId)
+                            r => new ObjectId(r.groupId)
                         )
                     }
                 })
@@ -183,10 +248,10 @@ export const UserResolvers = {
 
             const RepresentativeGroupMemberRelations = !!AuthUser && await mongoDB.collection("GroupMembers")
                 .find({
-                    'userId': ObjectID(Representative?._id),
+                    'userId': new ObjectId(Representative?._id),
                     'groupId': {
                         "$in": UserGroupMemberRelations.map(
-                            r => ObjectID(r.groupId)
+                            r => new ObjectId(r.groupId)
                         )
                     }
                 })
@@ -194,7 +259,7 @@ export const UserResolvers = {
 
             const Groups = await Promise.all((await mongoDB.collection("Groups").find({
                 "_id": {
-                    "$in": UserGroupMemberRelations.map(r => ObjectID(r.groupId))
+                    "$in": UserGroupMemberRelations.map(r => new ObjectId(r.groupId))
                 }
             })
                 .toArray())
@@ -217,9 +282,9 @@ export const UserResolvers = {
                         ...(!!r) && {
                             ... await mongoDB.collection("UserRepresentations")
                                 .findOne({
-                                    representativeId: ObjectID(Representative?._id),
-                                    representeeId: ObjectID(User?._id),
-                                    groupId: ObjectID(g?._id),
+                                    representativeId: new ObjectId(Representative?._id),
+                                    representeeId: new ObjectId(User?._id),
+                                    groupId: new ObjectId(g?._id),
                                 })
                         }
                     }))(RepresentativeGroupMemberRelations && RepresentativeGroupMemberRelations.find(
@@ -229,11 +294,7 @@ export const UserResolvers = {
 
             return Groups;
         },
-        UserVotes: async (_source, { handle, type = 'directVotesMade' }, { mongoDB, s3, AuthUser }) => {
-
-            console.log({
-                type
-            });
+        UserVotes: async (_source, { handle, type = 'directVotesMade' }, { mongoDB, AuthUser }) => {
 
             const User = await mongoDB.collection("Users")
                 .findOne({ 'LiquidUser.handle': handle });
@@ -241,13 +302,13 @@ export const UserResolvers = {
             const votesInCommonGeneralAggregationLogic = (
                 [{
                     '$match': {
-                        'user': ObjectID(User._id),
+                        'user': new ObjectId(User._id),
                     }
                 }, {
                     '$lookup': {
                         'from': 'Votes',
                         'let': {
-                            'userId': ObjectID(AuthUser._id),
+                            'userId': new ObjectId(AuthUser._id),
                             'questionText': '$questionText',
                             'choiceText': '$choiceText',
                             'group': '$group',
@@ -309,6 +370,9 @@ export const UserResolvers = {
                     }
                 }, {
                     '$addFields': {
+                        'byYou': {
+                            '$eq': ['$user', new ObjectId(AuthUser?._id)]
+                        },
                         'bothDirect': {
                             '$and': [
                                 {
@@ -423,10 +487,88 @@ export const UserResolvers = {
                 ]
             );
 
+            const representeeVotesAggregationLogic = (
+                [
+                    {
+                        '$lookup': {
+                            'from': 'Votes',
+                            'let': {
+                                'representativeId': { '$toObjectId': '$user' },
+                                'questionText': '$questionText',
+                                'choiceText': '$choiceText',
+                                'group': '$groupChannel.group',
+                                'channel': '$groupChannel.channel'
+                            },
+                            'pipeline': [
+                                {
+                                    '$match': {
+                                        '$and': [
+                                            {
+                                                '$expr': {
+                                                    '$eq': [
+                                                        '$questionText', '$$questionText'
+                                                    ]
+                                                }
+                                            },
+                                            {
+                                                '$expr': {
+                                                    '$eq': [
+                                                        '$choiceText', '$$choiceText'
+                                                    ]
+                                                }
+                                            },
+                                            {
+                                                '$expr': {
+                                                    '$eq': [
+                                                        '$groupChannel.group', '$$group'
+                                                    ]
+                                                }
+                                            },
+                                            {
+                                                '$expr': {
+                                                    '$eq': [
+                                                        '$groupChannel.channel', '$$channel'
+                                                    ]
+                                                }
+                                            }
+                                        ]
+                                    }
+                                }, {
+                                    '$unwind': '$representatives'
+                                }, {
+                                    '$match': {
+                                        '$expr': {
+                                            '$eq': [
+                                                '$representatives.representativeId', {
+                                                    '$toObjectId': '$$representativeId'
+                                                }
+                                            ]
+                                        }
+                                    }
+                                }, {
+                                    '$lookup': {
+                                        'from': 'Users',
+                                        'localField': 'user',
+                                        'foreignField': '_id',
+                                        'as': 'user'
+                                    }
+                                },
+                                {
+                                    '$addFields': {
+                                        'user': { '$first': '$user.LiquidUser' }
+                                    }
+                                }
+                            ],
+                            'as': 'representeeVotes'
+                        }
+                    }
+                ]
+            );
+
             const Votes = await (async (type) => {
                 return {
                     'directVotesMade': async () => await mongoDB.collection("Votes")
-                        // .find({ 'user': ObjectID(User?._id), 'isDirect': true })
+                        // .find({ 'user': new ObjectId(User?._id), 'isDirect': true })
                         .aggregate([
                             ...votesInCommonGeneralAggregationLogic,
                             {
@@ -434,6 +576,7 @@ export const UserResolvers = {
                                     'isDirect': true
                                 }
                             },
+                            ...representeeVotesAggregationLogic,
                             ...questionStatsAggregationLogic
                         ])
                         .toArray(),
@@ -443,9 +586,11 @@ export const UserResolvers = {
                             {
                                 '$match': {
                                     'InAgreement': true,
-                                    'bothDirect': true
+                                    'bothDirect': true,
+                                    'byYou': false
                                 }
                             },
+                            ...representeeVotesAggregationLogic,
                             ...questionStatsAggregationLogic
                         ])
                         .toArray(),
@@ -455,14 +600,16 @@ export const UserResolvers = {
                             {
                                 '$match': {
                                     'InAgreement': false,
-                                    'bothDirect': true
+                                    'bothDirect': true,
+                                    'byYou': false
                                 }
                             },
+                            ...representeeVotesAggregationLogic,
                             ...questionStatsAggregationLogic
                         ])
                         .toArray(),
                     'indirectVotesMadeForUser': async () => await mongoDB.collection("Votes")
-                        // .find({ 'user': ObjectID(User?._id), 'isDirect': false })
+                        // .find({ 'user': new ObjectId(User?._id), 'isDirect': false })
                         .aggregate([
                             ...votesInCommonGeneralAggregationLogic,
                             {
@@ -470,6 +617,7 @@ export const UserResolvers = {
                                     'isDirect': false
                                 }
                             },
+                            ...representeeVotesAggregationLogic,
                             ...questionStatsAggregationLogic
                         ])
                         .toArray(),
@@ -481,6 +629,7 @@ export const UserResolvers = {
                                     'yourVoteMadeForUser': true
                                 }
                             },
+                            ...representeeVotesAggregationLogic,
                             ...questionStatsAggregationLogic
                         ])
                         .toArray(),
@@ -492,21 +641,18 @@ export const UserResolvers = {
                                     'yourVoteMadeByUser': true
                                 }
                             },
+                            ...representeeVotesAggregationLogic,
                             ...questionStatsAggregationLogic
                         ])
                         .toArray(),
                 }[type]();
             })(type);
 
-            console.log({
-                Votes
-            });
-
             return Votes;
         },
     },
     Mutation: {
-        editUser: async (_source, { User }, { mongoDB, s3, AuthUser }) => {
+        editUser: async (_source, { User }, { mongoDB, AuthUser }) => {
 
             const updated = (AuthUser && User) ? (
                 await mongoDB.collection("Users").findOneAndUpdate(
@@ -523,10 +669,7 @@ export const UserResolvers = {
                             'LiquidUser.lastEditOn': Date.now(),
                         },
                     },
-                    {
-                        returnNewDocument: true,
-                        returnOriginal: false
-                    }
+                    { returnDocument: 'after' }
                 )
             )?.value : null;
 
@@ -536,36 +679,28 @@ export const UserResolvers = {
             UserHandle,
             GroupHandle,
             Channels,
-            IsMember
-        }, { mongoDB, s3, AuthUser }) => {
+            IsMember,
+            InviteId
+        }, { mongoDB, AuthUser }) => {
 
-            const isUser = !!AuthUser && AuthUser?.LiquidUser?.handle === UserHandle;
-
-            // console.log('edit relation!', {
+            // console.log({
             //     UserHandle,
             //     GroupHandle,
             //     Channels,
             //     IsMember,
-            //     isUser: AuthUser?.LiquidUser?.handle === UserHandle
-            // });
+            //     InviteId
+            // })
+
+            const isUser = !!AuthUser && AuthUser?.LiquidUser?.handle === UserHandle;
 
             const Group = await mongoDB.collection("Groups")
                 .findOne({ 'handle': GroupHandle });
 
             const GroupsMemberRelation = await mongoDB.collection("GroupMembers")
                 .findOne({
-                    'userId': ObjectID(AuthUser._id),
-                    'groupId': ObjectID(Group._id)
+                    'userId': new ObjectId(AuthUser._id),
+                    'groupId': new ObjectId(Group._id)
                 });
-
-            // console.log({
-            //     isUser,
-            //     GroupsMemberRelation:  GroupsMemberRelation._id,
-            //     doIsMember: typeof IsMember !== 'undefined',
-            //     IsMember,
-            //     doChannels: typeof Channels !== 'undefined',
-            //     Channels
-            // })
 
             const updatedOrCreated = (isUser && !!GroupsMemberRelation) ? (
                 await mongoDB.collection("GroupMembers").findOneAndUpdate(
@@ -577,21 +712,26 @@ export const UserResolvers = {
                             'lastEditOn': Date.now(),
                         },
                     },
-                    {
-                        returnNewDocument: true,
-                        returnOriginal: false
-                    }
+                    { returnDocument: 'after' }
                 )
             )?.value : isUser ? (
                 await mongoDB.collection("GroupMembers").insertOne({
-                    groupId: ObjectID(Group._id),
-                    userId: ObjectID(AuthUser._id),
+                    groupId: new ObjectId(Group._id),
+                    userId: new ObjectId(AuthUser._id),
                     ...(typeof Channels !== 'undefined') && { 'channels': [...Channels] },
                     ...(typeof IsMember !== 'undefined') && { 'isMember': IsMember },
                     createdOn: Date.now(),
                     lastEditOn: Date.now(),
                 })
             )?.ops[0] : null;
+
+            if (InviteId) {
+                updateInviteStatus({
+                    InviteId,
+                    to: 'accepted',
+                    mongoDB
+                })
+            }
 
             return updatedOrCreated;
         },
@@ -600,7 +740,7 @@ export const UserResolvers = {
             RepresentativeHandle,
             Group,
             IsRepresentingYou
-        }, { mongoDB, s3, AuthUser }) => {
+        }, { mongoDB, AuthUser }) => {
 
             const isUser = AuthUser?.LiquidUser?.handle === RepresenteeHandle;
 
@@ -615,21 +755,10 @@ export const UserResolvers = {
 
             const RepresentativeGroupRelation = await mongoDB.collection("UserRepresentations")
                 .findOne({
-                    representativeId: ObjectID(Representative?._id),
-                    representeeId: ObjectID(Representee?._id),
-                    groupId: ObjectID(Group_?._id),
+                    representativeId: new ObjectId(Representative?._id),
+                    representeeId: new ObjectId(Representee?._id),
+                    groupId: new ObjectId(Group_?._id),
                 });
-
-            // console.log({
-            //     RepresenteeHandle,
-            //     RepresentativeHandle,
-            //     Group,
-            //     IsRepresentingYou,
-
-            //     Representee: Representee._id,
-            //     Representative: Representative._id,
-            //     Group_: Group_._id
-            // })
 
             const updatedOrCreated = (isUser && !!RepresentativeGroupRelation) ? (
                 await mongoDB.collection("UserRepresentations").findOneAndUpdate(
@@ -640,16 +769,13 @@ export const UserResolvers = {
                             'lastEditOn': Date.now(),
                         },
                     },
-                    {
-                        returnNewDocument: true,
-                        returnOriginal: false
-                    }
+                    { returnDocument: 'after' }
                 )
             )?.value : isUser ? (
                 await mongoDB.collection("UserRepresentations").insertOne({
-                    representativeId: ObjectID(Representative?._id),
-                    representeeId: ObjectID(Representee?._id),
-                    groupId: ObjectID(Group_?._id),
+                    representativeId: new ObjectId(Representative?._id),
+                    representeeId: new ObjectId(Representee?._id),
+                    groupId: new ObjectId(Group_?._id),
                     isRepresentingYou: IsRepresentingYou,
                     createdOn: Date.now(),
                     lastEditOn: Date.now(),
@@ -669,24 +795,7 @@ const getUserStats = async ({ userId, mongoDB }) => {
             await mongoDB.collection("UserRepresentations").aggregate(
                 [{
                     $match: {
-                        "representeeId": ObjectID(userId),
-                        "isRepresentingYou": true
-                    }
-                }, {
-                    $group: {
-                        _id: {
-                            "representeeId": "$representeeId"
-                        }
-                    }
-                }, {
-                    $count: 'count'
-                }]
-            ).toArray())?.[0]?.count || 0,
-        representedBy: (
-            await mongoDB.collection("UserRepresentations").aggregate(
-                [{
-                    $match: {
-                        "representativeId": ObjectID(userId),
+                        "representeeId": new ObjectId(userId),
                         "isRepresentingYou": true
                     }
                 }, {
@@ -699,25 +808,45 @@ const getUserStats = async ({ userId, mongoDB }) => {
                     $count: 'count'
                 }]
             ).toArray())?.[0]?.count || 0,
+        representedBy: (
+            await mongoDB.collection("UserRepresentations").aggregate(
+                [{
+                    $match: {
+                        "representativeId": new ObjectId(userId),
+                        "isRepresentingYou": true
+                    }
+                }, {
+                    $group: {
+                        _id: {
+                            "representeeId": "$representeeId"
+                        }
+                    }
+                }, {
+                    $count: 'count'
+                }]
+            ).toArray())?.[0]?.count || 0,
         groupsJoined: await mongoDB.collection("GroupMembers")
             .find({
-                "userId": ObjectID(userId),
+                "userId": new ObjectId(userId),
                 "isMember": true
             }).count(),
         directVotesMade: await mongoDB.collection("Votes")
             .find({
                 "isDirect": true,
-                "user": ObjectID(userId)
+                'position': { $ne: null },
+                "user": new ObjectId(userId)
             }).count(),
         indirectVotesMadeByUser: await mongoDB.collection("Votes")
             .find({
                 "isDirect": false,
-                "representatives.representativeId": ObjectID(userId)
+                'position': { $ne: null },
+                "representatives.representativeId": new ObjectId(userId)
             }).count(),
         indirectVotesMadeForUser: await mongoDB.collection("Votes")
             .find({
                 "isDirect": false,
-                "user": ObjectID(userId)
+                'position': { $ne: null },
+                "user": new ObjectId(userId)
             }).count(),
     });
 }
@@ -729,7 +858,8 @@ const getYourUserStats = async ({ userId, AuthUser, mongoDB }) => {
             .aggregate([
                 {
                     '$match': {
-                        'user': ObjectID(AuthUser._id),
+                        'user': new ObjectId(AuthUser._id),
+                        'position': { $ne: null }
                     }
                 }, {
                     '$lookup': {
@@ -738,8 +868,7 @@ const getYourUserStats = async ({ userId, AuthUser, mongoDB }) => {
                             'userId': userId,
                             'questionText': '$questionText',
                             'choiceText': '$choiceText',
-                            'group': '$group',
-                            'channel': '$channel'
+                            'group': '$groupChannel.group',
                         },
                         'pipeline': [
                             {
@@ -764,14 +893,7 @@ const getYourUserStats = async ({ userId, AuthUser, mongoDB }) => {
                                         {
                                             '$expr': {
                                                 '$eq': [
-                                                    '$group', '$$group'
-                                                ]
-                                            }
-                                        },
-                                        {
-                                            '$expr': {
-                                                '$eq': [
-                                                    '$channel', '$$channel'
+                                                    '$choiceText', '$$choiceText'
                                                 ]
                                             }
                                         }
@@ -837,20 +959,30 @@ const getYourUserStats = async ({ userId, AuthUser, mongoDB }) => {
                             ]
                         },
                         'otherVoteMadeForYou': {
-                            '$gte': [
+                            '$and': [
                                 {
-                                    '$size': {
-                                        '$filter': {
-                                            'input': '$representatives',
-                                            'as': 'r',
-                                            'cond': {
-                                                '$eq': [
-                                                    '$$r.representativeId', '$otherVote.user'
-                                                ]
+
+                                    '$eq': [
+                                        '$isDirect', false
+                                    ]
+                                },
+                                {
+                                    '$gte': [
+                                        {
+                                            '$size': {
+                                                '$filter': {
+                                                    'input': '$representatives',
+                                                    'as': 'r',
+                                                    'cond': {
+                                                        '$eq': [
+                                                            '$$r.representativeId', '$otherVote.user'
+                                                        ]
+                                                    }
+                                                }
                                             }
-                                        }
-                                    }
-                                }, 1
+                                        }, 1
+                                    ]
+                                }
                             ]
                         }
                     }
@@ -937,15 +1069,11 @@ const getYourUserStats = async ({ userId, AuthUser, mongoDB }) => {
             .toArray()
     )?.[0];
 
-    // console.log({
-    //     votesInCommon
-    // });
-
     return {
         votesInCommon: votesInCommon?.votesInCommon || 0, // count
         directVotesInCommon: votesInCommon?.directVotesInCommon || 0, // count it both direct
 
-        directVotesInAgreement: votesInCommon?.directVotesInAgreement || 0, // count if positions differ & both direct
+        directVotesInAgreement: votesInCommon?.directVotesInAgreement || 0, // count if positions are the same & both direct
         directVotesInDisagreement: votesInCommon?.directVotesInDisagreement || 0, // count if positions differ & both direct
 
         indirectVotesMadeByYou: votesInCommon?.indirectVotesMadeByYou || 0, // count if user made indirect vote and you represented him

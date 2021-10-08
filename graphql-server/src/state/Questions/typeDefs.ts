@@ -1,4 +1,4 @@
-import { gql } from "apollo-server";
+import { gql } from "apollo-server-lambda";
 
 export const QuestionTypeDefs = gql`
 
@@ -10,6 +10,8 @@ export const QuestionTypeDefs = gql`
         againstCount: Float                   #
         againstMostRepresentingVoters: [Voter]   #
         againstDirectCount: Float
+        directVotes: Float
+        indirectVotes: Float
     }
 
     type Choice {
@@ -51,14 +53,15 @@ export const QuestionTypeDefs = gql`
         ): Question
         Questions(
             group: String,
-            channels: [String]
+            sortBy: String
         ): [Question]
         QuestionVoters(
             questionText: String,
             choiceText: String,
             group: String,
             channel: String,
-            typeOfVoter: String
+            typeOfVoter: String,
+            sortBy: String
         ): [Vote]
     }
 

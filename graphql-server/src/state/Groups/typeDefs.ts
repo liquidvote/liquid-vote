@@ -1,6 +1,28 @@
-import { gql } from "apollo-server";
+import { gql } from "apollo-server-lambda";
 
 export const GroupTypeDefs = gql`
+
+    type GroupStats {
+        lastDirectVoteOn: String
+        members: Int
+        questions: Int
+        representations: Int
+        directVotesMade: Int
+        indirectVotesMade: Int
+        mostRepresentingMembers: [User]
+    }
+
+    type yourGroupStats {
+        lastDirectVoteOn: String
+        representing: Int
+        representedBy: Int
+        directVotesMade: Int
+        
+        directVotesInAgreement: Int
+        directVotesInDisagreement: Int
+        indirectVotesMadeByYou: Int
+        indirectVotesMadeForYou: Int
+    }
 
     type Group {
         handle: String
@@ -20,25 +42,6 @@ export const GroupTypeDefs = gql`
         representativeRelation: UserRepresentativeGroupRelation
         stats: GroupStats
         yourStats: yourGroupStats
-    }
-
-    type GroupStats {
-        lastDirectVoteOn: String
-        members: Int
-        questions: Int
-        representations: Int
-        directVotesMade: Int
-        indirectVotesMade: Int
-        mostRepresentingMembers: [User]
-    }
-
-    type yourGroupStats {
-        lastDirectVoteOn: String
-        representing: Int
-        representedBy: Int
-        directVotesMade: Int
-        indirectVotesMadeByYou: Int
-        indirectVotesMadeForYou: Int
     }
 
     type Channel {
@@ -76,6 +79,5 @@ export const GroupTypeDefs = gql`
 
     extend type Mutation {
         editGroup(handle: String, Group: JSON): JSON
-        editGroupChannel(handle: String, Channel: JSON): JSON
     }
 `;

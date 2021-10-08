@@ -1,7 +1,7 @@
 import React, { FunctionComponent } from 'react';
 import { Link } from "react-router-dom";
 import { useQuery, useMutation } from "@apollo/client";
-import { AUTH_USER } from "@state/AuthUser/typeDefs";
+import useAuthUser from '@state/AuthUser/authUser.effect';
 
 import LockSVG from "@shared/Icons/Lock.svg";
 import WorldSVG from "@shared/Icons/World.svg";
@@ -21,14 +21,7 @@ export const GroupInList: FunctionComponent<{
     alternativeButton,
 }) => {
 
-        const {
-            loading: authUser_loading,
-            error: authUser_error,
-            data: authUser_data,
-            refetch: authUser_refetch
-        } = useQuery(AUTH_USER);
-
-        const authUser = authUser_data?.authUser;
+        const { liquidUser } = useAuthUser();
 
         const [editGroupMemberChannelRelation, {
             loading: editGroupMemberChannelRelation_loading,
@@ -42,15 +35,13 @@ export const GroupInList: FunctionComponent<{
             group?.yourMemberRelation ||
             editGroupMemberChannelRelation_data?.editGroupMemberChannelRelation?.isMember;
 
-        console.log({ group });
-
         return (
             <div className="d-flex relative border-bottom py-3 mx-n3 px-3">
                 <Link to={`/group/${group.handle}/polls`}>
                     <div
                         className={`small-avatar bg`}
                         style={{
-                            background: group.avatar && `url(${group.avatar}) no-repeat`,
+                            background: group.cover && `url(${group.cover}) no-repeat`,
                             backgroundSize: 'cover'
                         }}
                     ></div>
@@ -90,7 +81,7 @@ export const GroupInList: FunctionComponent<{
                                         <div
                                             onClick={() => editGroupMemberChannelRelation({
                                                 variables: {
-                                                    UserHandle: authUser?.LiquidUser?.handle,
+                                                    UserHandle: liquidUser?.handle,
                                                     GroupHandle: group.handle,
                                                     IsMember: !group?.yourMemberRelation?.isMember
                                                 }
@@ -111,7 +102,7 @@ export const GroupInList: FunctionComponent<{
                     For personal use, Airbnb, long term renting or whatever. */}
                     </small>
                     <div className="d-flex ml-2 mt-2">
-                        {group?.stats?.mostRepresentingMembers?.map((m:  any)  => (
+                        {group?.stats?.mostRepresentingMembers?.slice(0, 6).map((m: any) => (
                             <Link
                                 to={`/profile/${m.handle}`}
                                 title={`${m.name}`}
@@ -122,7 +113,11 @@ export const GroupInList: FunctionComponent<{
                                 }}
                             ></Link>
                         ))}
-                        <div className="vote-avatar count ml-n2">{group?.stats?.members}</div>
+                        <Link
+                            to={`/group-people/${group.handle}/members`}
+                        >
+                            <div className="vote-avatar count ml-n2">{group?.stats?.members}</div>
+                        </Link>
                     </div>
                 </div>
             </div>

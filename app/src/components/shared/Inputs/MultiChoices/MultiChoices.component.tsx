@@ -82,6 +82,7 @@ export const MultiChoices: FunctionComponent<Props> = ({
                                 onFocus={() => setIsFocused(true)}
                                 onChange={e => handleChoiceChange({ i, text: e.target.value })}
                                 value={value[i]?.text}
+                                maxLength={20}
                             />
                         ))}
                     </div>

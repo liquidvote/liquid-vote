@@ -1,30 +1,37 @@
-import { gql } from "apollo-server";
+import { gql } from "apollo-server-lambda";
 
 export const InviteTypeDefs = gql`
 
     type Invite {
-        toWhat: String # Group | Representation | Vote
-        toWhom: String
-        fromWhom: String
+        toWhat: ToWhat
+        toWhom: ToWhom
+        fromWhom: User
         isAccepted: Boolean
-        Object: InviteObject
+        group: Group
+        question: Question
+        status: String # sent | accepted | canceled
 
+        lastSentOn: String
         createdOn: String
         lastEditOn: String
     }
 
-    type InviteObject {
-        id: String
-        handle: String
-        name: String
-        avatar: String
+    type ToWhat {
+        type: String # group | representation | vote | groupAdmin
+        group: Group
+        question: Question
+        user: User
+    }
+
+    type ToWhom {
+        user: User
+        email: String 
     }
 
     extend type Query {
         Invite(handle: String): Invite
         Invites(
             groupHandle: String,
-            inviterUserHandle: String,
             invitedUserHandle: String
         ): [Invite]
     }

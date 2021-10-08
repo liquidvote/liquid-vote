@@ -1,4 +1,4 @@
-import { gql } from "apollo-server";
+import { gql } from "apollo-server-lambda";
 
 export const VoteTypeDefs = gql`
 
@@ -44,6 +44,13 @@ export const VoteTypeDefs = gql`
             group: String,
             channel: String
         ): Vote
+        Votes(
+            questionText: String,
+            groupHandle: String,
+            userHandle: String,
+            type: String,
+            sortBy: String
+        ):  [Vote]
     }
 
     extend type Mutation {

@@ -1,6 +1,29 @@
-import { gql } from "apollo-server";
+import { gql } from "apollo-server-lambda";
 
 export const UserTypeDefs = gql`
+
+    type UserStats {
+        lastDirectVoteOn: String
+        representing: Int                       # inUse
+        representedBy: Int                      # inUse
+        groupsJoined: Int
+        directVotesMade: Int                    # inUse
+        indirectVotesMadeByUser: Int            
+        indirectVotesMadeForUser: Int           # inUse
+    }
+
+    type YourUserStats {
+        # groupsInCommon: Int
+        votesInCommon: Int
+        directVotesInCommon: Int
+        votesInAgreement: Int                   
+        votesInDisagreement: Int
+        
+        directVotesInAgreement: Int             # inUse
+        directVotesInDisagreement: Int          # inUse
+        indirectVotesMadeByYou: Int             # inUse
+        indirectVotesMadeForYou: Int            # inUse
+    }
 
     type User {
         handle: String
@@ -21,28 +44,6 @@ export const UserTypeDefs = gql`
         representationGroups: [Group]
     }
 
-    type UserStats {
-        lastDirectVoteOn: String
-        representing: Int                       # inUse
-        representedBy: Int                      # inUse
-        groupsJoined: Int
-        directVotesMade: Int                    # inUse
-        indirectVotesMadeByUser: Int            
-        indirectVotesMadeForUser: Int           # inUse
-    }
-
-    type YourUserStats {
-        # groupsInCommon: Int
-        votesInCommon: Int
-        directVotesInCommon: Int
-        votesInAgreement: Int                   
-        votesInDisagreement: Int
-        directVotesInAgreement: Int             # inUse
-        directVotesInDisagreement: Int          # inUse
-        indirectVotesMadeByYou: Int             # inUse
-        indirectVotesMadeForYou: Int            # inUse
-    }
-
     type UserRepresentativeGroupRelation {
         representativeId: String
         representeeId: String
@@ -56,7 +57,12 @@ export const UserTypeDefs = gql`
 
     extend type Query {
         User(handle: String): User
-        SearchUsers(text: String): [User]
+        SearchUsers(
+            text: String,
+            notInGroup: String,
+            inGroup: String,
+            notSelf: Boolean
+        ): [User]
         UserRepresenting(handle: String, groupHandle: String): [User] # Users that this user is representing
         UserRepresentedBy(handle: String, groupHandle: String): [User] # Users that this user is represented by
         UserGroups(
@@ -67,6 +73,7 @@ export const UserTypeDefs = gql`
             handle: String,
             type: String
         ):  [Vote]
+        # UserRelatedUsers(groupHandle: String) : [User]
     }
 
     extend type Mutation {
@@ -75,7 +82,8 @@ export const UserTypeDefs = gql`
             UserHandle: String,
             GroupHandle: String,
             Channels: [String],
-            IsMember: Boolean
+            IsMember: Boolean,
+            InviteId: String
         ): GroupMemberRelation
         editUserRepresentativeGroupRelation(
             RepresenteeHandle: String,

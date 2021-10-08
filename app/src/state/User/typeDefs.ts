@@ -36,6 +36,16 @@ export const USER = gql`
   }
 `;
 
+export const SEARCH_USERS = gql`
+  query($text: String!, $notInGroup: String, $inGroup: String) {
+    SearchUsers(text: $text, notInGroup: $notInGroup, inGroup: $inGroup) {
+        handle,
+        name,
+        avatar
+    }
+  }
+`;
+
 export const USER_REPRESENTING = gql`
   query($handle: String!, $groupHandle: String) {
     UserRepresenting(handle: $handle, groupHandle: $groupHandle) {
@@ -172,7 +182,15 @@ export const USER_VOTES = gql`
         }
         createdOn
         lastEditOn
-        # representeeVotes
+        representeeVotes {
+            isDirect
+            position
+            user {
+                handle
+                name
+                avatar
+            }
+        }
         QuestionStats {
             lastVoteOn
             forCount
@@ -224,14 +242,16 @@ export const EDIT_GROUP_MEMBER_CHANNEL_RELATION = gql`
   mutation (
       $UserHandle: String!,
       $GroupHandle: String!,
-      $Channels: [String]
-      $IsMember: Boolean
+      $Channels: [String],
+      $IsMember: Boolean,
+      $InviteId: String
     ) {
     editGroupMemberChannelRelation(
         UserHandle: $UserHandle,
         GroupHandle: $GroupHandle,
-        Channels: $Channels
-        IsMember: $IsMember
+        Channels: $Channels,
+        IsMember: $IsMember,
+        InviteId: $InviteId
     ) {
         createdOn
         lastEditOn

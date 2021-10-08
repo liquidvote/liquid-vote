@@ -27,7 +27,7 @@ export const ModalRoutes: FunctionComponent<{}> = ({ }) => {
             // contentLabel="Example Modal"
             className="Modal"
             overlayClassName="Overlay"
-        // appElement={document.querySelector('#app')}
+            // appElement={document.querySelector('#app')}
         >
             <>
                 {!!allSearchParams.modal && (
@@ -36,7 +36,7 @@ export const ModalRoutes: FunctionComponent<{}> = ({ }) => {
                             <>Error</>
                         }
                         onError={(err) => {
-                            console.log({ err });
+                            console.log({ err, allSearchParams });
                             updateParams({ keysToRemove: ['modal', 'modalData'] })
                         }}
                     >

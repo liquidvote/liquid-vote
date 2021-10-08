@@ -1,17 +1,15 @@
-import { ObjectID } from 'mongodb';
+import { ObjectId } from 'mongodb';
 
 export const QuestionResolvers = {
     Query: {
-        Question: async (_source, { questionText, group, channel }, { mongoDB, s3, AuthUser }) => {
+        Question: async (_source, { questionText, group }, { mongoDB, AuthUser }) => {
 
             const Question = await mongoDB.collection("Questions")
                 .findOne({
                     questionText,
                     'groupChannel.group': group,
-                    'groupChannel.channel': channel
+                    // 'groupChannel.channel': channel
                 });
-
-            // TODO: get User Vote
 
             return {
                 ...Question,
@@ -20,69 +18,108 @@ export const QuestionResolvers = {
                     userVote: {
                         ...await mongoDB.collection("Votes").findOne({
                             questionText: Question?.questionText,
-                            groupChannel: Question?.groupChannel,
+                            'groupChannel.group': Question?.groupChannel?.group,
                             user: AuthUser?._id
                         })
                     }
+                },
+                ...(Question?.questionType === 'multi' && !!AuthUser) && {
+                    // stats: Question?.stats,
+                    choices: await Promise.all(Question?.choices?.map(async (c) => ({
+                        ...c,
+                        userVote: {
+                            ...await mongoDB.collection("Votes").findOne({
+                                questionText: Question?.questionText,
+                                choiceText: c.text,
+                                'groupChannel.group': Question?.groupChannel?.group,
+                                user: AuthUser?._id
+                            })
+                        }
+                    }))),
                 },
                 thisUserIsAdmin: Question?.createdBy === AuthUser?.LiquidUser?.handle,
             };
         },
         Questions: async (_source, {
             group,
-            channels
-        }, { mongoDB, s3, AuthUser }) => {
-
-            // console.log('Questions', { group, channels });
+            sortBy
+        }, { mongoDB, AuthUser }) => {
 
             const Questions = await mongoDB.collection("Questions")
-                .find({ 'groupChannel.group': group })
+                .aggregate(
+                    [
+                        {
+                            '$match': {
+                                'groupChannel.group': group
+                            }
+                        }, {
+                            '$addFields': {
+                                'stats.lastEditOrVote': {
+                                    '$cond': [
+                                        {
+                                            '$gt': [
+                                                '$lastEditOn', '$stats.lastVoteOn'
+                                            ]
+                                        }, '$lastEditOn', '$stats.lastVoteOn'
+                                    ]
+                                },
+                                'stats.totalVotes': {
+                                    '$sum': [
+                                        '$stats.directVotes', '$stats.indirectVotes'
+                                    ]
+                                },
+                                // 'thisUserIsAdmin': {
+                                //     '$eq': ['$createdBy', AuthUser?.LiquidUser?.handle]
+                                // }
+                            }
+                        },
+                        ...(sortBy === 'weight') ? [
+                            {
+                                '$sort': { 'stats.totalVotes': -1 }
+                            }
+                        ] : [],
+                        ...(sortBy === 'time') ? [
+                            {
+                                '$sort': { 'stats.lastEditOrVote': -1 }
+                            }
+                        ] : []
+                    ]
+                )
                 .toArray();
 
+            // TODO: move this logic to the aggregation, it'll run much faster
             return await Promise.all(Questions.map(async (q) => ({
                 ...q,
-                thisUserIsAdmin: q.createdBy === AuthUser?.LiquidUser?.handle,
+                // thisUserIsAdmin: q.createdBy === AuthUser?.LiquidUser?.handle,
                 ...(q.questionType === 'single' && !!AuthUser) && {
-                    stats: {
-                        ...q.stats,
-                    },
                     userVote: await mongoDB.collection("Votes").findOne({
                         questionText: q.questionText,
-                        groupChannel: q.groupChannel,
+                        'groupChannel.group': group,
                         user: AuthUser?._id
                     })
                 },
                 ...(q.questionType === 'multi' && !!AuthUser) && {
-                    choices: Promise.all(q.choices.map(async (c) => ({
+                    choices: await Promise.all(q.choices.map(async (c) => ({
                         ...c,
-                        stats: {
-                            ...q.stats,
-                            userVote: await mongoDB.collection("Votes").findOne({
-                                questionText: q.questionText,
-                                groupChannel: q.groupChannel,
-                                choiceText: q.choiceText,
-                                createdBy: AuthUser?.LiquidUser?.handle
-                            })
-                        },
+                        userVote: await mongoDB.collection("Votes").findOne({
+                            questionText: q.questionText,
+                            'groupChannel.group': group,
+                            choiceText: c.text,
+                            user: AuthUser?._id
+                        })
                     })))
                 }
             })));
         },
-        QuestionVoters: async (_source, { questionText, group, channel, typeOfVoter }, { mongoDB, s3, AuthUser }) => {
-
-
-            // console.log({
-            //     // questionText,
-            //     // group,
-            //     // channel,
-            //     typeOfVoter
-            // });
+        QuestionVoters: async (_source, {
+            questionText, group, typeOfVoter, sortBy
+        }, { mongoDB, AuthUser }) => {
 
             const Question = await mongoDB.collection("Questions")
                 .findOne({
                     questionText,
                     'groupChannel.group': group,
-                    'groupChannel.channel': channel
+                    // 'groupChannel.channel': channel
                 });
 
             const directVoters = async () => (await mongoDB.collection("Votes")
@@ -91,7 +128,7 @@ export const QuestionResolvers = {
                         '$match': {
                             'isDirect': true,
                             "groupChannel.group": group,
-                            "groupChannel.channel": channel,
+                            // "groupChannel.channel": channel,
                             "questionText": questionText,
                             "position": typeOfVoter === 'directFor' ? 'for' : 'against'
                         }
@@ -108,7 +145,7 @@ export const QuestionResolvers = {
                                         questionText,
                                         // choiceText,
                                         'groupChannel.group': group,
-                                        'groupChannel.channel': channel,
+                                        // 'groupChannel.channel': channel,
                                     }
                                 },
                                 { $unwind: '$representatives' },
@@ -147,7 +184,11 @@ export const QuestionResolvers = {
                         }
                     }, {
                         '$sort': {
-                            'representeeCount': -1
+                            ...(sortBy === 'time') ? {
+                                'lastEditOn': -1
+                            } : {
+                                'representeeCount': -1
+                            }
                         }
                     }, {
                         '$lookup': {
@@ -173,9 +214,9 @@ export const QuestionResolvers = {
                     {
                         '$match': {
                             "groupChannel.group": group,
-                            "groupChannel.channel": channel,
+                            // "groupChannel.channel": channel,
                             "questionText": questionText,
-                            'user': new ObjectID(AuthUser._id)
+                            'user': new ObjectId(AuthUser._id)
                         }
                     }, {
                         '$unwind': {
@@ -205,7 +246,7 @@ export const QuestionResolvers = {
                                 {
                                     '$match': {
                                         "groupChannel.group": group,
-                                        "groupChannel.channel": channel,
+                                        // "groupChannel.channel": channel,
                                         "questionText": questionText,
                                     }
                                 }, {
@@ -248,7 +289,11 @@ export const QuestionResolvers = {
                         }
                     }, {
                         '$sort': {
-                            'representeeCount': -1
+                            ...(sortBy === 'time') ? {
+                                'lastEditOn': -1
+                            } : {
+                                'representeeCount': -1
+                            }
                         }
                     }
 
@@ -261,9 +306,9 @@ export const QuestionResolvers = {
                     {
                         '$match': {
                             "groupChannel.group": group,
-                            "groupChannel.channel": channel,
+                            // "groupChannel.channel": channel,
                             "questionText": questionText,
-                            'user': new ObjectID(AuthUser._id)
+                            'user': new ObjectId(AuthUser._id)
                         }
                     }, {
                         '$lookup': {
@@ -275,7 +320,7 @@ export const QuestionResolvers = {
                                 {
                                     '$match': {
                                         "groupChannel.group": group,
-                                        "groupChannel.channel": channel,
+                                        // "groupChannel.channel": channel,
                                         "questionText": questionText,
                                     }
                                 }, {
@@ -332,10 +377,6 @@ export const QuestionResolvers = {
                 .toArray()
             ) : [];
 
-            // console.log({
-            //     directVoters: (await directVoters()).map(v => v.representeeVotes)
-            // });
-
             return [
                 ...(typeOfVoter === 'directFor' || typeOfVoter === 'directAgainst') ?
                     await directVoters() : [],
@@ -348,20 +389,31 @@ export const QuestionResolvers = {
     },
     Mutation: {
         editQuestion: async (_source, {
-            Question, questionText, group, channel
+            Question, questionText, group
         }, {
-            mongoDB, s3, AuthUser
+            mongoDB, AuthUser
         }) => {
 
             const Question_ = await mongoDB.collection("Questions")
-                .findOne({ questionText, group, channel });
+                .findOne({ questionText, group });
 
             const savedQuestion = (AuthUser && questionText === 'new') ?
                 (await mongoDB.collection("Questions").insertOne({
                     'questionType': Question.questionType,
                     'questionText': Question.questionText,
                     'startText': Question.startText,
-                    'choices': Question.choices,
+                    'choices': Question.choices
+                        .filter(c => c.text !== "")
+                        .map(c => ({
+                            ...c,
+                            'stats': {
+                                forCount: 0,
+                                forDirectCount: 0,
+                                againstCount: 0,
+                                againstDirectCount: 0,
+                                lastVoteOn: null,
+                            }
+                        })),
                     'groupChannel': Question.groupChannel,
                     'resultsOn': Question.resultsOn,
 
@@ -386,16 +438,13 @@ export const QuestionResolvers = {
                             'questionType': Question.questionType,
                             'questionText': Question.questionText,
                             'startText': Question.startText,
-                            'choices': Question.choices,
+                            'choices': Question.choices.filter(c => c.text !== ""),
                             'groupChannel': Question.groupChannel,
                             'resultsOn': Question.resultsOn,
                             'lastEditOn': Date.now(),
                         },
                     },
-                    {
-                        returnNewDocument: true,
-                        returnOriginal: false
-                    }
+                    { returnDocument: 'after' }
                 ))?.value : null;
 
             return {
@@ -410,7 +459,7 @@ export const updateQuestionVotingStats = async ({
     questionText,
     choiceText,
     group,
-    channel,
+    // channel,
     mongoDB,
     AuthUser
 }) => {
@@ -420,16 +469,17 @@ export const updateQuestionVotingStats = async ({
             questionText,
             // choiceText,
             'groupChannel.group': group,
-            'groupChannel.channel': channel
+            // 'groupChannel.channel': channel
         });
 
-    const VoteCounts = (await mongoDB.collection("Votes")
+    const VoteCounts = async ({ choiceText }) => (await mongoDB.collection("Votes")
         .aggregate([
             {
                 $match: {
                     "groupChannel.group": group,
-                    "groupChannel.channel": channel,
+                    // "groupChannel.channel": channel,
                     "questionText": questionText,
+                    ...choiceText && { "choiceText": choiceText }
                 },
             },
             {
@@ -480,7 +530,7 @@ export const updateQuestionVotingStats = async ({
         ])
         .toArray())?.[0];
 
-    const DirectVotersByPosition = (await mongoDB.collection("Votes")
+    const DirectVotersByPosition = async ({ choiceText }) => (await mongoDB.collection("Votes")
         .aggregate([
             {
                 '$match': {
@@ -491,8 +541,9 @@ export const updateQuestionVotingStats = async ({
                     // },
                     'isDirect': true,
                     "groupChannel.group": group,
-                    "groupChannel.channel": channel,
+                    // "groupChannel.channel": channel,
                     "questionText": questionText,
+                    ...choiceText && { "choiceText": choiceText }
                 }
             },
             {
@@ -506,8 +557,9 @@ export const updateQuestionVotingStats = async ({
                             $match: {
                                 questionText,
                                 choiceText,
+                                ...choiceText && { "choiceText": choiceText },
                                 'groupChannel.group': group,
-                                'groupChannel.channel': channel,
+                                // 'groupChannel.channel': channel,
                             }
                         },
                         { $unwind: '$representatives' },
@@ -576,18 +628,48 @@ export const updateQuestionVotingStats = async ({
         [curr._id]: curr
     }), {});
 
+    const questionVoteCounts = await VoteCounts({ choiceText: undefined });
+    const questionDirectVotersByPosition = await DirectVotersByPosition({ choiceText: undefined });
+    const choiceVoteCounts = !!choiceText && await VoteCounts({ choiceText });
+    const choiceDirectVotersByPosition = !!choiceText && await DirectVotersByPosition({ choiceText });
+
     const updatedQuestion = (await mongoDB.collection("Questions").findOneAndUpdate(
         { _id: Question_._id },
         {
+
             $set: {
-                'stats.forCount': VoteCounts?.forVotes || 0,
-                'stats.forDirectCount': VoteCounts?.forDirectVotes || 0,
-                'stats.againstCount': VoteCounts?.againstVotes || 0,
-                'stats.againstDirectCount': VoteCounts?.againstDirectVotes || 0,
-                'stats.lastVoteOn': VoteCounts?.lastVoteOn,
-                'stats.forMostRepresentingVoters': DirectVotersByPosition?.for?.voters,
-                'stats.againstMostRepresentingVoters': DirectVotersByPosition?.against?.voters,
-            },
+                'stats.forCount': questionVoteCounts?.forVotes || 0,
+                'stats.forDirectCount': questionVoteCounts?.forDirectVotes || 0,
+                'stats.againstCount': questionVoteCounts?.againstVotes || 0,
+                'stats.againstDirectCount': questionVoteCounts?.againstDirectVotes || 0,
+                'stats.lastVoteOn': questionVoteCounts?.lastVoteOn,
+                'stats.forMostRepresentingVoters': questionDirectVotersByPosition?.for?.voters,
+                'stats.againstMostRepresentingVoters': questionDirectVotersByPosition?.against?.voters,
+                'stats.directVotes': questionVoteCounts?.forDirectVotes + questionVoteCounts?.againstDirectVotes || 0,
+                'stats.indirectVotes':
+                    (questionVoteCounts?.forVotes - questionVoteCounts?.forDirectVotes) +
+                    (questionVoteCounts?.againstVotes - questionVoteCounts?.againstDirectVotes) || 0,
+                ...(!!choiceText) && {
+                    'choices': Question_.choices.map(c => ({
+                        ...c,
+                        ...(c.text === choiceText) && {
+                            stats: {
+                                'forCount': choiceVoteCounts?.forVotes || 0,
+                                'forDirectCount': choiceVoteCounts?.forDirectVotes || 0,
+                                'againstCount': choiceVoteCounts?.againstVotes || 0,
+                                'againstDirectCount': choiceVoteCounts?.againstDirectVotes || 0,
+                                'lastVoteOn': choiceVoteCounts?.lastVoteOn,
+                                'forMostRepresentingVoters': choiceDirectVotersByPosition?.for?.voters,
+                                'againstMostRepresentingVoters': choiceDirectVotersByPosition?.against?.voters,
+                                'directVotes': choiceVoteCounts?.forDirectVotes + choiceVoteCounts?.againstDirectVotes || 0,
+                                'indirectVotes':
+                                    (choiceVoteCounts?.forVotes - choiceVoteCounts?.forDirectVotes) +
+                                    (choiceVoteCounts?.againstVotes - choiceVoteCounts?.againstDirectVotes) || 0,
+                            }
+                        }
+                    }))
+                }
+            }
         },
         {
             returnNewDocument: true,
@@ -595,5 +677,7 @@ export const updateQuestionVotingStats = async ({
         }
     ))?.value
 
-    return updatedQuestion?.stats;
+    return !choiceText ?
+        updatedQuestion?.stats :
+        updatedQuestion?.choices.find(c => c.text === choiceText)?.stats;
 }

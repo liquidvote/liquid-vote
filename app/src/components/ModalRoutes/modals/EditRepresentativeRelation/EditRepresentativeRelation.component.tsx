@@ -6,7 +6,7 @@ import GroupInList from "@shared/GroupInList";
 import TextInput from "@shared/Inputs/TextInput";
 import useSearchParams from "@state/Global/useSearchParams.effect";
 import { USER, USER_GROUPS, EDIT_USER_REPRESENTATIVE_GROUP_RELATION } from "@state/User/typeDefs";
-import { AUTH_USER } from "@state/AuthUser/typeDefs";
+import useAuthUser from '@state/AuthUser/authUser.effect';
 
 import ModalHeader from "../../shared/ModalHeader";
 import './style.sass';
@@ -16,12 +16,7 @@ export const EditRepresentativeRelation: FunctionComponent<{}> = ({ }) => {
     const { allSearchParams, updateParams } = useSearchParams();
     const modalData = JSON.parse(allSearchParams.modalData);
 
-    const {
-        loading: authUser_loading,
-        error: authUser_error,
-        data: authUser_data,
-        refetch: authUser_refetch
-    } = useQuery(AUTH_USER);
+    const { liquidUser } = useAuthUser();
 
     const {
         loading: yourGroups_loading,
@@ -30,10 +25,10 @@ export const EditRepresentativeRelation: FunctionComponent<{}> = ({ }) => {
         refetch: yourGroups_refetch
     } = useQuery(USER_GROUPS, {
         variables: {
-            handle: authUser_data?.authUser?.LiquidUser?.handle,
+            handle: liquidUser?.handle,
             representative: modalData.userHandle
         },
-        skip: !authUser_data?.authUser
+        skip: !liquidUser
     });
 
     const {
@@ -105,7 +100,7 @@ export const EditRepresentativeRelation: FunctionComponent<{}> = ({ }) => {
                                         onClick={
                                             () => editUserRepresentativeGroupRelation({
                                                 variables: {
-                                                    RepresenteeHandle: authUser_data?.authUser?.LiquidUser?.handle,
+                                                    RepresenteeHandle: liquidUser?.handle,
                                                     RepresentativeHandle: representative_data?.User?.handle,
                                                     Group: g.handle,
                                                     IsRepresentingYou: !g.representativeRelation?.isRepresentingYou

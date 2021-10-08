@@ -25,7 +25,7 @@ $theme5-colors: ("bg": #0b414d, "primary": #08f3a5, "secondary": white, "border"
         fill: map-get($theme, "bg") !important
         background: map-get($theme, "bg")
 
-    &.AppContainer, .AppContainer, .Modal, .Modal-Header
+    &.AppContainer, .AppContainer, .Modal, .Modal-Header, .baseColors
         background: map-get($theme, "bg")
         color: map-get($theme, "primary")
 
@@ -205,6 +205,10 @@ form
     background: inherit
     white-space: nowrap
     height: fit-content
+    user-select: none
+
+    &:hover:not([disabled], .inverted, .selected)
+        background-color: rgba(0,0,0,0.1)
 
     &.small
         font-size: 12px
@@ -221,6 +225,9 @@ form
         border: 1px solid rgba(255,255,255, 0.5)
         color: rgba(255,255,255, 0.5)
         cursor: default
+
+    &.min-w
+        min-width: 97px
 
 .svgText
     font-size: 13px
@@ -308,6 +315,25 @@ hr
     flex-direction: column
     align-items: center
     padding-top: 10px
+
+    @media (max-width: 768px)
+        position: fixed
+        bottom: 0
+        width: 100vw
+        height: 50px
+        flex-direction: row
+        z-index: 2
+        background: #0b414d
+        justify-content: space-around
+        align-items: center
+        padding: 0
+        border-top: 1px solid rgba(0, 0, 0, 0.3)
+
+        .icon
+            margin-bottom: 0 !important
+
+        .hide-on-smaller-sideMenu
+            display: none
 
     .icon
         margin-bottom: 20px
@@ -400,7 +426,7 @@ hr
     opacity: 0.7
 
 .vote-avatar
-    background-size: cover
+    background-size: cover !important
     border-radius: 150px
     height: 30px
     width: 30px
@@ -464,6 +490,11 @@ hr
 
     .nav-link
         padding: 0.5rem 0rem
+        height: 100%
+        line-height: normal
+
+        *
+            padding: 0 3px
 
     .active
         border-bottom: 1px solid
@@ -514,6 +545,10 @@ hr
     display: flex
     justify-content: center
     align-items: center
+    z-index: 1
+
+    @media (max-width: 768px)
+        bottom: 50px
 
     .Modal
         display: flex
@@ -521,6 +556,7 @@ hr
         position: relative
         border-radius: 20px
         width: 500px
+        max-width: 100%
         outline: none
         max-height: calc(100% - 30px)
 
@@ -537,6 +573,7 @@ hr
     position: absolute
     top: 0
     right: 0
+    z-index: 1
 
 .small-for-against-buttons-container
     .button_
@@ -574,7 +611,7 @@ hr
         pointer-events: none
         text-transform: capitalize
 
-    input, select
+    input, select, textarea, .input-element
         outline: none
         box-sizing: border-box
         width: 100%
@@ -611,3 +648,10 @@ hr
     color: red
     font-size: 0.8rem
     padding: 0px 10px 10px
+
+.pre-wrap
+    white-space: pre-wrap
+
+.clickable
+    user-select: none
+    cursor: pointer

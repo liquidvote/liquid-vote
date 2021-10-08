@@ -1,12 +1,11 @@
 import React, { FunctionComponent } from 'react';
-import Header from "@shared/Header";
 import { Link, useParams } from "react-router-dom";
-import { useQuery } from "@apollo/client";
 
-import PersonInList from '@shared/PersonInList';
-import { people } from "@state/Mock/People";
-import { USER, USER_REPRESENTING, USER_REPRESENTED_BY } from "@state/User/typeDefs";
+import { useQuery } from "@apollo/client";
 import DropAnimation from '@components/shared/DropAnimation';
+import Header from "@shared/Header";
+import PersonInList from '@shared/PersonInList';
+import { USER, USER_REPRESENTED_BY, USER_REPRESENTING } from "@state/User/typeDefs";
 
 import './style.sass';
 
@@ -41,11 +40,6 @@ export const ProfilePeople: FunctionComponent<{}> = ({ }) => {
         variables: { handle }
     });
 
-    console.log({
-        user_representing_data,
-        user_represented_by_data
-    })
-
     const profile = user_data?.User;
 
     return user_loading ? (
@@ -59,12 +53,12 @@ export const ProfilePeople: FunctionComponent<{}> = ({ }) => {
             <ul className="nav d-flex justify-content-around mt-1 mb-n4 mx-n3">
                 <li className="nav-item">
                     <Link className={`nav-link ${which === 'representing' && 'active'}`} to={`/profile-people/${profile.handle}/representing`}>
-                        <b>{profile.representing}</b> Representing {profile.name}
+                        <b>{profile?.stats?.representing}</b> Representing {profile.name}
                     </Link>
                 </li>
                 <li className="nav-item">
                     <Link className={`nav-link ${which === 'representedBy' && 'active'}`} to={`/profile-people/${profile.handle}/representedBy`}>
-                        <b>{profile.represented}</b> Represented by {profile.name}
+                        <b>{profile?.stats?.representedBy}</b> Represented by {profile.name}
                     </Link>
                 </li>
             </ul>
@@ -72,26 +66,30 @@ export const ProfilePeople: FunctionComponent<{}> = ({ }) => {
             <hr />
 
             {which === 'representedBy' && (
-                // <pre>{JSON.stringify(user_representing_data?.UserRepresenting, null, 2)}</pre>
                 <div className="mt-n2">
                     {user_representing_data?.UserRepresenting?.map((el, i) => (
                         <PersonInList person={el} />
                     ))}
-                    {!user_representing_data?.UserRepresenting?.length && (
+                    {(!user_representing_data?.UserRepresenting?.length && !user_representing_loading) && (
                         <div className="p-4 text-center">{`${profile?.name} isn't represented by anyone yet.`}</div>
                     )}
                 </div>
             )}
 
             {which === 'representing' && (
-                // <pre>{JSON.stringify(user_represented_by_data?.UserRepresented, null, 2)}</pre>
                 <div className="mt-n2">
                     {user_represented_by_data?.UserRepresentedBy?.map((el, i) => (
                         <PersonInList person={el} />
                     ))}
-                    {!user_represented_by_data?.UserRepresentedBy?.length && (
+                    {(!user_represented_by_data?.UserRepresentedBy?.length && !user_represented_by_loading) && (
                         <div className="p-4 text-center">{`${profile?.name} isn't representing anyone yet.`}</div>
                     )}
+                </div>
+            )}
+
+            {(user_representing_loading || user_representing_loading) && (
+                <div className="d-flex justify-content-center mt-5">
+                    <DropAnimation />
                 </div>
             )}
         </>

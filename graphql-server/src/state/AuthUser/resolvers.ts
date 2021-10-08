@@ -2,18 +2,16 @@
 
 export const AuthUserResolvers = {
     Query: {
-        authUser: async (_source, { }, { mongoDB, s3, AuthUser }) => {
+        authUser: async (_source, { }, { mongoDB, AuthUser }) => {
 
             return AuthUser;
         },
     },
     Mutation: {
-        authUserLoggedIn: async (_source, { Auth0User }, { mongoDB, s3 }) => {
+        authUserLoggedIn: async (_source, { Auth0User }, { mongoDB }) => {
 
             const AuthUser = await mongoDB.collection("Users")
                 .findOne({ 'Auth0User.sub': Auth0User.sub });
-
-            // console.log({ authUserLoggedIn: AuthUser });
 
             if (!AuthUser) {
 

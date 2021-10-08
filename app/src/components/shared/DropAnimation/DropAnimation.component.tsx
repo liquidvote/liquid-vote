@@ -4,7 +4,7 @@ import './style.sass';
 
 export const DropAnimation: FunctionComponent<{}> = ({ }) => {
     return (
-        <div className="wrapper">
+        <div className="drop-wrapper">
             <div>
                 <div className="ripple-wrapper">
                     <div className="wave_1 outer-shadow"></div>

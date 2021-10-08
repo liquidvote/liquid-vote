@@ -4,7 +4,7 @@ import { Auth0Provider } from "@auth0/auth0-react";
 import { ApolloProvider, ApolloClient, createHttpLink, InMemoryCache } from '@apollo/client';
 // import { InMemoryCache } from "apollo-cache-inmemory";
 import { setContext } from '@apollo/client/link/context';
-import { persistCache } from 'apollo-cache-persist';
+import { persistCache, LocalStorageWrapper } from 'apollo3-cache-persist';
 import localforage from "localforage";
 import { useAuth0 } from "@auth0/auth0-react";
 import env from '@env';
@@ -21,24 +21,40 @@ const AppolloAppWrapper: FunctionComponent<{}> = ({ }) => {
         uri: env.graphql,
     });
 
+    const cache = new InMemoryCache();
+
+    // TODO: await before instantiating ApolloClient, else queries might run before the cache is persisted
+    // persistCache({
+    //     cache,
+    //     storage: new LocalStorageWrapper(window.localStorage),
+    // });
+
     const client = new ApolloClient({
         link: httpLink,
-        cache: new InMemoryCache()
+        credentials: 'include',
+        cache
     });
 
     useEffect(() => {
         if (user) {
-            const authLink = setContext((_, { headers }) => {
-                return {
-                    headers: {
-                        ...headers,
-                        authorization: user?.sub,
+            const login = async () => {
+                const authLink = await setContext((_, { headers }) => {
+                    return {
+                        headers: {
+                            ...headers,
+                            authorization: user?.sub,
+                        }
                     }
-                }
-            });
-            client.setLink(authLink.concat(httpLink));
-            client.mutate({ mutation: AUTH_USER_LOGGEDIN, variables: { Auth0User: user } });
+                });
+                await client.setLink(authLink.concat(httpLink));
+                await client.mutate({
+                    mutation: AUTH_USER_LOGGEDIN,
+                    variables: { Auth0User: user }
+                });
 
+                // TODO: Continue login logic here, currently it continues on SideMenu
+            }
+            login();
         } else {
             client.setLink(httpLink);
         }

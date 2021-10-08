@@ -1,13 +1,19 @@
-import React, { FunctionComponent, useEffect } from 'react';
+import React, { FunctionComponent, useEffect, useState } from 'react';
 import { useForm } from "react-hook-form";
 import { useQuery, useMutation } from "@apollo/client";
+import { useHistory } from "react-router-dom";
 
 import TextInput from "@shared/Inputs/TextInput";
+import ImageInput from "@shared/Inputs/ImageInput";
+import TextAreaInput from "@shared/Inputs/TextAreaInput";
 import DropDownInput from "@shared/Inputs/DropDownInput";
 import AdminsInput from "@shared/Inputs/AdminsInput";
+import ChannelsInput from "@shared/Inputs/ChannelsInput";
 import useSearchParams from "@state/Global/useSearchParams.effect";
-import { GROUP, EDIT_GROUP } from "@state/Group/typeDefs";
-import { AUTH_USER } from "@state/AuthUser/typeDefs";
+import useFileUploader from "@state/S3/useFileUploader.effect";
+import DropAnimation from '@components/shared/DropAnimation';
+import useAuthUser from '@state/AuthUser/authUser.effect';
+import useGroup from '@state/Group/group.effect';
 
 import ModalHeader from "../../shared/ModalHeader";
 import './style.sass';
@@ -16,97 +22,104 @@ interface IFormValues {
     name: string
     handle: string
     // avatar: string
-    cover: string
+    cover: string | File
     bio: string
     externalLink: string,
+    channels: any,
     admins: any
     privacy: string
 }
 
 export const EditGroup: FunctionComponent<{}> = ({ }) => {
 
+    const history = useHistory();
     const { allSearchParams, updateParams } = useSearchParams();
     const modalData = JSON.parse(allSearchParams.modalData);
+    const { uploadFile } = useFileUploader();
 
-    const {
-        loading: authUser_loading,
-        error: authUser_error,
-        data: authUser_data,
-        refetch: authUser_refetch
-    } = useQuery(AUTH_USER);
+    const [isSubmitting, setIsSubmitting] = useState(false);
 
-    const authUser = authUser_data?.authUser;
-
-    const {
-        loading: group_loading,
-        error: group_error,
-        data: group_data,
-        refetch: group_refetch
-    } = useQuery(GROUP, {
-        variables: { handle: modalData.groupHandle },
-        skip: modalData.groupHandle === "new"
-    });
-
-    const [editGroup, {
-        loading: editGroup_loading,
-        error: editGroup_error,
-        data: editGroup_data,
-    }] = useMutation(EDIT_GROUP);
+    const { liquidUser } = useAuthUser();
+    const { group, editGroup, editedGroup } = useGroup({ handle: modalData?.groupHandle });
 
     const {
         handleSubmit, register, formState: { errors }, watch, setValue
     } = useForm<IFormValues>({
         mode: 'onChange'
     });
-    const onSubmit = (values: any) => {
-        console.log(values);
+    const onSubmit = async (values: any) => {
+        setIsSubmitting(true);
 
-        editGroup({ variables: { Group: values, handle: modalData.groupHandle } });
+        editGroup({
+            variables: {
+                Group: {
+                    ...values,
+                    // avatar: !!values.avatar && typeof values.avatar === 'string' ? values.avatar : await uploadFile({ file: values.avatar }),
+                    cover: !!values.cover && typeof values.cover === 'string' ? values.cover : await uploadFile({ file: values.cover })
+
+                },
+                handle: modalData.groupHandle
+            }
+        });
     }
 
     useEffect(() => {
-        console.log({
-            group_data,
-            modalData
-        })
-        setValue('handle', group_data?.Group.handle);
-        setValue('name', group_data?.Group.name);
-        setValue('bio', group_data?.Group.bio);
-        setValue('externalLink', group_data?.Group.externalLink);
-        // setValue('avatar', group_data?.Group.avatar);
-        setValue('cover', group_data?.Group.cover);
-        setValue('admins', group_data?.Group.admins || [{
-            handle: authUser?.LiquidUser?.handle,
-            name: authUser?.LiquidUser?.name,
-            avatar: authUser?.LiquidUser?.avatar,
+        setValue('handle', group?.handle);
+        setValue('name', group?.name);
+        setValue('bio', group?.bio);
+        setValue('externalLink', group?.externalLink);
+        // setValue('avatar', group?.avatar);
+        setValue('cover', group?.cover);
+        setValue('channels', group?.channels || ['general']);
+        setValue('admins', group?.admins || [{
+            handle: liquidUser?.handle,
+            name: liquidUser?.name,
+            avatar: liquidUser?.avatar,
         }]);
-        setValue('privacy', group_data?.Group.privacy);
-    }, [group_data]);
+        setValue('privacy', group?.privacy);
+    }, [group]);
 
     useEffect(() => {
-        if (editGroup_data) {
+        if (!!editedGroup) {
 
             if (modalData.groupHandle === "new") {
-                alert("new group created!!")
-                console.log({ editGroup_data });
-                // TODO: navigate to new group
+                // console.log("push!!", { g: editedGroup });
+                history.push(`/group/${editedGroup?.handle}`);
+            } else {
+                updateParams({
+                    keysToRemove: ['modal', 'modalData'],
+                    paramsToAdd: { refetch: 'group' }
+                });
             }
-
-            updateParams({
-                keysToRemove: ['modal', 'modalData'],
-                paramsToAdd: { refetch: 'group' }
-            });
         }
-    }, [editGroup_data])
+    }, [editedGroup])
 
     return (
         <form onSubmit={handleSubmit(onSubmit)}>
 
             <ModalHeader title={modalData.groupHandle === "new" ? "Create Group" : "Edit Group"} />
 
-            <div className="Modal-Content">
+            {!isSubmitting ? (
+                <div className="Modal-Content">
 
-                {modalData.groupHandle === "new" && (
+                    {modalData.groupHandle === "new" && (
+                        <div className="my-3">
+                            {((name: keyof IFormValues) => (
+                                <TextInput
+                                    name={name}
+                                    register={register(name, {
+                                        required: true,
+                                        validate: {
+                                            tooBig: v => v.length < 15 || 'should be smaller than 15 characters',
+                                        }
+                                    })}
+                                    value={watch(name)}
+                                    error={errors[name]}
+                                />
+                            ))('handle')}
+                        </div>
+                    )}
+
                     <div className="my-3">
                         {((name: keyof IFormValues) => (
                             <TextInput
@@ -120,79 +133,64 @@ export const EditGroup: FunctionComponent<{}> = ({ }) => {
                                 value={watch(name)}
                                 error={errors[name]}
                             />
-                        ))('handle')}
+                        ))('name')}
                     </div>
-                )}
 
-                <div className="my-3">
-                    {((name: keyof IFormValues) => (
-                        <TextInput
-                            name={name}
-                            register={register(name, {
-                                required: true,
-                                validate: {
-                                    tooBig: v => v.length < 15 || 'should be smaller than 15 characters',
-                                }
-                            })}
-                            value={watch(name)}
-                            error={errors[name]}
-                        />
-                    ))('name')}
-                </div>
+                    <div className="my-3">
+                        {((name: keyof IFormValues) => (
+                            <TextAreaInput
+                                name={name}
+                                register={register(name, {
+                                    required: true
+                                })}
+                                value={watch(name)}
+                                error={errors[name]}
+                            />
+                        ))('bio')}
+                    </div>
 
-                <div className="my-3">
-                    {((name: keyof IFormValues) => (
-                        <TextInput
-                            name={name}
-                            register={register(name, {
-                                required: true
-                            })}
-                            value={watch(name)}
-                            error={errors[name]}
-                        />
-                    ))('bio')}
-                </div>
+                    <div className="my-3">
+                        {((name: keyof IFormValues) => (
+                            <TextInput
+                                name={name}
+                                register={register(name, {
+                                    // required: true
+                                })}
+                                value={watch(name)}
+                                error={errors[name]}
+                            />
+                        ))('externalLink')}
+                    </div>
 
-                <div className="my-3">
-                    {((name: keyof IFormValues) => (
-                        <TextInput
-                            name={name}
-                            register={register(name, {
-                                // required: true
-                            })}
-                            value={watch(name)}
-                            error={errors[name]}
-                        />
-                    ))('externalLink')}
-                </div>
+                    <div className="my-3">
+                        {((name: keyof IFormValues) => (
+                            <ImageInput
+                                name={name}
+                                register={register(name, {
+                                    required: true
+                                })}
+                                value={watch(name)}
+                                error={errors[name]}
+                                setValue={setValue}
+                            />
+                        ))('cover')}
+                    </div>
 
-                <div className="my-3">
-                    {((name: keyof IFormValues) => (
-                        <TextInput
-                            name={name}
-                            register={register(name, {
-                                required: true
-                            })}
-                            value={watch(name)}
-                            error={errors[name]}
-                        />
-                    ))('cover')}
-                </div>
+                    <div className="my-3">
+                        {((name: keyof IFormValues) => (
+                            <AdminsInput
+                                name={name}
+                                register={register(name, {
+                                    required: true
+                                })}
+                                value={watch(name)}
+                                error={errors[name]}
+                                setValue={setValue}
+                            />
+                        ))('admins')}
+                    </div>
 
-                <div className="my-3">
-                    {((name: keyof IFormValues) => (
-                        <AdminsInput
-                            name={name}
-                            register={register(name, {
-                                required: true
-                            })}
-                            value={watch(name)}
-                            error={errors[name]}
-                        />
-                    ))('admins')}
-                </div>
-
-                {/* <div className="my-3">
+                    {/* <div className="my-3">
                     {((name: keyof IFormValues) => (
                         <TextInput
                             name={name}
@@ -205,38 +203,43 @@ export const EditGroup: FunctionComponent<{}> = ({ }) => {
                     ))('cover')}
                 </div> */}
 
-                <div className="my-3">
-                    {((name: keyof IFormValues) => (
-                        <DropDownInput
-                            name={name}
-                            register={register(name, {
-                                required: true
-                            })}
-                            value={watch(name)}
-                            error={errors[name]}
-                            options={[
-                                {
-                                    value: 'private',
-                                    label: 'Private'
-                                }, {
-                                    value: 'public',
-                                    label: 'Public'
-                                }
-                            ]}
-                        />
-                    ))('privacy')}
-                </div>
+                    <div className="my-3">
+                        {((name: keyof IFormValues) => (
+                            <DropDownInput
+                                name={name}
+                                register={register(name, {
+                                    required: true
+                                })}
+                                value={watch(name)}
+                                error={errors[name]}
+                                options={[
+                                    {
+                                        value: 'private',
+                                        label: 'Private'
+                                    }, {
+                                        value: 'public',
+                                        label: 'Public'
+                                    }
+                                ]}
+                            />
+                        ))('privacy')}
+                    </div>
 
-                {/* <select {...register("privacy")}>
+                    {/* <select {...register("privacy")}>
                     <option value="female">female</option>
                     <option value="male">male</option>
                     <option value="other">other</option>
                 </select> */}
 
-                <br />
-                <br />
+                    <br />
+                    <br />
 
-            </div>
+                </div>
+            ) : (
+                <div className="d-flex justify-content-center my-5">
+                    <DropAnimation />
+                </div>
+            )}
         </form >
     );
 }

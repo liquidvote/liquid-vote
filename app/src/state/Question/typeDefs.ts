@@ -4,7 +4,7 @@ export const QUESTION = gql`
   query(
       $questionText: String!,
       $group: String!,
-      $channel: String!
+      $channel: String
     ) {
         Question(
             questionText: $questionText,
@@ -14,7 +14,51 @@ export const QUESTION = gql`
             questionText
             questionType
             startText
-            # choices
+            choices {
+                text
+                stats {
+                    lastVoteOn
+                    forCount
+                    forDirectCount
+                    forMostRepresentingVoters {
+                        handle
+                        avatar
+                        name
+                        representeeCount
+                    }
+                    againstCount
+                    againstMostRepresentingVoters {
+                        handle
+                        avatar
+                        name
+                        representeeCount
+                    }
+                    againstDirectCount
+                    directVotes
+                    indirectVotes
+                }
+                userVote {
+                    position
+                    forWeight
+                    againstWeight
+                    representatives {
+                        representativeHandle
+                        representativeAvatar
+                        representativeName
+                        position
+                        forWeight
+                        againstWeight
+                    }
+                    representeeVotes {
+                        isDirect
+                        position
+                        user {
+                            handle
+                            name
+                        }
+                    }
+                }
+            }
             groupChannel{
                 group
                 channel
@@ -41,6 +85,8 @@ export const QUESTION = gql`
                     representeeCount
                 }
                 againstDirectCount
+                directVotes
+                indirectVotes
             }
             userVote {
                 position
@@ -73,14 +119,16 @@ export const QUESTION_VOTERS = gql`
         $choiceText: String
         $group: String
         $channel: String
-        $typeOfVoter: String
+        $typeOfVoter: String,
+        $sortBy: String
     ) {
         QuestionVoters (
             questionText: $questionText
             choiceText: $choiceText
             group: $group
             channel: $channel
-            typeOfVoter: $typeOfVoter
+            typeOfVoter: $typeOfVoter,
+            sortBy: $sortBy
          ) {
             questionText
             choiceText
@@ -120,8 +168,8 @@ export const QUESTION_VOTERS = gql`
 `;
 
 export const QUESTIONS = gql`
-  query($group: String!, $channels: [String]) {
-    Questions(group: $group, channels: $channels) {
+  query($group: String!, $sortBy: String) {
+    Questions(group: $group, sortBy: $sortBy) {
         questionText
         questionType
         startText
@@ -196,6 +244,8 @@ export const QUESTIONS = gql`
             representeeCount
         }
         againstDirectCount
+        directVotes
+        indirectVotes
     }
 `;
 

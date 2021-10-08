@@ -7,14 +7,14 @@ import MultiVoteInList from "@shared/MultiVoteInList";
 import DropPlusSVG from "@shared/Icons/Drop+.svg";
 import useSearchParams from "@state/Global/useSearchParams.effect";
 import { QUESTIONS } from "@state/Question/typeDefs";
-import { GROUP } from "@state/Group/typeDefs";
+import DropAnimation from "@components/shared/DropAnimation";
 
 import './style.sass';
 
 export const GroupPolls: FunctionComponent<{
-    selectedChannels: any
+    sortBy: any
 }> = ({
-    selectedChannels
+    sortBy
 }) => {
 
         let { handle } = useParams<any>();
@@ -28,20 +28,9 @@ export const GroupPolls: FunctionComponent<{
         } = useQuery(QUESTIONS, {
             variables: {
                 group: handle,
-                channels: selectedChannels
+                sortBy
             }
         });
-
-        const {
-            loading: group_loading,
-            error: group_error,
-            data: group_data,
-            refetch: group_refetch
-        } = useQuery(GROUP, {
-            variables: { handle }
-        });
-
-        // console.log({ questions_data });
 
         useEffect(() => {
             if (allSearchParams.refetch === 'question') {
@@ -52,26 +41,6 @@ export const GroupPolls: FunctionComponent<{
 
         return (
             <>
-
-                {group_data?.Group?.thisUserIsAdmin && (
-                    <div
-                        onClick={() => updateParams({
-                            paramsToAdd: {
-                                modal: "EditQuestion",
-                                modalData: JSON.stringify({
-                                    questionHandle: 'new',
-                                    groupHandle: handle,
-                                })
-                            }
-                        })}
-                        className="button_ mx-3 my-4"
-                    >
-                        <DropPlusSVG />
-                        <div className="ml-2">Create New Poll</div>
-                    </div>
-                )}
-
-
                 {questions_data?.Questions?.map((v: any, i: any) => (
                     <div key={'polls-' + i}>
                         {v.questionType === 'multi' && (
@@ -92,6 +61,18 @@ export const GroupPolls: FunctionComponent<{
                         <hr />
                     </div>
                 ))}
+
+                {questions_data?.Questions?.length === 0 && (
+                    <div className="p-4 text-center">
+                        There are no polls in this group yet
+                    </div>
+                )}
+
+                {questions_loading && (
+                    <div className="d-flex justify-content-center mt-5">
+                        <DropAnimation />
+                    </div>
+                )}
 
             </>
         );

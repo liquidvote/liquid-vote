@@ -4,9 +4,12 @@ import useOnClickOutside from 'use-onclickoutside';
 import './style.sass';
 
 export const Popper: FunctionComponent<{
-    button: any, popperContent: any
+    button: any, popperContent: any,
+    rightOnSmall?: boolean
 }> = ({
-    button, popperContent
+    button,
+    popperContent,
+    rightOnSmall
 }) => {
         const [isVisible, setIsvisible] = useState(false);
 
@@ -21,7 +24,7 @@ export const Popper: FunctionComponent<{
                 </div>
                 <div
                     ref={ref}
-                    className={`popper-content-wrapper ${isVisible && 'is-visible'}`}
+                    className={`popper-content-wrapper ${isVisible && 'is-visible'} ${rightOnSmall && 'rightOnSmall'}`}
                     onClick={() => setTimeout(() => setIsvisible(false))}
                 >
                     {popperContent}

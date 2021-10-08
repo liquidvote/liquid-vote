@@ -5,17 +5,22 @@ const { resolveTsAliases } = require("resolve-ts-aliases");
 
 const isProd = process.env.NODE_ENV === "production";
 
-console.log({ e: process.env.NODE_ENV, __dirname });
+console.log({
+    e: process.env.NODE_ENV,
+    __dirname
+});
 
 const config = {
   mode: isProd ? "production" : "development",
   entry: {
     index: "./src/index.tsx",
   },
+  devtool: isProd ? 'source-map' : 'inline-source-map',
   output: {
     path: `${__dirname}/dist`,
     publicPath: "/",
-    filename: "[name].js",
+    filename: "[name].[contenthash].js",
+    chunkFilename: '[id].chunk.[chunkhash].js',
   },
   resolve: {
     extensions: [".js", ".jsx", ".ts", ".tsx"],
@@ -55,24 +60,18 @@ const config = {
 
 if (isProd) {
   config.optimization = {
+    minimize: true,
     minimizer: [new TerserWebpackPlugin()],
   };
 } else {
   config.devServer = {
-    publicPath: "/",
+    // https: true,
     port: 8080,
     open: true,
     hot: true,
     compress: true,
-    stats: "errors-only",
-    overlay: true,
     historyApiFallback: {
       disableDotRule: true,
-    },
-    watchOptions: {
-        aggregateTimeout: 300,
-        poll: 1500,
-        ignored: 'node_modules/**'
     }
   };
 }

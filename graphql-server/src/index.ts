@@ -1,16 +1,14 @@
-import { ApolloServer, gql } from "apollo-server";
+import { ApolloServer, gql } from "apollo-server-lambda";
 const MongoClient = require("mongodb").MongoClient;
-const AWS = require("aws-sdk");
 
 const atlasCredentials = require("../credentials/atlas-credentials.json");
-const awsCredentials = require("../credentials/aws-credentials.json");
-import { BookTypeDefs, BookResolvers } from "./state/BooksDemo";
 import { AuthUserTypeDefs, AuthUserResolvers } from "./state/AuthUser";
 import { UserTypeDefs, UserResolvers } from "./state/Users";
 import { GroupTypeDefs, GroupResolvers } from "./state/Groups";
 import { QuestionTypeDefs, QuestionResolvers } from "./state/Questions";
 import { VoteTypeDefs, VoteResolvers } from "./state/Votes";
 import { InviteTypeDefs, InviteResolvers } from "./state/Invites";
+import { S3TypeDefs, S3Resolvers } from "./state/S3";
 
 const mongoClient = new MongoClient(
     `mongodb+srv://${atlasCredentials.username}:${atlasCredentials.password}@aiaiaiaminhavida.oobyz.mongodb.net/Enron?retryWrites=true&w=majority`,
@@ -20,10 +18,18 @@ const mongoClient = new MongoClient(
     }
 );
 
-const s3 = new AWS.S3({
-    accessKeyId: awsCredentials.accessKeyId,
-    secretAccessKey: awsCredentials.secretAccessKey,
-});
+let LiquidVoteDBCached = null
+const getDBConnection = async () => {
+    if (LiquidVoteDBCached === null) {
+        console.log('db not cached');
+        const LiquidVoteDB = (await mongoClient.connect()).db("LiquidVote");
+        LiquidVoteDBCached = LiquidVoteDB;
+        return LiquidVoteDBCached;
+    } else {
+        console.log('db cached');
+        return LiquidVoteDBCached;
+    }
+}
 
 const QueryTypeDefs = gql`
     scalar JSON
@@ -38,61 +44,69 @@ const QueryTypeDefs = gql`
     }
 `;
 
-mongoClient.connect(async (err) => {
-    const mongoDB = mongoClient.db("LiquidVote");
-  
+const createHandler = async () => {
+    const DBConnection = (await getDBConnection());
     const server = new ApolloServer({
         typeDefs: [
             QueryTypeDefs,
-            BookTypeDefs,
             AuthUserTypeDefs,
             UserTypeDefs,
             GroupTypeDefs,
             QuestionTypeDefs,
             VoteTypeDefs,
-            InviteTypeDefs
+            InviteTypeDefs,
+            S3TypeDefs
         ],
         resolvers: {
-            ...BookResolvers,
             ...AuthUserResolvers,
             ...UserResolvers,
             ...GroupResolvers,
             ...QuestionResolvers,
             ...VoteResolvers,
             ...InviteResolvers,
+            ...S3Resolvers,
             Query: {
-                ...BookResolvers.Query,
                 ...AuthUserResolvers.Query,
                 ...UserResolvers.Query,
                 ...GroupResolvers.Query,
                 ...QuestionResolvers.Query,
                 ...VoteResolvers.Query,
-                ...InviteResolvers.Query
+                ...InviteResolvers.Query,
+                // ...S3Resolvers.Query
             },
             Mutation: {
-                // ...BookResolvers.Mutation,
                 ...AuthUserResolvers.Mutation,
                 ...UserResolvers.Mutation,
                 ...GroupResolvers.Mutation,
                 ...QuestionResolvers.Mutation,
                 ...VoteResolvers.Mutation,
-                ...InviteResolvers.Mutation
+                ...InviteResolvers.Mutation,
+                ...S3Resolvers.Mutation
             }
         },
-        context: async ({ req }) => {
-            const token = req.headers.authorization || null;
+        context: async ({ event }) => {
+            const token = event.headers.authorization || event.headers.Authorization || null;
 
-            const AuthUser = token && await mongoDB.collection("Users")
+            const AuthUser = !!token && await DBConnection.collection("Users")
                 .findOne({ 'Auth0User.sub': token });
 
-            // console.log({ ContextAuthUser: AuthUser });
-
-            return { AuthUser, mongoDB, s3 };
+            return { AuthUser, mongoDB: DBConnection };
         },
     });
-
-    // The `listen` method launches a web server.
-    server.listen().then(({ url }) => {
-        console.log(`🚀  Server ready at ${url}`);
+    return server.createHandler({
+        cors: {
+            origin: '*',
+            credentials: true,
+        },
     });
-});
+};
+
+let counter = 0;
+exports.graphqlHandler = (event, context, callback) => {
+    context.callbackWaitsForEmptyEventLoop = false;
+    counter++
+    console.log(counter);
+
+    createHandler().then((handler: any) => handler(event, context, callback));
+};
+

@@ -1,6 +1,5 @@
 import React, { FunctionComponent } from 'react';
 
-import SubVote from '@shared/SubVote';
 import VoteWrapper from "@shared/VoteWrapper";
 
 import './style.sass';
@@ -40,7 +39,7 @@ export const Home: FunctionComponent<{}> = ({ }) => {
             <div className="bar-container-horizontal">
                 <VoteWrapper
                     l={{
-                        name: 'Liquid Voting is Cool',
+                        questionText: 'Liquid Voting is Cool',
                         // showNameInside,
                         forDirectCount: 12000,
                         forCount: 35700,

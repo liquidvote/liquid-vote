@@ -1,11 +1,16 @@
-import React, { FunctionComponent, useMemo } from 'react';
+import React, { FunctionComponent, useState } from 'react';
 import { Link, useParams } from "react-router-dom";
 import { useQuery, useMutation } from "@apollo/client";
 
-import { AUTH_USER } from "@state/AuthUser/typeDefs";
+import useAuthUser from '@state/AuthUser/authUser.effect';
 import { USER, USER_VOTES } from "@state/User/typeDefs";
+import { VOTES } from "@state/Vote/typeDefs";
 import Notification from '@shared/Notification';
 import { VoteTimeline } from "@state/Mock/Notifications";
+import Popper from "@shared/Popper";
+import SortSmallSvg from "@shared/Icons/Sort-small.svg";
+import VoteSortPicker from '@components/shared/VoteSortPicker';
+import DropAnimation from '@components/shared/DropAnimation';
 
 import './style.sass';
 
@@ -13,14 +18,9 @@ export const ProfileVotes: FunctionComponent<{}> = ({ }) => {
 
     let { section, subsection, subsubsection, handle } = useParams<any>();
 
-    const {
-        loading: authUser_loading,
-        error: authUser_error,
-        data: authUser_data,
-        refetch: authUser_refetch
-    } = useQuery(AUTH_USER);
+    const [sortBy, setSortBy] = useState('weight');
 
-    const authLiquidUser = authUser_data?.authUser?.LiquidUser;
+    const { liquidUser } = useAuthUser();
 
     const {
         loading: user_loading,
@@ -33,11 +33,6 @@ export const ProfileVotes: FunctionComponent<{}> = ({ }) => {
 
     const profile = user_data?.User;
 
-    console.log({
-        authLiquidUser,
-        profile
-    })
-
     const type = (() => {
         if ((!subsection || subsection === 'direct') && !subsubsection) {
             return 'directVotesMade';
@@ -46,7 +41,7 @@ export const ProfileVotes: FunctionComponent<{}> = ({ }) => {
         } else if (subsubsection === 'different') {
             return 'directVotesInDisagreement';
         } else if (subsection === 'represented' && !subsubsection) {
-            return 'indirectVotesMadeForUser'
+            return 'indirectVotes'
         } else if (subsection === 'represented' && subsubsection === 'byyou') {
             return 'indirectVotesMadeByYou';
         } else if (subsection === 'represented' && subsubsection === 'foryou') {
@@ -60,18 +55,12 @@ export const ProfileVotes: FunctionComponent<{}> = ({ }) => {
         error: user_votes_error,
         data: user_votes_data,
         refetch: user_votes_refetch
-    } = useQuery(USER_VOTES, {
-        variables: { handle, type }
-    });
-
-    console.log({
-        type,
-        user_votes_data
+    } = useQuery(VOTES, {
+        variables: { userHandle: handle, type, sortBy }
     });
 
     return (
         <>
-
             <ul className="nav d-flex justify-content-around mt-n2 mx-n3">
                 <li className="nav-item">
                     <Link className={`nav-link ${(!subsection || subsection === 'direct') && 'active'}`} to={`/profile/${handle}/votes/direct`}>
@@ -80,13 +69,16 @@ export const ProfileVotes: FunctionComponent<{}> = ({ }) => {
                 </li>
                 <li className="nav-item">
                     <Link className={`nav-link ${subsection === 'represented' && 'active'}`} to={`/profile/${handle}/votes/represented`}>
-                        <b>{profile?.stats?.indirectVotesMadeForUser}</b> Represented Votes
+                        <b>{profile?.stats?.indirectVotesMadeForUser}</b> Represented
                     </Link>
+                </li>
+                <li className="px-4 mt-1">
+                    <VoteSortPicker updateSortInParent={setSortBy} />
                 </li>
             </ul>
             <hr className="mt-n4" />
 
-            {!!authLiquidUser && profile.handle !== authLiquidUser.handle && (!subsection || subsection === 'direct') && (
+            {!!liquidUser && profile.handle !== liquidUser.handle && (!subsection || subsection === 'direct') && (
                 <>
                     <ul className="nav d-flex justify-content-around mt-n2 mx-n3">
                         <li className="nav-item">
@@ -109,12 +101,12 @@ export const ProfileVotes: FunctionComponent<{}> = ({ }) => {
                 </>
             )}
 
-            {!!authLiquidUser && profile.handle !== authLiquidUser.handle && subsection === 'represented' && (
+            {!!liquidUser && profile.handle !== liquidUser.handle && subsection === 'represented' && (
                 <>
                     <ul className="nav d-flex justify-content-around mt-n2 mx-n3">
                         <li className="nav-item">
                             <Link className={`nav-link ${!subsubsection && 'active'}`} to={`/profile/${handle}/votes/represented`}>
-                                <b>{profile?.stats?.indirectVotesMadeForUser}</b> By others
+                                <b>{profile?.stats?.indirectVotesMadeByUser}</b> By anyone
                             </Link>
                         </li>
                         <li className="nav-item">
@@ -132,7 +124,7 @@ export const ProfileVotes: FunctionComponent<{}> = ({ }) => {
                 </>
             )}
 
-            {user_votes_data?.UserVotes.length === 0 && (
+            {user_votes_data?.Votes.length === 0 && (
                 <div className="p-4 text-center">
                     {user_data?.User?.name}{' '}
                     {
@@ -143,7 +135,7 @@ export const ProfileVotes: FunctionComponent<{}> = ({ }) => {
                                 return 'hasn\'t agreed with you on any polls';
                             } else if (type === 'directVotesInDisagreement') {
                                 return 'hasn\'t disagreed with you on any polls';
-                            } else if (type === 'indirectVotesMadeForUser') {
+                            } else if (type === 'indirectVotes') {
                                 return 'hasn\'t been represented on any polls'
                             } else if (type === 'indirectVotesMadeByYou') {
                                 return 'hasn\'t been represented by you on any polls';
@@ -166,22 +158,32 @@ export const ProfileVotes: FunctionComponent<{}> = ({ }) => {
                     {' '}<b className="white againstDirect px-1 rounded">{useMemo(() => Math.floor(Math.random() * 100), [])}</b>
             </small> */}
 
-            {user_votes_data?.UserVotes.map((n, i) => (
-                <Notification
-                    key={'notification-uservote' + n.questionText}
-                    v={{
-                        ...n,
-                        user: profile,
-                        // who: {
-                        //     name: "Dan Price",
-                        //     avatarClass: 1,
-                        //     representing: 12000,
-                        //     representsYou: true,
-                        // }
-                    }}
-                    showChart={true}
-                />
+            {user_votes_data?.Votes.map((n, i) => (
+                <>
+                    <Notification
+                        key={'notification-uservote' + n.questionText + type + n.choiceText}
+                        v={{
+                            ...n,
+                            // user: profile
+                        }}
+                        showChart={true}
+                    />
+                </>
             ))}
+
+            {user_votes_loading && (
+                <div className="d-flex justify-content-center mt-5">
+                    <DropAnimation />
+                </div>
+            )}
+
+            <br />
+            <br />
+            {/* <pre style={{ color: "white" }}>
+                {JSON.stringify(profile?.stats, null, 2)}
+                {JSON.stringify(profile?.yourStats, null, 2)}
+            </pre> */}
+
         </>
     );
 }

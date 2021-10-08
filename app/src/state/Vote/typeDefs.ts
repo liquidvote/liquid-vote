@@ -15,6 +15,87 @@ export const VOTE = gql`
   }
 `;
 
+export const VOTES = gql`
+  query($questionText: String, $groupHandle: String, $userHandle: String, $type: String, $sortBy: String) {
+    Votes(questionText: $questionText, groupHandle: $groupHandle, userHandle: $userHandle, type: $type, sortBy: $sortBy) {
+        questionText
+        choiceText
+        groupChannel {
+            group
+            channel
+        }
+        position
+        isDirect
+        forWeight
+        againstWeight
+        representatives{
+            representativeHandle
+            representativeAvatar
+            representativeName
+            position
+            forWeight
+            againstWeight
+            createdOn
+            lastEditOn
+        }
+        createdOn
+        lastEditOn
+        representeeVotes {
+            isDirect
+            position
+            user {
+                handle
+                name
+                avatar
+            }
+        }
+        QuestionStats {
+            lastVoteOn
+            forCount
+            forDirectCount
+            forMostRepresentingVoters {
+                handle
+                avatar
+                name
+                representeeCount
+            }
+            againstCount
+            againstMostRepresentingVoters {
+                handle
+                avatar
+                name
+                representeeCount
+            }
+            againstDirectCount
+        }
+        yourVote {
+            position
+            isDirect
+            forWeight
+            againstWeight
+            representatives{
+                representativeHandle
+                representativeAvatar
+                representativeName
+                position
+                forWeight
+                againstWeight
+                createdOn
+                lastEditOn
+            }
+            createdOn
+            lastEditOn
+        }
+        user {
+            name
+            handle
+            avatar
+        }
+    }
+  }
+`;
+
+
 export const EDIT_VOTE = gql`
     mutation (
       $questionText: String!,

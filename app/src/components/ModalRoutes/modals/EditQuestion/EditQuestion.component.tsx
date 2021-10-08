@@ -1,9 +1,8 @@
 import React, { FunctionComponent, useEffect } from 'react';
 import { useForm } from "react-hook-form";
-import TextareaAutosize from 'react-textarea-autosize';
-import { useParams, Link } from 'react-router-dom';
 import ReactTooltip from 'react-tooltip';
 import { useQuery, useMutation } from "@apollo/client";
+import { useHistory } from "react-router-dom";
 
 import ButtonPicker from "@shared/Inputs/ButtonPicker";
 import useSearchParams from "@state/Global/useSearchParams.effect";
@@ -36,6 +35,8 @@ const startTextOptions = [
 
 export const EditQuestion: FunctionComponent<{}> = ({ }) => {
 
+    const history = useHistory();
+
     const { allSearchParams, updateParams } = useSearchParams();
     const modalData = JSON.parse(allSearchParams.modalData);
 
@@ -58,6 +59,24 @@ export const EditQuestion: FunctionComponent<{}> = ({ }) => {
         error: editQuestion_error,
         data: editQuestion_data,
     }] = useMutation(EDIT_QUESTION);
+
+    useEffect(() => {
+        if (!!editQuestion_data?.editQuestion) {
+
+            const savedQuestion = editQuestion_data?.editQuestion;
+
+            console.log({
+                savedQuestion
+            });
+
+            if (savedQuestion.questionType === 'single') {
+                history.push(`/poll/${savedQuestion.questionText}/${savedQuestion.groupChannel.group}`);
+            } else {
+                history.push(`/multipoll/${savedQuestion.questionText}/${savedQuestion.groupChannel.group}`);
+            }
+        }
+    }, [editQuestion_data]);
+
 
     const {
         handleSubmit, register, formState: { errors, isValid }, watch, setValue
@@ -100,20 +119,13 @@ export const EditQuestion: FunctionComponent<{}> = ({ }) => {
                 questionText: modalData.questionHandle,
                 group: modalData.groupHandle || '',
                 channel: modalData.channelHandle || '',
-                Question: values
+                Question: {
+                    ...values,
+                    questionText: values.questionText.replaceAll('?', '')
+                }
             }
         });
     }
-    // const onSubmit = (values: any) => alert(JSON.stringify(values, null, 2));
-
-    // useEffect(() => {
-    //     if (editUser_data) {
-    //         updateParams({
-    //             keysToRemove: ['modal', 'modalData'],
-    //             paramsToAdd: { refetch: 'user' }
-    //         });
-    //     }
-    // }, [editUser_data])
 
     useEffect(() => {
         ReactTooltip.rebuild();
@@ -123,7 +135,7 @@ export const EditQuestion: FunctionComponent<{}> = ({ }) => {
         <form onSubmit={handleSubmit(onSubmit)} className="voteForm">
 
             <ModalHeader
-                title={modalData.questionHandle === "new" ? "Launch Question" : "Edit Question"}
+                title={modalData.questionHandle === "new" ? "Launch Poll" : "Edit Poll"}
                 submitText={modalData.questionHandle === "new" ? "Launch" : "Save"}
             />
 
@@ -158,19 +170,23 @@ export const EditQuestion: FunctionComponent<{}> = ({ }) => {
                 ) : null}
 
                 <div>
-                    <TextareaAutosize
+                    <input
                         autoFocus
-                        name="questionText"
-                        ref={register('questionText', {
+                        // name="questionText"
+                        {...register('questionText', {
                             validate: {
                                 single: (v: any) =>
                                     v?.length > 5 ||
                                     'please make a question',
                             }
                         })}
-                        value={watchAllFields?.questionText?.length ? watchAllFields?.questionText + "?" : ''} //+ "?"
+                        value={
+                            watchAllFields?.questionText?.length ?
+                                watchAllFields?.questionText + "?" : ''
+                        } //+ "?"
                         placeholder="Ask a question..."
                         onSelect={(e: any) => {
+                            console.log(e.key);
                             // move cursor to before "?"
                             if (e.target.value.length === e.target.selectionStart) {
                                 e.target.selectionStart = e.target.value.length - 1;
@@ -178,12 +194,24 @@ export const EditQuestion: FunctionComponent<{}> = ({ }) => {
                             }
                         }}
                         onChange={(e) => {
+                            console.log(e);
                             // remove "?" from value
                             setValue(
                                 "questionText",
                                 e.target.value.replaceAll('?', ''),
                                 // { shouldValidate: true }
                             );
+                        }}
+                        onKeyDown={e => {
+                            if (e.key === 'Enter') e.preventDefault();
+                        }}
+                        onKeyUp={e => {
+                            if (e.key === 'Backspace') {
+                                if (e.target.value.length === e.target.selectionStart) {
+                                    e.target.selectionStart = e.target.value.length - 1;
+                                    e.target.selectionEnd = e.target.value.length - 1;
+                                }
+                            }
                         }}
                     />
                     {errors?.questionText && <div className="error pl-0 mt-n2">{errors?.questionText.message}</div>}
@@ -212,11 +240,11 @@ export const EditQuestion: FunctionComponent<{}> = ({ }) => {
                     {((name: keyof IFormValues) => (
                         <GroupChannelPicker
                             name={name}
-                            label="Group Channel to poll in"
+                            label="Group to Poll in"
                             register={register(name, {
                                 validate: {
-                                    group: (v: any) => !!v.group || 'please select a group and channel',
-                                    channel: (v: any) => !!v.channel || 'please select a channel',
+                                    group: (v: any) => typeof v.group !== 'undefined' || 'please select a group and channel',
+                                    // channel: (v: any) => typeof v.channel !=='undefined' || 'please select a channel',
                                 }
                             })}
                             value={watch(name)}
@@ -230,7 +258,7 @@ export const EditQuestion: FunctionComponent<{}> = ({ }) => {
                     {((name: keyof IFormValues) => (
                         <DropDownInput
                             name={name}
-                            label="Show results"
+                            label="Show results 🧪"
                             register={register(name, {
                                 required: true
                             })}
@@ -258,11 +286,11 @@ export const EditQuestion: FunctionComponent<{}> = ({ }) => {
                 </div>
 
                 <br />
-                <br />
+                {/* <br />
 
                 <pre style={{ color: 'white' }}>
                     {JSON.stringify(watchAllFields, null, 2)}
-                </pre>
+                </pre> */}
 
             </div>
         </form>

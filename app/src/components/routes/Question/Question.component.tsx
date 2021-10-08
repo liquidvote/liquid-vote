@@ -1,42 +1,28 @@
-import React, { FunctionComponent, useState, useEffect } from 'react';
-import { Link, useParams } from "react-router-dom";
+import React from 'react';
 import { DiscussionEmbed } from 'disqus-react';
-import numeral from 'numeral';
+import { Link, useParams } from "react-router-dom";
 import ReactTooltip from 'react-tooltip';
-import { useQuery, useMutation } from "@apollo/client";
+import { useQuery } from "@apollo/client";
 
-import VoteGraph1 from "@shared/VoteGraph1";
-import Chart from "@shared/VoteGraph1/chart.svg";
+import DropAnimation from "@components/shared/DropAnimation";
+import Choice from '@shared/Choice';
 import Header from "@shared/Header";
-import DropPlusSVG from "@shared/Icons/Drop+.svg";
-import XSVG from "@shared/Icons/X.svg";
-import {
-    defaults,
-    byGroups,
-    votesBy,
-    onSubTopics
-} from "@state/Mock/Votes";
-import SubVote from '@shared/SubVote';
 import GroupSmallSvg from "@shared/Icons/Group-small.svg";
-import { people } from "@state/Mock/People";
-import PersonInList from '@shared/PersonInList';
-import { VoteTimeline } from "@state/Mock/Notifications";
-import Notification from '@shared/Notification';
-import { QUESTION } from '@state/Question/typeDefs';
-import { voteStatsMap } from '@state/Question/map';
-import { EDIT_VOTE } from '@state/Vote/typeDefs';
+import VoteGraph1 from "@shared/VoteGraph1";
 import useSearchParams from "@state/Global/useSearchParams.effect";
+import {
+    byGroups,
+    votesBy
+} from "@state/Mock/Votes";
+import { QUESTION } from '@state/Question/typeDefs';
+import { timeAgo } from '@state/TimeAgo';
+
 import QuestionVotes from "./QuestionVotes";
 
 export default function Question() {
 
-    let { voteName, groupChannel, section } = useParams<any>();
+    let { voteName, groupHandle, section } = useParams<any>();
     const { allSearchParams, updateParams } = useSearchParams();
-
-    const groupChannel_ = (([g, c]) => ({
-        group: g,
-        channel: c
-    }))(groupChannel.split("-"))
 
     const {
         loading: question_loading,
@@ -46,295 +32,110 @@ export default function Question() {
     } = useQuery(QUESTION, {
         variables: {
             questionText: voteName,
-            group: groupChannel_.group,
-            channel: groupChannel_.channel
+            group: groupHandle,
+            // channel: groupChannel_.channel
         }
     });
 
-    const [editVote, {
-        loading: editVote_loading,
-        error: editVote_error,
-        data: editVote_data,
-    }] = useMutation(EDIT_VOTE);
+    const sortedChoices = question_data?.Question?.questionType === 'multi' ? [...question_data?.Question?.choices]?.
+        sort((a, b) => (b?.stats?.directVotes + b?.stats?.indirectVotes) - (a?.stats?.directVotes + a?.stats?.indirectVotes)) : [];
 
-    const userVote = editVote_data?.editVote?.position || question_data?.Question?.userVote?.position || null;
+    const maxVoteCount = question_data?.Question?.questionType === 'multi' && sortedChoices?.[0]?.stats?.directVotes + sortedChoices?.[0]?.stats?.indirectVotes;
 
-    // const [isPollingInOtherGroup, setIsPollingInOtherGroup] = useState(false);
-    // const [isShowingVotersModal, setIsShowingVotersModal] = useState(false);
-    // const [usersShowing, setUsersShowing] = useState('');
-
-    const handleUserVote = (vote: string) => {
-        editVote({
-            variables: {
-                questionText: question_data?.Question?.questionText,
-                // choiceText
-                group: question_data?.Question?.groupChannel.group,
-                channel: question_data?.Question?.groupChannel.channel,
-                Vote: {
-                    position: (vote === userVote) ? null : vote
-                },
-            }
-        });
-    }
-
-    const stats = voteStatsMap({
-        forCount: question_data?.Question?.stats.forCount,
-        againstCount: question_data?.Question?.stats.againstCount,
-        forDirectCount: question_data?.Question?.stats.forDirectCount,
-        againstDirectCount: question_data?.Question?.stats.againstDirectCount,
-        ...(!!editVote_data?.editVote?.QuestionStats) && {
-            forCount: editVote_data?.editVote?.QuestionStats.forCount,
-            againstCount: editVote_data?.editVote?.QuestionStats.againstCount,
-            forDirectCount: editVote_data?.editVote?.QuestionStats.forDirectCount,
-            againstDirectCount: editVote_data?.editVote?.QuestionStats.againstDirectCount,
-        }
-    });
-
-    const forRepresentatives = question_data?.Question?.userVote?.representatives.filter((r: any) => r.position === 'for');
-    const againstRepresentatives = question_data?.Question?.userVote?.representatives.filter((r: any) => r.position === 'against');
-
-    console.log({
-        stats,
-        s: question_data?.Question?.stats
-    });
-
-    return (
+    return question_loading ? (
+        <div className="d-flex justify-content-center mt-5">
+            <DropAnimation />
+        </div>
+    ) : (question_error) ? (<>Error</>) : (
         <>
             <ReactTooltip place="bottom" type="dark" effect="solid" />
 
             <Header title="Opinion Poll" />
 
-            <h2 className="mb-0 mt-4">Do you approve</h2>
-            <h2 className="mb-2 white"><b>{voteName}</b>?</h2>
+            {question_data?.Question?.questionType === 'single' ? (
+                <h2 className="mb-0 mt-4">Do you approve</h2>
+            ) : (
+                <div className="mt-4"></div>
+            )}
+            <h2 className="mb-2 white pre-wrap"><b>{voteName}</b>?</h2>
 
             <div>
-                <div className="bar-wrapper">
-                    <Chart
-                        name={question_data?.Question?.questionText}
-                        forDirectCount={stats.forDirectCount}
-                        forCount={stats.forCount}
-                        againstDirectCount={stats.againstDirectCount}
-                        againstCount={stats.againstCount}
-                        userVote={null}
-                        userDelegatedVotes={null}
-                    />
-                </div>
 
-                <div className="d-flex color-legend mt-2 mb-n2">
-                    <div>
-                        <small>Direct For</small><div className="color forDirect count">{stats?.forDirectPercentage.toFixed(0)}%</div>
-                    </div>
-                    <div>
-                        <small>Delegated For</small><div className="color for count">{stats?.forDelegatedPercentage.toFixed(0)}%</div>
-                    </div>
-                    <div>
-                        <small>Direct Against</small><div className="color againstDirect count">{stats?.againstDirectPercentage.toFixed(0)}%</div>
-                    </div>
-                    <div>
-                        <small>Delegated Against</small><div className="color against count">{stats?.againstDelegatedPercentage.toFixed(0)}%</div>
-                    </div>
-                </div>
+                {/* <pre>{JSON.stringify(question_data?.Question, null, 2)}</pre> */}
 
-                <div className="d-flex d-flex justify-content-between mt-4">
-                    <div className="d-flex align-items-center">
-                        <div
-                            className={`button_ mr-1 ${userVote === 'for' && 'selected'}`}
-                        >
-                            <span className="mr-1" onClick={() => handleUserVote('for')}>
-                                For
-                            </span>
-                            {
-                                (
-                                    !!forRepresentatives?.length &&
-                                    question_data?.Question?.userVote?.position === 'delegated' &&
-                                    (!editVote_data || editVote_data?.editVote?.position === 'delegated')
-                                ) && (
-                                    <div className="d-flex ml-2 my-n2 mr-n1">
-                                        <Link
-                                            to={`/profile/${forRepresentatives[0].representativeHandle}`}
-                                            className="vote-avatar for ml-n2 d-none d-md-block"
-                                            style={{
-                                                background: `url(${forRepresentatives[0].representativeAvatar}) no-repeat`,
-                                                backgroundSize: 'cover'
-                                            }}
-                                        ></Link>
-                                        <div
-                                            onClick={(e) => {
-                                                updateParams({
-                                                    paramsToAdd: {
-                                                        modal: "ListVoters",
-                                                        modalData: JSON.stringify({
-                                                            votersSection: 'forRepresentatives',
-                                                            questionText: question_data?.Question?.questionText,
-                                                            groupChannel
-                                                        })
-                                                    }
-                                                })
-                                            }}
-                                            className="vote-avatar count for ml-n2"
-                                        >{forRepresentatives.length}</div>
-                                    </div>
-                                )
-                            }
-                        </div>
-
-
-                        <div className="d-flex ml-2">
-                            {(
-                                editVote_data?.editVote?.QuestionStats?.forMostRepresentingVoters ||
-                                question_data?.Question?.stats?.forMostRepresentingVoters
-                            )?.slice(0, 2).map((v: any) => (
-                                <Link
-                                    to={`/profile/${v?.handle}`}
-                                    className="vote-avatar for ml-n2 d-none d-md-block"
-                                    style={{
-                                        background: `url(${v?.avatar}) no-repeat`,
-                                        backgroundSize: 'cover'
-                                    }}
-                                ></Link>
-                            ))}
-
-                            <div onClick={(e) => {
-                                updateParams({
-                                    paramsToAdd: {
-                                        modal: "ListVoters",
-                                        modalData: JSON.stringify({
-                                            votersSection: 'directFor',
-                                            questionText: question_data?.Question?.questionText,
-                                            groupChannel
-                                        })
-                                    }
-                                })
-                            }}
-                                className="vote-avatar count for ml-n2">{
-                                    numeral(stats.forCount).format('0a[.]0')
-                                }
+                {
+                    question_data?.Question?.questionType === 'multi' ?
+                        sortedChoices?.map(c => (
+                            <div className="my-3">
+                                <Choice
+                                    choiceText={c.text}
+                                    voteName={voteName}
+                                    groupHandle={groupHandle}
+                                    stats={c.stats}
+                                    userVote={c.userVote}
+                                    maxVoteCount={maxVoteCount}
+                                />
                             </div>
+                        )) :
+                        <Choice
+                            choiceText={question_data?.Question?.text}
+                            voteName={voteName}
+                            groupHandle={groupHandle}
+                            stats={question_data?.Question?.stats}
+                            userVote={question_data?.Question?.userVote}
+                            showPercentages={true}
+                        />
+                }
 
-                        </div>
-                    </div>
-                    <div className="d-flex align-items-center">
-                        <div className="d-flex ml-2">
-                            {
-                                (
-                                    editVote_data?.editVote?.QuestionStats?.againstMostRepresentingVoters ||
-                                    question_data?.Question?.stats?.againstMostRepresentingVoters
-                                )?.slice(0, 2).map((v: any) => (
-                                    <Link
-                                        to={`/profile/${v?.handle}`}
-                                        className="vote-avatar against ml-n2 d-none d-md-block"
-                                        style={{
-                                            background: `url(${v?.avatar}) no-repeat`,
-                                            backgroundSize: 'cover'
-                                        }}
-                                    ></Link>
-                                ))}
-                            {/* <div className="vote-avatar avatar-1 ml-n2" /> */}
-                            <div onClick={(e) => {
-                                updateParams({
-                                    paramsToAdd: {
-                                        modal: "ListVoters",
-                                        modalData: JSON.stringify({
-                                            votersSection: 'directAgainst',
-                                            questionText: question_data?.Question?.questionText,
-                                            groupChannel
-                                        })
-                                    }
-                                })
-                            }} className="vote-avatar count against ml-n2">{
-                                    numeral(stats.againstCount).format('0a[.]0')
-                                }</div>
-                        </div>
-                        <div
-                            className={`button_ ml-1 ${userVote === 'against' && 'selected'}`}
-                        >
-                            <span onClick={() => handleUserVote('against')}>
-                                Against
-                            </span>
-                            {
-                                (
-                                    !!againstRepresentatives?.length &&
-                                    question_data?.Question?.userVote?.position === 'delegated' &&
-                                    (!editVote_data || editVote_data?.editVote?.position === 'delegated')
-                                ) && (
-                                    <div className="d-flex ml-3 my-n2 mr-n1">
-                                        <Link
-                                            to={`/profile/${againstRepresentatives[0].representativeHandle}`}
-                                            className="vote-avatar against ml-n2 d-none d-md-block"
-                                            style={{
-                                                background: `url(${againstRepresentatives[0].representativeAvatar}) no-repeat`,
-                                                backgroundSize: 'cover'
-                                            }}
-                                        ></Link>
-                                        {/* <Link to="/profile" className="vote-avatar avatar-5 against ml-n2 d-none d-md-block"></Link> */}
-                                        <div onClick={(e) => {
-                                            updateParams({
-                                                paramsToAdd: {
-                                                    modal: "ListVoters",
-                                                    modalData: JSON.stringify({
-                                                        votersSection: 'againstRepresentatives',
-                                                        questionText: question_data?.Question?.questionText,
-                                                        groupChannel
-                                                    })
-                                                }
-                                            })
-                                        }} className="vote-avatar count against ml-n2">{againstRepresentatives.length}</div>
-                                    </div>
-                                )
-                            }
-                        </div>
-                    </div>
-                </div>
+                <>
 
-                <div className="mt-4 d-flex align-items-start flex-nowrap justify-content-between">
-                    <div className="d-flex flex-nowrap">
-                        <div data-tip="Selected groups"><GroupSmallSvg /></div>
-                        <div className="d-flex flex-wrap justify-content-start">
-                            <Link
-                                to={`/group/${question_data?.Question?.groupChannel.group}`}
-                                className="badge ml-1 mb-1 mt-1"
-                            >
-                                {question_data?.Question?.groupChannel.group}:
-                                {question_data?.Question?.groupChannel.channel}
-                            </Link>
+                    <div className="mt-4 d-flex align-items-start flex-nowrap justify-content-between">
+                        <div className="d-flex flex-nowrap">
+                            <div data-tip="Selected groups"><GroupSmallSvg /></div>
+                            <div className="d-flex flex-wrap justify-content-start">
+                                <Link
+                                    to={`/group/${groupHandle}`}
+                                    className="badge ml-1 mb-1 mt-1"
+                                >
+                                    {question_data?.Question?.groupChannel?.group}
+                                </Link>
+                            </div>
                         </div>
+                        {/* <div className="d-flex justify-content-center">
+                            {question_data?.Question?.thisUserIsAdmin && (
+                                <>
+                                    <div
+                                        onClick={() => alert('soon')}
+                                        className={`button_ small mx-1`}
+                                    >Edit</div>
+                                </>
+                            )}
+                        </div> */}
+                        <small data-tip="Created on">
+                            {/* <small className="time-ago" data-tip="Last vote was"> */}
+                            {timeAgo.format(new Date(Number(question_data?.Question?.createdOn)))}
+                        </small>
+                        {/* <div onClick={() => setIsPollingInOtherGroup(true)} className="button_ small mb-0 mw-25">
+                            poll this in another group
+                        </div> */}
                     </div>
-                    <div className="d-flex justify-content-center">
-                        {question_data?.Question?.thisUserIsAdmin && (
-                            <>
-                                <div
-                                    onClick={() => alert('soon')}
-                                    className={`button_ small mx-1`}
-                                >Edit</div>
-                            </>
-                        )}
-                        <div
-                            className={`button_ small mx-1`}
-                        >Invite to Vote 🧪</div>
-                    </div>
-                    <small data-tip="Last vote was">
-                        {question_data?.Question?.stats?.lastVoteOn || '3s ago 🧪'}
-                    </small>
-                    {/* <div onClick={() => setIsPollingInOtherGroup(true)} className="button_ small mb-0 mw-25">
-                        poll this in another group
-                    </div> */}
-                </div>
+                </>
 
                 <br />
 
                 <ul className="nav d-flex justify-content-around mt-1 mb-n4 mx-n3">
                     <li className="nav-item">
-                        <Link className={`nav-link ${(!section || section === 'timeline') && 'active'}`} to={`/poll/${voteName}/${groupChannel}/timeline`}>
-                            Timeline
+                        <Link className={`nav-link ${(!section || section === 'timeline') && 'active'}`} to={`/poll/${voteName}/${groupHandle}/timeline`}>
+                            Votes
                         </Link>
                     </li>
                     <li className="nav-item">
-                        <Link className={`nav-link ${section === 'votesby' && 'active'}`} to={`/poll/${voteName}/${groupChannel}/votesby`}>
+                        <Link className={`nav-link ${section === 'votesby' && 'active'}`} to={`/poll/${voteName}/${groupHandle}/votesby`}>
                             Votes by 🧪
                         </Link>
                     </li>
                     <li className="nav-item">
-                        <Link className={`nav-link ${section === 'conversation' && 'active'}`} to={`/poll/${voteName}/${groupChannel}/conversation`}>
+                        <Link className={`nav-link ${section === 'conversation' && 'active'}`} to={`/poll/${voteName}/${groupHandle}/conversation`}>
                             Conversation 🧪
                         </Link>
                     </li>
@@ -432,11 +233,6 @@ export default function Question() {
                 {(!section || section === 'timeline') && (
                     <QuestionVotes />
                 )}
-
-                {/* // VoteTimeline.map((l, i) => (
-                //     <Notification v={{ ...l, poll: null }} showChart={false} />
-                // ))} */}
-
 
                 {(section === 'conversation') && (
                     <DiscussionEmbed

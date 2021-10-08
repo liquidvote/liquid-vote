@@ -5,10 +5,8 @@ import React, {
 } from 'react';
 import { FieldError } from 'react-hook-form';
 import { useQuery, useMutation } from "@apollo/client";
-import { GROUP, EDIT_GROUP } from "@state/Group/typeDefs";
 import { USER_GROUPS } from "@state/User/typeDefs";
-import { AUTH_USER } from "@state/AuthUser/typeDefs";
-
+import useAuthUser from '@state/AuthUser/authUser.effect';
 
 import GroupSVG from "@shared/Icons/Group-small.svg";
 
@@ -39,12 +37,7 @@ export const GroupChannelPicker: FunctionComponent<Props> = ({
     setValue
 }) => {
 
-    const {
-        loading: authUser_loading,
-        error: authUser_error,
-        data: authUser_data,
-        refetch: authUser_refetch
-    } = useQuery(AUTH_USER);
+    const { liquidUser } = useAuthUser();
 
     const {
         loading: yourGroups_loading,
@@ -52,17 +45,8 @@ export const GroupChannelPicker: FunctionComponent<Props> = ({
         data: yourGroups_data,
         refetch: yourGroups_refetch
     } = useQuery(USER_GROUPS, {
-        variables: { handle: authUser_data?.authUser?.LiquidUser?.handle },
-        skip: !authUser_data?.authUser
-    });
-
-    const {
-        loading: group_loading,
-        error: group_error,
-        data: group_data,
-        refetch: group_refetch
-    } = useQuery(GROUP, {
-        variables: { handle: value?.group }
+        variables: { handle: liquidUser?.handle },
+        skip: !liquidUser
     });
 
     const [isFocused, setIsFocused] = useState(false);
@@ -74,7 +58,7 @@ export const GroupChannelPicker: FunctionComponent<Props> = ({
                 group: e?.target?.value,
                 channel: value.channel
             },
-            { shouldValidate: true }
+            // { shouldValidate: true }
         );
     }
 
@@ -85,9 +69,9 @@ export const GroupChannelPicker: FunctionComponent<Props> = ({
                 group: value.group,
                 channel: e?.target?.value
             },
-            {
-                shouldValidate: true
-            }
+            // {
+            //     shouldValidate: true
+            // }
         );
     }
 
@@ -132,7 +116,7 @@ export const GroupChannelPicker: FunctionComponent<Props> = ({
                             ))}
                             <option value="">--</option>
                         </select>
-                        <select
+                        {/* <select
                             className="badge select ml-1 mb-1 mt-1 inverted"
                             onChange={handleChannelPickChange}
                             value={value?.channel}
@@ -146,47 +130,17 @@ export const GroupChannelPicker: FunctionComponent<Props> = ({
                                 >{g.name}</option>
                             ))}
                             <option value="">--</option>
-                        </select>
-                        {/* <div
-                            className="badge ml-1 mb-1 mt-1"
-                        >{selectedGroup?.name}</div> */}
-                        {/* <div
-                            className="badge ml-1 mb-1 mt-1 inverted"
-                        >select a channel</div>
-                        <select
-                            className="badge select ml-1 mb-1 mt-1 inverted"
-                            name="cars"
-                        >
-                            <option value="volvo">Volvo asd a ada da das da das as  d asd</option>
-                            <option value="saab">Saab</option>
-                            <option value="mercedes">Mercedes</option>
-                            <option value="audi">Audi</option>
                         </select> */}
-                        {/* <div
-                            className="badge ml-1 mb-1 mt-1"
-                        >{selectedGroup.name}</div> */}
-                        {/* <div className="badge inverted ml-1 mb-1 mt-1" role="button">+4</div> */}
-                        {/* <div onClick={() => { }} className="button_ small mb-0">
-                            poll in another group
-                        </div> */}
-                        {/* {!!watchAllFields.voteText?.length && (
-                            <small role="button">
-                                Poll was made in 5 other groups already
-                            </small>
-                        )} */}
                     </div>
-
-                    {/* <div>
-                        <button
-                            className="button_"
-                            type="submit"
-                            disabled={!watchAllFields.voteText?.length}
-                        >Launch Poll</button>
-                    </div> */}
                 </div>
 
             </div>
             {error && <div className="error">{(error as any).message}</div>}
+
+
+            {/* <pre>
+                {JSON.stringify(group_data?.Group, null, 2)}
+            </pre> */}
         </div>
     );
 };

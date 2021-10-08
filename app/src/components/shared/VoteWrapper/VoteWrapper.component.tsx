@@ -108,7 +108,7 @@ export const VoteWrapper: FunctionComponent<{
                                     For
                                 </span>
                                 <div className="d-flex ml-3 my-n2 mr-n1">
-                                    <Link to="/profile" className="vote-avatar tiny avatar-1 for ml-n2 d-none d-md-block"></Link>
+                                    <Link to="/profile" className="vote-avatar tiny avatar-2 for ml-n2 d-none d-md-block"></Link>
                                     <div onClick={() => {
                                         setIsShowingVotersModal(true);
                                         setUsersShowing(`Your Representatives Voting For on ${l.questionText}`);

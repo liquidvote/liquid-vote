@@ -9,7 +9,8 @@ export default function useSearchParams() {
         theme?: '1' | '2' | '3',
         modal?: 'editProfile' | 'editGroup' | 'editQuestion' | 'listUsers' | 'listGroups',
         modalData?: any,
-        refetch?: 'user' | 'group' | 'question'
+        refetch?: 'user' | 'group' | 'question',
+        inviteId?: string
     };
 
     const getNewSearchParamsString = ({
@@ -30,12 +31,13 @@ export default function useSearchParams() {
         keysToRemove?: Array<string>,
         paramsToAdd?: Object
     }) =>
-        history.push({
+        history.replace({
             pathname: location.pathname,
             search: getNewSearchParamsString({
                 keysToRemove,
                 paramsToAdd
-            })
+            }),
+
         })
 
     return {
