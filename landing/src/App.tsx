@@ -9,6 +9,7 @@ import loadable from "@loadable/component";
 
 import twitterIcon from "@assets/twitter.svg";
 import Navi from "./components/shared/Navi/Navi";
+import Footer from "./components/shared/Footer/Footer";
 
 export default function App() {
   const themeFromParams = ((q) => q.get("theme") || "3")(
@@ -35,15 +36,7 @@ export default function App() {
               />
             </Switch>
 
-            <hr />
-
-            <a
-              className="btn btn-sm"
-              href="https://twitter.com/intent/tweet?text=@esperancaJs+halp"
-            >
-              <img className="img-fluid" src={twitterIcon} />
-              Any questions?
-            </a>
+            <Footer />
           </div>
         </div>
       </Router>

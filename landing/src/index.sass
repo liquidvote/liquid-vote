@@ -35,7 +35,12 @@ $theme5-colors: ("bg": #0b414d, "primary": #08f3a5, "secondary": white, "border"
         background: map-get($theme, "secondary" )
         p
             color: map-get($theme, "bg")
-    
+
+    .footer
+        background: map-get($theme, "bg")
+        p
+            color: map-get($theme, "secondary" )
+
     .cta-container, .box
         background: map-get($theme, "border" )
         // box-shadow: 7px 7px 8px map-get($theme, "border" )
@@ -424,7 +429,16 @@ hr
   padding: 13px 65px
   text-decoration: none
 
-
+.footer
+    // margin-top: 20px
+    height: 150px
+    text-align: center
+    display: flex
+    justify-content: center
+    align-content: center
+    flex-direction: column
+    p
+        margin: 5px 0
 
 // cta
 
