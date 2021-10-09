@@ -3,6 +3,7 @@ import { Link } from "react-router-dom";
 import numeral from 'numeral';
 import { format } from 'timeago.js';
 import ReactTooltip from 'react-tooltip';
+import { timeAgo } from '@state/TimeAgo';
 
 import VoteGraph1 from "@shared/VoteGraph1";
 import './style.sass';
@@ -21,7 +22,7 @@ export const MultiVoteInList: FunctionComponent<{ v: any, i?: number }> = ({ v, 
             <ReactTooltip place="bottom" type="dark" effect="solid" />
 
             <div className="time-ago" data-tip="Last vote was">
-                <small data-tip="last vote was">{format(Date.now() - (i + Math.random()) * 1000 * 60 * 60)}</small>
+                <small data-tip="last vote was">{timeAgo.format(new Date(Number(v?.stats?.lastVoteOn)))}</small>
             </div>
 
             <div className="d-flex align-items-center flex-wrap mb-2">
@@ -35,9 +36,9 @@ export const MultiVoteInList: FunctionComponent<{ v: any, i?: number }> = ({ v, 
                     >{v.questionText}?</div>
                 </a>
 
-                <div
+                <Link to={`/group/${v.groupChannel.group}`}
                     className="badge m-0 ml-2 text-truncate"
-                >{v.groupChannel.group}</div>
+                >{v.groupChannel.group}</Link>
             </div>
 
             <div>

@@ -55,9 +55,10 @@ export const SingleVoteInList: FunctionComponent<{
                                     </div>
                                 </a>
                                 {!!showGroup && (
-                                    <div className="badge m-0 ml-2">
-                                        {l.groupChannel?.group}
-                                    </div>
+
+                                    <Link to={`/group/${l.groupChannel.group}`}
+                                        className="badge m-0 ml-2 text-truncate"
+                                    >{l.groupChannel.group}</Link>
                                 )}
                             </div>
                         )}

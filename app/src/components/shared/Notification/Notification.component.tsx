@@ -95,9 +95,12 @@ export const Notification: FunctionComponent<{
                                 </small>
                                 <div className="d-flex flex-wrap justify-content-end">
                                     <div className="tiny-svg-wrapper"><GroupSvg /></div>
-                                    <div className="badge ml-1 mb-1 mt-1">
+                                    <Link
+                                        to={`/group/${v.groupChannel?.group}`}
+                                        className="badge ml-1 mb-1 mt-1"
+                                    >
                                         {v.groupChannel?.group}
-                                    </div>
+                                    </Link>
                                 </div>
                             </div>
                         </div>

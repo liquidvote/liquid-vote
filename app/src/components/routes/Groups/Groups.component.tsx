@@ -1,6 +1,6 @@
 import React, { FunctionComponent } from 'react';
 import { useQuery } from "@apollo/client";
-import { useParams } from "react-router-dom";
+import { Link, useParams } from "react-router-dom";
 
 import Header from "@shared/Header";
 import GroupInList from "@shared/GroupInList";
@@ -24,7 +24,10 @@ export const Groups: FunctionComponent<{}> = ({ }) => {
         data: yourGroups_data,
         refetch: yourGroups_refetch
     } = useQuery(USER_GROUPS, {
-        variables: { handle: liquidUser?.handle },
+        variables: {
+            handle: liquidUser?.handle,
+            notUsers: section === 'other'
+        },
         skip: !liquidUser
     });
 
@@ -32,7 +35,20 @@ export const Groups: FunctionComponent<{}> = ({ }) => {
 
     return (
         <>
-            <Header title="Your Groups" />
+            <Header title="Groups" />
+
+            <ul className="nav d-flex flex-nowrap justify-content-around align-items-center mt-1 mx-n3">
+                <li className="nav-item">
+                    <Link className={`nav-link ${!section && 'active'}`} to={`/groups`}>
+                        Yours
+                    </Link>
+                </li>
+                <li className="nav-item">
+                    <Link className={`nav-link ${section === 'other' && 'active'}`} to={`/groups/other`}>
+                        Other
+                    </Link>
+                </li>
+            </ul>
 
             {
                 !yourGroups_data && (
@@ -55,7 +71,7 @@ export const Groups: FunctionComponent<{}> = ({ }) => {
             </div>
 
 
-            {(!!liquidUser &&  !yourGroups_loading) && (
+            {(!!liquidUser && !yourGroups_loading) && (
                 <div onClick={() => updateParams({
                     paramsToAdd: {
                         modal: 'EditGroup',

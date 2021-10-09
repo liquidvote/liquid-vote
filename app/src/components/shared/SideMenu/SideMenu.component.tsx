@@ -45,7 +45,7 @@ export const SideMenu: FunctionComponent<{}> = ({ }) => {
 
     return (
         <div className="sideMenu">
-            <Link to="/home" className="hide-on-smaller-sideMenu">
+            <Link to="/" className="hide-on-smaller-sideMenu">
                 <RippleDrop />
             </Link>
             <Link to="/home" data-tip="Home">
@@ -53,7 +53,7 @@ export const SideMenu: FunctionComponent<{}> = ({ }) => {
             </Link>
             {isAuthenticated && user && (
                 <>
-                    <Link to="/feed" data-tip="Notifications">
+                    <Link to="/notifications" data-tip="Notifications">
                         <NotificationSvg />
                     </Link>
                     <Link to="/groups" data-tip="Your Groups">

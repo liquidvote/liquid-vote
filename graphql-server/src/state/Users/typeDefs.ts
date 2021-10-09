@@ -68,17 +68,18 @@ export const UserTypeDefs = gql`
         UserRepresentedBy(handle: String, groupHandle: String): [User] # Users that this user is represented by
         UserGroups(
             handle: String,
-            representative: String
+            representative: String,
+            notUsers: Boolean
         ): [Group],
-        UserGroupsRepresentedBy(
-            handle: String,
-            representative: String
-        ): [UserRepresentativeGroupRelation],
         UserVotes(
             handle: String,
             type: String
         ):  [Vote]
-        # UserRelatedUsers(groupHandle: String) : [User]
+        UserQuestions(
+            handle: String,
+            sortBy: String,
+            notUsers: Boolean
+        ):  [Question]
     }
 
     extend type Mutation {

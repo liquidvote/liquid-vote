@@ -30,7 +30,7 @@ export const GroupInList: FunctionComponent<{
         const { allSearchParams, updateParams } = useSearchParams();
 
         const isMember =
-            group?.yourMemberRelation ||
+            group?.yourMemberRelation?.isMember ||
             editGroupMemberChannelRelation_data?.editGroupMemberChannelRelation?.isMember;
 
         return (
@@ -70,6 +70,12 @@ export const GroupInList: FunctionComponent<{
                                         className={`button_ small ml-1 mb-0 ${isMember ? "selected" : ""}`}
                                         disabled={group.thisUserIsAdmin}
                                     >
+                                        {editGroupMemberChannelRelation_loading && (
+                                            <img
+                                                className="vote-avatar mr-1 my-n2"
+                                                src={'http://images.liquid-vote.com/system/loading.gif'}
+                                            />
+                                        )}
                                         {isMember ? "Joined" : "Join"}
                                     </button>
                                 )

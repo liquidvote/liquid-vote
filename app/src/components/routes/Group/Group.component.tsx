@@ -198,6 +198,12 @@ export const Group: FunctionComponent<{}> = ({ }) => {
                                 })}
                                 className={`button_ small ml-2 mb-0 ${isMember ? "selected" : ""}`}
                             >
+                                {editGroupMemberChannelRelation_loading && (
+                                    <img
+                                        className="vote-avatar mr-1 my-n2"
+                                        src={'http://images.liquid-vote.com/system/loading.gif'}
+                                    />
+                                )}
                                 {isMember ? "Joined" : "Join"}
                             </div>
                         )}

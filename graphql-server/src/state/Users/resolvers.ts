@@ -223,7 +223,7 @@ export const UserResolvers = {
             return representativesAndGroups;
         },
 
-        UserGroups: async (_source, { handle, representative }, { mongoDB, AuthUser }) => {
+        UserGroups: async (_source, { handle, representative, notUsers }, { mongoDB, AuthUser }) => {
 
             const User = await mongoDB.collection("Users")
                 .findOne({ 'LiquidUser.handle': handle });
@@ -259,7 +259,7 @@ export const UserResolvers = {
 
             const Groups = await Promise.all((await mongoDB.collection("Groups").find({
                 "_id": {
-                    "$in": UserGroupMemberRelations.map(r => new ObjectId(r.groupId))
+                    [`${notUsers? '$nin': '$in'}`]: UserGroupMemberRelations.map(r => new ObjectId(r.groupId))
                 }
             })
                 .toArray())
@@ -294,21 +294,6 @@ export const UserResolvers = {
 
             return Groups;
         },
-        // UserGroupsRepresentedBy: async (_source, { handle, representative }, { mongoDB, AuthUser }) => {
-
-        //     const Representative = await mongoDB.collection("Users")
-        //         .findOne({ 'LiquidUser.handle': representative });
-
-        //     const representativeRelations = !!AuthUser && await mongoDB.collection("UserRepresentations")
-        //         .find({
-        //             representativeId: new ObjectId(Representative?._id),
-        //             representeeId: new ObjectId(AuthUser?._id),
-        //         });
-
-        //     // missing  stuff 
-
-        //     return representativeRelations;
-        // },
         UserVotes: async (_source, { handle, type = 'directVotesMade' }, { mongoDB, AuthUser }) => {
 
             const User = await mongoDB.collection("Users")
@@ -665,6 +650,98 @@ export const UserResolvers = {
 
             return Votes;
         },
+        UserQuestions: async (_source, {
+            handle,
+            sortBy,
+            notUsers
+        }, { mongoDB, AuthUser }) => {
+
+            const User = !!handle && await mongoDB.collection("Users")
+                .findOne({ 'LiquidUser.handle': handle });
+
+            const UserGroupMemberRelations = !!User && await mongoDB.collection("GroupMembers")
+                .find({ 'userId': new ObjectId(User?._id) })
+                .toArray();
+
+            const UserGroups = !!UserGroupMemberRelations && await mongoDB.collection("Groups").find({
+                "_id": {
+                    "$in": UserGroupMemberRelations.map(r => new ObjectId(r.groupId))
+                }
+            })
+                .toArray();
+
+            const Questions = await mongoDB.collection("Questions")
+                .aggregate(
+                    [
+                        ...(!!UserGroups && !notUsers) ? [{
+                            '$match': {
+                                'groupChannel.group': { '$in': UserGroups.map(g => g.handle) }
+                            }
+                        }] : [],
+                        ...(!!UserGroups && notUsers) ? [{
+                            '$match': {
+                                'groupChannel.group': { '$nin': UserGroups.map(g => g.handle) }
+                            }
+                        }] : [],
+                        {
+                            '$addFields': {
+                                'stats.lastEditOrVote': {
+                                    '$cond': [
+                                        {
+                                            '$gt': [
+                                                '$lastEditOn', '$stats.lastVoteOn'
+                                            ]
+                                        }, '$lastEditOn', '$stats.lastVoteOn'
+                                    ]
+                                },
+                                'stats.totalVotes': {
+                                    '$sum': [
+                                        '$stats.directVotes', '$stats.indirectVotes'
+                                    ]
+                                },
+                                // 'thisUserIsAdmin': {
+                                //     '$eq': ['$createdBy', AuthUser?.LiquidUser?.handle]
+                                // }
+                            }
+                        },
+                        ...(sortBy === 'weight') ? [
+                            {
+                                '$sort': { 'stats.totalVotes': -1 }
+                            }
+                        ] : [],
+                        ...(sortBy === 'time') ? [
+                            {
+                                '$sort': { 'stats.lastEditOrVote': -1 }
+                            }
+                        ] : []
+                    ]
+                )
+                .toArray();
+
+            // TODO: move this logic to the aggregation, it'll run much faster
+            return await Promise.all(Questions.map(async (q) => ({
+                ...q,
+                // thisUserIsAdmin: q.createdBy === AuthUser?.LiquidUser?.handle,
+                ...(q.questionType === 'single' && !!AuthUser) && {
+                    userVote: await mongoDB.collection("Votes").findOne({
+                        questionText: q.questionText,
+                        'groupChannel.group': q.groupChannel.group,
+                        user: AuthUser?._id
+                    })
+                },
+                ...(q.questionType === 'multi' && !!AuthUser) && {
+                    choices: await Promise.all(q.choices.map(async (c) => ({
+                        ...c,
+                        userVote: await mongoDB.collection("Votes").findOne({
+                            questionText: q.questionText,
+                            'groupChannel.group': q.groupChannel.group,
+                            choiceText: c.text,
+                            user: AuthUser?._id
+                        })
+                    })))
+                }
+            })));
+        }
     },
     Mutation: {
         editUser: async (_source, { User }, { mongoDB, AuthUser }) => {

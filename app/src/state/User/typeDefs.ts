@@ -113,8 +113,8 @@ export const USER_REPRESENTED_BY = gql`
 `;
 
 export const USER_GROUPS = gql`
-  query($handle: String!, $representative: String) {
-    UserGroups(handle: $handle, representative: $representative) {
+  query($handle: String!, $representative: String, $notUsers: Boolean) {
+    UserGroups(handle: $handle, representative: $representative, notUsers: $notUsers) {
         handle
         name
         bio
@@ -239,6 +239,90 @@ export const USER_VOTES = gql`
   }
 `;
 
+export const USER_QUESTIONS = gql`
+  query($handle: String, $sortBy: String, $notUsers: Boolean) {
+    UserQuestions(handle: $handle, sortBy: $sortBy, notUsers: $notUsers) {
+        questionText
+        questionType
+        startText
+        choices {
+            text
+            stats {
+                ...stats
+            }
+            userVote {
+                questionText
+                position
+                representatives {
+                    representativeHandle
+                    representativeAvatar
+                    representativeName
+                    position
+                    forWeight
+                    againstWeight
+
+                    createdOn
+                    lastEditOn
+                }
+                
+                createdOn
+                lastEditOn
+            }
+        }
+        groupChannel {
+            group
+            channel
+        }
+        resultsOn
+
+        stats {
+            ...stats
+        }
+        userVote {
+          questionText
+          position
+          representatives {
+            representativeHandle
+            representativeAvatar
+            representativeName
+            position
+
+            createdOn
+            lastEditOn
+          }
+          
+          createdOn
+          lastEditOn
+        }
+        createdOn
+        lastEditOn
+        thisUserIsAdmin
+    }
+  }
+
+  fragment stats on QuestionStats {
+		lastVoteOn
+        forCount
+        forDirectCount
+        forMostRepresentingVoters {
+            handle
+            avatar
+            name
+            representeeCount
+        }
+        againstCount
+        againstMostRepresentingVoters {
+            handle
+            avatar
+            name
+            representeeCount
+        }
+        againstDirectCount
+        directVotes
+        indirectVotes
+    }
+`;
+
 export const EDIT_USER = gql`
   mutation ($User: JSON!) {
     editUser(User: $User)
@@ -258,6 +342,8 @@ export const EDIT_GROUP_MEMBER_CHANNEL_RELATION = gql`
         Channels: $Channels,
         IsMember: $IsMember
     ) {
+        groupId
+        userId
         createdOn
         lastEditOn
         isMember

@@ -42,7 +42,10 @@ export default function App() {
                         <Route path="/profile" component={loadable(() => import('./components/routes/Profile'))} />
                         <Route path="/profile-people/:handle/:which" component={loadable(() => import('./components/routes/ProfilePeople'))} />
                         <Route path="/trending" component={loadable(() => import('./components/routes/Trending'))} />
-                        <Route path="/feed" component={loadable(() => import('./components/routes/Feed'))} />
+                        <Route path="/home/:section" component={loadable(() => import('./components/routes/Feed'))} />
+                        <Route path="/home" component={loadable(() => import('./components/routes/Feed'))} />
+                        <Route path="/notifications" component={loadable(() => import('./components/routes/Notifications'))} />
+                        <Route path="/groups/:section" component={loadable(() => import('./components/routes/Groups'))} />
                         <Route path="/groups" component={loadable(() => import('./components/routes/Groups'))} />
                         <Route path="/group/:handle/:section/:subsection/:subsubsection" component={loadable(() => import('./components/routes/Group'))} />
                         <Route path="/group/:handle/:section/:subsection" component={loadable(() => import('./components/routes/Group'))} />
