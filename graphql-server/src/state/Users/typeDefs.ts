@@ -71,10 +71,10 @@ export const UserTypeDefs = gql`
             representative: String,
             notUsers: Boolean
         ): [Group],
-        UserVotes(
-            handle: String,
-            type: String
-        ):  [Vote]
+        # UserVotes(
+        #     handle: String,
+        #     type: String
+        # ):  [Vote]
         UserQuestions(
             handle: String,
             sortBy: String,

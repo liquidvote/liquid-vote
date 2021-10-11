@@ -231,13 +231,6 @@ export const VoteResolvers = {
                                                     ]
                                                 }
                                             },
-                                            // {
-                                            //     '$expr': {
-                                            //         '$eq': [
-                                            //             '$groupChannel.channel', '$$channel'
-                                            //         ]
-                                            //     }
-                                            // }
                                         ]
                                     }
                                 },
@@ -484,8 +477,7 @@ export const VoteResolvers = {
                             ...userObjectAggregationLogic
                         ])
                         .toArray(),
-                    'indirectVotesMade': async () => await mongoDB.collection("Votes")
-                        // .find({ 'user': new ObjectId(User?._id), 'isDirect': false })
+                    'indirectVotesMade': async () => await mongoDB.collection("Votes") // hum
                         .aggregate([
                             ...votesInCommonGeneralAggregationLogic,
                             ...representeeVotesAggregationLogic,
@@ -494,22 +486,7 @@ export const VoteResolvers = {
                             ...questionStatsAggregationLogic
                         ])
                         .toArray(),
-                    'indirectVotes': async () => await mongoDB.collection("Votes")
-                        // .find({ 'user': new ObjectId(User?._id), 'isDirect': false })
-                        .aggregate([
-                            ...votesInCommonGeneralAggregationLogic,
-                            {
-                                '$match': {
-                                    'isDirect': false,
-                                }
-                            },
-                            ...representeeVotesAggregationLogic,
-                            ...sortLogic,
-                            ...questionStatsAggregationLogic
-                        ])
-                        .toArray(),
-                    'indirectVotesMadeByUser': async () => await mongoDB.collection("Votes")
-                        // .find({ 'user': new ObjectId(User?._id), 'isDirect': false })
+                    'indirectVotesMadeForUser': async () => await mongoDB.collection("Votes")
                         .aggregate([
                             ...votesInCommonGeneralAggregationLogic,
                             {
@@ -522,6 +499,7 @@ export const VoteResolvers = {
                             ...userObjectAggregationLogic
                         ])
                         .toArray(),
+                    'indirectVotesMadeByUser': [], //TODO
                     'indirectVotesMadeByYou': async () => await mongoDB.collection("Votes")
                         .aggregate([
                             ...votesInCommonGeneralAggregationLogic,

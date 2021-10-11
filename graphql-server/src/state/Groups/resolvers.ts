@@ -287,8 +287,7 @@ const getYourGroupStats = async ({ groupId, groupHandle, AuthUser, mongoDB }) =>
                             'userId': new ObjectId(AuthUser._id),
                             'questionText': '$questionText',
                             'choiceText': '$choiceText',
-                            'group': '$groupChannel.group',
-                            'channel': '$groupChannel.channel'
+                            'group': '$groupChannel.group'
                         },
                         'pipeline': [
                             {
@@ -321,13 +320,6 @@ const getYourGroupStats = async ({ groupId, groupHandle, AuthUser, mongoDB }) =>
                                             '$expr': {
                                                 '$eq': [
                                                     '$groupChannel.group', '$$group'
-                                                ]
-                                            }
-                                        },
-                                        {
-                                            '$expr': {
-                                                '$eq': [
-                                                    '$groupChannel.channel', '$$channel'
                                                 ]
                                             }
                                         }

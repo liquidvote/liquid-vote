@@ -3,7 +3,6 @@ import { Link, useParams } from "react-router-dom";
 import { useQuery, useMutation } from "@apollo/client";
 
 import useAuthUser from '@state/AuthUser/authUser.effect';
-import { USER, USER_VOTES } from "@state/User/typeDefs";
 import { VOTES } from "@state/Vote/typeDefs";
 import Notification from '@shared/Notification';
 import SortSmallSvg from "@shared/Icons/Sort-small.svg";

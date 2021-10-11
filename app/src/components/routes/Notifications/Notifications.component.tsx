@@ -22,7 +22,7 @@ export const Notifications: FunctionComponent<{}> = ({ }) => {
     } = useQuery(VOTES, {
         variables: {
             userHandle: liquidUser?.handle,
-            type: 'indirectVotes',
+            type: 'indirectVotesMadeForUser',
             sortBy: 'time'
         }
     });

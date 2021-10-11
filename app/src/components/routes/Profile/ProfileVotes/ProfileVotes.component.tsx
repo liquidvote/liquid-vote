@@ -3,7 +3,7 @@ import { Link, useParams } from "react-router-dom";
 import { useQuery, useMutation } from "@apollo/client";
 
 import useAuthUser from '@state/AuthUser/authUser.effect';
-import { USER, USER_VOTES } from "@state/User/typeDefs";
+import { USER } from "@state/User/typeDefs";
 import { VOTES } from "@state/Vote/typeDefs";
 import Notification from '@shared/Notification';
 import { VoteTimeline } from "@state/Mock/Notifications";
@@ -41,7 +41,7 @@ export const ProfileVotes: FunctionComponent<{}> = ({ }) => {
         } else if (subsubsection === 'different') {
             return 'directVotesInDisagreement';
         } else if (subsection === 'represented' && !subsubsection) {
-            return 'indirectVotes'
+            return 'indirectVotesMadeForUser'
         } else if (subsection === 'represented' && subsubsection === 'byyou') {
             return 'indirectVotesMadeByYou';
         } else if (subsection === 'represented' && subsubsection === 'foryou') {
@@ -106,7 +106,7 @@ export const ProfileVotes: FunctionComponent<{}> = ({ }) => {
                     <ul className="nav d-flex justify-content-around mt-n2 mx-n3">
                         <li className="nav-item">
                             <Link className={`nav-link ${!subsubsection && 'active'}`} to={`/profile/${handle}/votes/represented`}>
-                                <b>{profile?.stats?.indirectVotesMadeByUser}</b> By anyone
+                                <b>{profile?.stats?.indirectVotesMadeForUser}</b> By anyone
                             </Link>
                         </li>
                         <li className="nav-item">
@@ -135,7 +135,7 @@ export const ProfileVotes: FunctionComponent<{}> = ({ }) => {
                                 return 'hasn\'t agreed with you on any polls';
                             } else if (type === 'directVotesInDisagreement') {
                                 return 'hasn\'t disagreed with you on any polls';
-                            } else if (type === 'indirectVotes') {
+                            } else if (type === 'indirectVotesMadeForUser') {
                                 return 'hasn\'t been represented on any polls'
                             } else if (type === 'indirectVotesMadeByYou') {
                                 return 'hasn\'t been represented by you on any polls';
