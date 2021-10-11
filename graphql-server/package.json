@@ -5,6 +5,7 @@
   "main": "index.js",
   "scripts": {
     "start": "npx sls offline",
+    "dev:server": "nodemon --watch './**/*.ts' --exec 'ts-node' src/index-server.ts",
     "test": "echo \"Error: no test specified\" && exit 1",
     "build": "tsc --build",
     "deploy": "npm run deploy:dev",
@@ -23,10 +24,11 @@
     "@aws-sdk/types": "^3.29.0",
     "apollo-datasource-rest": "^3.2.0",
     "apollo-server-lambda": "^2",
-    "graphql": "^15.5.2",
     "mongodb": "^3.7"
   },
   "devDependencies": {
+    "apollo-server": "^2",
+    "nodemon": "^2.0.13",
     "serverless": "^2.57.0",
     "serverless-domain-manager": "^5.1.5",
     "serverless-offline": "^8.2.0",

@@ -74,8 +74,7 @@ export const ArgumentForm: FunctionComponent<{}> = ({ }) => {
 
     return (
         <form onSubmit={handleSubmit(onSubmit)} className="argumentForm">
-
-     
+            Hey!
         </form>
     );
 }

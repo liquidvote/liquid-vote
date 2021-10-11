@@ -1,9 +1,6 @@
-// IMPORTS NOT WORKING
-
-// import { ApolloServer, gql } from "apollo-server-lambda";
 const MongoClient = require("mongodb").MongoClient;
 
-const atlasCredentials = require("../credentials/atlas-credentials.json");
+const atlasCredentials = require("../../credentials/atlas-credentials.json");
 import { AuthUserTypeDefs, AuthUserResolvers } from "../state/AuthUser";
 import { UserTypeDefs, UserResolvers } from "../state/Users";
 import { GroupTypeDefs, GroupResolvers } from "../state/Groups";
@@ -88,8 +85,8 @@ export const configServer = async ({ ApolloServer, gql }) => {
                 ...S3Resolvers.Mutation
             }
         },
-        context: async ({ event }) => {
-            const token = event.headers.authorization || event.headers.Authorization || null;
+        context: async ({ req, event }) => {
+            const token = req?.headers.authorization || event?.headers.authorization || event?.headers.Authorization || null;
 
             const AuthUser = !!token && await DBConnection.collection("Users")
                 .findOne({ 'Auth0User.sub': token });
