@@ -8,6 +8,7 @@ import { QuestionTypeDefs, QuestionResolvers } from "../state/Questions";
 import { VoteTypeDefs, VoteResolvers } from "../state/Votes";
 import { InviteTypeDefs, InviteResolvers } from "../state/Invites";
 import { S3TypeDefs, S3Resolvers } from "../state/S3";
+import { ArgumentTypeDefs, ArgumentResolvers } from "../state/Arguments";
 
 const mongoClient = new MongoClient(
     `mongodb+srv://${atlasCredentials.username}:${atlasCredentials.password}@aiaiaiaminhavida.oobyz.mongodb.net/Enron?retryWrites=true&w=majority`,
@@ -56,7 +57,8 @@ export const configServer = async ({ ApolloServer, gql }) => {
             QuestionTypeDefs,
             VoteTypeDefs,
             InviteTypeDefs,
-            S3TypeDefs
+            S3TypeDefs,
+            ArgumentTypeDefs
         ],
         resolvers: {
             ...AuthUserResolvers,
@@ -66,6 +68,7 @@ export const configServer = async ({ ApolloServer, gql }) => {
             ...VoteResolvers,
             ...InviteResolvers,
             ...S3Resolvers,
+            ...ArgumentResolvers,
             Query: {
                 ...AuthUserResolvers.Query,
                 ...UserResolvers.Query,
@@ -74,6 +77,7 @@ export const configServer = async ({ ApolloServer, gql }) => {
                 ...VoteResolvers.Query,
                 ...InviteResolvers.Query,
                 // ...S3Resolvers.Query
+                ...ArgumentResolvers.Query
             },
             Mutation: {
                 ...AuthUserResolvers.Mutation,
@@ -82,7 +86,8 @@ export const configServer = async ({ ApolloServer, gql }) => {
                 ...QuestionResolvers.Mutation,
                 ...VoteResolvers.Mutation,
                 ...InviteResolvers.Mutation,
-                ...S3Resolvers.Mutation
+                ...S3Resolvers.Mutation,
+                ...ArgumentResolvers.Mutation
             }
         },
         context: async ({ req, event }) => {

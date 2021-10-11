@@ -186,7 +186,7 @@ export default function Question() {
                             Arguments
                         </Link>
                     </li>
-                    <li className="nav-item">
+                    {/* <li className="nav-item">
                         <Link className={`nav-link ${section === 'votesby' && 'active'}`} to={`/poll/${voteName}/${groupHandle}/votesby`}>
                             Votes by 🧪
                         </Link>
@@ -195,7 +195,7 @@ export default function Question() {
                         <Link className={`nav-link ${(!section || section === 'timeline') && 'active'}`} to={`/poll/${voteName}/${groupHandle}/timeline`}>
                             Votes
                         </Link>
-                    </li>
+                    </li> */}
                 </ul>
 
                 <br />

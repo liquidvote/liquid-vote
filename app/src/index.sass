@@ -426,8 +426,18 @@ hr
 .light
     opacity: 0.7
 
+.profile-avatar
+    height: 130px
+    width: 130px
+    margin: 0 -15px
+    border-radius: 150px
+
+.comment-avatar
+    height: 60px
+    width: 60px
+    border-radius: 150px
+
 .vote-avatar
-    background-size: cover !important
     border-radius: 150px
     height: 30px
     width: 30px
@@ -443,8 +453,6 @@ hr
 .small-avatar
     height: 43px
     width: 43px
-    background: url(https://pbs.twimg.com/profile_images/1257731768569917440/DXgWC7tR_400x400.jpg) no-repeat
-    background-size: cover !important
     margin: 5px 15px 0 0px
     border-radius: 150px
 
@@ -592,6 +600,10 @@ hr
         &[disabled]
             color: grey
 
+        &.argument-input
+            border: none
+            padding-top: 0
+
     &.hasValue, &.isFocused
         >label
             top: 7px
@@ -653,3 +665,55 @@ hr
             &:last-child
                 border-radius: 0 0 5px 5px
                 border-bottom: 1px solid rgba(0,0,0,0.3)
+
+.profile-top
+    position: relative
+
+    .cover
+        height: 200px
+        margin: 0 -15px
+
+    .profile-avatar
+        position: absolute
+        top: 125px
+        left: 15px
+
+    .profile-buttons-container
+        display: flex
+        justify-content: flex-end
+        padding: 10px
+        margin-right: -15px
+
+.profile-name
+    font-weight: bold
+    font-size: 20px
+    margin: 5px 0px 0px
+
+.profile-handle
+    opacity: 0.7
+    padding: 0
+    margin: 0px 0px 5px
+
+.profile-icons-container
+    display: flex
+    flex-wrap: wrap
+
+    > div
+        display: flex
+        flex-direction: row
+        flex-wrap: nowrap
+        margin: 0 10px 0 0
+
+.profile-stats-container
+    display: flex
+    margin-top: 15px
+    margin: 0px -15px 0px
+    padding: 0px 15px
+    flex-wrap: wrap
+
+    > div
+        margin-right: 15px
+
+.profile-description
+    line-height: 20px
+    padding: 5px 0

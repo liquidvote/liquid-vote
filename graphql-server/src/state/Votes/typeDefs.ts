@@ -28,6 +28,7 @@ export const VoteTypeDefs = gql`
         representeeVotes: [Vote]
         representeeCount: Int
         yourVote: Vote
+        choiceVotes: [Vote]
 
         # createdBy
         user: User
