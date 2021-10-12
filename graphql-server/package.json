@@ -4,8 +4,8 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "start": "npx sls offline",
-    "dev:server": "nodemon --watch './**/*.ts' --exec 'ts-node' src/index-server.ts",
+    "start": "nodemon --watch './**/*.ts' --exec 'ts-node' src/index-server.ts",
+    "dev:server": "npx sls offline",
     "test": "echo \"Error: no test specified\" && exit 1",
     "build": "tsc --build",
     "deploy": "npm run deploy:dev",

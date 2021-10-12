@@ -46,6 +46,7 @@ export const RegisterBefore: FunctionComponent<{}> = ({ }) => {
                         {modalData?.toWhat === 'joinGroup' ? `Please Signup before joining ${modalData?.groupName}` :
                             modalData?.toWhat === 'vote' ? `Please Signup before voting on  ${modalData?.questionText}` :
                                 modalData?.toWhat === 'delegating' ? `Please Signup before delegating votes to ${modalData?.userName}` :
+                                    modalData?.toWhat === 'upVoteArgument'? `Please Signup before liking an argument` :
                         ''}
                     </p>
                 </div>

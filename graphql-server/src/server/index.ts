@@ -1,3 +1,9 @@
+// This server config serves both for `apollo-server` and `apollo-server-lambda`
+// which helps us use both locally and not depend only on `sls offline` which is crazy slow.
+
+// The big drawback is that not all config options are available on both,
+// so only muttually available configs can be used
+
 const MongoClient = require("mongodb").MongoClient;
 
 const atlasCredentials = require("../../credentials/atlas-credentials.json");
@@ -9,6 +15,7 @@ import { VoteTypeDefs, VoteResolvers } from "../state/Votes";
 import { InviteTypeDefs, InviteResolvers } from "../state/Invites";
 import { S3TypeDefs, S3Resolvers } from "../state/S3";
 import { ArgumentTypeDefs, ArgumentResolvers } from "../state/Arguments";
+import { ArgumentUpVotesTypeDefs, ArgumentUpVotesResolvers } from "../state/ArgumentUpVotes";
 
 const mongoClient = new MongoClient(
     `mongodb+srv://${atlasCredentials.username}:${atlasCredentials.password}@aiaiaiaminhavida.oobyz.mongodb.net/Enron?retryWrites=true&w=majority`,
@@ -58,7 +65,8 @@ export const configServer = async ({ ApolloServer, gql }) => {
             VoteTypeDefs,
             InviteTypeDefs,
             S3TypeDefs,
-            ArgumentTypeDefs
+            ArgumentTypeDefs,
+            ArgumentUpVotesTypeDefs
         ],
         resolvers: {
             ...AuthUserResolvers,
@@ -69,6 +77,7 @@ export const configServer = async ({ ApolloServer, gql }) => {
             ...InviteResolvers,
             ...S3Resolvers,
             ...ArgumentResolvers,
+            ...ArgumentUpVotesResolvers,
             Query: {
                 ...AuthUserResolvers.Query,
                 ...UserResolvers.Query,
@@ -77,7 +86,8 @@ export const configServer = async ({ ApolloServer, gql }) => {
                 ...VoteResolvers.Query,
                 ...InviteResolvers.Query,
                 // ...S3Resolvers.Query
-                ...ArgumentResolvers.Query
+                ...ArgumentResolvers.Query,
+                ...ArgumentUpVotesResolvers.Query
             },
             Mutation: {
                 ...AuthUserResolvers.Mutation,
@@ -87,7 +97,8 @@ export const configServer = async ({ ApolloServer, gql }) => {
                 ...VoteResolvers.Mutation,
                 ...InviteResolvers.Mutation,
                 ...S3Resolvers.Mutation,
-                ...ArgumentResolvers.Mutation
+                ...ArgumentResolvers.Mutation,
+                ...ArgumentUpVotesResolvers.Mutation
             }
         },
         context: async ({ req, event }) => {

@@ -4,6 +4,8 @@ export const ArgumentTypeDefs = gql`
 
     type Argument {
         argumentText: String
+        stats: ArgumentStats
+        yourUpVote: Boolean
 
         question: Question
         user: User
@@ -12,6 +14,11 @@ export const ArgumentTypeDefs = gql`
 
         createdOn: String
         lastEditOn: String
+    }
+
+    type ArgumentStats {
+        lastVoteOn: String
+        votes: Float
     }
 
     extend type Query {

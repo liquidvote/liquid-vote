@@ -109,7 +109,7 @@ export default function Question() {
             )}
             <h2 className="mb-2 white pre-wrap"><b>{voteName}</b>?</h2>
 
-            <p>
+            <p className="pre-wrap">
                 Description will go here <br></br>
                 Description will go here <br></br>
                 Description will go here <br></br>

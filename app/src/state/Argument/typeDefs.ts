@@ -4,6 +4,10 @@ export const ARGUMENT = gql`
   query($questionText: String, $groupHandle: String, $userHandle: String) {
     Argument(questionText: $questionText, groupHandle: $groupHandle, userHandle: $userHandle) {
         argumentText,
+        stats {
+            votes
+        },
+        yourUpVote,
         question {
             questionText
             groupChannel {
@@ -29,6 +33,10 @@ export const ARGUMENTS = gql`
   query($questionText: String, $groupHandle: String, $userHandle: String, $sortBy: String) {
     Arguments(questionText: $questionText, groupHandle: $groupHandle, userHandle: $userHandle, sortBy: $sortBy) {
         argumentText,
+        stats {
+            votes
+        },
+        yourUpVote,
         question {
             questionText
             groupChannel {
@@ -69,5 +77,4 @@ export const EDIT_ARGUMENT = gql`
             lastEditOn
         }
     }
-
 `;

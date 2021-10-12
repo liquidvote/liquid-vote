@@ -1,12 +1,31 @@
 import React, { FunctionComponent } from 'react';
 import { Link } from 'react-router-dom';
+import { useQuery, useMutation } from "@apollo/client";
 
 import { timeAgo } from '@state/TimeAgo';
 import GroupSvg from "@shared/Icons/Group.svg";
+import LikeSVG from '@components/shared/Icons/Like.svg';
+import LikedSVG from '@components/shared/Icons/Liked.svg';
+import { EDIT_ARGUMENT_UP_VOTE } from "@state/ArgumentUpVotes/typeDefs";
+import useAuthUser from '@state/AuthUser/authUser.effect';
+import useSearchParams from "@state/Global/useSearchParams.effect";
 
 import './style.sass';
 
 export const ArgumentInList: FunctionComponent<{ a: any }> = ({ a }) => {
+
+    const { liquidUser } = useAuthUser();
+    const { allSearchParams, updateParams } = useSearchParams();
+
+    const [editArgumentUpVote, {
+        loading: editArgumentUpVote_loading,
+        error: editArgumentUpVote_error,
+        data: editArgumentUpVote_data,
+    }] = useMutation(EDIT_ARGUMENT_UP_VOTE);
+
+    const voted = !!editArgumentUpVote_data ? editArgumentUpVote_data.editArgumentUpVote.voted : a?.yourUpVote;
+    const count = !!editArgumentUpVote_data ? editArgumentUpVote_data?.editArgumentUpVote.argument.stats.votes : a?.stats.votes;
+
     return (
         <>
             <div className="d-flex">
@@ -40,15 +59,37 @@ export const ArgumentInList: FunctionComponent<{ a: any }> = ({ a }) => {
                             </div> */}
                         </div>
                     </div>
-                    <p className="mt-1 mb-0 white">
+                    <p className="mt-1 mb-0 white pre-wrap">
                         {a.argumentText}
                     </p>
+                    {/* <pre>{JSON.stringify(a, null, 2)}</pre> */}
+                    <div className="mt-1 d-flex align-items-center">
+                        <div className="pointer mr-1" onClick={() => !!liquidUser ? editArgumentUpVote({
+                            variables: {
+                                questionText: a.question.questionText,
+                                groupHandle: a.group.handle,
+                                userHandle: liquidUser?.handle,
+                                voted: !voted
+                            }
+                        }) : updateParams({
+                            paramsToAdd: {
+                                modal: "RegisterBefore",
+                                modalData: JSON.stringify({
+                                    toWhat: 'upVoteArgument'
+                                })
+                            }
+                        })}>{!!voted ? <LikedSVG /> : <LikeSVG />}</div>
+                        <div>{count > 0 ? count : ''}</div>
+                        {editArgumentUpVote_loading && (
+                            <img
+                                className="vote-avatar"
+                                src={'http://images.liquid-vote.com/system/loading.gif'}
+                                alt={'loading'}
+                            />
+                        )}
+                    </div>
                 </div>
             </div>
-
-            {/* <p className="mt-1 mb-0">
-                {a.argumentText}
-            </p> */}
             <hr />
         </>
     );

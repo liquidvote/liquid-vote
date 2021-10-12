@@ -54,6 +54,27 @@ export const ArgumentResolvers = {
                                 'question': new ObjectId(question._id)
                             }
                         }, {
+                            '$sort': { 'stats.votes': -1 }
+                        },{
+                            '$lookup': {
+                                'from': 'ArgumentUpVotes',
+                                'let': {
+                                    'argumentId': '$_id',
+                                    'userId': new ObjectId(AuthUser._id)
+                                },
+                                'pipeline': [
+                                    {
+                                        '$match': {
+                                            '$and': [
+                                                { '$expr': { '$eq': [ '$user', '$$userId' ] } },
+                                                { '$expr': { '$eq': [ '$argument', '$$argumentId' ] } }
+                                            ]
+                                        }
+                                    }
+                                ],
+                                'as': 'yourUpVote'
+                            }
+                        }, {
                             '$lookup': {
                                 'from': 'Groups',
                                 'localField': 'group',
@@ -84,19 +105,19 @@ export const ArgumentResolvers = {
                                 },
                                 'question': {
                                     '$first': '$question'
+                                },
+                                'yourUpVote': {
+                                    '$first': '$yourUpVote'
                                 }
                             }
                         }, {
                             '$addFields': {
-                                'user': '$user.LiquidUser'
+                                'user': '$user.LiquidUser',
+                                'yourUpVote': '$yourUpVote.voted'
                             }
                         }
                     ])?.toArray()
             );
-
-            console.log({
-                argumentList
-            });
 
             return argumentList;
         },
@@ -152,3 +173,28 @@ export const ArgumentResolvers = {
         },
     },
 };
+
+export const updateArgumentStats = async ({
+    argumentId,
+    mongoDB
+}) => {
+
+    const votes = await mongoDB.collection("ArgumentUpVotes")
+        .find({
+            "argument": new ObjectId(argumentId),
+            "voted": true
+        }).count();
+
+    const dbDoc = await mongoDB.collection("Arguments")
+        .findOneAndUpdate({
+            _id: new ObjectId(argumentId)
+        }, {
+            $set: { "stats.votes": votes }
+        }, {
+            returnDocument: 'after'
+        });
+
+    return {
+        votes
+    };
+}
