@@ -120,21 +120,6 @@ export const Group: FunctionComponent<{}> = ({ }) => {
                 <div className="d-flex mb-n1 ml-n1 flex-wrap justify-content-end">
                     {isMember && (
                         <>
-                            {/* <div
-                                className="button_ small mb-0"
-                                onClick={() => updateParams({
-                                    paramsToAdd: {
-                                        modal: "InviteFor",
-                                        modalData: JSON.stringify({
-                                            InviteType: 'representation',
-                                            groupHandle: group.handle,
-                                            groupName: group.name
-                                        })
-                                    }
-                                })}
-                            >
-                                Invite Representees
-                            </div> */}
                             <div
                                 className="button_ small mb-2 ml-2"
                                 onClick={() => updateParams({

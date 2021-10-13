@@ -36,10 +36,6 @@ export const QuestionArguments: FunctionComponent<{}> = ({ }) => {
 
     const { liquidUser } = useAuthUser();
 
-    console.log({
-        arguments_data
-    });
-
     return (
         <>
 
@@ -50,27 +46,15 @@ export const QuestionArguments: FunctionComponent<{}> = ({ }) => {
                 </>
             )}
 
-            {!arguments_data?.Arguments?.length &&  (
-                <p className="py-5 text-center">No one has made any arguments on this poll yet.</p>
+            {!arguments_data?.Arguments?.filter(a => a.user.handle !== liquidUser?.handle)?.length && (
+                <p className="py-5 text-center">No one else has made any arguments on this poll yet.</p>
             )}
 
-            {arguments_data?.Arguments?.map(a =>
-                <ArgumentInList a={a} />
-            )}
-
-            {/* <pre>
-                {JSON.stringify({
-                    type
-                }, null, 2)}
-            </pre>
-
-            <pre>
-                {JSON.stringify(question_voters_data, null, 2)}
-            </pre> */}
-
-
-
-
+            {arguments_data?.Arguments?.filter(a => a.user.handle !== liquidUser?.handle)?.
+                map(a =>
+                    <ArgumentInList key={a.user.handle} a={a} />
+                )
+            }
         </>
     );
 }

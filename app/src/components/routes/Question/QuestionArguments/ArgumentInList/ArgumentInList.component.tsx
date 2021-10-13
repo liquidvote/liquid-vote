@@ -23,8 +23,8 @@ export const ArgumentInList: FunctionComponent<{ a: any }> = ({ a }) => {
         data: editArgumentUpVote_data,
     }] = useMutation(EDIT_ARGUMENT_UP_VOTE);
 
-    const voted = !!editArgumentUpVote_data ? editArgumentUpVote_data.editArgumentUpVote.voted : a?.yourUpVote;
-    const count = !!editArgumentUpVote_data ? editArgumentUpVote_data?.editArgumentUpVote.argument.stats.votes : a?.stats.votes;
+    const voted = !!editArgumentUpVote_data ? editArgumentUpVote_data?.editArgumentUpVote?.voted : a?.yourUpVote;
+    const count = !!editArgumentUpVote_data ? editArgumentUpVote_data?.editArgumentUpVote?.argument?.stats?.votes : a?.stats?.votes;
 
     return (
         <>
@@ -82,7 +82,7 @@ export const ArgumentInList: FunctionComponent<{ a: any }> = ({ a }) => {
                         <div>{count > 0 ? count : ''}</div>
                         {editArgumentUpVote_loading && (
                             <img
-                                className="vote-avatar"
+                                className="vote-avatar ml-1"
                                 src={'http://images.liquid-vote.com/system/loading.gif'}
                                 alt={'loading'}
                             />

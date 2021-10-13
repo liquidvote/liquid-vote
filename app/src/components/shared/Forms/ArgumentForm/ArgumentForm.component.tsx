@@ -13,6 +13,10 @@ import MultiChoices from "@shared/Inputs/MultiChoices";
 import { ARGUMENT, EDIT_ARGUMENT } from "@state/Argument/typeDefs";
 import ArgumentInput from "@shared/Inputs/ArgumentInput";
 import useAuthUser from '@state/AuthUser/authUser.effect';
+import { EDIT_ARGUMENT_UP_VOTE } from "@state/ArgumentUpVotes/typeDefs";
+import LikeSVG from '@components/shared/Icons/Like.svg';
+import LikedSVG from '@components/shared/Icons/Liked.svg';
+import { timeAgo } from '@state/TimeAgo';
 
 import './style.sass';
 
@@ -45,6 +49,12 @@ export const ArgumentForm: FunctionComponent<{}> = ({ }) => {
         data: editArgument_data,
     }] = useMutation(EDIT_ARGUMENT);
 
+    const [editArgumentUpVote, {
+        loading: editArgumentUpVote_loading,
+        error: editArgumentUpVote_error,
+        data: editArgumentUpVote_data,
+    }] = useMutation(EDIT_ARGUMENT_UP_VOTE);
+
     const {
         handleSubmit, register, formState: { errors, isValid }, watch, setValue
     } = useForm<IFormValues>({
@@ -66,6 +76,8 @@ export const ArgumentForm: FunctionComponent<{}> = ({ }) => {
                     argumentText: values.argumentText
                 }
             }
+        }).then(() => {
+            argument_refetch();
         });
     }
 
@@ -74,6 +86,9 @@ export const ArgumentForm: FunctionComponent<{}> = ({ }) => {
             setValue('argumentText', argument_data?.Argument?.argumentText);
         };
     }, [argument_data?.Argument?.argumentText]);
+
+    const voted = !!editArgumentUpVote_data ? editArgumentUpVote_data?.editArgumentUpVote?.voted : argument_data?.Argument?.yourUpVote;
+    const count = !!editArgumentUpVote_data ? editArgumentUpVote_data?.editArgumentUpVote.argument?.stats?.votes : argument_data?.Argument?.stats?.votes;
 
     return (
         <form onSubmit={handleSubmit(onSubmit)} className="argumentForm">
@@ -86,21 +101,83 @@ export const ArgumentForm: FunctionComponent<{}> = ({ }) => {
                     }}
                 />
 
-                <div className="flex-grow-1 ml-2">
-                    {((name: keyof IFormValues) => (
-                        <ArgumentInput
-                            name={name}
-                            register={register(name, {
-                                required: true
-                            })}
-                            value={watch(name)}
-                            error={errors[name]}
-                        />
-                    ))('argumentText')}
+                <div className="flex-grow-1 ml-3">
+                    <div className="mb-n1 flex-fill d-flex align-items-center justify-content-between">
+                        <div className="w-75">
+                            <div className="d-block">
+                                <b className="mr-1">{liquidUser?.name}</b>
+                            </div>
+                        </div>
+                        {!!argument_data?.Argument?.lastEditOn && (
+                            <div className="d-flex flex-column justify-content-end mw-25" style={{ flex: 1 }}>
+                                <small className="text-right" data-tip="Voted on">
+                                    {timeAgo.format(new Date(Number(argument_data?.Argument?.lastEditOn)))}
+                                </small>
+                            </div>
+                        )}
+                    </div>
+                    <div className="">
+                        {((name: keyof IFormValues) => (
+                            <ArgumentInput
+                                name={name}
+                                register={register(name, {
+                                    required: true
+                                })}
+                                value={watch(name)}
+                                error={errors[name]}
+                            />
+                        ))('argumentText')}
+                    </div>
+                    <div className="d-flex align-items-center justify-content-between">
+                        <div>
+                            {argument_data?.Argument?.argumentText && (
+                                <div className="d-flex align-items-center">
+                                    <div className="pointer mr-1" onClick={() => editArgumentUpVote({
+                                        variables: {
+                                            questionText: argument_data?.Argument.question.questionText,
+                                            groupHandle: argument_data?.Argument.group.handle,
+                                            userHandle: liquidUser?.handle,
+                                            voted: !voted
+                                        }
+                                    })}>{!!voted ? <LikedSVG /> : <LikeSVG />}</div>
+                                    <div>{count > 0 ? count : ''}</div>
+                                    {editArgumentUpVote_loading && (
+                                        <img
+                                            className="vote-avatar ml-1"
+                                            src={'http://images.liquid-vote.com/system/loading.gif'}
+                                            alt={'loading'}
+                                        />
+                                    )}
+                                </div>
+                            )}
+                        </div>
+                        <div className="d-flex align-items-center">
+                            {editArgument_loading && (
+                                <img
+                                    className="vote-avatar ml-1"
+                                    src={'http://images.liquid-vote.com/system/loading.gif'}
+                                    alt={'loading'}
+                                />
+                            )}
+                            <button
+                                className="button_ small ml-1"
+                                type="submit"
+                                disabled={
+                                    !watch('argumentText') ||
+                                    argument_data?.Argument?.argumentText === watch('argumentText')
+                                }
+                            >
+                                {argument_data?.Argument?.argumentText ?
+                                    'Update' :
+                                    'State your case'
+                                }
+                            </button>
+                        </div>
+                    </div>
                 </div>
             </div>
 
-            <div className="d-flex justify-content-end">
+            {/* <div className="d-flex justify-content-end">
                 <button
                     className="button_ small"
                     type="submit"
@@ -114,7 +191,7 @@ export const ArgumentForm: FunctionComponent<{}> = ({ }) => {
                         'State your case'
                     }
                 </button>
-            </div>
+            </div> */}
         </form>
     );
 }

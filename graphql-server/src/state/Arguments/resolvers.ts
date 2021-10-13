@@ -17,17 +17,84 @@ export const ArgumentResolvers = {
                 'LiquidUser.handle': userHandle,
             });
 
-            return {
-                ...await mongoDB.collection("Arguments")
-                    .findOne({
-                        question: new ObjectId(question._id),
-                        group: new ObjectId(group._id),
-                        user: new ObjectId(user._id)
-                    }),
-                group,
-                question,
-                user: user?.LiquidUser
-            }
+            const argumentList = (
+                await mongoDB.collection("Arguments")
+                    .aggregate([
+                        {
+                            '$match': {
+                                'group': new ObjectId(group._id),
+                                'question': new ObjectId(question._id),
+                                'user': new ObjectId(user._id)
+                            }
+                        }, {
+                            '$sort': { 'stats.votes': -1 }
+                        },{
+                            '$lookup': {
+                                'from': 'ArgumentUpVotes',
+                                'let': {
+                                    'argumentId': '$_id',
+                                    'userId': new ObjectId(AuthUser._id)
+                                },
+                                'pipeline': [
+                                    {
+                                        '$match': {
+                                            '$and': [
+                                                { '$expr': { '$eq': [ '$user', '$$userId' ] } },
+                                                { '$expr': { '$eq': [ '$argument', '$$argumentId' ] } }
+                                            ]
+                                        }
+                                    }
+                                ],
+                                'as': 'yourUpVote'
+                            }
+                        }, {
+                            '$lookup': {
+                                'from': 'Groups',
+                                'localField': 'group',
+                                'foreignField': '_id',
+                                'as': 'group'
+                            }
+                        }, {
+                            '$lookup': {
+                                'from': 'Users',
+                                'localField': 'user',
+                                'foreignField': '_id',
+                                'as': 'user'
+                            }
+                        }, {
+                            '$lookup': {
+                                'from': 'Questions',
+                                'localField': 'question',
+                                'foreignField': '_id',
+                                'as': 'question'
+                            }
+                        }, {
+                            '$addFields': {
+                                'user': {
+                                    '$first': '$user'
+                                },
+                                'group': {
+                                    '$first': '$group'
+                                },
+                                'question': {
+                                    '$first': '$question'
+                                },
+                                'yourUpVote': {
+                                    '$first': '$yourUpVote'
+                                }
+                            }
+                        }, {
+                            '$addFields': {
+                                'user': '$user.LiquidUser',
+                                'yourUpVote': '$yourUpVote.voted'
+                            }
+                        }
+                    ])?.toArray()
+            );
+
+
+
+            return argumentList[0];
         },
         Arguments: async (_source, {
             questionText,

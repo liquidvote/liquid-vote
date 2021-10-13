@@ -31,11 +31,8 @@ export const RegisterBefore: FunctionComponent<{}> = ({ }) => {
 
     return (
         <form>
-
             <ModalHeader
-                title={
-                    `Please Sign Up`
-                }
+                title={`Please Sign Up`}
                 hideSubmitButton={true}
             />
 
@@ -43,11 +40,14 @@ export const RegisterBefore: FunctionComponent<{}> = ({ }) => {
 
                 <div className="d-flex justify-content-center align-items-center mt-4 mb-2 px-4">
                     <p className="m-0">
-                        {modalData?.toWhat === 'joinGroup' ? `Please Signup before joining ${modalData?.groupName}` :
-                            modalData?.toWhat === 'vote' ? `Please Signup before voting on  ${modalData?.questionText}` :
-                                modalData?.toWhat === 'delegating' ? `Please Signup before delegating votes to ${modalData?.userName}` :
-                                    modalData?.toWhat === 'upVoteArgument'? `Please Signup before liking an argument` :
-                        ''}
+                        {
+                            modalData?.toWhat === 'joinGroup' ? `Please Signup before joining ${modalData?.groupName}` :
+                                modalData?.toWhat === 'vote' ? `Please Signup before voting on  ${modalData?.questionText}` :
+                                    modalData?.toWhat === 'delegating' ? `Please Signup before delegating votes to ${modalData?.userName}` :
+                                        modalData?.toWhat === 'upVoteArgument' ? `Please Signup before liking an argument` :
+                                            modalData?.toWhat === 'chooseRepresentatives' ? `Please Signup before choosing representatives on ${modalData?.groupName}` :
+                                                ''
+                        }
                     </p>
                 </div>
 
@@ -57,7 +57,6 @@ export const RegisterBefore: FunctionComponent<{}> = ({ }) => {
                 >
                     Sign Up
                 </div>
-
             </div>
         </form>
     );

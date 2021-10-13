@@ -19,6 +19,7 @@ import { timeAgo } from '@state/TimeAgo';
 // import useGroup from '@state/Group/group.effect';
 import useUserRepresentedBy from "@state/User/userRepresentedBy.effect";
 import useAuthUser from '@state/AuthUser/authUser.effect';
+import useGroup from '@state/Group/group.effect';
 
 import QuestionVotes from "./QuestionVotes";
 import QuestionArguments from "./QuestionArguments";
@@ -28,7 +29,7 @@ export default function Question() {
     let { voteName, groupHandle, section } = useParams<any>();
     const { allSearchParams, updateParams } = useSearchParams();
 
-    // const { group, group_refetch } = useGroup({ handle: groupHandle });
+    const { group, group_refetch } = useGroup({ handle: groupHandle });
 
     const {
         loading: question_loading,
@@ -88,7 +89,16 @@ export default function Question() {
 
                 <div
                     className="button_ small mb-0 ml-2"
-                    onClick={() => updateParams({
+                    onClick={() => !liquidUser ? updateParams({
+                        paramsToAdd: {
+                            modal: "RegisterBefore",
+                            modalData: JSON.stringify({
+                                toWhat: 'chooseRepresentatives',
+                                groupHandle: group.handle,
+                                groupName: group.name
+                            })
+                        }
+                    }) : updateParams({
                         paramsToAdd: {
                             modal: "ChooseRepresentatives",
                             modalData: JSON.stringify({
