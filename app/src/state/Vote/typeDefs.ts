@@ -18,12 +18,152 @@ export const VOTE = gql`
 export const VOTES = gql`
   query($questionText: String, $groupHandle: String, $userHandle: String, $type: String, $sortBy: String) {
     Votes(questionText: $questionText, groupHandle: $groupHandle, userHandle: $userHandle, type: $type, sortBy: $sortBy) {
-        questionText
-        choiceText
-        groupChannel {
-            group
-            channel
+        ...voteMain
+        choiceVotes {
+            ...voteMain
         }
+        question {
+            questionText
+            questionType
+            choices {
+                text
+                stats {
+                    lastVoteOn
+                    forCount
+                    forDirectCount
+                    forMostRepresentingVoters {
+                        handle
+                        avatar
+                        name
+                        representeeCount
+                    }
+                    againstCount
+                    againstMostRepresentingVoters {
+                        handle
+                        avatar
+                        name
+                        representeeCount
+                    }
+                    againstDirectCount
+                    directVotes
+                    indirectVotes
+                }
+                userVote {
+                    questionText
+                    position
+                    forWeight
+                    againstWeight
+                    representatives {
+                        representativeHandle
+                        representativeAvatar
+                        representativeName
+                        position
+                        forWeight
+                        againstWeight
+                    }
+                    representeeVotes {
+                        isDirect
+                        position
+                        user {
+                            handle
+                            name
+                        }
+                    }
+                }
+            }
+            groupChannel{
+                group
+                channel
+            }
+            resultsOn
+            createdOn
+            lastEditOn
+            thisUserIsAdmin
+            stats {
+                lastVoteOn
+                forCount
+                forDirectCount
+                forMostRepresentingVoters {
+                    handle
+                    avatar
+                    name
+                    representeeCount
+                }
+                againstCount
+                againstMostRepresentingVoters {
+                    handle
+                    avatar
+                    name
+                    representeeCount
+                }
+                againstDirectCount
+                directVotes
+                indirectVotes
+            }
+            userVote {
+                questionText
+                position
+                forWeight
+                againstWeight
+                representatives {
+                    representativeHandle
+                    representativeAvatar
+                    representativeName
+                    position
+                    forWeight
+                    againstWeight
+                }
+                representeeVotes {
+                    isDirect
+                    position
+                    user {
+                        handle
+                        name
+                    }
+                }
+            }
+        }
+        user {
+            name
+            handle
+            avatar
+        }
+    }
+  }
+
+  fragment voteMain on Vote {
+    questionText
+    choiceText
+    groupChannel {
+        group
+        channel
+    }
+    position
+    isDirect
+    forWeight
+    againstWeight
+    representatives{
+        representativeHandle
+        representativeAvatar
+        representativeName
+        position
+        forWeight
+        againstWeight
+        createdOn
+        lastEditOn
+    }
+    createdOn
+    lastEditOn
+    representeeVotes {
+        isDirect
+        position
+        user {
+            handle
+            name
+            avatar
+        }
+    }
+    yourVote {
         position
         isDirect
         forWeight
@@ -40,59 +180,9 @@ export const VOTES = gql`
         }
         createdOn
         lastEditOn
-        representeeVotes {
-            isDirect
-            position
-            user {
-                handle
-                name
-                avatar
-            }
-        }
-        QuestionStats {
-            lastVoteOn
-            forCount
-            forDirectCount
-            forMostRepresentingVoters {
-                handle
-                avatar
-                name
-                representeeCount
-            }
-            againstCount
-            againstMostRepresentingVoters {
-                handle
-                avatar
-                name
-                representeeCount
-            }
-            againstDirectCount
-        }
-        yourVote {
-            position
-            isDirect
-            forWeight
-            againstWeight
-            representatives{
-                representativeHandle
-                representativeAvatar
-                representativeName
-                position
-                forWeight
-                againstWeight
-                createdOn
-                lastEditOn
-            }
-            createdOn
-            lastEditOn
-        }
-        user {
-            name
-            handle
-            avatar
-        }
     }
   }
+
 `;
 
 

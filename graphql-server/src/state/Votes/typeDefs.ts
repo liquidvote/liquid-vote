@@ -36,6 +36,7 @@ export const VoteTypeDefs = gql`
         lastEditOn: String
         thisUserIsAdmin: Boolean
         QuestionStats: QuestionStats
+        question: Question
     }
 
     extend type Query {

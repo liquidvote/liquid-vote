@@ -37,6 +37,9 @@ export const Notifications: FunctionComponent<{}> = ({ }) => {
                 </div>
             )}
 
+            <br />
+            {/* <pre>{ JSON.stringify(user_votes_data, null, 2) }</pre> */}
+
             {user_votes_data?.Votes.map((n, i) => (
                 <>
                     <Notification

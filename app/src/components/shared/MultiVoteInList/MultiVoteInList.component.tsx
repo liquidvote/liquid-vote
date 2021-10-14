@@ -10,7 +10,7 @@ import './style.sass';
 import { valores } from "@state/Mock/Votes";
 import Choice from "@shared/Choice";
 
-export const MultiVoteInList: FunctionComponent<{ v: any, i?: number }> = ({ v, i = 0 }) => {
+export const MultiVoteInList: FunctionComponent<{ v: any }> = ({ v }) => {
 
     const sortedChoices = [...v.choices]?.
         sort((a, b) => (b?.stats?.directVotes + b?.stats?.indirectVotes) - (a?.stats?.directVotes + a?.stats?.indirectVotes));

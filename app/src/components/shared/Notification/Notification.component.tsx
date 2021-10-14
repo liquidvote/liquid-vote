@@ -4,6 +4,7 @@ import GroupSvg from "@shared/Icons/Group.svg";
 
 import VoteWrapper from "@shared/VoteWrapper";
 import SingleVoteInList from "@shared/SingleVoteInList";
+import MultiVoteInList from "@shared/MultiVoteInList";
 import Choice from "@shared/Choice";
 import './style.sass';
 import { timeAgo } from '@state/TimeAgo';
@@ -114,14 +115,31 @@ export const Notification: FunctionComponent<{
                 {
                     showChart && (
                         <div key={`notificationVote-${v.questionText}`} className="mt-1">
-                            <Choice
+
+
+                            {v.question.questionType === 'multi' && (
+                                <MultiVoteInList
+                                    key={`multi-${v.questionText}`}
+                                    v={v.question}
+                                />
+                            )}
+                            {v.question.questionType === 'single' && (
+                                <SingleVoteInList
+                                    key={`single-${v.questionText}`}
+                                    l={v.question}
+                                    showGroup={true}
+                                    showIntroMessage={true}
+                                />
+                            )}
+
+                            {/* <Choice
                                 choiceText={v.choiceText}
                                 voteName={v.questionText}
                                 groupHandle={v.groupChannel.group}
                                 stats={v.QuestionStats}
                                 userVote={v.yourVote}
                                 inList={true}
-                            />
+                            /> */}
                         </div>
                     )
                 }

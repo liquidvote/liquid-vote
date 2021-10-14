@@ -41,19 +41,19 @@ export const GroupPolls: FunctionComponent<{
 
         return (
             <>
-                {questions_data?.Questions?.map((v: any, i: any) => (
+                {questions_data?.Questions?.map((q: any, i: any) => (
                     <div key={'polls-' + i}>
-                        {v.questionType === 'multi' && (
+                        {q.questionType === 'multi' && (
                             <MultiVoteInList
-                                key={`multi-${v.questionText}`}
-                                v={v}
+                                key={`multi-${q.questionText}`}
+                                v={q}
                                 i={i}
                             />
                         )}
-                        {v.questionType === 'single' && (
+                        {q.questionType === 'single' && (
                             <SingleVoteInList
-                                key={`single-${v.questionText}`}
-                                l={v}
+                                key={`single-${q.questionText}`}
+                                l={q}
                                 showGroup={true}
                                 showIntroMessage={true}
                             />
