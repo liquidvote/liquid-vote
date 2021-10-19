@@ -33,11 +33,11 @@ export const SingleVoteInList: FunctionComponent<{
 
         return (
             <div className="position-relative">
-                {(l.questionText && !hideTitle) && (
+                {/* {(l.questionText && !hideTitle) && (
                     <small className="time-ago" data-tip="Last vote was">
                         {timeAgo.format(new Date(Number(l?.stats?.lastVoteOn)))}
                     </small>
-                )}
+                )} */}
                 <div>
                     {(showIntroMessage && !hideTitle) && (
                         <small className="do-you d-flex mb-n1">{introMessage || 'Do you approve'}</small>
@@ -55,7 +55,6 @@ export const SingleVoteInList: FunctionComponent<{
                                     </div>
                                 </a>
                                 {!!showGroup && (
-
                                     <Link to={`/group/${l.groupChannel.group}`}
                                         className="badge m-0 ml-2 text-truncate"
                                     >{l.groupChannel.group}</Link>

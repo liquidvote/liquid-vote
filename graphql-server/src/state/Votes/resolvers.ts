@@ -57,7 +57,7 @@ export const VoteResolvers = {
                         }
                     ]
                 ),
-                voteInCommon: (
+                yourVoteAndBooleans: (
                     [
                         {
                             '$lookup': {
@@ -203,6 +203,63 @@ export const VoteResolvers = {
                         },
                     ]
                 ),
+                representativeUsers: (
+                    [
+                        {
+                            '$unwind': {
+                                'path': '$representatives'
+                            }
+                        }, {
+                            '$lookup': {
+                                'from': 'Users',
+                                'localField': 'representatives.representativeId',
+                                'foreignField': '_id',
+                                'as': 'representativeUser'
+                            }
+                        }, {
+                            '$addFields': {
+                                'representativeUser': {
+                                    '$first': '$representativeUser'
+                                }
+                            }
+                        }, {
+                            '$addFields': {
+                                'representatives.representativeHandle': '$representativeUser.LiquidUser.handle',
+                                'representatives.representativeName': '$representativeUser.LiquidUser.name',
+                                'representatives.representativeAvatar': '$representativeUser.LiquidUser.avatar'
+                            }
+                        }, {
+                            '$group': {
+                                '_id': {
+                                    'user': '$user',
+                                    'questionText': '$questionText',
+                                    'groupChannel': '$groupChannel'
+                                },
+                                'lastEditOn': {
+                                    '$last': '$lastEditOn'
+                                },
+                                'choiceVotes': {
+                                    '$push': '$$ROOT'
+                                },
+                                'representatives': {
+                                    '$push': '$representatives'
+                                },
+                                'representees': {
+                                    '$push': '$representeeVotes'
+                                },
+                                'user': {
+                                    '$first': '$user'
+                                },
+                                'questionText': {
+                                    '$first': '$questionText'
+                                },
+                                'groupChannel': {
+                                    '$first': '$groupChannel'
+                                }
+                            }
+                        }
+                    ]
+                ),
                 representeeVotes: (
                     [
                         {
@@ -211,7 +268,7 @@ export const VoteResolvers = {
                                 'let': {
                                     'representativeId': { '$toObjectId': '$user' },
                                     'questionText': '$questionText',
-                                    // 'choiceText': '$choiceText',
+                                    'choiceText': '$choiceText',
                                     'group': '$groupChannel.group'
                                 },
                                 'pipeline': [
@@ -300,6 +357,7 @@ export const VoteResolvers = {
                         }, {
                             '$group': {
                                 '_id': {
+                                    // no `choiceText`
                                     'user': '$user',
                                     'questionText': '$questionText',
                                     'groupChannel': '$groupChannel'
@@ -321,6 +379,7 @@ export const VoteResolvers = {
                         }
                     ]
                 ),
+                // hum..
                 mergedChoicesUniqueRepresentees: (
                     [
                         {
@@ -582,7 +641,7 @@ export const VoteResolvers = {
                     'directFor': async () => await mongoDB.collection("Votes")
                         .aggregate([
                             ...AggregateLogic.matchVoteToParams,
-                            ...AggregateLogic.voteInCommon,
+                            ...AggregateLogic.yourVoteAndBooleans,
                             {
                                 '$match': {
                                     'position': 'for',
@@ -590,15 +649,18 @@ export const VoteResolvers = {
                                 }
                             },
                             ...AggregateLogic.representeeVotes,
+                            // ...AggregateLogic.mergedChoices,
+                            // ...AggregateLogic.mergedChoicesUniqueRepresentatives,
                             ...AggregateLogic.sortLogic,
-                            ...AggregateLogic.questionStats,
+                            // ...AggregateLogic.question,
+                            ...AggregateLogic.question,
                             ...AggregateLogic.userObject
                         ])
                         .toArray(),
                     'directAgainst': async () => await mongoDB.collection("Votes")
                         .aggregate([
                             ...AggregateLogic.matchVoteToParams,
-                            ...AggregateLogic.voteInCommon,
+                            ...AggregateLogic.yourVoteAndBooleans,
                             {
                                 '$match': {
                                     'position': 'against',
@@ -607,14 +669,14 @@ export const VoteResolvers = {
                             },
                             ...AggregateLogic.representeeVotes,
                             ...AggregateLogic.sortLogic,
-                            ...AggregateLogic.questionStats,
+                            ...AggregateLogic.question,
                             ...AggregateLogic.userObject
                         ])
                         .toArray(),
                     'directVotesMade': async () => await mongoDB.collection("Votes")
                         .aggregate([
                             ...AggregateLogic.matchVoteToParams,
-                            ...AggregateLogic.voteInCommon,
+                            ...AggregateLogic.yourVoteAndBooleans,
                             {
                                 '$match': {
                                     'isDirect': true
@@ -622,14 +684,14 @@ export const VoteResolvers = {
                             },
                             ...AggregateLogic.representeeVotes,
                             ...AggregateLogic.sortLogic,
-                            ...AggregateLogic.questionStats,
+                            ...AggregateLogic.question,
                             ...AggregateLogic.userObject
                         ])
                         .toArray(),
                     'directVotesInAgreement': async () => await mongoDB.collection("Votes")
                         .aggregate([
                             ...AggregateLogic.matchVoteToParams,
-                            ...AggregateLogic.voteInCommon,
+                            ...AggregateLogic.yourVoteAndBooleans,
                             {
                                 '$match': {
                                     'InAgreement': true,
@@ -639,14 +701,14 @@ export const VoteResolvers = {
                             },
                             ...AggregateLogic.representeeVotes,
                             ...AggregateLogic.sortLogic,
-                            ...AggregateLogic.questionStats,
+                            ...AggregateLogic.question,
                             ...AggregateLogic.userObject
                         ])
                         .toArray(),
                     'directVotesInDisagreement': async () => await mongoDB.collection("Votes")
                         .aggregate([
                             ...AggregateLogic.matchVoteToParams,
-                            ...AggregateLogic.voteInCommon,
+                            ...AggregateLogic.yourVoteAndBooleans,
                             {
                                 '$match': {
                                     'InAgreement': false,
@@ -656,18 +718,18 @@ export const VoteResolvers = {
                             },
                             ...AggregateLogic.representeeVotes,
                             ...AggregateLogic.sortLogic,
-                            ...AggregateLogic.questionStats,
+                            ...AggregateLogic.question,
                             ...AggregateLogic.userObject
                         ])
                         .toArray(),
                     'indirectVotesMade': async () => await mongoDB.collection("Votes") // hum
                         .aggregate([
                             ...AggregateLogic.matchVoteToParams,
-                            ...AggregateLogic.voteInCommon,
+                            ...AggregateLogic.yourVoteAndBooleans,
                             ...AggregateLogic.representeeVotes,
                             ...AggregateLogic.sortLogic,
                             ...AggregateLogic.representeeVotesAsList,
-                            ...AggregateLogic.questionStats
+                            ...AggregateLogic.question,
                         ])
                         .toArray(),
                     'indirectVotesMadeForUser': async () => await mongoDB.collection("Votes")
@@ -678,7 +740,7 @@ export const VoteResolvers = {
                             //         'isDirect': false
                             //     }
                             // },
-                            ...AggregateLogic.voteInCommon,
+                            ...AggregateLogic.yourVoteAndBooleans,
                             ...AggregateLogic.mergedChoices,
                             ...AggregateLogic.mergedChoicesUniqueRepresentatives,
                             {
@@ -693,7 +755,7 @@ export const VoteResolvers = {
                     'indirectVotesMadeByUser': async () => await mongoDB.collection("Votes") // hum
                         .aggregate([
                             ...AggregateLogic.matchVoteToParams,
-                            ...AggregateLogic.voteInCommon,
+                            ...AggregateLogic.yourVoteAndBooleans,
                             ...AggregateLogic.representeeVotes,
                             ...AggregateLogic.sortLogic,
                             ...AggregateLogic.representeeVotesAsList,
@@ -703,7 +765,7 @@ export const VoteResolvers = {
                     'indirectVotesMadeByYou': async () => await mongoDB.collection("Votes")
                         .aggregate([
                             ...AggregateLogic.matchVoteToParams,
-                            ...AggregateLogic.voteInCommon,
+                            ...AggregateLogic.yourVoteAndBooleans,
                             {
                                 '$match': {
                                     'yourVoteMadeForUser': true
@@ -711,14 +773,14 @@ export const VoteResolvers = {
                             },
                             ...AggregateLogic.representeeVotes,
                             ...AggregateLogic.sortLogic,
-                            ...AggregateLogic.questionStats,
+                            ...AggregateLogic.question,
                             ...AggregateLogic.userObject
                         ])
                         .toArray(),
                     'indirectVotesMadeForYou': async () => await mongoDB.collection("Votes")
                         .aggregate([
                             ...AggregateLogic.matchVoteToParams,
-                            ...AggregateLogic.voteInCommon,
+                            ...AggregateLogic.yourVoteAndBooleans,
                             {
                                 '$match': {
                                     'yourVoteMadeByUser': true
@@ -726,14 +788,14 @@ export const VoteResolvers = {
                             },
                             ...AggregateLogic.representeeVotes,
                             ...AggregateLogic.sortLogic,
-                            ...AggregateLogic.questionStats,
+                            ...AggregateLogic.question,
                             ...AggregateLogic.userObject
                         ])
                         .toArray(),
                     'directVotesMadeByYou': async () => await mongoDB.collection("Votes")
                         .aggregate([
                             ...AggregateLogic.matchVoteToParams,
-                            ...AggregateLogic.voteInCommon,
+                            ...AggregateLogic.yourVoteAndBooleans,
                             {
                                 '$match': {
                                     'user': new ObjectId(AuthUser?._id),
@@ -743,7 +805,7 @@ export const VoteResolvers = {
                             },
                             ...AggregateLogic.representeeVotes,
                             ...AggregateLogic.sortLogic,
-                            ...AggregateLogic.questionStats,
+                            ...AggregateLogic.question,
                             ...AggregateLogic.userObject
                         ])
                         .toArray(),
@@ -751,18 +813,27 @@ export const VoteResolvers = {
             })(type);
 
             console.log({
-                singleQuestions: Votes.filter(v => v.question.questionType === 'single') 
+                Votes: Votes?.length,
+                v: Votes.map(v => ({
+                    q: v.question?.questionText,
+                    g: v.question?.groupChannel?.group
+                }))
+                // singleQuestions: Votes.filter(v => v.question.questionType === 'single')
             });
 
             return Votes.map(v => ({
                 ...v,
+
+                // get `yourVote`s into `question` and `question.choices`
                 question: {
                     ...v.question,
                     choices: v.question?.choices?.map(c => ({
                         ...c,
-                        userVote: v.choiceVotes?.find(cv => cv.choiceText === c.text)?.yourVote
+                        // TODO: differentiate `userVote` from `yourVote`
+                        yourVote: v.choiceVotes?.find(cv => cv.choiceText === c.text)?.yourVote
                     })),
-                    userVote: v.yourVote
+                    yourVote: v.yourVote,
+                    userVote: v
                 }
             }));
         },

@@ -56,7 +56,15 @@ export const ProfileVotes: FunctionComponent<{}> = ({ }) => {
         data: user_votes_data,
         refetch: user_votes_refetch
     } = useQuery(VOTES, {
-        variables: { userHandle: handle, type, sortBy }
+        variables: {
+            userHandle: handle,
+            type,
+            sortBy
+        }
+    });
+
+    console.log({
+        user_votes_data
     });
 
     return (

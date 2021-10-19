@@ -46,15 +46,15 @@ export const Notification: FunctionComponent<{
                                             <small className="d-flex align-items-center d-inline-block">
                                                 Was represented by
                                                 <span className="d-flex ml-2 pl-1 mr-1">
-                                                    {v.representatives?.map((r: any) => (
+                                                    {v.representatives?.map((r: any, i: number) => (
                                                         <Link
-                                                            key={`representatives-${v?.representativeHandle}`}
-                                                            to={`/profile/${r.representativeHandle}`}
-                                                            className={`vote-avatar tiny ${r.position} ml-n2`}
+                                                            key={`representatives-${v?.representativeHandle || i}`}
+                                                            to={`/profile/${r?.representativeHandle}`}
+                                                            className={`vote-avatar tiny ${r?.position} ml-n2`}
                                                             style={{
-                                                                background: `url(${r.representativeAvatar}) 50% 50% / cover no-repeat`
+                                                                background: `url(${r?.representativeAvatar}) 50% 50% / cover no-repeat`
                                                             }}
-                                                            title={r.representativeName}
+                                                            title={r?.representativeName}
                                                         ></Link>
                                                     ))}
                                                 </span>
@@ -64,9 +64,11 @@ export const Notification: FunctionComponent<{
 
                                     <>
                                         <small className="mr-1">on</small>
-                                        <Link
-                                            to={`/${v.choiceText ? 'multipoll' : 'poll'}/${v.questionText}/${v.groupChannel?.group}`}
-                                        ><b className="white">{v.questionText}{v.choiceText ? ':' + v.choiceText : ''}</b></Link>
+                                        {!showChart ? (
+                                            <Link
+                                                to={`/${v.choiceText ? 'multipoll' : 'poll'}/${v.questionText}/${v.groupChannel?.group}`}
+                                            ><b className="white">{v.questionText}{v.choiceText ? ':' + v.choiceText : ''}</b></Link>
+                                        ) : ''}
                                     </>
 
                                 </p>
@@ -90,20 +92,22 @@ export const Notification: FunctionComponent<{
                                     </small>
                                 )}
                             </div>
-                            <div className="d-flex flex-column justify-content-end mw-25" style={{ flex: 1 }}>
-                                <small className="text-right" data-tip="Voted on">
-                                    {timeAgo.format(new Date(Number(v?.lastEditOn)))}
-                                </small>
-                                <div className="d-flex flex-wrap justify-content-end">
-                                    <div className="tiny-svg-wrapper"><GroupSvg /></div>
-                                    <Link
-                                        to={`/group/${v.groupChannel?.group}`}
-                                        className="badge ml-1 mb-1 mt-1"
-                                    >
-                                        {v.groupChannel?.group}
-                                    </Link>
+                            {(
+                                <div className="d-flex flex-column justify-content-end mw-25" style={{ flex: 1 }}>
+                                    <small className="text-right" data-tip="Voted on">
+                                        {timeAgo.format(new Date(Number(v?.lastEditOn)))}
+                                    </small>
+                                    <div className="d-flex flex-wrap justify-content-end">
+                                        <div className="tiny-svg-wrapper"><GroupSvg /></div>
+                                        <Link
+                                            to={`/group/${v.groupChannel?.group}`}
+                                            className="badge ml-1 mb-1 mt-1"
+                                        >
+                                            {v.groupChannel?.group}
+                                        </Link>
+                                    </div>
                                 </div>
-                            </div>
+                            )}
                         </div>
                     </div>
                 </div>
@@ -117,17 +121,17 @@ export const Notification: FunctionComponent<{
                         <div key={`notificationVote-${v.questionText}`} className="mt-1">
 
 
-                            {v.question.questionType === 'multi' && (
+                            {v.question?.questionType === 'multi' && (
                                 <MultiVoteInList
                                     key={`multi-${v.questionText}`}
                                     v={v.question}
                                 />
                             )}
-                            {v.question.questionType === 'single' && (
+                            {v.question?.questionType === 'single' && (
                                 <SingleVoteInList
                                     key={`single-${v.questionText}`}
                                     l={v.question}
-                                    showGroup={true}
+                                    showGroup={false}
                                     showIntroMessage={true}
                                 />
                             )}

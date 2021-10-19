@@ -16,8 +16,8 @@ export const VOTE = gql`
 `;
 
 export const VOTES = gql`
-  query($questionText: String, $groupHandle: String, $userHandle: String, $type: String, $sortBy: String) {
-    Votes(questionText: $questionText, groupHandle: $groupHandle, userHandle: $userHandle, type: $type, sortBy: $sortBy) {
+  query($questionText: String, $choiceText: String, $groupHandle: String, $userHandle: String, $type: String, $sortBy: String) {
+    Votes(questionText: $questionText, choiceText: $choiceText,, groupHandle: $groupHandle, userHandle: $userHandle, type: $type, sortBy: $sortBy) {
         ...voteMain
         choiceVotes {
             ...voteMain
@@ -101,26 +101,10 @@ export const VOTES = gql`
                 indirectVotes
             }
             userVote {
-                questionText
-                position
-                forWeight
-                againstWeight
-                representatives {
-                    representativeHandle
-                    representativeAvatar
-                    representativeName
-                    position
-                    forWeight
-                    againstWeight
-                }
-                representeeVotes {
-                    isDirect
-                    position
-                    user {
-                        handle
-                        name
-                    }
-                }
+                ...voteMain
+            }
+            yourVote {
+                ...voteMain
             }
         }
         user {

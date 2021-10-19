@@ -13,7 +13,7 @@ import './style.sass';
 
 export const Choice: FunctionComponent<{
     choiceText?: string,
-    voteName: string,
+    voteName: string, // TODO: change to `questionText`
     groupHandle: string,
     stats: any,
     userVote: any,
@@ -149,11 +149,28 @@ export const Choice: FunctionComponent<{
                                                 background: `url(${forRepresentatives[0].representativeAvatar}) 50% 50% / cover no-repeat`,
                                             }}
                                         ></Link>
-                                        <Link
-                                            to={`/${choiceText ? 'multipoll' : 'poll'}/${voteName}/${groupHandle}/timeline/representingYou`}
-                                            onClick={e => e.stopPropagation()}
+                                        <div
+                                            onClick={
+                                                e => {
+                                                    e.stopPropagation();
+                                                    updateParams({
+                                                        paramsToAdd: {
+                                                            modal: "ListVoters",
+                                                            modalData: JSON.stringify({
+                                                                questionText: voteName,
+                                                                choiceText,
+                                                                groupHandle,
+                                                                subsection: 'direct',
+                                                                subsubsection: 'for'
+                                                            })
+                                                        }
+                                                    })
+                                                }
+                                            }
+                                            // to={`/${choiceText ? 'multipoll' : 'poll'}/${voteName}/${groupHandle}/timeline/representingYou`}
+                                            // onClick={e => e.stopPropagation()}
                                             className={`vote-avatar text-decoration-none count for ml-n2 ${inList && 'tiny'}`}
-                                        >{forRepresentatives.length}</Link>
+                                        >{forRepresentatives.length}</div>
                                     </div>
                                 )
                             }
@@ -164,22 +181,56 @@ export const Choice: FunctionComponent<{
                                     editVote_data?.editVote?.QuestionStats?.forMostRepresentingVoters :
                                     stats?.forMostRepresentingVoters
                             )?.slice(0, 2).map((v: any) => (
-                                <Link
+                                <div
                                     key={`forMostRepresentingVoters-${v?.handle}`}
-                                    to={`/profile/${v?.handle}`}
-                                    className={`vote-avatar for ml-n2 ${inList && 'tiny'}`}
+                                    // to={`/profile/${v?.handle}`}
+                                    onClick={
+                                        e => {
+                                            e.stopPropagation();
+                                            updateParams({
+                                                paramsToAdd: {
+                                                    modal: "ListVoters",
+                                                    modalData: JSON.stringify({
+                                                        questionText: voteName,
+                                                        choiceText,
+                                                        groupHandle,
+                                                        subsection: 'represented',
+                                                        subsubsection: 'foryou'
+                                                    })
+                                                }
+                                            })
+                                        }
+                                    }
+                                    className={`vote-avatar for ml-n2 ${inList && 'tiny'} pointer`}
                                     style={{
                                         background: `url(${v?.avatar}) 50% 50% / cover no-repeat`
                                     }}
-                                ></Link>
+                                ></div>
                             ))}
 
-                            <Link
-                                to={`/${choiceText ? 'multipoll' : 'poll'}/${voteName}/${groupHandle}/timeline/direct/for`}
-                                className={`vote-avatar text-decoration-none count for ml-n2 ${inList && 'tiny'}`}
+                            <div
+                                // to={`/${choiceText ? 'multipoll' : 'poll'}/${voteName}/${groupHandle}/timeline/direct/for`}
+                                onClick={
+                                    e => {
+                                        e.stopPropagation();
+                                        updateParams({
+                                            paramsToAdd: {
+                                                modal: "ListVoters",
+                                                modalData: JSON.stringify({
+                                                    questionText: voteName,
+                                                    choiceText,
+                                                    groupHandle,
+                                                    subsection: 'direct',
+                                                    subsubsection: 'for'
+                                                })
+                                            }
+                                        })
+                                    }
+                                }
+                                className={`pointer vote-avatar text-decoration-none count for ml-n2 ${inList && 'tiny'}`}
                             >
                                 {numeral(stats_.forCount).format('0a[.]0')}
-                            </Link>
+                            </div>
                         </div>
                     </div>
 
@@ -208,11 +259,28 @@ export const Choice: FunctionComponent<{
                                     ></Link>
                                 ))}
 
-                            <Link
-                                to={`/${choiceText ? 'multipoll' : 'poll'}/${voteName}/${groupHandle}/timeline/direct/against`}
+                            <div
+                                // to={`/${choiceText ? 'multipoll' : 'poll'}/${voteName}/${groupHandle}/timeline/direct/against`}
+                                onClick={
+                                    e => {
+                                        e.stopPropagation();
+                                        updateParams({
+                                            paramsToAdd: {
+                                                modal: "ListVoters",
+                                                modalData: JSON.stringify({
+                                                    questionText: voteName,
+                                                    choiceText,
+                                                    groupHandle,
+                                                    subsection: 'direct',
+                                                    subsubsection: 'against'
+                                                })
+                                            }
+                                        })
+                                    }
+                                }
                                 className={`vote-avatar text-decoration-none count against ml-n2 ${inList && 'tiny'}`}>
                                 {numeral(stats_.againstCount).format('0a[.]0')}
-                            </Link>
+                            </div>
                         </div>
                         <div
                             className={`button_ min-w justify-content-between text-right ml-1 ${userVote_ === 'against' && 'selected'} ${inList && 'small'}`}
@@ -233,11 +301,27 @@ export const Choice: FunctionComponent<{
                                             }}
                                             onClick={e => e.stopPropagation()}
                                         ></Link>
-                                        <Link
-                                            to={`/${choiceText ? 'multipoll' : 'poll'}/${voteName}/${groupHandle}/timeline/representingYou`}
-                                            onClick={e => e.stopPropagation()}
+                                        <div
+                                            // to={`/${choiceText ? 'multipoll' : 'poll'}/${voteName}/${groupHandle}/timeline/representingYou`}
+                                            onClick={
+                                                e => {
+                                                    e.stopPropagation();
+                                                    updateParams({
+                                                        paramsToAdd: {
+                                                            modal: "ListVoters",
+                                                            modalData: JSON.stringify({
+                                                                questionText: voteName,
+                                                                choiceText,
+                                                                groupHandle,
+                                                                subsection: 'represented',
+                                                                subsubsection: 'foryou'
+                                                            })
+                                                        }
+                                                    })
+                                                }
+                                            }
                                             className={`vote-avatar text-decoration-none count against ml-n2 ${inList && 'tiny'}`}
-                                        >{againstRepresentatives.length}</Link>
+                                        >{againstRepresentatives.length}</div>
                                     </div>
                                 )
                             }

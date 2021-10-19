@@ -48,6 +48,7 @@ export const VoteTypeDefs = gql`
         ): Vote
         Votes(
             questionText: String,
+            choiceText: String,
             groupHandle: String,
             userHandle: String,
             type: String,

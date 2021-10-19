@@ -53,21 +53,6 @@ export const QuestionVotes: FunctionComponent<{}> = ({ }) => {
     })();
 
     const {
-        loading: question_voters_loading,
-        error: question_voters_error,
-        data: question_voters_data,
-        refetch: question_voters_refetch
-    } = useQuery(QUESTION_VOTERS, {
-        variables: {
-            questionText: voteName,
-            group: groupHandle,
-            typeOfVoter: type,
-            sortBy
-        },
-        skip: !type
-    });
-
-    const {
         loading: votes_loading,
         error: votes_error,
         data: votes_data,
@@ -159,17 +144,6 @@ export const QuestionVotes: FunctionComponent<{}> = ({ }) => {
                     <hr className="mt-n4" />
                 </>
             )}
-
-            {/* <pre>
-                {JSON.stringify({
-                    type
-                }, null, 2)}
-            </pre>
-
-            <pre>
-                {JSON.stringify(question_voters_data, null, 2)}
-            </pre> */}
-
 
             {votes_data?.Votes.length === 0 && (
                 <div className="p-4 text-center">
