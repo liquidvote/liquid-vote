@@ -16,6 +16,7 @@ export const Choice: FunctionComponent<{
     voteName: string, // TODO: change to `questionText`
     groupHandle: string,
     stats: any,
+    yourVote: any,
     userVote: any,
     inList?: boolean,
     showPercentages?: boolean,
@@ -25,6 +26,7 @@ export const Choice: FunctionComponent<{
     voteName,
     groupHandle,
     stats,
+    yourVote,
     userVote,
     inList,
     showPercentages,
@@ -41,7 +43,7 @@ export const Choice: FunctionComponent<{
             data: editVote_data,
         }] = useMutation(EDIT_VOTE);
 
-        const userVote_ = editVote_data ? editVote_data?.editVote?.position : userVote?.position;
+        const yourVote_ = editVote_data ? editVote_data?.editVote?.position : yourVote?.position;
 
         const handleUserVote = (vote: string) => {
 
@@ -52,7 +54,7 @@ export const Choice: FunctionComponent<{
                         choiceText,
                         group: groupHandle,
                         Vote: {
-                            position: (vote === userVote_) ? null : vote
+                            position: (vote === yourVote_) ? null : vote
                         },
                     }
                 });
@@ -83,8 +85,8 @@ export const Choice: FunctionComponent<{
             }
         });
 
-        const forRepresentatives = userVote?.representatives?.filter((r: any) => r.position === 'for');
-        const againstRepresentatives = userVote?.representatives?.filter((r: any) => r.position === 'against');
+        const forRepresentatives = yourVote?.representatives?.filter((r: any) => r.position === 'for');
+        const againstRepresentatives = yourVote?.representatives?.filter((r: any) => r.position === 'against');
 
         return (
             <div>
@@ -95,15 +97,50 @@ export const Choice: FunctionComponent<{
                     }
                 }}>
                     {!!choiceText && (
-                        <div className={`white choice-text mr-2 ${inList && 'small'}`}><b>{choiceText}</b></div>
+                        <div className={`d-flex align-items-center white choice-text mr-2 ${inList && 'small'}`}>
+
+                            {!!userVote && (
+                                !!userVote.representatives?.length ? (
+                                    <div className="mr-2 d-flex align-items-center d-inline-block">
+                                        Represented by
+                                        <span className="d-flex ml-2 mr-1 pl-1">
+                                            {userVote.representatives?.map((r: any, i: number) => (
+                                                <Link
+                                                    key={`representatives-${r?.representativeHandle || i}`}
+                                                    to={`/profile/${r?.representativeHandle}`}
+                                                    className={`vote-avatar tiny ${r?.position} ml-n2`}
+                                                    style={{
+                                                        background: `url(${r?.representativeAvatar}) 50% 50% / cover no-repeat`
+                                                    }}
+                                                    title={r?.representativeName}
+                                                ></Link>
+                                            ))}
+                                        </span>
+                                        {' '}
+                                        on
+                                    </div>
+                                ) : (
+                                    <div className="mr-2">
+                                        Voted{' '}
+                                        <b className={`white ${userVote?.position?.toLowerCase()}Direct px-1 rounded`}>{userVote?.position}</b>{' '}
+                                        on
+                                    </div>
+                                )
+
+                            )}
+
+
+                            <b>{choiceText}</b>
+                        </div>
                     )}
+                    {/* <pre>{JSON.stringify(userVote, null, 2)}</pre> */}
                     <Chart
                         name={choiceText || null}
                         forDirectCount={stats_.forDirectCount}
                         forCount={stats_.forCount}
                         againstDirectCount={stats_.againstDirectCount}
                         againstCount={stats_.againstCount}
-                        userVote={null}
+                        yourVote={null}
                         userDelegatedVotes={null}
                     />
                 </div>
@@ -128,7 +165,7 @@ export const Choice: FunctionComponent<{
                 <div className="d-flex d-flex justify-content-between mt-1">
                     <div className="d-flex align-items-center">
                         <div
-                            className={`button_ justify-content-between min-w mr-1 ${userVote_ === 'for' && 'selected'} ${inList && 'small'}`}
+                            className={`button_ justify-content-between min-w mr-1 ${yourVote_ === 'for' && 'selected'} ${inList && 'small'}`}
                             onClick={() => handleUserVote('for')}
                         >
                             <span className="mr-1">
@@ -137,7 +174,7 @@ export const Choice: FunctionComponent<{
                             {
                                 (
                                     !!forRepresentatives?.length &&
-                                    userVote?.position === 'delegated' &&
+                                    yourVote?.position === 'delegated' &&
                                     (!editVote_data || editVote_data?.editVote?.position === 'delegated')
                                 ) && (
                                     <div className="d-flex ml-2 my-n2 mr-n1">
@@ -181,31 +218,32 @@ export const Choice: FunctionComponent<{
                                     editVote_data?.editVote?.QuestionStats?.forMostRepresentingVoters :
                                     stats?.forMostRepresentingVoters
                             )?.slice(0, 2).map((v: any) => (
-                                <div
+                                <Link
                                     key={`forMostRepresentingVoters-${v?.handle}`}
-                                    // to={`/profile/${v?.handle}`}
-                                    onClick={
-                                        e => {
-                                            e.stopPropagation();
-                                            updateParams({
-                                                paramsToAdd: {
-                                                    modal: "ListVoters",
-                                                    modalData: JSON.stringify({
-                                                        questionText: voteName,
-                                                        choiceText,
-                                                        groupHandle,
-                                                        subsection: 'represented',
-                                                        subsubsection: 'foryou'
-                                                    })
-                                                }
-                                            })
-                                        }
-                                    }
+                                    to={`/profile/${v?.handle}`}
+                                    onClick={e => e.stopPropagation()}
+                                    // onClick={
+                                    //     e => {
+                                    //         e.stopPropagation();
+                                    //         updateParams({
+                                    //             paramsToAdd: {
+                                    //                 modal: "ListVoters",
+                                    //                 modalData: JSON.stringify({
+                                    //                     questionText: voteName,
+                                    //                     choiceText,
+                                    //                     groupHandle,
+                                    //                     subsection: 'represented',
+                                    //                     subsubsection: 'foryou'
+                                    //                 })
+                                    //             }
+                                    //         })
+                                    //     }
+                                    // }
                                     className={`vote-avatar for ml-n2 ${inList && 'tiny'} pointer`}
                                     style={{
                                         background: `url(${v?.avatar}) 50% 50% / cover no-repeat`
                                     }}
-                                ></div>
+                                ></Link>
                             ))}
 
                             <div
@@ -283,13 +321,13 @@ export const Choice: FunctionComponent<{
                             </div>
                         </div>
                         <div
-                            className={`button_ min-w justify-content-between text-right ml-1 ${userVote_ === 'against' && 'selected'} ${inList && 'small'}`}
+                            className={`button_ min-w justify-content-between text-right ml-1 ${yourVote_ === 'against' && 'selected'} ${inList && 'small'}`}
                             onClick={() => handleUserVote('against')}
                         >
                             {
                                 (
                                     !!againstRepresentatives?.length &&
-                                    userVote?.position === 'delegated' &&
+                                    yourVote?.position === 'delegated' &&
                                     (!editVote_data || editVote_data?.editVote?.position === 'delegated')
                                 ) && (
                                     <div className="d-flex mr-1 my-n2 ml-1">

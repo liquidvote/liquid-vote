@@ -26,6 +26,10 @@ export const Notifications: FunctionComponent<{}> = ({ }) => {
             sortBy: 'time'
         }
     });
+    
+    console.log({
+        user_votes_data
+    });
 
     return (
         <>

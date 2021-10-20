@@ -20,14 +20,14 @@ export const SingleVoteInList: FunctionComponent<{
     introMessage?: string,
     showIntroMessage?: boolean,
     showColorLegend?: boolean,
-    showGroup?: boolean,
+    showGroupAndTime?: boolean,
     hideTitle?: boolean
 }> = ({
     l,
     introMessage,
     showIntroMessage,
     showColorLegend,
-    showGroup,
+    showGroupAndTime,
     hideTitle
 }) => {
 
@@ -54,7 +54,7 @@ export const SingleVoteInList: FunctionComponent<{
                                         {showIntroMessage && '?'}
                                     </div>
                                 </a>
-                                {!!showGroup && (
+                                {!!showGroupAndTime && (
                                     <Link to={`/group/${l.groupChannel.group}`}
                                         className="badge m-0 ml-2 text-truncate"
                                     >{l.groupChannel.group}</Link>
@@ -66,6 +66,7 @@ export const SingleVoteInList: FunctionComponent<{
                             voteName={l.questionText}
                             groupHandle={l.groupChannel.group}
                             stats={l.stats}
+                            yourVote={l.yourVote}
                             userVote={l.userVote}
                             inList={true}
                         />

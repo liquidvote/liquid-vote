@@ -34,21 +34,16 @@ export const Notification: FunctionComponent<{
                                 <Link to={`/profile/${v.user?.handle}`} className="d-block mb-n1">
                                     <b className="mr-1">{v.user?.name}</b>
                                 </Link>
-                                <p className="d-inline-block mt-0 mb-0">
+                                <div className="d-flex align-items-center mt-0 mb-0">
 
                                     {
-                                        v.isDirect ? (
-                                            <small className="mr-1 d-inline-block">
-                                                Voted{' '}
-                                                <b className={`white ${v.position?.toLowerCase()}Direct px-1 rounded`}>{v.position}</b>
-                                            </small>
-                                        ) : (
+                                        (!!v.representatives?.length) ? (
                                             <small className="d-flex align-items-center d-inline-block">
                                                 Was represented by
-                                                <span className="d-flex ml-2 pl-1 mr-1">
+                                                <span className="d-flex ml-2 pl-1">
                                                     {v.representatives?.map((r: any, i: number) => (
                                                         <Link
-                                                            key={`representatives-${v?.representativeHandle || i}`}
+                                                            key={`representatives-${r?.representativeHandle || i}`}
                                                             to={`/profile/${r?.representativeHandle}`}
                                                             className={`vote-avatar tiny ${r?.position} ml-n2`}
                                                             style={{
@@ -59,11 +54,18 @@ export const Notification: FunctionComponent<{
                                                     ))}
                                                 </span>
                                             </small>
+                                        ) : (
+                                            <small className="d-inline-block">
+                                                Voted{' '}
+                                                {v.question?.questionType === 'single' ? (
+                                                    <b className={`white ${v.question?.userVote.position?.toLowerCase()}Direct px-1 rounded`}>{v.question?.userVote.position}</b>
+                                                ) : null}
+                                            </small>
                                         )
                                     }
 
                                     <>
-                                        <small className="mr-1">on</small>
+                                        <small className="ml-1">on</small>
                                         {!showChart ? (
                                             <Link
                                                 to={`/${v.choiceText ? 'multipoll' : 'poll'}/${v.questionText}/${v.groupChannel?.group}`}
@@ -71,7 +73,7 @@ export const Notification: FunctionComponent<{
                                         ) : ''}
                                     </>
 
-                                </p>
+                                </div>
                                 {/* <pre>{JSON.stringify(v, null, 2)}</pre> */}
                                 {v.representeeVotes?.length > 0 && (
                                     <small className="d-flex align-items-center">
@@ -124,6 +126,7 @@ export const Notification: FunctionComponent<{
                             {v.question?.questionType === 'multi' && (
                                 <MultiVoteInList
                                     key={`multi-${v.questionText}`}
+                                    showGroupAndTime={false}
                                     v={v.question}
                                 />
                             )}
@@ -131,7 +134,7 @@ export const Notification: FunctionComponent<{
                                 <SingleVoteInList
                                     key={`single-${v.questionText}`}
                                     l={v.question}
-                                    showGroup={false}
+                                    showGroupAndTime={false}
                                     showIntroMessage={true}
                                 />
                             )}
@@ -141,7 +144,7 @@ export const Notification: FunctionComponent<{
                                 voteName={v.questionText}
                                 groupHandle={v.groupChannel.group}
                                 stats={v.QuestionStats}
-                                userVote={v.yourVote}
+                                yourVote={v.yourVote}
                                 inList={true}
                             /> */}
                         </div>

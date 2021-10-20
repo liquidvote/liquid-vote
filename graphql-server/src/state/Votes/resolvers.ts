@@ -115,93 +115,109 @@ export const VoteResolvers = {
                             '$addFields': {
                                 'yourVote': {
                                     '$first': '$yourVote'
-                                }
+                                },
+                                'userVote': '$$ROOT',
                             }
                         }, {
                             '$addFields': {
-                                'byYou': {
-                                    '$eq': ['$user', new ObjectId(AuthUser?._id)]
-                                },
-                                'bothDirect': {
-                                    '$and': [
-                                        {
-                                            '$eq': [
-                                                '$isDirect', true
-                                            ]
-                                        }, {
-                                            '$eq': [
-                                                '$yourVote.isDirect', true
-                                            ]
-                                        }
-                                    ]
-                                },
-                                'InAgreement': {
-                                    '$and': [
-                                        {
-                                            '$eq': [
-                                                '$position', '$yourVote.position'
-                                            ]
-                                        }
-                                    ]
-                                },
-                                'yourVoteMadeByUser': {
-                                    $cond: {
-                                        if: {
-                                            '$or': [
-                                                { $not: ["$yourVote"] },
-                                                { $eq: ["$yourVote.isDirect", true] }
-                                            ]
-                                        },
-                                        then: false,
-                                        else: {
-                                            '$gte': [
-                                                {
-                                                    '$size': {
-                                                        '$filter': {
-                                                            'input': '$yourVote.representatives',
-                                                            'as': 'r',
-                                                            'cond': {
-                                                                '$and': [
-                                                                    {
-                                                                        '$eq': [
-                                                                            '$$r.representativeId', '$user'
-                                                                        ]
-                                                                    }
-                                                                ]
+                                'youAndUserDetails': {
+                                    'byYou': {
+                                        '$eq': ['$user', new ObjectId(AuthUser?._id)]
+                                    },
+                                    'bothDirect': {
+                                        '$and': [
+                                            {
+                                                '$eq': [
+                                                    '$isDirect', true
+                                                ]
+                                            }, {
+                                                '$eq': [
+                                                    '$yourVote.isDirect', true
+                                                ]
+                                            }
+                                        ]
+                                    },
+                                    'InAgreement': {
+                                        '$and': [
+                                            {
+                                                '$eq': [
+                                                    '$position', '$yourVote.position'
+                                                ]
+                                            }
+                                        ]
+                                    },
+                                    'yourVoteMadeByUser': {
+                                        $cond: {
+                                            if: {
+                                                '$or': [
+                                                    { $not: ["$yourVote"] },
+                                                    { $eq: ["$yourVote.isDirect", true] }
+                                                ]
+                                            },
+                                            then: false,
+                                            else: {
+                                                '$gte': [
+                                                    {
+                                                        '$size': {
+                                                            '$filter': {
+                                                                'input': '$yourVote.representatives',
+                                                                'as': 'r',
+                                                                'cond': {
+                                                                    '$and': [
+                                                                        {
+                                                                            '$eq': [
+                                                                                '$$r.representativeId', '$user'
+                                                                            ]
+                                                                        }
+                                                                    ]
+                                                                }
                                                             }
                                                         }
-                                                    }
-                                                }, 1
-                                            ]
+                                                    }, 1
+                                                ]
+                                            }
                                         }
-                                    }
-                                },
-                                'yourVoteMadeForUser': {
-                                    $cond: {
-                                        if: { $eq: ["$isDirect", true] },
-                                        then: false,
-                                        else: {
-                                            '$gte': [
-                                                {
-                                                    '$size': {
-                                                        '$filter': {
-                                                            'input': '$representatives',
-                                                            'as': 'r',
-                                                            'cond': {
-                                                                '$eq': [
-                                                                    '$$r.representativeId', new ObjectId(AuthUser?._id)
-                                                                ]
+                                    },
+                                    'yourVoteMadeForUser': {
+                                        $cond: {
+                                            if: { $eq: ["$isDirect", true] },
+                                            then: false,
+                                            else: {
+                                                '$gte': [
+                                                    {
+                                                        '$size': {
+                                                            '$filter': {
+                                                                'input': '$representatives',
+                                                                'as': 'r',
+                                                                'cond': {
+                                                                    '$eq': [
+                                                                        '$$r.representativeId', new ObjectId(AuthUser?._id)
+                                                                    ]
+                                                                }
                                                             }
                                                         }
-                                                    }
-                                                }, 1
-                                            ]
+                                                    }, 1
+                                                ]
+                                            }
                                         }
                                     }
                                 }
                             }
                         },
                     ]
+                ),
+                removeRepresentativesIfNotDelegated: (
+                    [{
+                        '$addFields': {
+                            representatives: {
+                                $cond: [
+                                    { $eq: ["$position", "delegated"] },
+                                    "$representatives",
+                                    []
+                                ]
+                            }
+                        }
+                    }]
                 ),
                 representativeUsers: (
                     [
@@ -362,41 +378,40 @@ export const VoteResolvers = {
                                     'questionText': '$questionText',
                                     'groupChannel': '$groupChannel'
                                 },
-                                'lastEditOn': { '$last': '$lastEditOn' },
-                                'choiceVotes': { '$push': '$$ROOT' },
-                                'representees': { '$push': '$representeeVotes' },
-                                'representatives': { '$push': '$representatives' },
-                                'user': { '$first': '$user' },
                                 'questionText': { '$first': '$questionText' },
                                 'groupChannel': { '$first': '$groupChannel' },
+                                'choiceVotes': { '$push': '$$ROOT' },
+                                'lastEditOn': { '$last': '$lastEditOn' },
+                                'representeeVotes': { '$push': '$representeeVotes' },
+                                'representatives': { '$push': '$representatives' },
+                                'user': { '$first': '$user' },
                                 'yourVote': { '$first': '$yourVote' },
-                                'byYou': { '$first': '$byYou' },
-                                'bothDirect': { '$first': '$bothDirect' },
-                                'InAgreement': { '$first': '$InAgreement' },
-                                'yourVoteMadeByUser': { '$first': '$yourVoteMadeByUser' },
-                                'yourVoteMadeForUser': { '$first': '$yourVoteMadeForUser' },
+                                'userVote': { '$first': '$userVote' },
+                                'youAndUserDetails': { '$first': '$youAndUserDetails' }
                             }
                         }
                     ]
                 ),
-                // hum..
                 mergedChoicesUniqueRepresentees: (
                     [
                         {
                             '$unwind': {
-                                'path': '$representees'
+                                'path': '$representeeVotes',
+                                'preserveNullAndEmptyArrays': true
                             }
                         }, {
                             '$unwind': {
-                                'path': '$representees'
+                                'path': '$representeeVotes',
+                                'preserveNullAndEmptyArrays': true
                             }
                         }, {
                             '$group': {
                                 '_id': {
+                                    // no `choiceText`
                                     'user': '$_id.user',
                                     'questionText': '$_id.questionText',
                                     'groupChannel': '$_id.groupChannel',
-                                    'representeeHandle': '$representees.user.handle'
+                                    'representeeHandle': '$representeeVotes.user.handle'
                                 },
                                 'roots': {
                                     '$first': '$$ROOT'
@@ -405,28 +420,23 @@ export const VoteResolvers = {
                         }, {
                             '$group': {
                                 '_id': {
-                                    'user': '$_id.user',
-                                    'questionText': '$_id.questionText',
-                                    'groupChannel': '$_id.groupChannel'
+                                    // no `choiceText`
+                                    // no 'representeeHandle`
+                                    'user': '$user',
+                                    'questionText': '$questionText',
+                                    'groupChannel': '$groupChannel'
                                 },
-                                'lastEditOn': {
-                                    '$first': '$roots.lastEditOn'
-                                },
-                                'choiceVotes': {
-                                    '$first': '$roots.choiceVotes'
-                                },
-                                'representees': {
-                                    '$push': '$roots.representees'
-                                },
-                                'representeeCount': {
-                                    '$sum': 1
-                                },
-                                'byYouCount': { $sum: { $cond: ["$byYou", 1, 0] } },
-                                'bothDirectCount': { $sum: { $cond: ["$bothDirect", 1, 0] } },
-                                'InAgreementCount': { $sum: { $cond: ["$InAgreement", 1, 0] } },
-                                'yourVoteMadeByUserCount': { $sum: { $cond: ["$yourVoteMadeByUser", 1, 0] } },
-                                'yourVoteMadeForUserCount': { $sum: { $cond: ["$yourVoteMadeForUser", 1, 0] } },
-                            }
+                                'questionText': { '$first': '$questionText' },
+                                'groupChannel': { '$first': '$groupChannel' },
+                                'choiceVotes': { '$first': '$root.choiceVotes' },
+                                'lastEditOn': { '$first': '$root.lastEditOn' },
+                                'representeeVotes': { '$push': '$root.representeeVotes' },
+                                'representatives': { '$first': '$root.representatives' },
+                                'user': { '$first': '$root.user' },
+                                'yourVote': { '$first': '$root.yourVote' },
+                                'userVote': { '$first': '$root.userVote' },
+                                'youAndUserDetails': { '$first': '$root.youAndUserDetails' }
+                              }
                         }
                     ]
                 ),
@@ -434,15 +444,18 @@ export const VoteResolvers = {
                     [
                         {
                             '$unwind': {
-                                'path': '$representatives'
+                                'path': '$representatives',
+                                'preserveNullAndEmptyArrays': true
                             }
                         }, {
                             '$unwind': {
-                                'path': '$representatives'
+                                'path': '$representatives',
+                                'preserveNullAndEmptyArrays': true
                             }
                         }, {
                             '$group': {
                                 '_id': {
+                                    // no `choiceText`
                                     'user': '$_id.user',
                                     'questionText': '$_id.questionText',
                                     'groupChannel': '$_id.groupChannel',
@@ -455,37 +468,22 @@ export const VoteResolvers = {
                         }, {
                             '$group': {
                                 '_id': {
+                                    // no `choiceText`
+                                    // no 'representativeHandle`
                                     'user': '$_id.user',
                                     'questionText': '$_id.questionText',
                                     'groupChannel': '$_id.groupChannel'
                                 },
-                                'lastEditOn': {
-                                    '$first': '$root.lastEditOn'
-                                },
-                                'choiceVotes': {
-                                    '$first': '$root.choiceVotes'
-                                },
-                                'representatives': {
-                                    '$push': '$root.representatives'
-                                },
-                                'representativesCount': {
-                                    '$sum': 1
-                                },
-                                // 'representees': { '$first': '$root.representees' },
+                                'questionText': { '$first': '$questionText' },
+                                'groupChannel': { '$first': '$groupChannel' },
+                                'choiceVotes': { '$first': '$root.choiceVotes' },
+                                'lastEditOn': { '$first': '$root.lastEditOn' },
+                                'representeeVotes': { '$first': '$root.representeeVotes' },
+                                'representatives': { '$push': '$root.representatives' },
                                 'user': { '$first': '$root.user' },
-                                'questionText': { '$first': '$root.questionText' },
-                                'groupChannel': { '$first': '$root.groupChannel' },
                                 'yourVote': { '$first': '$root.yourVote' },
-                                'byYou': { '$first': '$byYou' },
-                                'bothDirect': { '$first': '$bothDirect' },
-                                'InAgreement': { '$first': '$InAgreement' },
-                                'yourVoteMadeByUser': { '$first': '$yourVoteMadeByUser' },
-                                'yourVoteMadeForUser': { '$first': '$yourVoteMadeForUser' },
-                                'byYouCount': { $sum: { $cond: ["$byYou", 1, 0] } },
-                                'bothDirectCount': { $sum: { $cond: ["$bothDirect", 1, 0] } },
-                                'InAgreementCount': { $sum: { $cond: ["$InAgreement", 1, 0] } },
-                                'yourVoteMadeByUserCount': { $sum: { $cond: ["$yourVoteMadeByUser", 1, 0] } },
-                                'yourVoteMadeForUserCount': { $sum: { $cond: ["$yourVoteMadeForUser", 1, 0] } },
+                                'userVote': { '$first': '$root.userVote' },
+                                'youAndUserDetails': { '$first': '$root.youAndUserDetails' }
                             }
                         }
                     ]
@@ -641,7 +639,9 @@ export const VoteResolvers = {
                     'directFor': async () => await mongoDB.collection("Votes")
                         .aggregate([
                             ...AggregateLogic.matchVoteToParams,
+                            ...AggregateLogic.removeRepresentativesIfNotDelegated,
                             ...AggregateLogic.yourVoteAndBooleans,
+                            // #1 filter
                             {
                                 '$match': {
                                     'position': 'for',
@@ -660,7 +660,9 @@ export const VoteResolvers = {
                     'directAgainst': async () => await mongoDB.collection("Votes")
                         .aggregate([
                             ...AggregateLogic.matchVoteToParams,
+                            ...AggregateLogic.removeRepresentativesIfNotDelegated,
                             ...AggregateLogic.yourVoteAndBooleans,
+                            // #1 filter
                             {
                                 '$match': {
                                     'position': 'against',
@@ -676,13 +678,18 @@ export const VoteResolvers = {
                     'directVotesMade': async () => await mongoDB.collection("Votes")
                         .aggregate([
                             ...AggregateLogic.matchVoteToParams,
+                            ...AggregateLogic.removeRepresentativesIfNotDelegated,
                             ...AggregateLogic.yourVoteAndBooleans,
+                            // #1 filter
                             {
                                 '$match': {
                                     'isDirect': true
                                 }
                             },
-                            ...AggregateLogic.representeeVotes,
+                            ...AggregateLogic.mergedChoices,
+                            ...AggregateLogic.mergedChoicesUniqueRepresentatives,
+                            // ...AggregateLogic.mergedChoicesUniqueRepresentees,
+                            // ...AggregateLogic.representeeVotes,
                             ...AggregateLogic.sortLogic,
                             ...AggregateLogic.question,
                             ...AggregateLogic.userObject
@@ -692,6 +699,7 @@ export const VoteResolvers = {
                         .aggregate([
                             ...AggregateLogic.matchVoteToParams,
                             ...AggregateLogic.yourVoteAndBooleans,
+                            // #1 filter
                             {
                                 '$match': {
                                     'InAgreement': true,
@@ -709,6 +717,7 @@ export const VoteResolvers = {
                         .aggregate([
                             ...AggregateLogic.matchVoteToParams,
                             ...AggregateLogic.yourVoteAndBooleans,
+                            // #1 filter
                             {
                                 '$match': {
                                     'InAgreement': false,
@@ -735,19 +744,17 @@ export const VoteResolvers = {
                     'indirectVotesMadeForUser': async () => await mongoDB.collection("Votes")
                         .aggregate([
                             ...AggregateLogic.matchVoteToParams,
-                            // {
-                            //     '$match': {
-                            //         'isDirect': false
-                            //     }
-                            // },
+                            // ...AggregateLogic.removeRepresentativesIfNotDelegated,
+                            {
+                                '$match': {
+                                    position: "delegated",
+                                    isDirect: false
+                                }
+                            },
                             ...AggregateLogic.yourVoteAndBooleans,
                             ...AggregateLogic.mergedChoices,
                             ...AggregateLogic.mergedChoicesUniqueRepresentatives,
-                            {
-                                '$match': {
-                                    'byYouCount': 0
-                                }
-                            },
+                            ...AggregateLogic.sortLogic,
                             ...AggregateLogic.question,
                             ...AggregateLogic.userObject
                         ])
@@ -813,11 +820,12 @@ export const VoteResolvers = {
             })(type);
 
             console.log({
-                Votes: Votes?.length,
-                v: Votes.map(v => ({
-                    q: v.question?.questionText,
-                    g: v.question?.groupChannel?.group
-                }))
+                VotesL: Votes?.length,
+                // Votes,
+                // v: JSON.stringify(Votes.map(v => ({
+                //     r: v.representatives
+                //     // g: v.question?.groupChannel?.group
+                // })), null, 2)
                 // singleQuestions: Votes.filter(v => v.question.questionType === 'single')
             });
 
@@ -829,11 +837,12 @@ export const VoteResolvers = {
                     ...v.question,
                     choices: v.question?.choices?.map(c => ({
                         ...c,
-                        // TODO: differentiate `userVote` from `yourVote`
+
+                        userVote: v.choiceVotes?.find(cv => cv.choiceText === c.text),
                         yourVote: v.choiceVotes?.find(cv => cv.choiceText === c.text)?.yourVote
                     })),
                     yourVote: v.yourVote,
-                    userVote: v
+                    userVote: v.userVote
                 }
             }));
         },

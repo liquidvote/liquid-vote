@@ -139,7 +139,7 @@ export default function Question() {
                                     voteName={voteName}
                                     groupHandle={groupHandle}
                                     stats={c.stats}
-                                    userVote={c.userVote}
+                                    yourVote={c.yourVote}
                                     maxVoteCount={maxVoteCount}
                                 />
                             </div>
@@ -149,7 +149,7 @@ export default function Question() {
                             voteName={voteName}
                             groupHandle={groupHandle}
                             stats={question_data?.Question?.stats}
-                            userVote={question_data?.Question?.userVote}
+                            yourVote={question_data?.Question?.yourVote}
                             showPercentages={true}
                         />
                 }

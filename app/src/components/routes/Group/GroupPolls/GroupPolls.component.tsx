@@ -54,7 +54,7 @@ export const GroupPolls: FunctionComponent<{
                             <SingleVoteInList
                                 key={`single-${q.questionText}`}
                                 l={q}
-                                showGroup={true}
+                                showGroupAndTime={true}
                                 showIntroMessage={true}
                             />
                         )}

@@ -66,7 +66,7 @@ export const Feed: FunctionComponent<{}> = ({ }) => {
                             <SingleVoteInList
                                 key={`single-${v.questionText}`}
                                 l={v}
-                                showGroup={true}
+                                showGroupAndTime={true}
                                 showIntroMessage={true}
                             />
                         )}

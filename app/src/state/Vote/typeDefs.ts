@@ -70,6 +70,28 @@ export const VOTES = gql`
                         }
                     }
                 }
+                yourVote {
+                    questionText
+                    position
+                    forWeight
+                    againstWeight
+                    representatives {
+                        representativeHandle
+                        representativeAvatar
+                        representativeName
+                        position
+                        forWeight
+                        againstWeight
+                    }
+                    representeeVotes {
+                        isDirect
+                        position
+                        user {
+                            handle
+                            name
+                        }
+                    }
+                }
             }
             groupChannel{
                 group
@@ -147,24 +169,24 @@ export const VOTES = gql`
             avatar
         }
     }
-    yourVote {
-        position
-        isDirect
-        forWeight
-        againstWeight
-        representatives{
-            representativeHandle
-            representativeAvatar
-            representativeName
-            position
-            forWeight
-            againstWeight
-            createdOn
-            lastEditOn
-        }
-        createdOn
-        lastEditOn
-    }
+    # yourVote {
+    #     position
+    #     isDirect
+    #     forWeight
+    #     againstWeight
+    #     representatives{
+    #         representativeHandle
+    #         representativeAvatar
+    #         representativeName
+    #         position
+    #         forWeight
+    #         againstWeight
+    #         createdOn
+    #         lastEditOn
+    #     }
+    #     createdOn
+    #     lastEditOn
+    # }
   }
 
 `;
