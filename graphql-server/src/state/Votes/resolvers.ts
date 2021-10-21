@@ -280,6 +280,7 @@ export const VoteResolvers = {
                     [
                         {
                             '$lookup': {
+                                'as': 'representeeVotes',
                                 'from': 'Votes',
                                 'let': {
                                     'representativeId': { '$toObjectId': '$user' },
@@ -349,8 +350,7 @@ export const VoteResolvers = {
                                             'user': { '$first': '$user.LiquidUser' }
                                         }
                                     }
-                                ],
-                                'as': 'representeeVotes'
+                                ]
                             }
                         },
                         {
@@ -385,6 +385,7 @@ export const VoteResolvers = {
                                 'representeeVotes': { '$push': '$representeeVotes' },
                                 'representatives': { '$push': '$representatives' },
                                 'user': { '$first': '$user' },
+                                // for single questions
                                 'yourVote': { '$first': '$yourVote' },
                                 'userVote': { '$first': '$userVote' },
                                 'youAndUserDetails': { '$first': '$youAndUserDetails' }
@@ -407,13 +408,12 @@ export const VoteResolvers = {
                         }, {
                             '$group': {
                                 '_id': {
-                                    // no `choiceText`
                                     'user': '$_id.user',
                                     'questionText': '$_id.questionText',
                                     'groupChannel': '$_id.groupChannel',
                                     'representeeHandle': '$representeeVotes.user.handle'
                                 },
-                                'roots': {
+                                'root': {
                                     '$first': '$$ROOT'
                                 }
                             }
@@ -422,12 +422,12 @@ export const VoteResolvers = {
                                 '_id': {
                                     // no `choiceText`
                                     // no 'representeeHandle`
-                                    'user': '$user',
-                                    'questionText': '$questionText',
-                                    'groupChannel': '$groupChannel'
+                                    'user': '$_id.user',
+                                    'questionText': '$_id.questionText',
+                                    'groupChannel': '$_id.groupChannel'
                                 },
-                                'questionText': { '$first': '$questionText' },
-                                'groupChannel': { '$first': '$groupChannel' },
+                                'questionText': { '$first': '$root.questionText' },
+                                'groupChannel': { '$first': '$root.groupChannel' },
                                 'choiceVotes': { '$first': '$root.choiceVotes' },
                                 'lastEditOn': { '$first': '$root.lastEditOn' },
                                 'representeeVotes': { '$push': '$root.representeeVotes' },
@@ -436,7 +436,7 @@ export const VoteResolvers = {
                                 'yourVote': { '$first': '$root.yourVote' },
                                 'userVote': { '$first': '$root.userVote' },
                                 'youAndUserDetails': { '$first': '$root.youAndUserDetails' }
-                              }
+                            }
                         }
                     ]
                 ),
@@ -474,8 +474,8 @@ export const VoteResolvers = {
                                     'questionText': '$_id.questionText',
                                     'groupChannel': '$_id.groupChannel'
                                 },
-                                'questionText': { '$first': '$questionText' },
-                                'groupChannel': { '$first': '$groupChannel' },
+                                'questionText': { '$first': '$root.questionText' },
+                                'groupChannel': { '$first': '$root.groupChannel' },
                                 'choiceVotes': { '$first': '$root.choiceVotes' },
                                 'lastEditOn': { '$first': '$root.lastEditOn' },
                                 'representeeVotes': { '$first': '$root.representeeVotes' },
@@ -622,7 +622,7 @@ export const VoteResolvers = {
                     [
                         ...(sortBy === 'weight') ? [
                             {
-                                '$sort': { representeeCount: -1 }
+                                '$sort': { representeeCount: -1 } // TODO: FIX
                             }
                         ] : [],
                         ...(sortBy === 'time') ? [
@@ -633,6 +633,24 @@ export const VoteResolvers = {
                     ]
                 )
             }
+
+            const defaultAggregation = async ({ filterAfterYourVoteAndBooleans }) => await mongoDB.collection("Votes")
+                .aggregate([
+                    ...AggregateLogic.matchVoteToParams,
+                    ...AggregateLogic.removeRepresentativesIfNotDelegated,
+                    ...AggregateLogic.yourVoteAndBooleans,
+                    ...!!filterAfterYourVoteAndBooleans ? [
+                        ...filterAfterYourVoteAndBooleans
+                    ] : [],
+                    ...AggregateLogic.representeeVotes,
+                    ...AggregateLogic.mergedChoices,
+                    ...AggregateLogic.mergedChoicesUniqueRepresentatives,
+                    ...AggregateLogic.mergedChoicesUniqueRepresentees,
+                    ...AggregateLogic.sortLogic,
+                    ...AggregateLogic.question,
+                    ...AggregateLogic.userObject
+                ])
+                .toArray();
 
             const Votes = await (async (type) => {
                 return {
@@ -675,26 +693,13 @@ export const VoteResolvers = {
                             ...AggregateLogic.userObject
                         ])
                         .toArray(),
-                    'directVotesMade': async () => await mongoDB.collection("Votes")
-                        .aggregate([
-                            ...AggregateLogic.matchVoteToParams,
-                            ...AggregateLogic.removeRepresentativesIfNotDelegated,
-                            ...AggregateLogic.yourVoteAndBooleans,
-                            // #1 filter
-                            {
-                                '$match': {
-                                    'isDirect': true
-                                }
-                            },
-                            ...AggregateLogic.mergedChoices,
-                            ...AggregateLogic.mergedChoicesUniqueRepresentatives,
-                            // ...AggregateLogic.mergedChoicesUniqueRepresentees,
-                            // ...AggregateLogic.representeeVotes,
-                            ...AggregateLogic.sortLogic,
-                            ...AggregateLogic.question,
-                            ...AggregateLogic.userObject
-                        ])
-                        .toArray(),
+                    'directVotesMade': async () => await defaultAggregation({
+                        filterAfterYourVoteAndBooleans: [{
+                            '$match': {
+                                'isDirect': true
+                            }
+                        }]
+                    }),
                     'directVotesInAgreement': async () => await mongoDB.collection("Votes")
                         .aggregate([
                             ...AggregateLogic.matchVoteToParams,
@@ -821,7 +826,7 @@ export const VoteResolvers = {
 
             console.log({
                 VotesL: Votes?.length,
-                // Votes,
+                // Vote: Votes[0],
                 // v: JSON.stringify(Votes.map(v => ({
                 //     r: v.representatives
                 //     // g: v.question?.groupChannel?.group
@@ -843,7 +848,7 @@ export const VoteResolvers = {
                     })),
                     yourVote: v.yourVote,
                     userVote: v.userVote
-                }
+                },
             }));
         },
     },
