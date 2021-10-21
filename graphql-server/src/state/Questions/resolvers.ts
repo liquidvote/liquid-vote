@@ -15,7 +15,7 @@ export const QuestionResolvers = {
                 ...Question,
                 ...(Question?.questionType === 'single' && !!AuthUser) && {
                     stats: Question?.stats,
-                    userVote: {
+                    yourVote: {
                         ...await mongoDB.collection("Votes").findOne({
                             questionText: Question?.questionText,
                             'groupChannel.group': Question?.groupChannel?.group,
@@ -27,7 +27,7 @@ export const QuestionResolvers = {
                     // stats: Question?.stats,
                     choices: await Promise.all(Question?.choices?.map(async (c) => ({
                         ...c,
-                        userVote: {
+                        yourVote: {
                             ...await mongoDB.collection("Votes").findOne({
                                 questionText: Question?.questionText,
                                 choiceText: c.text,
@@ -92,7 +92,7 @@ export const QuestionResolvers = {
                 ...q,
                 // thisUserIsAdmin: q.createdBy === AuthUser?.LiquidUser?.handle,
                 ...(q.questionType === 'single' && !!AuthUser) && {
-                    userVote: await mongoDB.collection("Votes").findOne({
+                    yourVote: await mongoDB.collection("Votes").findOne({
                         questionText: q.questionText,
                         'groupChannel.group': group,
                         user: AuthUser?._id
@@ -101,7 +101,7 @@ export const QuestionResolvers = {
                 ...(q.questionType === 'multi' && !!AuthUser) && {
                     choices: await Promise.all(q.choices.map(async (c) => ({
                         ...c,
-                        userVote: await mongoDB.collection("Votes").findOne({
+                        yourVote: await mongoDB.collection("Votes").findOne({
                             questionText: q.questionText,
                             'groupChannel.group': group,
                             choiceText: c.text,

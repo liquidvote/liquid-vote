@@ -637,11 +637,11 @@ const getYourUserStats = async ({ userId, AuthUser, mongoDB }) => {
                                 }
                             }
                         ],
-                        'as': 'otherVote'
+                        'as': 'userVote'
                     }
                 }, {
                     '$match': {
-                        'otherVote': {
+                        'userVote': {
                             '$gte': {
                                 '$size': 1
                             }
@@ -649,8 +649,8 @@ const getYourUserStats = async ({ userId, AuthUser, mongoDB }) => {
                     }
                 }, {
                     '$addFields': {
-                        'otherVote': {
-                            '$first': '$otherVote'
+                        'userVote': {
+                            '$first': '$userVote'
                         }
                     }
                 }, {
@@ -663,7 +663,7 @@ const getYourUserStats = async ({ userId, AuthUser, mongoDB }) => {
                                     ]
                                 }, {
                                     '$eq': [
-                                        '$otherVote.isDirect', true
+                                        '$userVote.isDirect', true
                                     ]
                                 }
                             ]
@@ -672,17 +672,17 @@ const getYourUserStats = async ({ userId, AuthUser, mongoDB }) => {
                             '$and': [
                                 {
                                     '$eq': [
-                                        '$position', '$otherVote.position'
+                                        '$position', '$userVote.position'
                                     ]
                                 }
                             ]
                         },
-                        'otherVoteMadeByYou': {
+                        'userVoteMadeByYou': {
                             '$and': [
                                 {
 
                                     '$eq': [
-                                        '$otherVote.isDirect', false
+                                        '$userVote.isDirect', false
                                     ]
                                 },
                                 {
@@ -690,7 +690,7 @@ const getYourUserStats = async ({ userId, AuthUser, mongoDB }) => {
                                         {
                                             '$size': {
                                                 '$filter': {
-                                                    'input': '$otherVote.representatives',
+                                                    'input': '$userVote.representatives',
                                                     'as': 'r',
                                                     'cond': {
                                                         '$eq': [
@@ -704,7 +704,7 @@ const getYourUserStats = async ({ userId, AuthUser, mongoDB }) => {
                                 }
                             ]
                         },
-                        'otherVoteMadeForYou': {
+                        'userVoteMadeForYou': {
                             '$and': [
                                 {
 
@@ -721,7 +721,7 @@ const getYourUserStats = async ({ userId, AuthUser, mongoDB }) => {
                                                     'as': 'r',
                                                     'cond': {
                                                         '$eq': [
-                                                            '$$r.representativeId', '$otherVote.user'
+                                                            '$$r.representativeId', '$userVote.user'
                                                         ]
                                                     }
                                                 }
@@ -792,7 +792,7 @@ const getYourUserStats = async ({ userId, AuthUser, mongoDB }) => {
                                 '$cond': [
                                     {
                                         '$eq': [
-                                            '$otherVoteMadeByYou', true
+                                            '$userVoteMadeByYou', true
                                         ]
                                     }, 1, 0
                                 ]
@@ -803,7 +803,7 @@ const getYourUserStats = async ({ userId, AuthUser, mongoDB }) => {
                                 '$cond': [
                                     {
                                         '$eq': [
-                                            '$otherVoteMadeForYou', true
+                                            '$userVoteMadeForYou', true
                                         ]
                                     }, 1, 0
                                 ]

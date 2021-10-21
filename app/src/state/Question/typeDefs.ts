@@ -37,7 +37,7 @@ export const QUESTION = gql`
                     directVotes
                     indirectVotes
                 }
-                userVote {
+                yourVote {
                     questionText
                     position
                     forWeight
@@ -89,7 +89,7 @@ export const QUESTION = gql`
                 directVotes
                 indirectVotes
             }
-            userVote {
+            yourVote {
                 questionText
                 position
                 forWeight
@@ -180,7 +180,7 @@ export const QUESTIONS = gql`
             stats {
                 ...stats
             }
-            userVote {
+            yourVote {
                 questionText
                 position
                 representatives {
@@ -208,7 +208,7 @@ export const QUESTIONS = gql`
         stats {
             ...stats
         }
-        userVote {
+        yourVote {
           questionText
           position
           representatives {

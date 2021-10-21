@@ -121,9 +121,9 @@ export const VoteResolvers = {
                         }, {
                             '$addFields': {
                                 'youAndUserDetails': {
-                                    'byYou': {
-                                        '$eq': ['$user', new ObjectId(AuthUser?._id)]
-                                    },
+                                    // 'byYou': {
+                                    //     '$eq': ['$user', new ObjectId(AuthUser?._id)]
+                                    // },
                                     'bothDirect': {
                                         '$and': [
                                             {
@@ -488,77 +488,6 @@ export const VoteResolvers = {
                         }
                     ]
                 ),
-
-                // remove
-                questionStats: (
-                    [
-                        {
-                            $lookup: {
-                                from: 'Questions',
-                                let: {
-                                    questionText: "$questionText",
-                                    choiceText: "$choiceText",
-                                    group: "$groupChannel.group",
-                                },
-                                pipeline: [
-                                    {
-                                        $match: {
-                                            $and: [
-                                                {
-                                                    '$expr': {
-                                                        '$eq': [
-                                                            '$questionText', '$$questionText'
-                                                        ]
-                                                    }
-                                                },
-                                                {
-                                                    '$expr': {
-                                                        '$eq': [
-                                                            '$groupChannel.group', '$$group'
-                                                        ]
-                                                    }
-                                                }
-                                            ]
-                                        }
-                                    }
-                                ],
-                                as: 'question'
-                            }
-                        },
-                        {
-                            $addFields: {
-                                QuestionStats: {
-                                    $cond: {
-                                        if: {
-                                            $not: ["$choiceText"]
-                                        },
-                                        then: { $first: '$question.stats' },
-                                        else: {
-                                            $let: {
-                                                vars: {
-                                                    choice: {
-                                                        $first: {
-                                                            '$filter': {
-                                                                'input': { $first: '$question.choices' },
-                                                                'as': 'c',
-                                                                'cond': {
-                                                                    '$eq': [
-                                                                        '$$c.text', '$choiceText'
-                                                                    ]
-                                                                }
-                                                            }
-                                                        }
-                                                    }
-                                                },
-                                                in: "$$choice.stats"
-                                            }
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                    ]
-                ),
                 question: (
                     [
                         {
@@ -654,45 +583,22 @@ export const VoteResolvers = {
 
             const Votes = await (async (type) => {
                 return {
-                    'directFor': async () => await mongoDB.collection("Votes")
-                        .aggregate([
-                            ...AggregateLogic.matchVoteToParams,
-                            ...AggregateLogic.removeRepresentativesIfNotDelegated,
-                            ...AggregateLogic.yourVoteAndBooleans,
-                            // #1 filter
-                            {
-                                '$match': {
-                                    'position': 'for',
-                                    'isDirect': true
-                                }
-                            },
-                            ...AggregateLogic.representeeVotes,
-                            // ...AggregateLogic.mergedChoices,
-                            // ...AggregateLogic.mergedChoicesUniqueRepresentatives,
-                            ...AggregateLogic.sortLogic,
-                            // ...AggregateLogic.question,
-                            ...AggregateLogic.question,
-                            ...AggregateLogic.userObject
-                        ])
-                        .toArray(),
-                    'directAgainst': async () => await mongoDB.collection("Votes")
-                        .aggregate([
-                            ...AggregateLogic.matchVoteToParams,
-                            ...AggregateLogic.removeRepresentativesIfNotDelegated,
-                            ...AggregateLogic.yourVoteAndBooleans,
-                            // #1 filter
-                            {
-                                '$match': {
-                                    'position': 'against',
-                                    'isDirect': true
-                                }
-                            },
-                            ...AggregateLogic.representeeVotes,
-                            ...AggregateLogic.sortLogic,
-                            ...AggregateLogic.question,
-                            ...AggregateLogic.userObject
-                        ])
-                        .toArray(),
+                    'directFor': async () => await defaultAggregation({
+                        filterAfterYourVoteAndBooleans: [{
+                            '$match': {
+                                'position': 'for',
+                                'isDirect': true
+                            }
+                        }]
+                    }),
+                    'directAgainst': async () => await defaultAggregation({
+                        filterAfterYourVoteAndBooleans: [{
+                            '$match': {
+                                'position': 'against',
+                                'isDirect': true
+                            }
+                        }]
+                    }),
                     'directVotesMade': async () => await defaultAggregation({
                         filterAfterYourVoteAndBooleans: [{
                             '$match': {
@@ -700,127 +606,74 @@ export const VoteResolvers = {
                             }
                         }]
                     }),
-                    'directVotesInAgreement': async () => await mongoDB.collection("Votes")
-                        .aggregate([
-                            ...AggregateLogic.matchVoteToParams,
-                            ...AggregateLogic.yourVoteAndBooleans,
-                            // #1 filter
-                            {
-                                '$match': {
-                                    'InAgreement': true,
-                                    'bothDirect': true,
-                                    'byYou': false
-                                }
-                            },
-                            ...AggregateLogic.representeeVotes,
-                            ...AggregateLogic.sortLogic,
-                            ...AggregateLogic.question,
-                            ...AggregateLogic.userObject
-                        ])
-                        .toArray(),
-                    'directVotesInDisagreement': async () => await mongoDB.collection("Votes")
-                        .aggregate([
-                            ...AggregateLogic.matchVoteToParams,
-                            ...AggregateLogic.yourVoteAndBooleans,
-                            // #1 filter
-                            {
-                                '$match': {
-                                    'InAgreement': false,
-                                    'bothDirect': true,
-                                    'byYou': false
-                                }
-                            },
-                            ...AggregateLogic.representeeVotes,
-                            ...AggregateLogic.sortLogic,
-                            ...AggregateLogic.question,
-                            ...AggregateLogic.userObject
-                        ])
-                        .toArray(),
-                    'indirectVotesMade': async () => await mongoDB.collection("Votes") // hum
-                        .aggregate([
-                            ...AggregateLogic.matchVoteToParams,
-                            ...AggregateLogic.yourVoteAndBooleans,
-                            ...AggregateLogic.representeeVotes,
-                            ...AggregateLogic.sortLogic,
-                            ...AggregateLogic.representeeVotesAsList,
-                            ...AggregateLogic.question,
-                        ])
-                        .toArray(),
-                    'indirectVotesMadeForUser': async () => await mongoDB.collection("Votes")
-                        .aggregate([
-                            ...AggregateLogic.matchVoteToParams,
-                            // ...AggregateLogic.removeRepresentativesIfNotDelegated,
-                            {
-                                '$match': {
-                                    position: "delegated",
-                                    isDirect: false
-                                }
-                            },
-                            ...AggregateLogic.yourVoteAndBooleans,
-                            ...AggregateLogic.mergedChoices,
-                            ...AggregateLogic.mergedChoicesUniqueRepresentatives,
-                            ...AggregateLogic.sortLogic,
-                            ...AggregateLogic.question,
-                            ...AggregateLogic.userObject
-                        ])
-                        .toArray(),
-                    'indirectVotesMadeByUser': async () => await mongoDB.collection("Votes") // hum
-                        .aggregate([
-                            ...AggregateLogic.matchVoteToParams,
-                            ...AggregateLogic.yourVoteAndBooleans,
-                            ...AggregateLogic.representeeVotes,
-                            ...AggregateLogic.sortLogic,
-                            ...AggregateLogic.representeeVotesAsList,
-                            ...AggregateLogic.questionStats
-                        ])
-                        .toArray(),
-                    'indirectVotesMadeByYou': async () => await mongoDB.collection("Votes")
-                        .aggregate([
-                            ...AggregateLogic.matchVoteToParams,
-                            ...AggregateLogic.yourVoteAndBooleans,
-                            {
-                                '$match': {
-                                    'yourVoteMadeForUser': true
-                                }
-                            },
-                            ...AggregateLogic.representeeVotes,
-                            ...AggregateLogic.sortLogic,
-                            ...AggregateLogic.question,
-                            ...AggregateLogic.userObject
-                        ])
-                        .toArray(),
-                    'indirectVotesMadeForYou': async () => await mongoDB.collection("Votes")
-                        .aggregate([
-                            ...AggregateLogic.matchVoteToParams,
-                            ...AggregateLogic.yourVoteAndBooleans,
-                            {
-                                '$match': {
-                                    'yourVoteMadeByUser': true
-                                }
-                            },
-                            ...AggregateLogic.representeeVotes,
-                            ...AggregateLogic.sortLogic,
-                            ...AggregateLogic.question,
-                            ...AggregateLogic.userObject
-                        ])
-                        .toArray(),
-                    'directVotesMadeByYou': async () => await mongoDB.collection("Votes")
-                        .aggregate([
-                            ...AggregateLogic.matchVoteToParams,
-                            ...AggregateLogic.yourVoteAndBooleans,
-                            {
-                                '$match': {
-                                    'user': new ObjectId(AuthUser?._id),
-                                    'isDirect': true,
-                                    'position': { $ne: null }
-                                }
-                            },
-                            ...AggregateLogic.representeeVotes,
-                            ...AggregateLogic.sortLogic,
-                            ...AggregateLogic.question,
-                            ...AggregateLogic.userObject
-                        ])
-                        .toArray(),
+                    'directVotesInAgreement': async () => await defaultAggregation({
+                        filterAfterYourVoteAndBooleans: [{
+                            '$match': {
+                                'youAndUserDetails.InAgreement': true,
+                                'youAndUserDetails.bothDirect': true,
+                                // 'byYou': false
+                            }
+                        }]
+                    }),
+                    'directVotesInDisagreement': async () => await defaultAggregation({
+                        filterAfterYourVoteAndBooleans: [{
+                            '$match': {
+                                'youAndUserDetails.InAgreement': false,
+                                'youAndUserDetails.bothDirect': true,
+                                // 'byYou': false
+                            }
+                        }]
+                    }),
+                    'indirectVotesMade': async () => await defaultAggregation({
+                        filterAfterYourVoteAndBooleans: [{
+                            '$match': {
+                                position: "delegated",
+                                isDirect: false
+                            }
+                        }]
+                    }),
+                    'indirectVotesMadeForUser': async () => await defaultAggregation({
+                        filterAfterYourVoteAndBooleans: [{
+                            '$match': {
+                                position: "delegated",
+                                isDirect: false
+                            }
+                        }]
+                    }),
+                    // huuuuuuuum
+                    // 'indirectVotesMadeByUser': async () => await mongoDB.collection("Votes")
+                    //     .aggregate([
+                    //         ...AggregateLogic.matchVoteToParams,
+                    //         ...AggregateLogic.yourVoteAndBooleans,
+                    //         ...AggregateLogic.representeeVotes,
+                    //         ...AggregateLogic.sortLogic,
+                    //         ...AggregateLogic.representeeVotesAsList,
+                    //         // ...AggregateLogic.questionStats
+                    //     ])
+                    //     .toArray(),
+                    'indirectVotesMadeByYou': async () => await defaultAggregation({
+                        filterAfterYourVoteAndBooleans: [{
+                            '$match': {
+                                'youAndUserDetails.yourVoteMadeForUser': true
+                            }
+                        }]
+                    }),
+                    'indirectVotesMadeForYou': async () => await defaultAggregation({
+                        filterAfterYourVoteAndBooleans: [{
+                            '$match': {
+                                'youAndUserDetails.yourVoteMadeByUser': true
+                            }
+                        }]
+                    }),
+                    'directVotesMadeByYou': async () => await defaultAggregation({
+                        filterAfterYourVoteAndBooleans: [{
+                            '$match': {
+                                'user': new ObjectId(AuthUser?._id),
+                                'isDirect': true,
+                                'position': { $ne: null }
+                            }
+                        }]
+                    }),
                 }[type]();
             })(type);
 

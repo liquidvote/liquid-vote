@@ -54,6 +54,10 @@ export default function Question() {
     const sortedChoices = question_data?.Question?.questionType === 'multi' ? [...question_data?.Question?.choices]?.
         sort((a, b) => (b?.stats?.directVotes + b?.stats?.indirectVotes) - (a?.stats?.directVotes + a?.stats?.indirectVotes)) : [];
 
+    console.log({
+        c: question_data?.Question?.choices
+    });
+
     const maxVoteCount = question_data?.Question?.questionType === 'multi' && sortedChoices?.[0]?.stats?.directVotes + sortedChoices?.[0]?.stats?.indirectVotes;
 
     return question_loading ? (
