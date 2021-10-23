@@ -12,11 +12,15 @@ import Choice from "@shared/Choice";
 
 export const MultiVoteInList: FunctionComponent<{
     v: any,
-    showGroupAndTime: boolean
+    showGroupAndTime: boolean,
+    user: any
 }> = ({
     v,
-    showGroupAndTime
+    showGroupAndTime,
+    user
 }) => {
+
+        console.log({ v })
 
         const sortedChoices = [...v.choices]?.
             sort((a, b) => (b?.stats?.directVotes + b?.stats?.indirectVotes) - (a?.stats?.directVotes + a?.stats?.indirectVotes));
@@ -55,7 +59,7 @@ export const MultiVoteInList: FunctionComponent<{
                     {sortedChoices?.
                         sort((a, b) => (b?.stats?.directVotes + b?.stats?.indirectVotes) - (a?.stats?.directVotes + a?.stats?.indirectVotes))
                         .map((c, i) => (
-                            <div className="my-1" key={v.questionText + ' ' + c.text}>
+                            <div className="my-2" key={v.questionText + ' ' + c.text}>
                                 <Choice
                                     choiceText={c.text}
                                     voteName={v.questionText}
@@ -65,6 +69,7 @@ export const MultiVoteInList: FunctionComponent<{
                                     userVote={c.userVote}
                                     inList={true}
                                     maxVoteCount={maxVoteCount}
+                                    user={user}
                                 />
                             </div>
                         ))}

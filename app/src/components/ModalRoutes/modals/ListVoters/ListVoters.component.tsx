@@ -90,7 +90,7 @@ export const ListVoters: FunctionComponent<{}> = ({ }) => {
     return (
         <>
             <ModalHeader
-                title={`Voters`}
+                title={`Votes on ${questionText}${!!choiceText && ": "}${choiceText}`}
                 hideSubmitButton={true}
             />
             <div className="">
@@ -131,6 +131,7 @@ export const ListVoters: FunctionComponent<{}> = ({ }) => {
                                             modal: "ListVoters",
                                             modalData: JSON.stringify({
                                                 questionText,
+                                                choiceText,
                                                 groupHandle,
                                                 subsection: 'represented',
                                                 // subsubsection: 'foryou'
@@ -167,7 +168,7 @@ export const ListVoters: FunctionComponent<{}> = ({ }) => {
                                                             questionText,
                                                             choiceText,
                                                             groupHandle,
-                                                            subsection: 'represented',
+                                                            subsection: 'direct',
                                                             subsubsection: 'for'
                                                         })
                                                     }

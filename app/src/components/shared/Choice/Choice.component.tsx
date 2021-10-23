@@ -20,7 +20,8 @@ export const Choice: FunctionComponent<{
     userVote: any,
     inList?: boolean,
     showPercentages?: boolean,
-    maxVoteCount?: number
+    maxVoteCount?: number,
+    user?: any
 }> = ({
     choiceText,
     voteName,
@@ -30,7 +31,8 @@ export const Choice: FunctionComponent<{
     userVote,
     inList,
     showPercentages,
-    maxVoteCount
+    maxVoteCount,
+    user
 }) => {
 
         const { allSearchParams, updateParams } = useSearchParams();
@@ -90,46 +92,76 @@ export const Choice: FunctionComponent<{
 
         return (
             <div>
-                <div className="d-flex d-flex flex-column mb-1" style={{
-                    ...(maxVoteCount) && {
-                        'maxWidth':
-                            ((stats?.directVotes + stats?.indirectVotes | 0) / maxVoteCount) * 30 + 70 + '%'
-                    }
-                }}>
+                <div
+                    className="d-flex d-flex flex-column mb-1"
+                // style={{
+                //     ...(maxVoteCount) && {
+                //         'maxWidth':
+                //             ((stats?.directVotes + stats?.indirectVotes | 0) / maxVoteCount) * 30 + 70 + '%'
+                //     }
+                // }}
+                >
                     {!!choiceText && (
                         <div className={`d-flex align-items-center white choice-text mr-2 ${inList && 'small'}`}>
-
                             {!!userVote && (
-                                !!userVote.representatives?.length ? (
-                                    <div className="mr-2 d-flex align-items-center d-inline-block">
-                                        Represented by
-                                        <span className="d-flex ml-2 mr-1 pl-1">
-                                            {userVote.representatives?.map((r: any, i: number) => (
+                                <div className={`d-flex align-items-center mx-1`}>
+
+                                    <>
+                                        {!!user && (
+                                            <>
+                                                {!!userVote.representatives?.length && (
+                                                    <div className="d-flex on-top">
+                                                        {userVote.representatives?.map((r: any, i: number) => (
+                                                            <Link
+                                                                data-tip={`${r?.representativeName} representing ${user.name} ${r?.position} `}
+                                                                key={`representatives-${r?.representativeHandle || i}`}
+                                                                to={`/profile/${r?.representativeHandle}`}
+                                                                className={`vote-avatar tiny-big ${r?.position} ml-n2`}
+                                                                style={{
+                                                                    background: `url(${r?.representativeAvatar}) 50% 50% / cover no-repeat`
+                                                                }}
+                                                            ></Link>
+                                                        ))}
+                                                        {/* <span className="ml-1 mr-2 pr-1">Representing</span> */}
+                                                    </div>
+                                                )}
                                                 <Link
-                                                    key={`representatives-${r?.representativeHandle || i}`}
-                                                    to={`/profile/${r?.representativeHandle}`}
-                                                    className={`vote-avatar tiny ${r?.position} ml-n2`}
+                                                    data-tip={
+                                                        !userVote?.representatives?.length ?
+                                                            `${user.name} voted ${userVote?.position}` :
+                                                            `${user.name} represented by ${userVote?.representatives.length === 1 ? userVote.representatives?.[0].representativeName : userVote?.representatives.length }`
+                                                    }
+                                                    key={`user-${user.handle}`}
+                                                    to={`/profile/${user.handle}`}
+                                                    className={`vote-avatar ${!userVote?.representatives?.length && 'on-top'} ${!!userVote.representatives?.length ? 'tiny' : 'tiny-big'} ${userVote?.position} ml-n2`}
                                                     style={{
-                                                        background: `url(${r?.representativeAvatar}) 50% 50% / cover no-repeat`
+                                                        background: `url(${user.avatar}) 50% 50% / cover no-repeat`
                                                     }}
-                                                    title={r?.representativeName}
                                                 ></Link>
-                                            ))}
-                                        </span>
-                                        {' '}
-                                        on
-                                    </div>
-                                ) : (
-                                    <div className="mr-2">
-                                        Voted{' '}
-                                        <b className={`white ${userVote?.position?.toLowerCase()}Direct px-1 rounded`}>{userVote?.position}</b>{' '}
-                                        on
-                                    </div>
-                                )
+                                                <div className="d-flex" data-tip={`Represented by ${user.name}`}>
+                                                    {!userVote?.representatives?.length && userVote?.representeeVotes?.map((r: any) => (
+                                                        <Link
+                                                            key={`representeeVotes-${r.user.handle}`}
+                                                            to={`/profile/${r.user.handle}`}
+                                                            className={`vote-avatar light tiny none ml-n2`}
+                                                            style={{
+                                                                background: `url(${r.user.avatar}) 50% 50% / cover no-repeat`
+                                                            }}
+                                                        ></Link>
+                                                    ))}
+                                                </div>
+                                            </>
+                                        )}
+                                        {/* {userVote?.position !== 'delegated' && (
+                                            <div className="ml-1">
+                                                Voted{' '}
+                                                <b className={`white ${userVote?.position?.toLowerCase()}Direct px-1 rounded`}>{userVote?.position}</b>
+                                            </div>
+                                        )} */}
+                                    </>
 
+                                </div>
                             )}
-
-
                             <b>{choiceText}</b>
                         </div>
                     )}
@@ -177,7 +209,7 @@ export const Choice: FunctionComponent<{
                                     yourVote?.position === 'delegated' &&
                                     (!editVote_data || editVote_data?.editVote?.position === 'delegated')
                                 ) && (
-                                    <div className="d-flex ml-2 my-n2 mr-n1">
+                                    <div className="d-flex ml-2 my-n2 mr-n1" data-tip={`Representing you`}>
                                         <Link
                                             to={`/profile/${forRepresentatives[0].representativeHandle}`}
                                             onClick={e => e.stopPropagation()}
@@ -212,7 +244,7 @@ export const Choice: FunctionComponent<{
                                 )
                             }
                         </div>
-                        <div className="d-flex ml-2">
+                        <div className="d-flex ml-2" data-tip={`Votes For`}>
                             {(
                                 !!editVote_data ?
                                     editVote_data?.editVote?.QuestionStats?.forMostRepresentingVoters :
@@ -280,7 +312,7 @@ export const Choice: FunctionComponent<{
                     )}
 
                     <div className="d-flex align-items-center">
-                        <div className="d-flex ml-2">
+                        <div className="d-flex ml-2" data-tip={`Votes Against`}>
                             {
                                 (
                                     !!editVote_data ?
@@ -330,7 +362,7 @@ export const Choice: FunctionComponent<{
                                     yourVote?.position === 'delegated' &&
                                     (!editVote_data || editVote_data?.editVote?.position === 'delegated')
                                 ) && (
-                                    <div className="d-flex mr-1 my-n2 ml-1">
+                                    <div className="d-flex mr-1 my-n2 ml-1" data-tip={`Representing you`}>
                                         <Link
                                             to={`/profile/${againstRepresentatives[0].representativeHandle}`}
                                             className={`vote-avatar against ml-n2 ${inList && 'tiny'}`}

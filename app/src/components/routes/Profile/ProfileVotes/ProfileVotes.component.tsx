@@ -96,7 +96,7 @@ export const ProfileVotes: FunctionComponent<{}> = ({ }) => {
                         </li>
                         <li className="nav-item">
                             <Link className={`nav-link ${subsubsection === 'same' && 'active'}`} to={`/profile/${handle}/votes/direct/same`}>
-                                <b className="white forDirect px-1 rounded" >{profile?.yourStats?.directVotesInAgreement}</b> Same
+                                <b className="white forDirect px-1 rounded" >{profile?.yourStats?.directVotesInAgreement}</b> Same as you
                             </Link>
                         </li>
                         <li className="nav-item">

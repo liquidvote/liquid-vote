@@ -119,6 +119,9 @@ $theme5-colors: ("bg": #0b414d, "primary": #08f3a5, "secondary": white, "border"
     .vote-avatar
         border: 2px solid map-get($theme, "primary")
 
+        &.none, &.delegated
+            border: 2px solid map-get($theme, "bg")
+
         &.count
             background-color: map-get($theme, "primary")
 
@@ -446,9 +449,14 @@ hr
     &.tiny
         height: 20px
         width: 20px
+    
+    &.tiny-big
+        height: 24px
+        width: 24px
 
     &:hover
         z-index: 1
+        opacity: 1
 
 .small-avatar
     height: 43px
@@ -533,6 +541,12 @@ hr
     position: absolute
     top: 0
     right: 0
+    z-index: 1
+
+.behind
+    z-index: 0
+    
+.on-top
     z-index: 1
 
 .small-for-against-buttons-container

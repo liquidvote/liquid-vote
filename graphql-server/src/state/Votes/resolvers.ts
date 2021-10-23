@@ -213,7 +213,17 @@ export const VoteResolvers = {
                                 $cond: [
                                     { $eq: ["$position", "delegated"] },
                                     "$representatives",
-                                    []
+                                    {
+                                        '$filter': {
+                                            'input': '$representatives',
+                                            'as': 'r',
+                                            'cond': {
+                                                '$ne': [
+                                                    '$$r.position', null
+                                                ]
+                                            }
+                                        }
+                                    }
                                 ]
                             }
                         }
@@ -388,7 +398,36 @@ export const VoteResolvers = {
                                 // for single questions
                                 'yourVote': { '$first': '$yourVote' },
                                 'userVote': { '$first': '$userVote' },
-                                'youAndUserDetails': { '$first': '$youAndUserDetails' }
+                                'youAndUserDetails': { '$first': '$youAndUserDetails' },
+                                'youAndUserDetailsCounts_bothDirect': {
+                                    '$sum': {
+                                        $cond: ['$youAndUserDetails.bothDirect', 1, 0]
+                                    }
+                                },
+                                'youAndUserDetailsCounts_InAgreement': {
+                                    '$sum': {
+                                        $cond: ['$youAndUserDetails.InAgreement', 1, 0]
+                                    }
+                                },
+                                'youAndUserDetailsCounts_yourVoteMadeByUser': {
+                                    '$sum': {
+                                        $cond: ['$youAndUserDetails.yourVoteMadeByUser', 1, 0]
+                                    }
+                                },
+                                'youAndUserDetailsCounts_yourVoteMadeForUser': {
+                                    '$sum': {
+                                        $cond: ['$youAndUserDetails.yourVoteMadeForUser', 1, 0]
+                                    }
+                                }
+                            }
+                        }, {
+                            '$addFields': {
+                                youAndUserDetailsCount: {
+                                    bothDirect: '$youAndUserDetailsCounts_bothDirect',
+                                    InAgreement: '$youAndUserDetailsCounts_InAgreement',
+                                    yourVoteMadeByUser: '$youAndUserDetailsCounts_yourVoteMadeByUser',
+                                    yourVoteMadeForUser: '$youAndUserDetailsCounts_yourVoteMadeForUser'
+                                }
                             }
                         }
                     ]
@@ -435,7 +474,8 @@ export const VoteResolvers = {
                                 'user': { '$first': '$root.user' },
                                 'yourVote': { '$first': '$root.yourVote' },
                                 'userVote': { '$first': '$root.userVote' },
-                                'youAndUserDetails': { '$first': '$root.youAndUserDetails' }
+                                // 'youAndUserDetails': { '$first': '$root.youAndUserDetails' },
+                                'youAndUserDetailsCount': { '$first': '$root.youAndUserDetailsCount' }
                             }
                         }
                     ]
@@ -483,7 +523,8 @@ export const VoteResolvers = {
                                 'user': { '$first': '$root.user' },
                                 'yourVote': { '$first': '$root.yourVote' },
                                 'userVote': { '$first': '$root.userVote' },
-                                'youAndUserDetails': { '$first': '$root.youAndUserDetails' }
+                                // 'youAndUserDetails': { '$first': '$root.youAndUserDetails' },
+                                'youAndUserDetailsCount': { '$first': '$root.youAndUserDetailsCount' }
                             }
                         }
                     ]
@@ -549,9 +590,14 @@ export const VoteResolvers = {
                 ),
                 sortLogic: (
                     [
+                        {
+                            '$addFields': {
+                                'representeeVotesCount': { '$size': "$representeeVotes" }
+                            }
+                        },
                         ...(sortBy === 'weight') ? [
                             {
-                                '$sort': { representeeCount: -1 } // TODO: FIX
+                                '$sort': { representeeVotesCount: -1 }
                             }
                         ] : [],
                         ...(sortBy === 'time') ? [
@@ -563,7 +609,10 @@ export const VoteResolvers = {
                 )
             }
 
-            const defaultAggregation = async ({ filterAfterYourVoteAndBooleans }) => await mongoDB.collection("Votes")
+            const defaultAggregation = async ({
+                filterAfterYourVoteAndBooleans,
+                filterAfterMerge
+            }) => await mongoDB.collection("Votes")
                 .aggregate([
                     ...AggregateLogic.matchVoteToParams,
                     ...AggregateLogic.removeRepresentativesIfNotDelegated,
@@ -575,6 +624,9 @@ export const VoteResolvers = {
                     ...AggregateLogic.mergedChoices,
                     ...AggregateLogic.mergedChoicesUniqueRepresentatives,
                     ...AggregateLogic.mergedChoicesUniqueRepresentees,
+                    ...!!filterAfterMerge ? [
+                        ...filterAfterMerge
+                    ] : [],
                     ...AggregateLogic.sortLogic,
                     ...AggregateLogic.question,
                     ...AggregateLogic.userObject
@@ -589,7 +641,8 @@ export const VoteResolvers = {
                                 'position': 'for',
                                 'isDirect': true
                             }
-                        }]
+                        }],
+                        filterAfterMerge: false // { Count.directFor > 0 }
                     }),
                     'directAgainst': async () => await defaultAggregation({
                         filterAfterYourVoteAndBooleans: [{
@@ -597,32 +650,34 @@ export const VoteResolvers = {
                                 'position': 'against',
                                 'isDirect': true
                             }
-                        }]
+                        }],
+                        filterAfterMerge: false // { Count.directFor > 0 }
                     }),
                     'directVotesMade': async () => await defaultAggregation({
                         filterAfterYourVoteAndBooleans: [{
                             '$match': {
                                 'isDirect': true
                             }
-                        }]
+                        }],
+                        filterAfterMerge: false // { Count.direct > 0 }
                     }),
                     'directVotesInAgreement': async () => await defaultAggregation({
                         filterAfterYourVoteAndBooleans: [{
                             '$match': {
                                 'youAndUserDetails.InAgreement': true,
-                                'youAndUserDetails.bothDirect': true,
-                                // 'byYou': false
+                                'youAndUserDetails.bothDirect': true
                             }
-                        }]
+                        }],
+                        filterAfterMerge: false // c
                     }),
                     'directVotesInDisagreement': async () => await defaultAggregation({
                         filterAfterYourVoteAndBooleans: [{
                             '$match': {
                                 'youAndUserDetails.InAgreement': false,
-                                'youAndUserDetails.bothDirect': true,
-                                // 'byYou': false
+                                'youAndUserDetails.bothDirect': true
                             }
-                        }]
+                        }],
+                        filterAfterMerge: false // c
                     }),
                     'indirectVotesMade': async () => await defaultAggregation({
                         filterAfterYourVoteAndBooleans: [{
@@ -630,7 +685,8 @@ export const VoteResolvers = {
                                 position: "delegated",
                                 isDirect: false
                             }
-                        }]
+                        }],
+                        filterAfterMerge: false  // { delegated > 0 }
                     }),
                     'indirectVotesMadeForUser': async () => await defaultAggregation({
                         filterAfterYourVoteAndBooleans: [{
@@ -638,7 +694,8 @@ export const VoteResolvers = {
                                 position: "delegated",
                                 isDirect: false
                             }
-                        }]
+                        }],
+                        filterAfterMerge: false // { delegated > 0 }
                     }),
                     // huuuuuuuum
                     // 'indirectVotesMadeByUser': async () => await mongoDB.collection("Votes")
@@ -656,30 +713,33 @@ export const VoteResolvers = {
                             '$match': {
                                 'youAndUserDetails.yourVoteMadeForUser': true
                             }
-                        }]
+                        }],
+                        filterAfterMerge: false // c
                     }),
                     'indirectVotesMadeForYou': async () => await defaultAggregation({
                         filterAfterYourVoteAndBooleans: [{
                             '$match': {
                                 'youAndUserDetails.yourVoteMadeByUser': true
                             }
-                        }]
+                        }],
+                        filterAfterMerge: false // c
                     }),
                     'directVotesMadeByYou': async () => await defaultAggregation({
                         filterAfterYourVoteAndBooleans: [{
                             '$match': {
-                                'user': new ObjectId(AuthUser?._id),
+                                'user': new ObjectId(AuthUser?._id), // stays
                                 'isDirect': true,
                                 'position': { $ne: null }
                             }
-                        }]
+                        }],
+                        filterAfterMerge: false // { direct > 0 }
                     }),
                 }[type]();
             })(type);
 
             console.log({
                 VotesL: Votes?.length,
-                // Vote: Votes[0],
+                Vote: Votes[0].question.choices,
                 // v: JSON.stringify(Votes.map(v => ({
                 //     r: v.representatives
                 //     // g: v.question?.groupChannel?.group

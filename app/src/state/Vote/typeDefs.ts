@@ -18,9 +18,9 @@ export const VOTE = gql`
 export const VOTES = gql`
   query($questionText: String, $choiceText: String, $groupHandle: String, $userHandle: String, $type: String, $sortBy: String) {
     Votes(questionText: $questionText, choiceText: $choiceText,, groupHandle: $groupHandle, userHandle: $userHandle, type: $type, sortBy: $sortBy) {
-        ...voteMain
+        ...vote
         choiceVotes {
-            ...voteMain
+            ...vote
         }
         question {
             questionText
@@ -49,48 +49,10 @@ export const VOTES = gql`
                     indirectVotes
                 }
                 userVote {
-                    questionText
-                    position
-                    forWeight
-                    againstWeight
-                    representatives {
-                        representativeHandle
-                        representativeAvatar
-                        representativeName
-                        position
-                        forWeight
-                        againstWeight
-                    }
-                    representeeVotes {
-                        isDirect
-                        position
-                        user {
-                            handle
-                            name
-                        }
-                    }
+                    ...vote
                 }
                 yourVote {
-                    questionText
-                    position
-                    forWeight
-                    againstWeight
-                    representatives {
-                        representativeHandle
-                        representativeAvatar
-                        representativeName
-                        position
-                        forWeight
-                        againstWeight
-                    }
-                    representeeVotes {
-                        isDirect
-                        position
-                        user {
-                            handle
-                            name
-                        }
-                    }
+                    ...vote
                 }
             }
             groupChannel{
@@ -123,10 +85,10 @@ export const VOTES = gql`
                 indirectVotes
             }
             userVote {
-                ...voteMain
+                ...vote
             }
             yourVote {
-                ...voteMain
+                ...vote
             }
         }
         user {
@@ -137,7 +99,7 @@ export const VOTES = gql`
     }
   }
 
-  fragment voteMain on Vote {
+  fragment vote on Vote {
     questionText
     choiceText
     groupChannel {
@@ -169,24 +131,6 @@ export const VOTES = gql`
             avatar
         }
     }
-    # yourVote {
-    #     position
-    #     isDirect
-    #     forWeight
-    #     againstWeight
-    #     representatives{
-    #         representativeHandle
-    #         representativeAvatar
-    #         representativeName
-    #         position
-    #         forWeight
-    #         againstWeight
-    #         createdOn
-    #         lastEditOn
-    #     }
-    #     createdOn
-    #     lastEditOn
-    # }
   }
 
 `;

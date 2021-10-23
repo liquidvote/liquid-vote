@@ -57,7 +57,7 @@ export const Notification: FunctionComponent<{
                                         ) : (
                                             <small className="d-inline-block">
                                                 Voted{' '}
-                                                {v.question?.questionType === 'single' ? (
+                                                {v.question?.questionType === 'single' || !showChart ? (
                                                     <b className={`white ${v.question?.userVote.position?.toLowerCase()}Direct px-1 rounded`}>{v.question?.userVote.position}</b>
                                                 ) : null}
                                             </small>
@@ -68,8 +68,8 @@ export const Notification: FunctionComponent<{
                                         <small className="ml-1">on</small>
                                         {!showChart ? (
                                             <Link
-                                                to={`/${v.choiceText ? 'multipoll' : 'poll'}/${v.questionText}/${v.groupChannel?.group}`}
-                                            ><b className="white">{v.questionText}{v.choiceText ? ':' + v.choiceText : ''}</b></Link>
+                                                to={`/${v.question?.choiceText ? 'multipoll' : 'poll'}/${v.questionText}/${v.groupChannel?.group}`}
+                                            ><b className="white">{v.question?.questionText}{v.question?.choiceText ? ':' + v.question?.choiceText : ''}</b></Link>
                                         ) : ''}
                                     </>
 
@@ -99,7 +99,7 @@ export const Notification: FunctionComponent<{
                                     <small className="text-right" data-tip="Voted on">
                                         {timeAgo.format(new Date(Number(v?.lastEditOn)))}
                                     </small>
-                                    <div className="d-flex flex-wrap justify-content-end">
+                                    <div className="d-flex justify-content-end">
                                         <div className="tiny-svg-wrapper"><GroupSvg /></div>
                                         <Link
                                             to={`/group/${v.groupChannel?.group}`}
@@ -122,12 +122,12 @@ export const Notification: FunctionComponent<{
                     showChart && (
                         <div key={`notificationVote-${v.questionText}`} className="mt-1">
 
-
                             {v.question?.questionType === 'multi' && (
                                 <MultiVoteInList
                                     key={`multi-${v.questionText}`}
                                     showGroupAndTime={false}
                                     v={v.question}
+                                    user={v.user}
                                 />
                             )}
                             {v.question?.questionType === 'single' && (
