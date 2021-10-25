@@ -13,7 +13,7 @@ import Choice from "@shared/Choice";
 export const MultiVoteInList: FunctionComponent<{
     v: any,
     showGroupAndTime: boolean,
-    user: any
+    user?: any
 }> = ({
     v,
     showGroupAndTime,

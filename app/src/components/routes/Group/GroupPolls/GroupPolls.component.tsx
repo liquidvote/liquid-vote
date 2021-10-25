@@ -47,7 +47,8 @@ export const GroupPolls: FunctionComponent<{
                             <MultiVoteInList
                                 key={`multi-${q.questionText}`}
                                 v={q}
-                                i={i}
+                                // i={i}
+                                showGroupAndTime={true}
                             />
                         )}
                         {q.questionType === 'single' && (

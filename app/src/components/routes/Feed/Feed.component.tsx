@@ -59,7 +59,6 @@ export const Feed: FunctionComponent<{}> = ({ }) => {
                             <MultiVoteInList
                                 key={`multi-${v.questionText}`}
                                 v={v}
-                                i={i}
                             />
                         )}
                         {v.questionType === 'single' && (

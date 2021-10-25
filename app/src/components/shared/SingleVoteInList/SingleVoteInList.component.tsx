@@ -33,6 +33,13 @@ export const SingleVoteInList: FunctionComponent<{
 
         return (
             <div className="position-relative">
+                {!!showGroupAndTime && (
+                    <div className="time-ago" data-tip="Last vote was">
+                        <small data-tip="last vote was">
+                            {timeAgo.format(new Date(Number(l?.stats?.lastVoteOn)))}
+                        </small>
+                    </div>
+                )}
                 {/* {(l.questionText && !hideTitle) && (
                     <small className="time-ago" data-tip="Last vote was">
                         {timeAgo.format(new Date(Number(l?.stats?.lastVoteOn)))}
