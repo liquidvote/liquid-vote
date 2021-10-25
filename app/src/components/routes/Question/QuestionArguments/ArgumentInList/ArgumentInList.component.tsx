@@ -45,7 +45,7 @@ export const ArgumentInList: FunctionComponent<{ a: any }> = ({ a }) => {
                             </Link>
                         </div>
                         <div className="d-flex flex-column justify-content-end mw-25" style={{ flex: 1 }}>
-                            <small className="text-right" data-tip="Voted on">
+                            <small className="text-right" data-tip="Last edited on">
                                 {timeAgo.format(new Date(Number(a?.lastEditOn)))}
                             </small>
                             {/* <div className="d-flex flex-wrap justify-content-end">

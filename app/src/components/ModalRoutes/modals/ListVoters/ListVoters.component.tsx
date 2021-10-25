@@ -333,7 +333,7 @@ export const ListVoters: FunctionComponent<{}> = ({ }) => {
                                         ...n.user,
                                     }
                                 }}
-                                showChart={false}
+                                showChart={true}
                             // hideGroup={true}
                             // hideQuestionText={true}
                             />

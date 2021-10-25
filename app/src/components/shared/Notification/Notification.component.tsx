@@ -31,30 +31,51 @@ export const Notification: FunctionComponent<{
                     <div className="flex-fill">
                         <div className="mb-n1 flex-fill d-flex align-items-center justify-content-between">
                             <div className="w-75">
-                                <Link to={`/profile/${v.user?.handle}`} className="d-block mb-n1">
-                                    <b className="mr-1">{v.user?.name}</b>
-                                </Link>
+                                <div className="d-flex align-items-end">
+                                    <Link to={`/profile/${v.user?.handle}`} className="d-block">
+                                        <b className="mr-1">{v.user?.name}</b>
+                                    </Link>
+                                    {v.representeeVotes?.length > 0 && (
+                                        <small className="d-flex align-items-center mx-1">
+                                            Representing
+                                            <div className="d-flex ml-2 pl-1 mr-1">
+                                                {v.representeeVotes?.map((r: any) => (
+                                                    <Link
+                                                        key={`representeeVotes-${r.user.handle}`}
+                                                        to={`/profile/${r.user.handle}`}
+                                                        className={`vote-avatar tiny ml-n2`}
+                                                        style={{
+                                                            background: `url(${r.user.avatar}) 50% 50% / cover no-repeat`
+                                                        }}
+                                                        title={r.user.name}
+                                                    ></Link>
+                                                ))}
+                                            </div>
+                                        </small>
+                                    )}
+                                    {(!!v.representatives?.length) && (
+                                        <small className="d-flex align-items-center d-inline-block mx-1">
+                                            Represented by
+                                            <span className="d-flex ml-2 pl-1">
+                                                {v.representatives?.map((r: any, i: number) => (
+                                                    <Link
+                                                        key={`representatives-${r?.representativeHandle || i}`}
+                                                        to={`/profile/${r?.representativeHandle}`}
+                                                        className={`vote-avatar tiny ${r?.position} ml-n2`}
+                                                        style={{
+                                                            background: `url(${r?.representativeAvatar}) 50% 50% / cover no-repeat`
+                                                        }}
+                                                        title={r?.representativeName}
+                                                    ></Link>
+                                                ))}
+                                            </span>
+                                        </small>
+                                    )}
+                                </div>
                                 <div className="d-flex align-items-center mt-0 mb-0">
 
                                     {
-                                        (!!v.representatives?.length) ? (
-                                            <small className="d-flex align-items-center d-inline-block">
-                                                Was represented by
-                                                <span className="d-flex ml-2 pl-1">
-                                                    {v.representatives?.map((r: any, i: number) => (
-                                                        <Link
-                                                            key={`representatives-${r?.representativeHandle || i}`}
-                                                            to={`/profile/${r?.representativeHandle}`}
-                                                            className={`vote-avatar tiny ${r?.position} ml-n2`}
-                                                            style={{
-                                                                background: `url(${r?.representativeAvatar}) 50% 50% / cover no-repeat`
-                                                            }}
-                                                            title={r?.representativeName}
-                                                        ></Link>
-                                                    ))}
-                                                </span>
-                                            </small>
-                                        ) : (
+                                        (!v.representatives?.length) && (
                                             <small className="d-inline-block">
                                                 Voted{' '}
                                                 {v.question?.questionType === 'single' || !showChart ? (
@@ -74,8 +95,7 @@ export const Notification: FunctionComponent<{
                                     </>
 
                                 </div>
-                                {/* <pre>{JSON.stringify(v, null, 2)}</pre> */}
-                                {v.representeeVotes?.length > 0 && (
+                                {/* {v.representeeVotes?.length > 0 && (
                                     <small className="d-flex align-items-center">
                                         Representing
                                         <div className="d-flex ml-2 pl-1 mr-1">
@@ -92,11 +112,11 @@ export const Notification: FunctionComponent<{
                                             ))}
                                         </div>
                                     </small>
-                                )}
+                                )} */}
                             </div>
                             {(
                                 <div className="d-flex flex-column justify-content-end mw-25" style={{ flex: 1 }}>
-                                    <small className="text-right" data-tip="Voted on">
+                                    <small className="text-right" data-tip="Last voted on">
                                         {timeAgo.format(new Date(Number(v?.lastEditOn)))}
                                     </small>
                                     <div className="d-flex justify-content-end">
