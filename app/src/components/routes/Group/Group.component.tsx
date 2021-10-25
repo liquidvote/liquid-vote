@@ -246,15 +246,71 @@ export const Group: FunctionComponent<{}> = ({ }) => {
             </div>
             <div className="profile-stats-container mb-4 mt-2">
                 <div className="mr-1"><DropSVG /></div>
-                <Link className="mr-2" to={`/group-people/${group?.handle}/members`}>
+                <div
+                    className="mr-2 pointer"
+                    onClick={
+                        e => {
+                            e.stopPropagation();
+                            updateParams({
+                                paramsToAdd: {
+                                    modal: "ListVoters",
+                                    modalData: JSON.stringify({
+                                        groupHandle: group?.handle,
+                                        subsection: 'direct',
+                                    })
+                                }
+                            })
+                        }
+                    }
+                >
                     <b className="white">{group?.stats?.directVotesMade || 0}</b> Vote{group?.stats?.directVotesMade !== 1 && 's'}
-                </Link>
+                </div>
                 {
                     group?.yourStats && (
                         <>
-                            <Link className="mr-2" to={`/group-people/${group?.handle}/representingYou`}>
-                                <b className="white">{group?.yourStats.directVotesMade || 0}</b> Votes by you
-                            </Link>
+                            <div
+                                className="mr-2 pointer"
+                                onClick={
+                                    e => {
+                                        e.stopPropagation();
+                                        updateParams({
+                                            paramsToAdd: {
+                                                modal: "ListVoters",
+                                                modalData: JSON.stringify({
+                                                    groupHandle: group?.handle,
+                                                    subsection: 'represented',
+                                                    subsubsection: 'byyou'
+                                                })
+                                            }
+                                        })
+                                    }
+                                }
+                            >
+                                <b className="white">{(
+                                    group?.yourStats.directVotesMade +
+                                    group?.yourStats.indirectVotesMadeByYou
+                                 ) || 0}</b> Votes by you
+                            </div>
+                            <div
+                                className="mr-2 pointer"
+                                onClick={
+                                    e => {
+                                        e.stopPropagation();
+                                        updateParams({
+                                            paramsToAdd: {
+                                                modal: "ListVoters",
+                                                modalData: JSON.stringify({
+                                                    groupHandle: group?.handle,
+                                                    subsection: 'represented',
+                                                    subsubsection: 'foryou'
+                                                })
+                                            }
+                                        })
+                                    }
+                                }
+                            >
+                                <b className="white">{group?.yourStats.indirectVotesMadeForYou || 0}</b> Votes for you
+                            </div>
                         </>
                     )
                 }

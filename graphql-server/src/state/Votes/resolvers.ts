@@ -690,7 +690,7 @@ export const VoteResolvers = {
                         ] : []
                     ]
                 ),
-                matchChoiceParam: (
+                matchChoiceParam: (choiceFilters: any = false) => (
                     [
                         ...(!!choiceText) ? [
                             {
@@ -709,11 +709,9 @@ export const VoteResolvers = {
                                                                         '$$v.choiceText', choiceText
                                                                     ]
                                                                 },
-                                                                {
-                                                                    '$eq': [
-                                                                        '$$v.isDirect', true
-                                                                    ]
-                                                                },
+                                                                ...(!!choiceFilters) ? [
+                                                                    ...choiceFilters
+                                                                ] : []
                                                             ]
                                                         }
                                                     }
@@ -734,8 +732,9 @@ export const VoteResolvers = {
 
             const defaultAggregation = async ({
                 filterAfterYourVoteAndBooleans,
-                filterAfterMerge
-            }) => await mongoDB.collection("Votes")
+                filterAfterMerge,
+                choiceFilters = false
+            }: any) => await mongoDB.collection("Votes")
                 .aggregate([
                     ...AggregateLogic.matchVoteToParams,
                     ...AggregateLogic.removeRepresentativesIfNotDelegated,
@@ -750,7 +749,7 @@ export const VoteResolvers = {
                     ...!!filterAfterMerge ? [
                         ...filterAfterMerge
                     ] : [],
-                    ...AggregateLogic.matchChoiceParam,
+                    ...AggregateLogic.matchChoiceParam(choiceFilters),
                     ...AggregateLogic.sortLogic,
                     ...AggregateLogic.question,
                     ...AggregateLogic.userObject
@@ -770,6 +769,15 @@ export const VoteResolvers = {
                             '$match': {
                                 'Count.directFor': { $gt: 0 }
                             }
+                        }],
+                        choiceFilters: [{
+                            '$eq': [
+                                '$$v.isDirect', true
+                            ]
+                        }, {
+                            '$eq': [
+                                '$$v.position', 'for'
+                            ]
                         }]
                     }),
                     'directAgainst': async () => await defaultAggregation({
@@ -783,6 +791,15 @@ export const VoteResolvers = {
                             '$match': {
                                 'Count.directAgainst': { $gt: 0 }
                             }
+                        }],
+                        choiceFilters: [{
+                            '$eq': [
+                                '$$v.isDirect', true
+                            ]
+                        }, {
+                            '$eq': [
+                                '$$v.position', 'against'
+                            ]
                         }]
                     }),
                     'directVotesMade': async () => await defaultAggregation({
@@ -793,8 +810,13 @@ export const VoteResolvers = {
                         }],
                         filterAfterMerge: [{
                             '$match': {
-                                // 'Count.direct': { $gt: 0 }
+                                'Count.direct': { $gt: 0 }
                             }
+                        }],
+                        choiceFilters: [{
+                            '$eq': [
+                                '$$v.isDirect', true
+                            ]
                         }]
                     }),
                     'directVotesInAgreement': async () => await defaultAggregation({
@@ -808,6 +830,11 @@ export const VoteResolvers = {
                             '$match': {
                                 'youAndUserDetailsCount.InAgreement': { $gt: 0 }
                             }
+                        }],
+                        choiceFilters: [{
+                            '$eq': [
+                                '$$v.isDirect', true
+                            ]
                         }]
                     }),
                     'directVotesInDisagreement': async () => await defaultAggregation({
@@ -822,6 +849,11 @@ export const VoteResolvers = {
                             '$match': {
                                 'youAndUserDetailsCount.InDisagreement': { $gt: 0 }
                             }
+                        }],
+                        choiceFilters: [{
+                            '$eq': [
+                                '$$v.isDirect', true
+                            ]
                         }]
                     }),
                     'indirectVotesMade': async () => await defaultAggregation({
@@ -876,7 +908,7 @@ export const VoteResolvers = {
                     'indirectVotesMadeForYou': async () => await defaultAggregation({
                         filterAfterYourVoteAndBooleans: [{
                             '$match': {
-                            //     'youAndUserDetails.yourVoteMadeByUser': true
+                                //     'youAndUserDetails.yourVoteMadeByUser': true
                             }
                         }],
                         filterAfterMerge: [{
@@ -904,7 +936,7 @@ export const VoteResolvers = {
 
             console.log({
                 VotesL: Votes?.length,
-                firstVote: Votes[0].Count
+                // Votes: Votes?.map(v => v.Count)
                 // Votes: JSON.stringify(Votes.map(v => ({
                 //     c: v.youAndUserDetailsCount
                 // }))),

@@ -7,6 +7,7 @@ export const GroupTypeDefs = gql`
         members: Int
         questions: Int
         representations: Int
+        
         directVotesMade: Int
         indirectVotesMade: Int
         mostRepresentingMembers: [User]

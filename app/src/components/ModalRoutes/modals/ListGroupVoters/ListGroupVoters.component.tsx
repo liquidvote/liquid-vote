@@ -9,12 +9,11 @@ import { VOTES } from "@state/Vote/typeDefs";
 import VoteSortPicker from '@components/shared/VoteSortPicker';
 import Notification from '@shared/Notification';
 import DropAnimation from '@components/shared/DropAnimation';
-import useGroup from '@state/Group/group.effect';
 
 import ModalHeader from "../../shared/ModalHeader";
 import './style.sass';
 
-export const ListVoters: FunctionComponent<{}> = ({ }) => {
+export const ListGroupVoters: FunctionComponent<{}> = ({ }) => {
 
     const { allSearchParams, updateParams } = useSearchParams();
     const modalData = JSON.parse(allSearchParams.modalData);
@@ -23,7 +22,6 @@ export const ListVoters: FunctionComponent<{}> = ({ }) => {
     const [sortBy, setSortBy] = useState('weight');
 
     const { liquidUser } = useAuthUser();
-    const { group, group_refetch } = useGroup({ handle: groupHandle });
 
     const {
         loading: question_loading,
@@ -40,14 +38,10 @@ export const ListVoters: FunctionComponent<{}> = ({ }) => {
 
     const stats = !!choiceText ?
         question_data?.Question?.choices.find(c => c.text === choiceText)?.stats :
-        !!questionText ?
-            question_data?.Question?.stats :
-            group?.stats;
+        question_data?.Question?.stats;
 
     const type = (() => {
-        if (subsection === 'direct' && !subsubsection) {
-            return 'directVotesMade';
-        } else if (subsection === 'direct' && subsubsection === 'for') {
+        if (subsection === 'direct' && subsubsection !== 'against') {
             return 'directFor';
         } else if (subsection === 'direct' && subsubsection === 'against') {
             return 'directAgainst';
@@ -96,11 +90,7 @@ export const ListVoters: FunctionComponent<{}> = ({ }) => {
     return (
         <>
             <ModalHeader
-                title={
-                    !!questionText ?
-                        `Votes on ${questionText}${!!choiceText && ": "}${!!choiceText && choiceText}`:
-                        `Votes on ${group?.name}`
-                }
+                title={`Votes on ${questionText}${!!choiceText && ": "}${choiceText}`}
                 hideSubmitButton={true}
             />
             <div className="">
@@ -127,7 +117,7 @@ export const ListVoters: FunctionComponent<{}> = ({ }) => {
                                 }
                             }
                         >
-                            <b>{stats?.directVotes || stats?.directVotesMade}</b> Direct
+                            <b>{stats?.directVotes}</b> Direct
                         </div>
                     </li>
                     <li className="nav-item">
@@ -152,46 +142,22 @@ export const ListVoters: FunctionComponent<{}> = ({ }) => {
                                 }
                             }
                         >
-                            <b>{stats?.indirectVotes || stats?.indirectVotesMade}</b> Represented
+                            <b>{stats?.indirectVotes}</b> Represented
                         </div>
                     </li>
                     <li className="px-4 mt-1">
                         <VoteSortPicker updateSortInParent={setSortBy} />
                     </li>
                 </ul>
-                <hr className="mt-n4 mx-0 mb-0" />
+                <hr className="mt-n4 mx-0" />
 
                 {
-                    (!!questionText && (!subsection || subsection === 'direct')) && (
+                    (!subsection || subsection === 'direct') && (
                         <>
-                            <ul className="nav d-flex justify-content-around">
+                            <ul className="nav d-flex justify-content-around mt-n2">
                                 <li className="nav-item">
                                     <div
-                                        className={`pointer nav-link ${(!subsubsection) && 'active'}`}
-                                        // to={`/poll/${questionText}/${groupHandle}/timeline/direct/for`}
-                                        onClick={
-                                            e => {
-                                                e.stopPropagation();
-                                                updateParams({
-                                                    paramsToAdd: {
-                                                        modal: "ListVoters",
-                                                        modalData: JSON.stringify({
-                                                            questionText,
-                                                            choiceText,
-                                                            groupHandle,
-                                                            subsection: 'direct'
-                                                        })
-                                                    }
-                                                })
-                                            }
-                                        }
-                                    >
-                                        <b className="px-1 rounded">{stats?.directVotes || stats?.directVotesMade}</b> All
-                                    </div>
-                                </li>
-                                <li className="nav-item">
-                                    <div
-                                        className={`pointer nav-link ${(subsubsection === 'for') && 'active'}`}
+                                        className={`pointer nav-link ${(!subsubsection || subsubsection === 'for') && 'active'}`}
                                         // to={`/poll/${questionText}/${groupHandle}/timeline/direct/for`}
                                         onClick={
                                             e => {
@@ -449,7 +415,7 @@ export const ListVoters: FunctionComponent<{}> = ({ }) => {
                         votes_data
                     }, null, 2)
                 }</pre> */}
-                {/* <pre>{JSON.stringify({ stats }, null, 2)}</pre> */}
+                <pre>{JSON.stringify({ stats }, null, 2)}</pre>
             </div>
 
         </>

@@ -24,11 +24,12 @@
     "@aws-sdk/types": "^3.29.0",
     "apollo-datasource-rest": "^3.2.0",
     "apollo-server-lambda": "^2",
+    "graphql": "^15.6.1",
     "mongodb": "^3.7"
   },
   "devDependencies": {
     "apollo-server": "^2",
-    "nodemon": "^2.0.13",
+    "nodemon": "^2.0.14",
     "serverless": "^2.57.0",
     "serverless-domain-manager": "^5.1.5",
     "serverless-offline": "^8.2.0",
