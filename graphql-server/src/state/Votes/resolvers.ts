@@ -260,7 +260,8 @@ export const VoteResolvers = {
                     [
                         {
                             '$unwind': {
-                                'path': '$representatives'
+                                'path': '$representatives',
+                                'preserveNullAndEmptyArrays': true
                             }
                         }, {
                             '$lookup': {
@@ -272,43 +273,48 @@ export const VoteResolvers = {
                         }, {
                             '$addFields': {
                                 'representativeUser': {
-                                    '$first': '$representativeUser'
+                                    '$first': '$representativeUser.LiquidUser'
                                 }
                             }
                         }, {
                             '$addFields': {
-                                'representatives.representativeHandle': '$representativeUser.LiquidUser.handle',
-                                'representatives.representativeName': '$representativeUser.LiquidUser.name',
-                                'representatives.representativeAvatar': '$representativeUser.LiquidUser.avatar'
+                                'representatives.representativeHandle': '$representativeUser.handle',
+                                'representatives.representativeName': '$representativeUser.name',
+                                'representatives.representativeAvatar': '$representativeUser.avatar'
                             }
                         }, {
                             '$group': {
                                 '_id': {
                                     'user': '$user',
                                     'questionText': '$questionText',
+                                    'choiceText': '$choiceText',
                                     'groupChannel': '$groupChannel'
                                 },
-                                'lastEditOn': {
-                                    '$last': '$lastEditOn'
-                                },
-                                'choiceVotes': {
-                                    '$push': '$$ROOT'
-                                },
+                                'questionText': { '$first': '$questionText' },
+                                'choiceText': { '$first': '$choiceText' },
+                                'groupChannel': { '$first': '$groupChannel' },
+                                'lastEditOn': { '$first': '$lastEditOn' },
+                                'userVote': { '$first': '$userVote' },
+                                'yourVote': { '$first': '$yourVote' },
+                                'youAndUserDetails': { '$first': '$youAndUserDetails' },
+                                'representatives': { '$push': '$representatives' },
+                                'user': { '$first': '$user' },
+                            }
+                        }, {
+                            '$addFields': {
                                 'representatives': {
-                                    '$push': '$representatives'
-                                },
-                                'representees': {
-                                    '$push': '$representeeVotes'
-                                },
-                                'user': {
-                                    '$first': '$user'
-                                },
-                                'questionText': {
-                                    '$first': '$questionText'
-                                },
-                                'groupChannel': {
-                                    '$first': '$groupChannel'
+                                    '$filter': {
+                                        'input': '$representatives',
+                                        'as': 'r',
+                                        'cond': {
+                                            "$gt": ["$$r", {}]
+                                        }
+                                    }
                                 }
+                            }
+                        }, {
+                            '$addFields': {
+                                'userVote.representatives': '$representatives'
                             }
                         }
                     ]
@@ -417,7 +423,7 @@ export const VoteResolvers = {
                                 },
                                 'questionText': { '$first': '$questionText' },
                                 'groupChannel': { '$first': '$groupChannel' },
-                                'choiceVotes': { '$push': '$$ROOT' },
+                                'choiceVotes': { '$push': '$userVote' },
                                 'lastEditOn': { '$last': '$lastEditOn' },
                                 'representeeVotes': { '$push': '$representeeVotes' },
                                 'representatives': { '$push': '$representatives' },
@@ -425,7 +431,9 @@ export const VoteResolvers = {
                                 // for single questions
                                 'yourVote': { '$first': '$yourVote' },
                                 'userVote': { '$first': '$userVote' },
+                                // stats
                                 'youAndUserDetails': { '$first': '$youAndUserDetails' },
+                                // stats counts
                                 'youAndUserDetailsCounts_bothDirect': {
                                     '$sum': {
                                         $cond: ['$youAndUserDetails.bothDirect', 1, 0]
@@ -456,7 +464,7 @@ export const VoteResolvers = {
                                         "$switch": {
                                             "branches": [
                                                 {
-                                                    "case": { '$eq': ["$position", 'for'] },
+                                                    "case": { '$eq': ["$userVote.position", 'for'] },
                                                     "then": 1
                                                 }
                                             ],
@@ -466,7 +474,7 @@ export const VoteResolvers = {
                                 },
                                 'Count_direct': {
                                     '$sum': {
-                                        $cond: ['$isDirect', 1, 0]
+                                        $cond: ['$userVote.isDirect', 1, 0]
                                     }
                                 },
                                 'Count_delegated': {
@@ -474,7 +482,7 @@ export const VoteResolvers = {
                                         "$switch": {
                                             "branches": [
                                                 {
-                                                    "case": { '$eq': ["$position", 'delegated'] },
+                                                    "case": { '$eq': ["$userVote.position", 'delegated'] },
                                                     "then": 1
                                                 }
                                             ],
@@ -487,7 +495,7 @@ export const VoteResolvers = {
                                         "$switch": {
                                             "branches": [
                                                 {
-                                                    "case": { '$eq': ["$position", 'against'] },
+                                                    "case": { '$eq': ["$userVote.position", 'against'] },
                                                     "then": 1
                                                 }
                                             ],
@@ -742,6 +750,7 @@ export const VoteResolvers = {
                     ...!!filterAfterYourVoteAndBooleans ? [
                         ...filterAfterYourVoteAndBooleans
                     ] : [],
+                    ...AggregateLogic.representativeUsers,
                     ...AggregateLogic.representeeVotes,
                     ...AggregateLogic.mergedChoices,
                     ...AggregateLogic.mergedChoicesUniqueRepresentatives,
@@ -935,8 +944,9 @@ export const VoteResolvers = {
             })(type);
 
             // console.log({
+            //     type,
             //     VotesL: Votes?.length,
-            //     // Votes: Votes?.map(v => v.Count)
+            //     Votes: Votes?.map(v => v.Count)
             //     // Votes: JSON.stringify(Votes.map(v => ({
             //     //     c: v.youAndUserDetailsCount
             //     // }))),
