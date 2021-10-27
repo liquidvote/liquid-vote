@@ -11,7 +11,7 @@ export const PersonInList: FunctionComponent<{ person: any }> = ({ person }) => 
 
     return (
         <div className="d-flex relative border-bottom py-2">
-            <Link to="/profile">
+            <Link to={`/profile/${person.handle}`}>
                 <div
                     className="small-avatar bg"
                     style={{

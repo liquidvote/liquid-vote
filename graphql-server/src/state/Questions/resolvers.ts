@@ -18,7 +18,7 @@ export const QuestionResolvers = {
                     yourVote: {
                         ...await mongoDB.collection("Votes").findOne({
                             questionText: Question?.questionText,
-                            'groupChannel.group': Question?.groupChannel?.group,
+                            groupChannel: { group: Question?.groupChannel?.group },
                             user: AuthUser?._id
                         })
                     }
@@ -31,13 +31,13 @@ export const QuestionResolvers = {
                             ...await mongoDB.collection("Votes").findOne({
                                 questionText: Question?.questionText,
                                 choiceText: c.text,
-                                'groupChannel.group': Question?.groupChannel?.group,
+                                groupChannel: { group: Question?.groupChannel?.group },
                                 user: AuthUser?._id
                             })
                         }
                     }))),
                 },
-                thisUserIsAdmin: Question?.createdBy === AuthUser?.LiquidUser?.handle,
+                thisUserIsAdmin: Question?.createdBy === AuthUser?._id,
             };
         },
         Questions: async (_source, {
@@ -94,7 +94,7 @@ export const QuestionResolvers = {
                 ...(q.questionType === 'single' && !!AuthUser) && {
                     yourVote: await mongoDB.collection("Votes").findOne({
                         questionText: q.questionText,
-                        'groupChannel.group': group,
+                        groupChannel: { group: q?.groupChannel?.group },
                         user: AuthUser?._id
                     })
                 },
@@ -103,289 +103,14 @@ export const QuestionResolvers = {
                         ...c,
                         yourVote: await mongoDB.collection("Votes").findOne({
                             questionText: q.questionText,
-                            'groupChannel.group': group,
                             choiceText: c.text,
+                            groupChannel: { group: q?.groupChannel?.group },
                             user: AuthUser?._id
                         })
                     })))
                 }
             })));
-        },
-        QuestionVoters: async (_source, {
-            questionText, group, typeOfVoter, sortBy
-        }, { mongoDB, AuthUser }) => {
-
-            const Question = await mongoDB.collection("Questions")
-                .findOne({
-                    questionText,
-                    'groupChannel.group': group,
-                    // 'groupChannel.channel': channel
-                });
-
-            const directVoters = async () => (await mongoDB.collection("Votes")
-                .aggregate([
-                    {
-                        '$match': {
-                            'isDirect': true,
-                            "groupChannel.group": group,
-                            // "groupChannel.channel": channel,
-                            "questionText": questionText,
-                            "position": typeOfVoter === 'directFor' ? 'for' : 'against'
-                        }
-                    },
-                    {
-                        $lookup: {
-                            from: 'Votes',
-                            let: {
-                                representativeId: "$user"
-                            },
-                            pipeline: [
-                                {
-                                    $match: {
-                                        questionText,
-                                        // choiceText,
-                                        'groupChannel.group': group,
-                                        // 'groupChannel.channel': channel,
-                                    }
-                                },
-                                { $unwind: '$representatives' },
-                                {
-                                    $match: {
-                                        $expr: {
-                                            $eq: [
-                                                "$representatives.representativeId",
-                                                { "$toObjectId": "$$representativeId" }
-                                            ]
-                                        }
-                                    }
-                                },
-                                {
-                                    '$lookup': {
-                                        'from': 'Users',
-                                        'localField': 'user',
-                                        'foreignField': '_id',
-                                        'as': 'user'
-                                    }
-                                },
-                                {
-                                    '$addFields': {
-                                        'user': { '$first': '$user.LiquidUser' }
-                                    }
-                                }
-                            ],
-                            as: 'representeeVotes'
-                        }
-                    },
-                    {
-                        '$addFields': {
-                            'representeeCount': {
-                                '$size': { "$ifNull": ["$representeeVotes", []] }
-                            }
-                        }
-                    }, {
-                        '$sort': {
-                            ...(sortBy === 'time') ? {
-                                'lastEditOn': -1
-                            } : {
-                                'representeeCount': -1
-                            }
-                        }
-                    }, {
-                        '$lookup': {
-                            'from': 'Users',
-                            'localField': 'user',
-                            'foreignField': '_id',
-                            'as': 'user'
-                        }
-                    },
-                    {
-                        '$addFields': {
-                            'user': {
-                                '$first': '$user.LiquidUser'
-                            }
-                        }
-                    }
-                ])
-                .toArray()
-            );
-
-            const representingYou = async () => !!AuthUser ? (await mongoDB.collection("Votes")
-                .aggregate([
-                    {
-                        '$match': {
-                            "groupChannel.group": group,
-                            // "groupChannel.channel": channel,
-                            "questionText": questionText,
-                            'user': new ObjectId(AuthUser._id)
-                        }
-                    }, {
-                        '$unwind': {
-                            'path': '$representatives'
-                        }
-                    }, {
-                        '$project': {
-                            'questionText': 1,
-                            'groupChannel': 1,
-                            'user._id': '$representatives.representativeId',
-                            'user.name': '$representatives.representativeName',
-                            'user.handle': '$representatives.representativeHandle',
-                            'user.avatar': '$representatives.representativeAvatar',
-                            'position': '$representatives.position',
-                            "isDirect": { '$toBool': true },
-                            'forWeight': '$representatives.forWeight',
-                            'againstWeight': '$representatives.againstWeight',
-                            'lastEditOn': '$representatives.lastEditOn',
-                        }
-                    }, {
-                        '$lookup': {
-                            'from': 'Votes',
-                            'let': {
-                                'representativeId': '$user._id'
-                            },
-                            'pipeline': [
-                                {
-                                    '$match': {
-                                        "groupChannel.group": group,
-                                        // "groupChannel.channel": channel,
-                                        "questionText": questionText,
-                                    }
-                                }, {
-                                    '$unwind': '$representatives'
-                                }, {
-                                    '$match': {
-                                        '$expr': {
-                                            '$eq': [
-                                                '$representatives.representativeId', {
-                                                    '$toObjectId': '$$representativeId'
-                                                }
-                                            ]
-                                        }
-                                    }
-                                }, {
-                                    '$lookup': {
-                                        'from': 'Users',
-                                        'localField': 'user',
-                                        'foreignField': '_id',
-                                        'as': 'user'
-                                    }
-                                },
-                                {
-                                    '$addFields': {
-                                        'user': { '$first': '$user.LiquidUser' }
-                                    }
-                                }
-                            ],
-                            'as': 'representeeVotes'
-                        }
-                    }, {
-                        '$addFields': {
-                            'representeeCount': {
-                                '$size': {
-                                    '$ifNull': [
-                                        '$representeeVotes', []
-                                    ]
-                                }
-                            }
-                        }
-                    }, {
-                        '$sort': {
-                            ...(sortBy === 'time') ? {
-                                'lastEditOn': -1
-                            } : {
-                                'representeeCount': -1
-                            }
-                        }
-                    }
-
-                ])
-                .toArray()
-            ) : [];
-
-            const representedByYou = async () => !!AuthUser ? (await mongoDB.collection("Votes")
-                .aggregate([
-                    {
-                        '$match': {
-                            "groupChannel.group": group,
-                            // "groupChannel.channel": channel,
-                            "questionText": questionText,
-                            'user': new ObjectId(AuthUser._id)
-                        }
-                    }, {
-                        '$lookup': {
-                            'from': 'Votes',
-                            'let': {
-                                'representativeId': '$user'
-                            },
-                            'pipeline': [
-                                {
-                                    '$match': {
-                                        "groupChannel.group": group,
-                                        // "groupChannel.channel": channel,
-                                        "questionText": questionText,
-                                    }
-                                }, {
-                                    '$addFields': {
-                                        'representatives_': '$representatives'
-                                    }
-                                }, {
-                                    '$unwind': '$representatives_'
-                                }, {
-                                    '$match': {
-                                        '$expr': {
-                                            '$eq': [
-                                                '$representatives_.representativeId', {
-                                                    '$toObjectId': '$$representativeId'
-                                                }
-                                            ]
-                                        }
-                                    }
-                                }
-                            ],
-                            'as': 'representeeVotes'
-                        }
-                    }, {
-                        '$unwind': {
-                            'path': '$representeeVotes'
-                        }
-                    }, {
-                        '$project': {
-                            'questionText': 1,
-                            'groupChannel': 1,
-                            'isDirect': '$representeeVotes.isDirect',
-                            'user': '$representeeVotes.user',
-                            'position': '$representeeVotes.position',
-                            'representatives': '$representeeVotes.representatives',
-                            'forWeight': '$representeeVotes.forWeight',
-                            'againstWeight': '$representeeVotes.againstWeight',
-                            'lastEditOn': '$representeeVotes.lastEditOn'
-                        }
-                    }, {
-                        '$lookup': {
-                            'from': 'Users',
-                            'localField': 'user',
-                            'foreignField': '_id',
-                            'as': 'user'
-                        }
-                    }, {
-                        '$addFields': {
-                            'user': {
-                                '$first': '$user.LiquidUser'
-                            }
-                        }
-                    }
-                ])
-                .toArray()
-            ) : [];
-
-            return [
-                ...(typeOfVoter === 'directFor' || typeOfVoter === 'directAgainst') ?
-                    await directVoters() : [],
-                ...(!!AuthUser && typeOfVoter === 'representingYou') ?
-                    await representingYou() : [],
-                ...(!!AuthUser && typeOfVoter === 'representedByYou') ?
-                    await representedByYou() : [],
-            ];
-        },
+        }
     },
     Mutation: {
         editQuestion: async (_source, {
@@ -419,7 +144,7 @@ export const QuestionResolvers = {
 
                     'lastEditOn': Date.now(),
                     'createdOn': Date.now(),
-                    'createdBy': AuthUser.LiquidUser.handle,
+                    'createdBy': AuthUser._id,
 
                     'stats': {
                         forCount: 0,
@@ -430,7 +155,7 @@ export const QuestionResolvers = {
                     }
                 }))?.ops[0] : (
                     AuthUser &&
-                    Question_.createdBy === AuthUser.LiquidUser.handle
+                    Question_.createdBy === AuthUser._id
                 ) ? (await mongoDB.collection("Questions").findOneAndUpdate(
                     { _id: Question_._id },
                     {

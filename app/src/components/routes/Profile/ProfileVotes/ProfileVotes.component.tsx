@@ -60,7 +60,8 @@ export const ProfileVotes: FunctionComponent<{}> = ({ }) => {
             userHandle: handle,
             type,
             sortBy
-        }
+        },
+        // fetchPolicy: "no-cache"
     });
 
     console.log({
@@ -157,26 +158,15 @@ export const ProfileVotes: FunctionComponent<{}> = ({ }) => {
                 </div>
             )}
 
-            {/* <pre>{JSON.stringify(user_votes_data, null, 2)}</pre> */}
-
-            {/* <small>
-                Voted the same as you in
-                    {' '}<b className="white forDirect px-1 rounded">{useMemo(() => Math.floor(Math.random() * 100), [])}</b>
-                {' '}polls and different in
-                    {' '}<b className="white againstDirect px-1 rounded">{useMemo(() => Math.floor(Math.random() * 100), [])}</b>
-            </small> */}
-
             {user_votes_data?.Votes.map((n, i) => (
-                <>
-                    <Notification
-                        key={'notification-uservote' + n.questionText + type + n.choiceText}
-                        v={{
-                            ...n,
-                            // user: profile
-                        }}
-                        showChart={true}
-                    />
-                </>
+                <Notification
+                    key={'notification-uservote' + n.questionText + type + n.choiceText + n.user.handle}
+                    v={{
+                        ...n,
+                        // user: profile
+                    }}
+                    showChart={true}
+                />
             ))}
 
             {user_votes_loading && (

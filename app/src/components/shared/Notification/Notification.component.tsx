@@ -35,8 +35,10 @@ export const Notification: FunctionComponent<{
                                     <Link to={`/profile/${v.user?.handle}`} className="d-block">
                                         <b className="mr-1">{v.user?.name}</b>
                                     </Link>
+                                </div>
+                                <div className="d-flex align-items-center mt-0 mb-0">
                                     {v.representeeVotes?.length > 0 && (
-                                        <small className="d-flex align-items-center mx-1">
+                                        <small className="d-flex align-items-center mr-1">
                                             Representing
                                             <div className="d-flex ml-2 pl-1 mr-1">
                                                 {v.representeeVotes?.map((r: any) => (
@@ -54,7 +56,7 @@ export const Notification: FunctionComponent<{
                                         </small>
                                     )}
                                     {(!!v.representatives?.length) && (
-                                        <small className="d-flex align-items-center d-inline-block mx-1">
+                                        <small className="d-flex align-items-center d-inline-block mr-1">
                                             Represented by
                                             <span className="d-flex ml-2 pl-1">
                                                 {v.representatives?.map((r: any, i: number) => (
@@ -71,12 +73,9 @@ export const Notification: FunctionComponent<{
                                             </span>
                                         </small>
                                     )}
-                                </div>
-                                <div className="d-flex align-items-center mt-0 mb-0">
-
                                     {
                                         (!v.representatives?.length) && (
-                                            <small className="d-inline-block">
+                                            <small className="d-inline-block mr-1">
                                                 Voted{' '}
                                                 {v.question?.questionType === 'single' || !showChart ? (
                                                     <b className={`white ${v.question?.userVote.position?.toLowerCase()}Direct px-1 rounded`}>{v.question?.userVote.position}</b>
@@ -86,11 +85,13 @@ export const Notification: FunctionComponent<{
                                     }
 
                                     <>
-                                        <small className="ml-1">on</small>
                                         {!showChart ? (
-                                            <Link
-                                                to={`/${v.question?.choiceText ? 'multipoll' : 'poll'}/${v.questionText}/${v.groupChannel?.group}`}
-                                            ><b className="white">{v.question?.questionText}{v.question?.choiceText ? ':' + v.question?.choiceText : ''}</b></Link>
+                                            <>
+                                                <small className="">on</small>
+                                                <Link
+                                                    to={`/${v.question?.choiceText ? 'multipoll' : 'poll'}/${v.questionText}/${v.groupChannel?.group}`}
+                                                ><b className="white">{v.question?.questionText}{v.question?.choiceText ? ':' + v.question?.choiceText : ''}</b></Link>
+                                            </>
                                         ) : ''}
                                     </>
 

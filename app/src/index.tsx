@@ -31,32 +31,32 @@ const AppolloAppWrapper: FunctionComponent<{}> = ({ }) => {
                     representativeRelation: {
                         read(_, { args, toReference }) {
                             return toReference({
-                              __typename: 'UserRepresentativeGroupRelation',
-                              groupId: args?.groupId,
-                              representativeId: args?.representativeId,
-                              representeeId: args?.representeeId,
+                                __typename: 'UserRepresentativeGroupRelation',
+                                groupId: args?.groupId,
+                                representativeId: args?.representativeId,
+                                representeeId: args?.representeeId,
                             });
-                          }
-                    }
+                        }
+                    },
                 }
             },
             User: {
                 keyFields: ["handle"],
             },
-            Question: {
-                keyFields: [
-                    "questionText",
-                    "groupChannel", ["group"]
-                ]
-            },
+            // Question: {
+            //     keyFields: [
+            //         "questionText",
+            //         "groupChannel", ["group"]
+            //     ],
+            // },
             UserRepresentativeGroupRelation: {
                 keyFields: ["groupId", "representativeId", "representeeId"],
             },
             GroupMemberRelation: {
                 keyFields: ["groupId", "userId"],
-            }
+            },
             // Vote: {
-            //     keyFields: ["questionText", "groupChannel", ["group"], "user" ,["handle"]]
+            //     keyFields: ["_id"]
             // },
         },
     });

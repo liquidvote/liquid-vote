@@ -3,14 +3,20 @@ import { gql, useMutation } from '@apollo/client';
 export const VOTE = gql`
   query($handle: String!) {
     Vote(handle: $handle) {
+        # _id
         questionType
         voteText
         startText
         choices
-        groupChannel
+        groupChannel {
+            group
+        }
         resultsOn
         createdOn,
         lastEditOn,
+        user {
+            handle
+        }
     }
   }
 `;
@@ -19,10 +25,11 @@ export const VOTES = gql`
   query($questionText: String, $choiceText: String, $groupHandle: String, $userHandle: String, $type: String, $sortBy: String) {
     Votes(questionText: $questionText, choiceText: $choiceText,, groupHandle: $groupHandle, userHandle: $userHandle, type: $type, sortBy: $sortBy) {
         ...vote
-        choiceVotes {
-            ...vote
-        }
+        # choiceVotes {
+        #     ...vote
+        # }
         question {
+            _id
             questionText
             questionType
             choices {
@@ -100,11 +107,11 @@ export const VOTES = gql`
   }
 
   fragment vote on Vote {
+    # _id
     questionText
     choiceText
     groupChannel {
         group
-        channel
     }
     position
     isDirect
@@ -123,6 +130,12 @@ export const VOTES = gql`
     createdOn
     lastEditOn
     representeeVotes {
+        # _id
+        questionText
+        choiceText
+        groupChannel {
+            group
+        }
         isDirect
         position
         user {
@@ -131,8 +144,12 @@ export const VOTES = gql`
             avatar
         }
     }
+    user {
+        handle
+        name
+        avatar
+    }
   }
-
 `;
 
 
@@ -151,11 +168,15 @@ export const EDIT_VOTE = gql`
             channel: $channel,
             Vote: $Vote
         ) {
+            # _id
             questionText
             choiceText
             groupChannel {
                 group
-                channel
+            }
+            user {
+                handle
+                name
             }
             position
             representatives {

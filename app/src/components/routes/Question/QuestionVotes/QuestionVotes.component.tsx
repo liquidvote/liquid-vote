@@ -7,7 +7,7 @@ import { VOTES } from "@state/Vote/typeDefs";
 import Notification from '@shared/Notification';
 import SortSmallSvg from "@shared/Icons/Sort-small.svg";
 
-import { QUESTION, QUESTION_VOTERS } from '@state/Question/typeDefs';
+import { QUESTION } from '@state/Question/typeDefs';
 import Popper from "@shared/Popper";
 import VoteSortPicker from '@components/shared/VoteSortPicker';
 import DropAnimation from '@components/shared/DropAnimation';

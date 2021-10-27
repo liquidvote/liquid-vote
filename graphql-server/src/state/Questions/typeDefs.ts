@@ -23,6 +23,7 @@ export const QuestionTypeDefs = gql`
     }
 
     type Question {
+        _id: ID!
         questionText: String
         questionType: String
         startText: String
@@ -57,14 +58,6 @@ export const QuestionTypeDefs = gql`
             group: String,
             sortBy: String
         ): [Question]
-        QuestionVoters(
-            questionText: String,
-            choiceText: String,
-            group: String,
-            channel: String,
-            typeOfVoter: String,
-            sortBy: String
-        ): [Vote]
     }
 
     extend type Mutation {

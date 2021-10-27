@@ -11,7 +11,7 @@ export const VoteResolvers = {
 
             return {
                 ...Vote,
-                thisUserIsAdmin: Vote.createdBy === AuthUser?.LiquidUser?.handle,
+                thisUserIsAdmin: Vote.createdBy === AuthUser?._id,
             };
         },
         Votes: async (_source, {
@@ -26,15 +26,15 @@ export const VoteResolvers = {
             const User = !!userHandle && await mongoDB.collection("Users")
                 .findOne({ 'LiquidUser.handle': userHandle });
 
-            console.log({
-                questionText,
-                choiceText,
-                groupHandle,
-                userHandle,
-                type,
-                sortBy,
-                you: AuthUser?._id
-            });
+            // console.log({
+            //     questionText,
+            //     choiceText,
+            //     groupHandle,
+            //     userHandle,
+            //     type,
+            //     sortBy,
+            //     you: AuthUser?._id
+            // });
 
             const AggregateLogic = {
                 matchVoteToParams: (
@@ -934,34 +934,52 @@ export const VoteResolvers = {
                 }[type]();
             })(type);
 
-            console.log({
-                VotesL: Votes?.length,
-                // Votes: Votes?.map(v => v.Count)
-                // Votes: JSON.stringify(Votes.map(v => ({
-                //     c: v.youAndUserDetailsCount
-                // }))),
-                // v: JSON.stringify(Votes.map(v => ({
-                //     r: v.representatives
-                //     // g: v.question?.groupChannel?.group
-                // })), null, 2)
-                // singleQuestions: Votes.filter(v => v.question.questionType === 'single')
-            });
+            // console.log({
+            //     VotesL: Votes?.length,
+            //     // Votes: Votes?.map(v => v.Count)
+            //     // Votes: JSON.stringify(Votes.map(v => ({
+            //     //     c: v.youAndUserDetailsCount
+            //     // }))),
+            //     // v: JSON.stringify(Votes.map(v => ({
+            //     //     r: v.representatives
+            //     //     // g: v.question?.groupChannel?.group
+            //     // })), null, 2)
+            //     // singleQuestions: Votes.filter(v => v.question.questionType === 'single')
+            // });
 
             return Votes.map(v => ({
+                // _id: Math.random()*1000000,
                 ...v,
 
                 // get `yourVote`s into `question` and `question.choices`
                 question: {
                     ...v.question,
+                    _id: `choiceaggregate_${type}_${questionText}_${choiceText}_${groupHandle}_${userHandle}_${v.user?.handle}_${v.questionText}`,
                     choices: v.question?.choices?.map(c => ({
                         ...c,
-
-                        userVote: v.choiceVotes?.find(cv => cv.choiceText === c.text),
-                        yourVote: v.choiceVotes?.find(cv => cv.choiceText === c.text)?.yourVote
+                        userVote: !!v.choiceVotes?.find(cv => cv.choiceText === c.text) ? ({
+                            ...v.choiceVotes?.find(cv => cv.choiceText === c.text),
+                            user: v.user,
+                            groupChannel: v.groupChannel,
+                            // _id: `userChoiceVote_${type}_${questionText}_${choiceText}_${groupHandle}_${userHandle}_${v.user?.handle}_${v.questionText}_${c.text}`,
+                        }) : null,
+                        yourVote: !!v.choiceVotes?.find(cv => cv.choiceText === c.text)?.yourVote ? ({
+                            ...v.choiceVotes?.find(cv => cv.choiceText === c.text)?.yourVote,
+                            user: AuthUser.LiquidUser,
+                            groupChannel: v.groupChannel,
+                            // _id: `yourVote_${type}_${questionText}_${choiceText}_${groupHandle}_${userHandle}_${v.user?.handle}_${v.questionText}_${c.text}`,
+                        }) : null
                     })),
-                    yourVote: v.yourVote,
-                    userVote: v.userVote
+                    yourVote: {
+                        ...v.yourVote,
+                        // _id: `yourVote_${type}_${questionText}_${groupHandle}_${userHandle}_${v.user?.handle}_${v.questionText}`,
+                    },
+                    userVote: {
+                        ...v.userVote,
+                        // _id: `userVote_${type}_${questionText}_${groupHandle}_${userHandle}_${v.user?.handle}_${v.questionText}`,
+                    }
                 },
+                // _id: `choiceaggregate_${type}_${questionText}_${choiceText}_${groupHandle}_${userHandle}_${v.user?.handle}_${v.questionText}`,
             }));
         },
     },
@@ -999,7 +1017,7 @@ export const VoteResolvers = {
 
                     'lastEditOn': Date.now(),
                     'createdOn': Date.now(),
-                    'createdBy': AuthUser.LiquidUser.handle,
+                    'createdBy': AuthUser._id,
                     'user': AuthUser._id
                 }))?.ops[0] : (
                     !!AuthUser &&
@@ -1102,7 +1120,7 @@ export const VoteResolvers = {
                         }],
                         'lastEditOn': Date.now(),
                         'createdOn': Date.now(),
-                        'createdBy': AuthUser.LiquidUser.handle,
+                        'createdBy': AuthUser._id,
                         'user': r.representeeId
                     }))?.ops[0] : (async () => {
 
@@ -1161,6 +1179,11 @@ export const VoteResolvers = {
                 // channel,
                 mongoDB,
                 AuthUser
+            });
+
+
+            console.log({
+                savedVote
             });
 
             return {

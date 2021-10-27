@@ -71,8 +71,6 @@ export const USER_REPRESENTING = gql`
             indirectVotesMadeForUser
         }
         representationGroups {
-            groupId
-            userId
             handle
             name
         }

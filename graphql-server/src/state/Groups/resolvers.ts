@@ -65,7 +65,7 @@ export const GroupResolvers = {
 
             return Questions.map(q => ({
                 ...q,
-                thisUserIsAdmin: q.createdBy === AuthUser?.LiquidUser?.handle,
+                thisUserIsAdmin: q.createdBy === AuthUser?._id,
             }));
         },
         Groups: async (_source, { userHandle }, { mongoDB, AuthUser }) => {

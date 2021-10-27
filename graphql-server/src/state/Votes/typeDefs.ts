@@ -16,6 +16,7 @@ export const VoteTypeDefs = gql`
     }
 
     type Vote {
+        # _id: ID!
         questionText: String
         choiceText: String
         groupChannel: GroupChannel
@@ -28,7 +29,7 @@ export const VoteTypeDefs = gql`
         representeeVotes: [Vote]
         representeeCount: Int
         yourVote: Vote
-        choiceVotes: [Vote]
+        # choiceVotes: [Vote]
 
         # createdBy
         user: User

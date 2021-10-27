@@ -23,7 +23,7 @@ export const ListVoters: FunctionComponent<{}> = ({ }) => {
     const [sortBy, setSortBy] = useState('weight');
 
     const { liquidUser } = useAuthUser();
-    const { group, group_refetch } = useGroup({ handle: groupHandle });
+    const { group } = useGroup({ handle: groupHandle });
 
     const {
         loading: question_loading,
@@ -35,7 +35,8 @@ export const ListVoters: FunctionComponent<{}> = ({ }) => {
             questionText,
             group: groupHandle,
             // channel: groupChannel.channel
-        }
+        },
+        // fetchPolicy: "no-cache"
     });
 
     const stats = !!choiceText ?

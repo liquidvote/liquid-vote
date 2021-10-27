@@ -116,6 +116,11 @@ export const UserResolvers = {
             const group = !!groupHandle && await mongoDB.collection("Groups")
                 .findOne({ 'handle': groupHandle });
 
+            console.log({
+                User,
+                group
+            })
+
             const representeesAndGroups = (
                 await mongoDB.collection("UserRepresentations").aggregate(
                     [

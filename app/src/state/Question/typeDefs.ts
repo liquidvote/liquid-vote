@@ -4,13 +4,12 @@ export const QUESTION = gql`
   query(
       $questionText: String!,
       $group: String!,
-      $channel: String
     ) {
         Question(
             questionText: $questionText,
             group: $group,
-            channel: $channel
         ) {
+            _id
             questionText
             questionType
             startText
@@ -38,31 +37,11 @@ export const QUESTION = gql`
                     indirectVotes
                 }
                 yourVote {
-                    questionText
-                    position
-                    forWeight
-                    againstWeight
-                    representatives {
-                        representativeHandle
-                        representativeAvatar
-                        representativeName
-                        position
-                        forWeight
-                        againstWeight
-                    }
-                    representeeVotes {
-                        isDirect
-                        position
-                        user {
-                            handle
-                            name
-                        }
-                    }
+                    ...vote
                 }
             }
             groupChannel{
                 group
-                channel
             }
             resultsOn
             createdOn
@@ -90,147 +69,91 @@ export const QUESTION = gql`
                 indirectVotes
             }
             yourVote {
-                questionText
-                position
-                forWeight
-                againstWeight
-                representatives {
-                    representativeHandle
-                    representativeAvatar
-                    representativeName
-                    position
-                    forWeight
-                    againstWeight
-                }
-                representeeVotes {
-                    isDirect
-                    position
-                    user {
-                        handle
-                        name
-                    }
-                }
+                ...vote
             }
         }
     }
-`;
 
-export const QUESTION_VOTERS = gql`
-    query(
-        $questionText: String
-        $choiceText: String
-        $group: String
-        $channel: String
-        $typeOfVoter: String,
-        $sortBy: String
-    ) {
-        QuestionVoters (
-            questionText: $questionText
-            choiceText: $choiceText
-            group: $group
-            channel: $channel
-            typeOfVoter: $typeOfVoter,
-            sortBy: $sortBy
-         ) {
+    fragment vote on Vote {
+        # _id
+        questionText
+        choiceText
+        groupChannel {
+            group
+        }
+        position
+        isDirect
+        forWeight
+        againstWeight
+        representatives{
+            representativeHandle
+            representativeAvatar
+            representativeName
+            position
+            forWeight
+            againstWeight
+            createdOn
+            lastEditOn
+        }
+        createdOn
+        lastEditOn
+        representeeVotes {
             questionText
             choiceText
             groupChannel {
                 group
-                channel
             }
-            position
             isDirect
-            forWeight
-            againstWeight
-            lastEditOn
-            representatives {
-                representativeHandle
-                representativeAvatar
-                representativeName
-                position
-                forWeight
-                againstWeight
-            }
-            representeeVotes {
-                user {
-                    name
-                    avatar
-                    handle
-                }
-            }
-            representeeCount
+            position
             user {
-                name
                 handle
+                name
                 avatar
             }
-            representeeCount
+        }
+        user {
+            handle
+            name
+            avatar
         }
     }
 `;
 
 export const QUESTIONS = gql`
-  query($group: String!, $sortBy: String) {
-    Questions(group: $group, sortBy: $sortBy) {
-        questionText
-        questionType
-        startText
-        choices {
-            text
+    query($group: String!, $sortBy: String) {
+        Questions(group: $group, sortBy: $sortBy) {
+            _id
+            questionText
+            questionType
+            startText
+            choices {
+                text
+                stats {
+                    ...stats
+                }
+                yourVote {
+                    ...vote
+                }
+            }
+            groupChannel {
+                group
+                channel
+            }
+            resultsOn
+
             stats {
                 ...stats
             }
             yourVote {
-                questionText
-                position
-                representatives {
-                    representativeHandle
-                    representativeAvatar
-                    representativeName
-                    position
-                    forWeight
-                    againstWeight
-
-                    createdOn
-                    lastEditOn
-                }
-                
-                createdOn
-                lastEditOn
+                ...vote
             }
-        }
-        groupChannel {
-            group
-            channel
-        }
-        resultsOn
-
-        stats {
-            ...stats
-        }
-        yourVote {
-          questionText
-          position
-          representatives {
-            representativeHandle
-            representativeAvatar
-            representativeName
-            position
-
             createdOn
             lastEditOn
-          }
-          
-          createdOn
-          lastEditOn
+            thisUserIsAdmin
         }
-        createdOn
-        lastEditOn
-        thisUserIsAdmin
     }
-  }
 
-  fragment stats on QuestionStats {
+    fragment stats on QuestionStats {
 		lastVoteOn
         forCount
         forDirectCount
@@ -250,6 +173,50 @@ export const QUESTIONS = gql`
         againstDirectCount
         directVotes
         indirectVotes
+    }
+
+    fragment vote on Vote {
+        # _id
+        questionText
+        choiceText
+        groupChannel {
+            group
+        }
+        position
+        isDirect
+        forWeight
+        againstWeight
+        representatives{
+            representativeHandle
+            representativeAvatar
+            representativeName
+            position
+            forWeight
+            againstWeight
+            createdOn
+            lastEditOn
+        }
+        createdOn
+        lastEditOn
+        representeeVotes {
+            questionText
+            choiceText
+            groupChannel {
+                group
+            }
+            isDirect
+            position
+            user {
+                handle
+                name
+                avatar
+            }
+        }
+        user {
+            handle
+            name
+            avatar
+        }
     }
 `;
 

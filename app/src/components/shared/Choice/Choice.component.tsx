@@ -47,6 +47,10 @@ export const Choice: FunctionComponent<{
 
         const yourVote_ = editVote_data ? editVote_data?.editVote?.position : yourVote?.position;
 
+        console.log({
+            yourVote
+        });
+
         const handleUserVote = (vote: string) => {
 
             if (!!liquidUser) {
@@ -103,66 +107,52 @@ export const Choice: FunctionComponent<{
                 >
                     {!!choiceText && (
                         <div className={`d-flex align-items-center white choice-text mr-2 ${inList && 'small'}`}>
-                            {!!userVote && (
-                                <div className={`d-flex align-items-center mx-1`}>
-
-                                    <>
-                                        {!!user && (
-                                            <>
-                                                {!!userVote.representatives?.length && (
-                                                    <div className="d-flex on-top">
-                                                        {userVote.representatives?.map((r: any, i: number) => (
-                                                            <Link
-                                                                data-tip={`${r?.representativeName} representing ${user.name} ${r?.position} `}
-                                                                key={`representatives-${r?.representativeHandle || i}`}
-                                                                to={`/profile/${r?.representativeHandle}`}
-                                                                className={`vote-avatar tiny-big ${r?.position} ml-n2`}
-                                                                style={{
-                                                                    background: `url(${r?.representativeAvatar}) 50% 50% / cover no-repeat`
-                                                                }}
-                                                            ></Link>
-                                                        ))}
-                                                        {/* <span className="ml-1 mr-2 pr-1">Representing</span> */}
-                                                    </div>
-                                                )}
+                            <b>{choiceText}</b>
+                            {(!!user && !!userVote) && (
+                                <div className={`d-flex align-items-center ml-3`}>
+                                    {!!userVote.representatives?.length && (
+                                        <div className="d-flex on-top">
+                                            {userVote.representatives?.map((r: any, i: number) => (
                                                 <Link
-                                                    data-tip={
-                                                        !userVote?.representatives?.length ?
-                                                            `${user.name} voted ${userVote?.position}` :
-                                                            `${user.name} represented by ${userVote?.representatives.length === 1 ? userVote.representatives?.[0].representativeName : userVote?.representatives.length }`
-                                                    }
-                                                    key={`user-${user.handle}`}
-                                                    to={`/profile/${user.handle}`}
-                                                    className={`vote-avatar ${!userVote?.representatives?.length && 'on-top'} ${!!userVote.representatives?.length ? 'tiny' : 'tiny-big'} ${userVote?.position} ml-n2`}
+                                                    data-tip={`${r?.representativeName} representing ${user.name} ${r?.position} `}
+                                                    key={`representatives-${r?.representativeHandle || i}`}
+                                                    to={`/profile/${r?.representativeHandle}`}
+                                                    className={`vote-avatar tiny-big ${r?.position} ml-n2`}
                                                     style={{
-                                                        background: `url(${user.avatar}) 50% 50% / cover no-repeat`
+                                                        background: `url(${r?.representativeAvatar}) 50% 50% / cover no-repeat`
                                                     }}
                                                 ></Link>
-                                                <div className="d-flex" data-tip={`Represented by ${user.name}`}>
-                                                    {!userVote?.representatives?.length && userVote?.representeeVotes?.map((r: any) => (
-                                                        <Link
-                                                            key={`representeeVotes-${r.user.handle}`}
-                                                            to={`/profile/${r.user.handle}`}
-                                                            className={`vote-avatar light tiny none ml-n2`}
-                                                            style={{
-                                                                background: `url(${r.user.avatar}) 50% 50% / cover no-repeat`
-                                                            }}
-                                                        ></Link>
-                                                    ))}
-                                                </div>
-                                            </>
-                                        )}
-                                        {/* {userVote?.position !== 'delegated' && (
-                                            <div className="ml-1">
-                                                Voted{' '}
-                                                <b className={`white ${userVote?.position?.toLowerCase()}Direct px-1 rounded`}>{userVote?.position}</b>
-                                            </div>
-                                        )} */}
-                                    </>
-
+                                            ))}
+                                            {/* <span className="ml-1 mr-2 pr-1">Representing</span> */}
+                                        </div>
+                                    )}
+                                    <Link
+                                        data-tip={
+                                            !userVote?.representatives?.length ?
+                                                `${user.name} voted ${userVote?.position}` :
+                                                `${user.name} represented by ${userVote?.representatives.length === 1 ? userVote.representatives?.[0].representativeName : userVote?.representatives.length}`
+                                        }
+                                        key={`user-${user.handle}`}
+                                        to={`/profile/${user.handle}`}
+                                        className={`vote-avatar ${!userVote?.representatives?.length && 'on-top'} ${!!userVote.representatives?.length ? 'tiny' : 'tiny-big'} ${userVote?.position} ml-n2`}
+                                        style={{
+                                            background: `url(${user.avatar}) 50% 50% / cover no-repeat`
+                                        }}
+                                    ></Link>
+                                    <div className="d-flex" data-tip={`Represented by ${user.name}`}>
+                                        {!userVote?.representatives?.length && userVote?.representeeVotes?.map((r: any) => (
+                                            <Link
+                                                key={`representeeVotes-${r.user.handle}`}
+                                                to={`/profile/${r.user.handle}`}
+                                                className={`vote-avatar light tiny none ml-n2`}
+                                                style={{
+                                                    background: `url(${r.user.avatar}) 50% 50% / cover no-repeat`
+                                                }}
+                                            ></Link>
+                                        ))}
+                                    </div>
                                 </div>
                             )}
-                            <b>{choiceText}</b>
                         </div>
                     )}
                     {/* <pre>{JSON.stringify(userVote, null, 2)}</pre> */}
