@@ -12,6 +12,7 @@ import { EDIT_VOTE } from '@state/Vote/typeDefs';
 import { voteStatsMap } from '@state/Question/map';
 import useSearchParams from "@state/Global/useSearchParams.effect";
 import Choice from "@shared/Choice";
+import GroupSvg from "@shared/Icons/Group.svg";
 
 import './style.sass';
 
@@ -34,10 +35,22 @@ export const SingleVoteInList: FunctionComponent<{
         return (
             <div className="position-relative">
                 {!!showGroupAndTime && (
-                    <div className="time-ago" data-tip="Last vote was">
-                        <small data-tip="last vote was">
-                            {timeAgo.format(new Date(Number(l?.stats?.lastVoteOn)))}
+                    <div className="time-ago d-flex flex-column justify-content-end">
+                        <small className="text-right" data-tip="Last vote was">
+                            {!!l?.stats?.lastVoteOn ? 
+                                timeAgo.format(new Date(Number(l?.stats?.lastVoteOn))) :
+                                'no votes yet'
+                            }
                         </small>
+                        <div className="d-flex justify-content-end mt-n1">
+                            {/* <div className="tiny-svg-wrapper"><GroupSvg /></div> */}
+                            <Link
+                                to={`/group/${l.groupChannel?.group}`}
+                                className="badge ml-1 mb-1 mt-1"
+                            >
+                                {l.groupChannel?.group}
+                            </Link>
+                        </div>
                     </div>
                 )}
                 {/* {(l.questionText && !hideTitle) && (
@@ -61,11 +74,11 @@ export const SingleVoteInList: FunctionComponent<{
                                         {showIntroMessage && '?'}
                                     </div>
                                 </a>
-                                {!!showGroupAndTime && (
+                                {/* {!!showGroupAndTime && (
                                     <Link to={`/group/${l.groupChannel.group}`}
                                         className="badge m-0 ml-2 text-truncate"
                                     >{l.groupChannel.group}</Link>
-                                )}
+                                )} */}
                             </div>
                         )}
 

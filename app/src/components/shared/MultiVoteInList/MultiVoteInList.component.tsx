@@ -9,6 +9,7 @@ import VoteGraph1 from "@shared/VoteGraph1";
 import './style.sass';
 import { valores } from "@state/Mock/Votes";
 import Choice from "@shared/Choice";
+import GroupSvg from "@shared/Icons/Group.svg";
 
 export const MultiVoteInList: FunctionComponent<{
     v: any,
@@ -20,7 +21,7 @@ export const MultiVoteInList: FunctionComponent<{
     user
 }) => {
 
-        console.log({ v })
+        // console.log({ v })
 
         const sortedChoices = [...v.choices]?.
             sort((a, b) => (b?.stats?.directVotes + b?.stats?.indirectVotes) - (a?.stats?.directVotes + a?.stats?.indirectVotes));
@@ -32,8 +33,22 @@ export const MultiVoteInList: FunctionComponent<{
                 <ReactTooltip place="bottom" type="dark" effect="solid" />
 
                 {!!showGroupAndTime && (
-                    <div className="time-ago" data-tip="Last vote was">
-                        <small data-tip="last vote was">{timeAgo.format(new Date(Number(v?.stats?.lastVoteOn)))}</small>
+                    <div className="time-ago d-flex flex-column justify-content-end">
+                        <small className="text-right" data-tip="Last vote was">
+                            {!!v?.stats?.lastVoteOn ?
+                                timeAgo.format(new Date(Number(v?.stats?.lastVoteOn))) :
+                                'no votes yet'
+                            }
+                        </small>
+                        <div className="d-flex justify-content-end mt-n1">
+                            {/* <div className="tiny-svg-wrapper"><GroupSvg /></div> */}
+                            <Link
+                                to={`/group/${v.groupChannel?.group}`}
+                                className="badge ml-1 mb-1 mt-1"
+                            >
+                                {v.groupChannel?.group}
+                            </Link>
+                        </div>
                     </div>
                 )}
 
@@ -48,11 +63,11 @@ export const MultiVoteInList: FunctionComponent<{
                         >{v.questionText}?</div>
                     </a>
 
-                    {!!showGroupAndTime && (
+                    {/* {!!showGroupAndTime && (
                         <Link to={`/group/${v.groupChannel.group}`}
                             className="badge m-0 ml-2 text-truncate"
                         >{v.groupChannel.group}</Link>
-                    )}
+                    )} */}
                 </div>
 
                 <div>

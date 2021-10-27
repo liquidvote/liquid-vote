@@ -1163,7 +1163,7 @@ export const VoteResolvers = {
                                             (acc, curr) => acc + curr.againstWeight, 0
                                         ) / representativesToUpdate.length) || 0,
                                     'representatives': representativesToUpdate,
-                                    'lastEditOn': Date.now(),
+                                    // 'lastEditOn': Date.now(),
                                 },
                             },
                             { returnDocument: 'after' }
@@ -1181,10 +1181,9 @@ export const VoteResolvers = {
                 AuthUser
             });
 
-
-            console.log({
-                savedVote
-            });
+            // console.log({
+            //     savedVote
+            // });
 
             return {
                 ...savedVote,

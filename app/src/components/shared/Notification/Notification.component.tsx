@@ -1,7 +1,7 @@
 import React, { FunctionComponent } from 'react';
 import { Link } from "react-router-dom";
-import GroupSvg from "@shared/Icons/Group.svg";
 
+import GroupSvg from "@shared/Icons/Group.svg";
 import VoteWrapper from "@shared/VoteWrapper";
 import SingleVoteInList from "@shared/SingleVoteInList";
 import MultiVoteInList from "@shared/MultiVoteInList";
@@ -94,34 +94,15 @@ export const Notification: FunctionComponent<{
                                             </>
                                         ) : ''}
                                     </>
-
                                 </div>
-                                {/* {v.representeeVotes?.length > 0 && (
-                                    <small className="d-flex align-items-center">
-                                        Representing
-                                        <div className="d-flex ml-2 pl-1 mr-1">
-                                            {v.representeeVotes?.map((r: any) => (
-                                                <Link
-                                                    key={`representeeVotes-${r.user.handle}`}
-                                                    to={`/profile/${r.user.handle}`}
-                                                    className={`vote-avatar tiny ml-n2`}
-                                                    style={{
-                                                        background: `url(${r.user.avatar}) 50% 50% / cover no-repeat`
-                                                    }}
-                                                    title={r.user.name}
-                                                ></Link>
-                                            ))}
-                                        </div>
-                                    </small>
-                                )} */}
                             </div>
                             {(
                                 <div className="d-flex flex-column justify-content-end mw-25" style={{ flex: 1 }}>
-                                    <small className="text-right" data-tip="Last voted on">
+                                    <small className="text-right" data-tip={`Last vote by ${v?.user?.name} on`}>
                                         {timeAgo.format(new Date(Number(v?.lastEditOn)))}
                                     </small>
                                     <div className="d-flex justify-content-end">
-                                        <div className="tiny-svg-wrapper"><GroupSvg /></div>
+                                        {/* <div className="tiny-svg-wrapper"><GroupSvg /></div> */}
                                         <Link
                                             to={`/group/${v.groupChannel?.group}`}
                                             className="badge ml-1 mb-1 mt-1"
