@@ -397,7 +397,10 @@ export const VoteResolvers = {
                             }
                         },
                         {
-                            '$addFields': { 'representeeCount': { $size: "$representeeVotes" } }
+                            '$addFields': {
+                                'representeeCount': { $size: "$representeeVotes" },
+                                'userVote.representeeVotes': '$representeeVotes'
+                            }
                         }
                     ]
                 ),
@@ -423,7 +426,12 @@ export const VoteResolvers = {
                                 },
                                 'questionText': { '$first': '$questionText' },
                                 'groupChannel': { '$first': '$groupChannel' },
-                                'choiceVotes': { '$push': '$userVote' },
+                                'choiceVotes': {
+                                    '$push': {
+                                        'userVote': '$userVote',
+                                        'yourVote': '$yourVote'
+                                    }
+                                },
                                 'lastEditOn': { '$last': '$lastEditOn' },
                                 'representeeVotes': { '$push': '$representeeVotes' },
                                 'representatives': { '$push': '$representatives' },
@@ -714,7 +722,7 @@ export const VoteResolvers = {
                                                             '$and': [
                                                                 {
                                                                     '$eq': [
-                                                                        '$$v.choiceText', choiceText
+                                                                        '$$v.userVote.choiceText', choiceText
                                                                     ]
                                                                 },
                                                                 ...(!!choiceFilters) ? [
@@ -781,11 +789,11 @@ export const VoteResolvers = {
                         }],
                         choiceFilters: [{
                             '$eq': [
-                                '$$v.isDirect', true
+                                '$$v.userVote.isDirect', true
                             ]
                         }, {
                             '$eq': [
-                                '$$v.position', 'for'
+                                '$$v.userVote.position', 'for'
                             ]
                         }]
                     }),
@@ -803,11 +811,11 @@ export const VoteResolvers = {
                         }],
                         choiceFilters: [{
                             '$eq': [
-                                '$$v.isDirect', true
+                                '$$v.userVote.isDirect', true
                             ]
                         }, {
                             '$eq': [
-                                '$$v.position', 'against'
+                                '$$v.userVote.position', 'against'
                             ]
                         }]
                     }),
@@ -824,7 +832,7 @@ export const VoteResolvers = {
                         }],
                         choiceFilters: [{
                             '$eq': [
-                                '$$v.isDirect', true
+                                '$$v.userVote.isDirect', true
                             ]
                         }]
                     }),
@@ -842,7 +850,7 @@ export const VoteResolvers = {
                         }],
                         choiceFilters: [{
                             '$eq': [
-                                '$$v.isDirect', true
+                                '$$v.userVote.isDirect', true
                             ]
                         }]
                     }),
@@ -861,7 +869,7 @@ export const VoteResolvers = {
                         }],
                         choiceFilters: [{
                             '$eq': [
-                                '$$v.isDirect', true
+                                '$$v.userVote.isDirect', true
                             ]
                         }]
                     }),
@@ -943,19 +951,19 @@ export const VoteResolvers = {
                 }[type]();
             })(type);
 
-            // console.log({
-            //     type,
-            //     VotesL: Votes?.length,
-            //     Votes: Votes?.map(v => v.Count)
-            //     // Votes: JSON.stringify(Votes.map(v => ({
-            //     //     c: v.youAndUserDetailsCount
-            //     // }))),
-            //     // v: JSON.stringify(Votes.map(v => ({
-            //     //     r: v.representatives
-            //     //     // g: v.question?.groupChannel?.group
-            //     // })), null, 2)
-            //     // singleQuestions: Votes.filter(v => v.question.questionType === 'single')
-            // });
+            console.log({
+                type,
+                VotesL: Votes?.length,
+                Vote: Votes?.[0]?.choiceVotes
+                // Votes: JSON.stringify(Votes.map(v => ({
+                //     c: v.youAndUserDetailsCount
+                // }))),
+                // v: JSON.stringify(Votes.map(v => ({
+                //     r: v.representatives
+                //     // g: v.question?.groupChannel?.group
+                // })), null, 2)
+                // singleQuestions: Votes.filter(v => v.question.questionType === 'single')
+            });
 
             return Votes.map(v => ({
                 // _id: Math.random()*1000000,
@@ -967,14 +975,14 @@ export const VoteResolvers = {
                     _id: `choiceaggregate_${type}_${questionText}_${choiceText}_${groupHandle}_${userHandle}_${v.user?.handle}_${v.questionText}`,
                     choices: v.question?.choices?.map(c => ({
                         ...c,
-                        userVote: !!v.choiceVotes?.find(cv => cv.choiceText === c.text) ? ({
-                            ...v.choiceVotes?.find(cv => cv.choiceText === c.text),
+                        userVote: !!v.choiceVotes?.find(cv => cv.userVote?.choiceText === c.text)?.userVote ? ({
+                            ...v.choiceVotes?.find(cv => cv.userVote.choiceText === c.text)?.userVote,
                             user: v.user,
                             groupChannel: v.groupChannel,
                             // _id: `userChoiceVote_${type}_${questionText}_${choiceText}_${groupHandle}_${userHandle}_${v.user?.handle}_${v.questionText}_${c.text}`,
                         }) : null,
-                        yourVote: !!v.choiceVotes?.find(cv => cv.choiceText === c.text)?.yourVote ? ({
-                            ...v.choiceVotes?.find(cv => cv.choiceText === c.text)?.yourVote,
+                        yourVote: !!v.choiceVotes?.find(cv => cv.userVote?.choiceText === c.text)?.yourVote ? ({
+                            ...v.choiceVotes?.find(cv => cv.userVote.choiceText === c.text)?.yourVote,
                             user: AuthUser.LiquidUser,
                             groupChannel: v.groupChannel,
                             // _id: `yourVote_${type}_${questionText}_${choiceText}_${groupHandle}_${userHandle}_${v.user?.handle}_${v.questionText}_${c.text}`,
