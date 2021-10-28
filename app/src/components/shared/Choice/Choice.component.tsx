@@ -47,9 +47,9 @@ export const Choice: FunctionComponent<{
 
         const yourVote_ = editVote_data ? editVote_data?.editVote?.position : yourVote?.position;
 
-        console.log({
-            yourVote
-        });
+        // console.log({
+        //     yourVote
+        // });
 
         const handleUserVote = (vote: string) => {
 
@@ -170,19 +170,33 @@ export const Choice: FunctionComponent<{
                 {showPercentages && (
                     <div className="d-flex color-legend my-3">
                         <div>
-                            <small>Direct For</small><div className="color forDirect count">{stats_?.forDirectPercentage.toFixed(0)}%</div>
+                            <small>Direct For</small>
+                            <div className="color forDirect count">
+                                {stats_?.forDirectPercentage.toFixed(0)}%
+                            </div>
                         </div>
                         <div>
-                            <small>Delegated For</small><div className="color for count">{stats_?.forDelegatedPercentage.toFixed(0)}%</div>
+                            <small>Delegated For</small>
+                            <div className="color for count">
+                                {stats_?.forDelegatedPercentage.toFixed(0)}%
+                            </div>
                         </div>
                         <div>
-                            <small>Direct Against</small><div className="color againstDirect count">{stats_?.againstDirectPercentage.toFixed(0)}%</div>
+                            <small>Direct Against</small>
+                            <div className="color againstDirect count">
+                                {stats_?.againstDirectPercentage.toFixed(0)}%
+                            </div>
                         </div>
                         <div>
-                            <small>Delegated Against</small><div className="color against count">{stats_?.againstDelegatedPercentage.toFixed(0)}%</div>
+                            <small>Delegated Against</small>
+                            <div className="color against count">
+                                {stats_?.againstDelegatedPercentage.toFixed(0)}%
+                            </div>
                         </div>
                     </div>
                 )}
+
+                {/* <pre>{JSON.stringify(stats_, null, 2) }</pre> */}
 
                 <div className="d-flex d-flex justify-content-between mt-1">
                     <div className="d-flex align-items-center">

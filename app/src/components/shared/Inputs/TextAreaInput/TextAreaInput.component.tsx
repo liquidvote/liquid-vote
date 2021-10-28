@@ -12,16 +12,18 @@ type Props = {
     // ref: any,
     register: any,
     labelName?: string,
+    placeholder?: string,
     name: string,
     value: string,
     type?: string,
+    noLabel?: boolean,
     error?: FieldError | undefined,
     disabled?: boolean,
     autoFocus?: boolean
 }
 
 export const TextAreaInput: FunctionComponent<Props> = ({
-    register, labelName, name, value, type = 'input', error, disabled, autoFocus
+    register, labelName, placeholder, name, value, type = 'input', noLabel, error, disabled, autoFocus
 }) => {
 
     const [isFocused, setIsFocused] = useState(false);
@@ -30,9 +32,11 @@ export const TextAreaInput: FunctionComponent<Props> = ({
         <div className={
             `InputWrapper ${value && 'hasValue'} ${error && 'hasError'} ${isFocused && 'isFocused'}`
         }>
-            <label>
-                {name}
-            </label>
+            {!noLabel && (
+                <label>
+                    {name}
+                </label>
+            )}
             {/* <div className="letter-count">
 
             </div> */}
@@ -40,6 +44,7 @@ export const TextAreaInput: FunctionComponent<Props> = ({
                 <TextareaAutosize
                     {...register}
                     name={name}
+                    placeholder={placeholder}
                     type={type || 'input'}
                     // disabled={disabled}
                     // autoFocus={autoFocus || false}

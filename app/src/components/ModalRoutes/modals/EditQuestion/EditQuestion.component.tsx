@@ -5,6 +5,7 @@ import { useQuery, useMutation } from "@apollo/client";
 import { useHistory } from "react-router-dom";
 
 import ButtonPicker from "@shared/Inputs/ButtonPicker";
+import TextAreaInput from "@shared/Inputs/TextAreaInput";
 import useSearchParams from "@state/Global/useSearchParams.effect";
 import DropDownInput from "@shared/Inputs/DropDownInput";
 import GroupChannelPicker from "@shared/Inputs/GroupChannelPicker";
@@ -17,6 +18,7 @@ import './style.sass';
 interface IFormValues {
     questionType: 'single' | 'multi',
     questionText: string
+    description:  string
     startText: string,
     choices: { text: string }[]
     resultsOn: string,
@@ -155,10 +157,11 @@ export const EditQuestion: FunctionComponent<{}> = ({ }) => {
 
                 {watch('questionType') === 'single' ? (
                     <>
-                        <div className="d-flex">
+                        <div className="d-flex input-override">
                             <h2 className="mb-0 mr-1 textAndInputWrapper">
                                 Do you
                             </h2>
+
                             <input
                                 {...register("startText", {
                                     required: "Required"
@@ -170,51 +173,34 @@ export const EditQuestion: FunctionComponent<{}> = ({ }) => {
                 ) : null}
 
                 <div>
-                    <input
-                        autoFocus
-                        // name="questionText"
-                        {...register('questionText', {
-                            validate: {
-                                single: (v: any) =>
-                                    v?.length > 5 ||
-                                    'please make a question',
-                            }
-                        })}
-                        value={
-                            watchAllFields?.questionText?.length ?
-                                watchAllFields?.questionText + "?" : ''
-                        } //+ "?"
-                        placeholder="Ask a question..."
-                        onSelect={(e: any) => {
-                            console.log(e.key);
-                            // move cursor to before "?"
-                            if (e.target.value.length === e.target.selectionStart) {
-                                e.target.selectionStart = e.target.value.length - 1;
-                                e.target.selectionEnd = e.target.value.length - 1;
-                            }
-                        }}
-                        onChange={(e) => {
-                            console.log(e);
-                            // remove "?" from value
-                            setValue(
-                                "questionText",
-                                e.target.value.replaceAll('?', ''),
-                                // { shouldValidate: true }
-                            );
-                        }}
-                        onKeyDown={e => {
-                            if (e.key === 'Enter') e.preventDefault();
-                        }}
-                        onKeyUp={e => {
-                            if (e.key === 'Backspace') {
-                                if (e.target.value.length === e.target.selectionStart) {
-                                    e.target.selectionStart = e.target.value.length - 1;
-                                    e.target.selectionEnd = e.target.value.length - 1;
-                                }
-                            }
-                        }}
-                    />
+                    <div className="questionMarkInputWrapper mt-n4 mx-n2 input-override">
+                        {((name: keyof IFormValues) => (
+                            <TextAreaInput
+                                name={name}
+                                noLabel={true}
+                                placeholder="Ask a question..."
+                                register={register(name, {
+                                    required: true
+                                })}
+                                value={watch(name)}
+                                error={errors[name]}
+                            />
+                        ))('questionText')}
+                    </div>
                     {errors?.questionText && <div className="error pl-0 mt-n2">{errors?.questionText.message}</div>}
+                </div>
+
+                <div className="my-3">
+                    {((name: keyof IFormValues) => (
+                        <TextAreaInput
+                            name={name}
+                            register={register(name, {
+                                required: true
+                            })}
+                            value={watch(name)}
+                            error={errors[name]}
+                        />
+                    ))('description')}
                 </div>
 
                 {watch('questionType') === 'multi' ? (
