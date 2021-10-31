@@ -12,11 +12,13 @@ import { timeAgo } from '@state/TimeAgo';
 export const Notification: FunctionComponent<{
     v: any,
     showChart?: boolean,
-    hideChoicesBesides?: string
+    hideChoicesBesides?: string,
+    showTitle?: boolean
 }> = ({
     v,
     showChart = false,
-    hideChoicesBesides
+    hideChoicesBesides,
+    showTitle = false,
 }) => {
 
         const [showAllChoices, setShowAllChoices] = useState(!hideChoicesBesides);
@@ -109,16 +111,16 @@ export const Notification: FunctionComponent<{
                                             </small>
                                         )}
 
-                                    {/* <>
-                                        {!showChart ? (
+                                    <>
+                                        {(showTitle && v.question?.questionType === 'single' && !showChart) ? (
                                             <>
-                                                <small className="">on</small>
+                                                <small className="mr-1">on</small>
                                                 <Link
                                                     to={`/${v.question?.choiceText ? 'multipoll' : 'poll'}/${v.questionText}/${v.groupChannel?.group}`}
                                                 ><b className="white">{v.question?.questionText}{v.question?.choiceText ? ':' + v.question?.choiceText : ''}</b></Link>
                                             </>
                                         ) : ''}
-                                    </> */}
+                                    </>
                                 </div>
                             </div>
                             {(

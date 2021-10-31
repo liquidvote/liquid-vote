@@ -493,6 +493,7 @@ export const ListVoters: FunctionComponent<{}> = ({ }) => {
                             }}
                             showChart={false}
                             hideChoicesBesides={choiceText}
+                            showTitle={!questionText}
                             // hideGroup={true}
                             // hideQuestionText={true}
                         />
