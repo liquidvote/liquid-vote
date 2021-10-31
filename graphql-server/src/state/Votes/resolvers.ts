@@ -747,8 +747,8 @@ export const VoteResolvers = {
             }
 
             const defaultAggregation = async ({
-                filterAfterYourVoteAndBooleans,
-                filterAfterMerge,
+                filterAfterYourVoteAndBooleans = false,
+                filterAfterMerge = false,
                 choiceFilters = false
             }: any) => await mongoDB.collection("Votes")
                 .aggregate([
@@ -775,6 +775,21 @@ export const VoteResolvers = {
 
             const Votes = await (async (type) => {
                 return {
+                    'all': async () => await defaultAggregation({}),
+                    'for': async () => await defaultAggregation({
+                        choiceFilters: [{
+                            '$eq': [
+                                '$$v.userVote.position', 'for'
+                            ]
+                        }]
+                    }),
+                    'against': async () => await defaultAggregation({
+                        choiceFilters: [{
+                            '$eq': [
+                                '$$v.userVote.position', 'against'
+                            ]
+                        }]
+                    }),
                     'directFor': async () => await defaultAggregation({
                         filterAfterYourVoteAndBooleans: [{
                             '$match': {
@@ -900,16 +915,7 @@ export const VoteResolvers = {
                         }]
                     }),
                     // huuuuuuuum
-                    // 'indirectVotesMadeByUser': async () => await mongoDB.collection("Votes")
-                    //     .aggregate([
-                    //         ...AggregateLogic.matchVoteToParams,
-                    //         ...AggregateLogic.yourVoteAndBooleans,
-                    //         ...AggregateLogic.representeeVotes,
-                    //         ...AggregateLogic.sortLogic,
-                    //         ...AggregateLogic.representeeVotesAsList,
-                    //         // ...AggregateLogic.questionStats
-                    //     ])
-                    //     .toArray(),
+                    // 'indirectVotesMadeByUser': 
                     'indirectVotesMadeByYou': async () => await defaultAggregation({
                         filterAfterYourVoteAndBooleans: [{
                             '$match': {
@@ -954,7 +960,7 @@ export const VoteResolvers = {
             console.log({
                 type,
                 VotesL: Votes?.length,
-                Vote: Votes?.[0]?.choiceVotes
+                // Vote: Votes?.[0]?.choiceVotes
                 // Votes: JSON.stringify(Votes.map(v => ({
                 //     c: v.youAndUserDetailsCount
                 // }))),

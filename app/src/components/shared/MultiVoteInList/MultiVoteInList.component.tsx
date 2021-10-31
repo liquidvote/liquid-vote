@@ -14,11 +14,13 @@ import GroupSvg from "@shared/Icons/Group.svg";
 export const MultiVoteInList: FunctionComponent<{
     v: any,
     showGroupAndTime: boolean,
-    user?: any
+    user?: any,
+    showChart?: boolean,
 }> = ({
     v,
     showGroupAndTime,
-    user
+    user,
+    showChart
 }) => {
 
         // console.log({ v })
@@ -85,6 +87,7 @@ export const MultiVoteInList: FunctionComponent<{
                                     inList={true}
                                     maxVoteCount={maxVoteCount}
                                     user={user}
+                                    showChart={showChart}
                                 />
                             </div>
                         ))}

@@ -49,11 +49,11 @@ export const EditQuestion: FunctionComponent<{}> = ({ }) => {
         refetch: question_refetch
     } = useQuery(QUESTION, {
         variables: {
-            questionText: modalData.questionHandle,
+            questionText: modalData.questionText,
             group: modalData.groupHandle,
-            channel: modalData.channelHandle
+            // channel: modalData.channelHandle
         },
-        skip: modalData.questionHandle === "new"
+        skip: modalData.questionText === "new"
     });
 
     const [editQuestion, {
@@ -118,7 +118,7 @@ export const EditQuestion: FunctionComponent<{}> = ({ }) => {
 
         editQuestion({
             variables: {
-                questionText: modalData.questionHandle,
+                questionText: modalData.questionText,
                 group: modalData.groupHandle || '',
                 channel: modalData.channelHandle || '',
                 Question: {
@@ -137,8 +137,8 @@ export const EditQuestion: FunctionComponent<{}> = ({ }) => {
         <form onSubmit={handleSubmit(onSubmit)} className="voteForm">
 
             <ModalHeader
-                title={modalData.questionHandle === "new" ? "Launch Poll" : "Edit Poll"}
-                submitText={modalData.questionHandle === "new" ? "Launch" : "Save"}
+                title={modalData.questionText === "new" ? "Launch Poll" : "Edit Poll"}
+                submitText={modalData.questionText === "new" ? "Launch" : "Save"}
             />
 
             <div className="Modal-Content">

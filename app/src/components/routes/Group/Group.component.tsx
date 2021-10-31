@@ -322,7 +322,7 @@ export const Group: FunctionComponent<{}> = ({ }) => {
                         paramsToAdd: {
                             modal: "EditQuestion",
                             modalData: JSON.stringify({
-                                questionHandle: 'new',
+                                questionText: 'new',
                                 groupHandle: handle,
                             })
                         }

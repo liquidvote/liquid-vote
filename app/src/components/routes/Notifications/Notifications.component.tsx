@@ -27,9 +27,9 @@ export const Notifications: FunctionComponent<{}> = ({ }) => {
         }
     });
     
-    console.log({
-        user_votes_data
-    });
+    // console.log({
+    //     user_votes_data
+    // });
 
     return (
         <>

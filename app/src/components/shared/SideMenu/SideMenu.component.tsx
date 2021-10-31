@@ -105,7 +105,7 @@ export const SideMenu: FunctionComponent<{}> = ({ }) => {
                             paramsToAdd: {
                                 modal: "EditQuestion",
                                 modalData: JSON.stringify({
-                                    questionHandle: 'new'
+                                    questionText: 'new'
                                 })
                             }
                         })}

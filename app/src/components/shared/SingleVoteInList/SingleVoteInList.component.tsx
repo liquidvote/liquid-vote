@@ -22,14 +22,16 @@ export const SingleVoteInList: FunctionComponent<{
     showIntroMessage?: boolean,
     showColorLegend?: boolean,
     showGroupAndTime?: boolean,
-    hideTitle?: boolean
+    hideTitle?: boolean,
+    showChart?: boolean,
 }> = ({
     l,
     introMessage,
     showIntroMessage,
     showColorLegend,
     showGroupAndTime,
-    hideTitle
+    hideTitle,
+    showChart
 }) => {
 
         return (
@@ -89,6 +91,7 @@ export const SingleVoteInList: FunctionComponent<{
                             yourVote={l.yourVote}
                             userVote={l.userVote}
                             inList={true}
+                            showChart={showChart}
                         />
                     </div>
                 </div>

@@ -3,6 +3,7 @@ import { DiscussionEmbed } from 'disqus-react';
 import { Link, useParams } from "react-router-dom";
 import ReactTooltip from 'react-tooltip';
 import { useQuery } from "@apollo/client";
+import Linkify from 'linkify-react';
 
 import DropAnimation from "@components/shared/DropAnimation";
 import Choice from '@shared/Choice';
@@ -123,12 +124,14 @@ export default function Question() {
             )}
             <h2 className="mb-2 white pre-wrap"><b>{voteName}</b>?</h2>
 
-            <p className="pre-wrap">
-                Description will go here <br></br>
-                Description will go here <br></br>
-                Description will go here <br></br>
-                Description will go here <br></br>
-            </p>
+            {!!question_data?.Question?.description && (
+                <p className="pre-wrap white-links">
+                    {question_data?.Question?.description}
+                    <Linkify tagName="span">
+                        {question_data?.Question?.description}
+                    </Linkify>
+                </p>
+            )}
 
             <div>
 
@@ -172,18 +175,43 @@ export default function Question() {
                                 </Link>
                             </div>
                         </div>
-                        {/* <div className="d-flex justify-content-center">
-                            {question_data?.Question?.thisUserIsAdmin && (
-                                <>
-                                    <div
-                                        onClick={() => alert('soon')}
-                                        className={`button_ small mx-1`}
-                                    >Edit</div>
-                                </>
-                            )}
-                        </div> */}
-                        <small data-tip="Poll launched on">
+                        <div className="d-flex justify-content-center">
+                            {
+                                (
+                                    question_data?.Question?.thisUserIsAdmin ||
+                                    group?.thisUserIsAdmin
+                                ) && (
+                                    <>
+                                        <div
+                                            onClick={() => updateParams({
+                                                paramsToAdd: {
+                                                    modal: "EditQuestion",
+                                                    modalData: JSON.stringify({
+                                                        questionText: voteName,
+                                                        groupHandle: group.handle,
+                                                    })
+                                                }
+                                            })}
+                                            className={`button_ small mx-1`}
+                                        >Edit</div>
+                                    </>
+                                )}
+                        </div>
+                        <small
+                            data-tip={`Poll launched ${!!question_data?.Question?.createdBy && `by ${question_data?.Question?.createdBy?.name}`} on`}
+                            className="d-flex justify-content-center align-items-center"
+                        >
                             {/* <small className="time-ago" data-tip="Last vote was"> */}
+                            {!!question_data?.Question?.createdBy && (
+                                <Link to={`/profile/${question_data?.Question?.createdBy.handle}`}>
+                                    <div
+                                        className="vote-avatar tiny none mr-1"
+                                        style={{
+                                            background: question_data?.Question?.createdBy.avatar && `url(${question_data?.Question?.createdBy.avatar}) 50% 50% / cover no-repeat`
+                                        }}
+                                    ></div>
+                                </Link>
+                            )}
                             {timeAgo.format(new Date(Number(question_data?.Question?.createdOn)))}
                         </small>
                         {/* <div onClick={() => setIsPollingInOtherGroup(true)} className="button_ small mb-0 mw-25">

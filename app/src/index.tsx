@@ -40,9 +40,9 @@ const AppolloAppWrapper: FunctionComponent<{}> = ({ }) => {
                     },
                 }
             },
-            User: {
-                keyFields: ["handle"],
-            },
+            // User: {
+            //     keyFields: ["handle"],
+            // },
             // Question: {
             //     keyFields: [
             //         "questionText",

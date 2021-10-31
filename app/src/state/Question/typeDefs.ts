@@ -11,6 +11,7 @@ export const QUESTION = gql`
         ) {
             _id
             questionText
+            description
             questionType
             startText
             choices {
@@ -71,6 +72,11 @@ export const QUESTION = gql`
             yourVote {
                 ...vote
             }
+            createdBy {
+                name
+                handle
+                avatar
+            }
         }
     }
 
@@ -124,6 +130,7 @@ export const QUESTIONS = gql`
         Questions(group: $group, sortBy: $sortBy) {
             _id
             questionText
+            description
             questionType
             startText
             choices {
@@ -150,6 +157,11 @@ export const QUESTIONS = gql`
             createdOn
             lastEditOn
             thisUserIsAdmin
+            createdBy {
+                name
+                handle
+                avatar
+            }
         }
     }
 

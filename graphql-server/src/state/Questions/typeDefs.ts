@@ -26,12 +26,13 @@ export const QuestionTypeDefs = gql`
         _id: ID!
         questionText: String
         questionType: String
+        description: String
         startText: String
         choices: [Choice]
         groupChannel: GroupChannel
         resultsOn: String
 
-        # createdBy
+        createdBy: User
         createdOn: String
         lastEditOn: String
         thisUserIsAdmin: Boolean

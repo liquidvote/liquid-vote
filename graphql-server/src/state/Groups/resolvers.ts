@@ -166,7 +166,8 @@ export const GroupResolvers = {
                 ...savedGroup,
                 thisUserIsAdmin: true
             };
-        }
+        },
+        // updateGroupRepresentatives
     },
 };
 

@@ -4,12 +4,33 @@ export const QuestionResolvers = {
     Query: {
         Question: async (_source, { questionText, group }, { mongoDB, AuthUser }) => {
 
-            const Question = await mongoDB.collection("Questions")
-                .findOne({
-                    questionText,
-                    'groupChannel.group': group,
-                    // 'groupChannel.channel': channel
-                });
+            const Question = (await mongoDB.collection("Questions")
+                .aggregate([
+                    {
+                        '$match': {
+                            questionText,
+                            'groupChannel.group': group,
+                        }
+                    }, {
+                        '$lookup': {
+                            'from': 'Users',
+                            'localField': 'createdBy',
+                            'foreignField': '_id',
+                            'as': 'createdBy'
+                        }
+                    }, {
+                        '$addFields': {
+                            'createdBy': {
+                                '$first': '$createdBy.LiquidUser'
+                            }
+                        }
+                    }
+                ])?.toArray())?.[0];
+
+            console.log({
+                Question,
+                // Question_: Question?.[0]
+            });
 
             return {
                 ...Question,
@@ -72,6 +93,13 @@ export const QuestionResolvers = {
                                 //     '$eq': ['$createdBy', AuthUser?.LiquidUser?.handle]
                                 // }
                             }
+                        }, {
+                            '$lookup': {
+                                'from': 'Users',
+                                'localField': 'createdBy',
+                                'foreignField': '_id',
+                                'as': 'createdBy'
+                            }
                         },
                         ...(sortBy === 'weight') ? [
                             {
@@ -126,6 +154,7 @@ export const QuestionResolvers = {
                 (await mongoDB.collection("Questions").insertOne({
                     'questionType': Question.questionType,
                     'questionText': Question.questionText,
+                    'description': Question.description,
                     'startText': Question.startText,
                     'choices': Question.choices
                         .filter(c => c.text !== "")
@@ -162,6 +191,7 @@ export const QuestionResolvers = {
                         $set: {
                             'questionType': Question.questionType,
                             'questionText': Question.questionText,
+                            'description': Question.description,
                             'startText': Question.startText,
                             'choices': Question.choices.filter(c => c.text !== ""),
                             'groupChannel': Question.groupChannel,

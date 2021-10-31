@@ -18,7 +18,7 @@ export const VoteSortPicker: FunctionComponent<{
         }, [sortBy]);
 
         const sortHumanText = (sort: string) => ({
-            'weight': 'representees',
+            'weight': 'weight',
             'time': 'vote date'
         })[sort];
 
