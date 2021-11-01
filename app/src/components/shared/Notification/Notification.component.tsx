@@ -51,7 +51,10 @@ export const Notification: FunctionComponent<{
                                 </div>
                                 <div className="d-flex flex-wrap align-items-center mt-0 mb-0">
                                     {
-                                        (!v.representatives?.length) && (
+                                        (
+                                            !!showAllChoices && !v.representatives?.length ||
+                                            !showAllChoices && !userVote.representatives?.length
+                                        ) && (
                                             <small className="d-inline-block mr-1">
                                                 Voted
                                                 {(v.question?.questionType === 'single' || !showAllChoices) && (
@@ -62,6 +65,7 @@ export const Notification: FunctionComponent<{
                                             </small>
                                         )
                                     }
+                                    {/* <pre>{JSON.stringify({showAllChoices, userVote}, null, 2)}</pre> */}
                                     {(
                                         !!showAllChoices && v.representeeVotes?.length > 0 ||
                                         !showAllChoices && userVote.representeeVotes?.length > 0
@@ -76,7 +80,7 @@ export const Notification: FunctionComponent<{
                                                         <Link
                                                             key={`representeeVotes-${r.user.handle}`}
                                                             to={`/profile/${r.user.handle}`}
-                                                            className={`vote-avatar tiny ml-n2`}
+                                                            className={`vote-avatar none tiny ml-n2`}
                                                             style={{
                                                                 background: `url(${r.user.avatar}) 50% 50% / cover no-repeat`
                                                             }}
@@ -100,7 +104,7 @@ export const Notification: FunctionComponent<{
                                                         <Link
                                                             key={`representatives-${r?.representativeHandle || i}`}
                                                             to={`/profile/${r?.representativeHandle}`}
-                                                            className={`vote-avatar tiny ${r?.position} ml-n2`}
+                                                            className={`vote-avatar tiny ${!!showAllChoices ? 'none': r?.position} ml-n2`}
                                                             style={{
                                                                 background: `url(${r?.representativeAvatar}) 50% 50% / cover no-repeat`
                                                             }}

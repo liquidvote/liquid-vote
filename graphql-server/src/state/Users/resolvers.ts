@@ -372,7 +372,7 @@ export const UserResolvers = {
                 ...q,
                 // thisUserIsAdmin: q.createdBy === AuthUser?.LiquidUser?.handle,
                 ...(q.questionType === 'single' && !!AuthUser) && {
-                    userVote: await mongoDB.collection("Votes").findOne({
+                    yourVote: await mongoDB.collection("Votes").findOne({
                         questionText: q.questionText,
                         'groupChannel.group': q.groupChannel.group,
                         user: AuthUser?._id
@@ -381,7 +381,7 @@ export const UserResolvers = {
                 ...(q.questionType === 'multi' && !!AuthUser) && {
                     choices: await Promise.all(q.choices.map(async (c) => ({
                         ...c,
-                        userVote: await mongoDB.collection("Votes").findOne({
+                        yourVote: await mongoDB.collection("Votes").findOne({
                             questionText: q.questionText,
                             'groupChannel.group': q.groupChannel.group,
                             choiceText: c.text,

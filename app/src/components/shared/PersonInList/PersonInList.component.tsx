@@ -43,7 +43,7 @@ export const PersonInList: FunctionComponent<{ person: any }> = ({ person }) => 
                 <small className="d-flex mb-0">
                     {person.bio}
                 </small>
-                {!!person.representationGroups && (
+                {/* {!!person.representationGroups && (
                     <div
                         className="d-flex flex-wrap justify-content-start"
                     >
@@ -66,7 +66,7 @@ export const PersonInList: FunctionComponent<{ person: any }> = ({ person }) => 
                     {' '}polls and different in
                     {' '}<b className="white againstDirect px-1 rounded">{useMemo(() => Math.floor(Math.random() * 100), [])}</b>
                     {' '}🧪
-                </small>
+                </small> */}
             </div>
         </div>
     );

@@ -6,12 +6,14 @@ import SortSmallSvg from "@shared/Icons/Sort-small.svg";
 import './style.sass';
 
 export const VoteSortPicker: FunctionComponent<{
-    updateSortInParent: Function
+    updateSortInParent: Function,
+    initialSort?: string
 }> = ({
-    updateSortInParent
+    updateSortInParent,
+    initialSort = 'weight'
 }) => {
 
-        const [sortBy, setSortBy] = useState('weight');
+        const [sortBy, setSortBy] = useState(initialSort);
 
         useEffect(() => {
             updateSortInParent(sortBy);

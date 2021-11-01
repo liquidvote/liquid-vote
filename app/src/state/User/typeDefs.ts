@@ -173,23 +173,8 @@ export const USER_QUESTIONS = gql`
             stats {
                 ...stats
             }
-            userVote {
-                questionText
-                position
-                representatives {
-                    representativeHandle
-                    representativeAvatar
-                    representativeName
-                    position
-                    forWeight
-                    againstWeight
-
-                    createdOn
-                    lastEditOn
-                }
-                
-                createdOn
-                lastEditOn
+            yourVote {
+                ...vote
             }
         }
         groupChannel {
@@ -201,21 +186,8 @@ export const USER_QUESTIONS = gql`
         stats {
             ...stats
         }
-        userVote {
-          questionText
-          position
-          representatives {
-            representativeHandle
-            representativeAvatar
-            representativeName
-            position
-
-            createdOn
-            lastEditOn
-          }
-          
-          createdOn
-          lastEditOn
+        yourVote {
+          ...vote
         }
         createdOn
         lastEditOn
@@ -243,6 +215,50 @@ export const USER_QUESTIONS = gql`
         againstDirectCount
         directVotes
         indirectVotes
+    }
+
+    fragment vote on Vote {
+        # _id
+        questionText
+        choiceText
+        groupChannel {
+            group
+        }
+        position
+        isDirect
+        forWeight
+        againstWeight
+        representatives{
+            representativeHandle
+            representativeAvatar
+            representativeName
+            position
+            forWeight
+            againstWeight
+            createdOn
+            lastEditOn
+        }
+        createdOn
+        lastEditOn
+        representeeVotes {
+            questionText
+            choiceText
+            groupChannel {
+                group
+            }
+            isDirect
+            position
+            user {
+                handle
+                name
+                avatar
+            }
+        }
+        user {
+            handle
+            name
+            avatar
+        }
     }
 `;
 

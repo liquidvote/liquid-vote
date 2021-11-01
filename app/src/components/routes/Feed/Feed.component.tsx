@@ -1,4 +1,4 @@
-import React, { FunctionComponent } from 'react';
+import React, { FunctionComponent, useState } from 'react';
 import { useQuery } from "@apollo/client";
 import { Link, useParams } from "react-router-dom";
 
@@ -8,6 +8,7 @@ import SingleVoteInList from "@shared/SingleVoteInList";
 import MultiVoteInList from "@shared/MultiVoteInList";
 import DropAnimation from "@components/shared/DropAnimation";
 import useAuthUser from '@state/AuthUser/authUser.effect';
+import VoteSortPicker from '@components/shared/VoteSortPicker';
 
 import './style.sass';
 
@@ -17,6 +18,8 @@ export const Feed: FunctionComponent<{}> = ({ }) => {
     let { section } = useParams<any>();
     const { liquidUser } = useAuthUser();
 
+    const [sortBy, setSortBy] = useState('time');
+
     const {
         loading: questions_loading,
         error: questions_error,
@@ -25,8 +28,8 @@ export const Feed: FunctionComponent<{}> = ({ }) => {
     } = useQuery(USER_QUESTIONS, {
         variables: {
             handle: liquidUser?.handle || null,
-            sortBy: 'time',
-            notUsers: section === 'other'
+            sortBy,
+            notUsers: section === 'other',
         }
         // skip: !liquidUser
     });
@@ -47,6 +50,9 @@ export const Feed: FunctionComponent<{}> = ({ }) => {
                             <Link className={`nav-link ${section === 'other' && 'active'}`} to={`/home/other`}>
                                 Other
                             </Link>
+                        </li>
+                        <li className="px-4 mt-1">
+                            <VoteSortPicker updateSortInParent={setSortBy} initialSort={sortBy} />
                         </li>
                     </ul>
                 )

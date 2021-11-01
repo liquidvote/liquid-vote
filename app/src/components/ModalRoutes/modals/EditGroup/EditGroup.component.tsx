@@ -203,7 +203,7 @@ export const EditGroup: FunctionComponent<{}> = ({ }) => {
                     ))('cover')}
                 </div> */}
 
-                    <div className="my-3">
+                    {/* <div className="my-3">
                         {((name: keyof IFormValues) => (
                             <DropDownInput
                                 name={name}
@@ -223,7 +223,7 @@ export const EditGroup: FunctionComponent<{}> = ({ }) => {
                                 ]}
                             />
                         ))('privacy')}
-                    </div>
+                    </div> */}
 
                     {/* <select {...register("privacy")}>
                     <option value="female">female</option>

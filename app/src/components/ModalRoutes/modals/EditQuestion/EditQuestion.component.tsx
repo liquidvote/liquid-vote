@@ -240,7 +240,7 @@ export const EditQuestion: FunctionComponent<{}> = ({ }) => {
                     ))('groupChannel')}
                 </div>
 
-                <div className="my-3 mt-4">
+                {/* <div className="my-3 mt-4">
                     {((name: keyof IFormValues) => (
                         <DropDownInput
                             name={name}
@@ -269,7 +269,7 @@ export const EditQuestion: FunctionComponent<{}> = ({ }) => {
                             ]}
                         />
                     ))('resultsOn')}
-                </div>
+                </div> */}
 
                 <br />
                 {/* <br />
