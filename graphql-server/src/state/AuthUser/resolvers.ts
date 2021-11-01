@@ -29,19 +29,19 @@ export const AuthUserResolvers = {
                         console.log(`${handle} already used`);
                         return getUniqueUserHandle(handle, count + 1);
                     } else {
+                        console.log(`${handle} new`);
                         return newHandle;
                     }
                 };
 
                 // TODO: send user avatar to S3
-                // TODO: make sure handle is unique
 
                 const created = await mongoDB.collection("Users").insertOne({
                     Auth0User,
                     LiquidUser: {
                         email: Auth0User.email,
                         name: Auth0User.nickname,
-                        handle: getUniqueUserHandle(Auth0User.nickname,0), // TODO: Force Unique
+                        handle: await getUniqueUserHandle(Auth0User.nickname,0),
                         avatar: Auth0User.picture || 'http://images.liquid-vote.com/system/placeholderCover1.jpeg',
                         cover: 'http://images.liquid-vote.com/system/placeholderCover1.jpeg',
                         bio: '🌱',

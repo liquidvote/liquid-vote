@@ -168,24 +168,26 @@ export const Profile: FunctionComponent<{}> = ({ }) => {
                 )} */}
             </div>
 
-            <div className="mt-2 mb-3 d-flex align-items-start flex-nowrap justify-content-between">
-                <div className="d-flex flex-column">
-                    <div
-                        className="d-flex flex-wrap justify-content-start"
-                    >
-                        <div data-tip="User Groups">
-                            <GroupSmallSvg />
+            {!!userGroups?.length && (
+                <div className="mt-2 mb-3 d-flex align-items-start flex-nowrap justify-content-between">
+                    <div className="d-flex flex-column">
+                        <div
+                            className="d-flex flex-wrap justify-content-start"
+                        >
+                            <div data-tip="User Groups">
+                                <GroupSmallSvg />
+                            </div>
+                            {userGroups?.map((el: any, i: any) => (
+                                <Link
+                                    to={`/group/${el.handle}`}
+                                    key={'s-' + el.name}
+                                    className={`badge inverted ml-1 mb-1 mt-1`}
+                                >{el.name}</Link>
+                            ))}
                         </div>
-                        {userGroups?.map((el: any, i: any) => (
-                            <Link
-                                to={`/group/${el.handle}`}
-                                key={'s-' + el.name}
-                                className={`badge inverted ml-1 mb-1 mt-1`}
-                            >{el.name}</Link>
-                        ))}
                     </div>
                 </div>
-            </div>
+            )}
 
             <br />
 

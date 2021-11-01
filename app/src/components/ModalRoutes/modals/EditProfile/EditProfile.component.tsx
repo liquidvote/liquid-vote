@@ -64,7 +64,6 @@ export const EditProfile: FunctionComponent<{}> = ({ }) => {
         // notifyOnNetworkStatusChange: true,
     });
 
-
     const onSubmit = async (values: any) => {
         setIsSubmitting(true);
 
