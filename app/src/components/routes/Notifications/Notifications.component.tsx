@@ -26,7 +26,7 @@ export const Notifications: FunctionComponent<{}> = ({ }) => {
             sortBy: 'time'
         }
     });
-    
+
     // console.log({
     //     user_votes_data
     // });
@@ -56,6 +56,10 @@ export const Notifications: FunctionComponent<{}> = ({ }) => {
                     />
                 </>
             ))}
+
+            {(!user_votes_data?.Votes?.length) && (
+                <div className="p-4 text-center">{`You haven't been represented on any Polls yet`}</div>
+            )}
         </>
     );
 }
