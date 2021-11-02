@@ -68,7 +68,7 @@ export const ArgumentInList: FunctionComponent<{ a: any }> = ({ a }) => {
                             variables: {
                                 questionText: a.question.questionText,
                                 groupHandle: a.group.handle,
-                                userHandle: liquidUser?.handle,
+                                userHandle: a.user?.handle,
                                 voted: !voted
                             }
                         }) : updateParams({

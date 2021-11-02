@@ -40,7 +40,7 @@ export const ArgumentUpVotesResolvers = {
                     argument: new ObjectId(argument._id),
                     question: new ObjectId(question._id),
                     group: new ObjectId(group._id),
-                    user: new ObjectId(user._id)
+                    user: new ObjectId(AuthUser._id)
                 }, {
                     $set: {
                         voted,
@@ -49,7 +49,7 @@ export const ArgumentUpVotesResolvers = {
                     $setOnInsert: {
                         question: new ObjectId(question._id),
                         group: new ObjectId(group._id),
-                        user: new ObjectId(user._id),
+                        user: new ObjectId(AuthUser._id),
                         createdOn: Date.now()
                     }
                 },
