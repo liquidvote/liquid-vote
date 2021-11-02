@@ -1,10 +1,15 @@
 import React, { FunctionComponent } from 'react';
+import { Link, useParams } from "react-router-dom";
 
 import VoteWrapper from "@shared/VoteWrapper";
+import useSearchParams from "@state/Global/useSearchParams.effect";
 
 import './style.sass';
 
 export const Home: FunctionComponent<{}> = ({ }) => {
+
+    const { allSearchParams, updateParams } = useSearchParams();
+
     return (
         <>
             {/* <Header title="Home" /> */}
@@ -29,7 +34,7 @@ export const Home: FunctionComponent<{}> = ({ }) => {
             <p>
                 If you vote on an poll, your vote's weight is 100% on your choice,
                 even when you have representatives.
-                <br/>
+                <br />
                 But when not voting, your vote's weight gets delegated to your representatives.
                 Or to their representatives, if they themselves do not vote either.
             </p>
@@ -58,6 +63,28 @@ export const Home: FunctionComponent<{}> = ({ }) => {
                     showColorLegend={true}
                 />
             </div>
+
+            <br />
+
+            <h4 className="mb-2 mt-3">Get started!</h4>
+            <div className="d-flex">
+                <div
+                    className="button_ mr-3"
+                    onClick={() => updateParams({
+                        paramsToAdd: {
+                            modal: 'EditGroup',
+                            modalData: JSON.stringify({ groupHandle: 'new' })
+                        }
+                    })}
+                >Create a Group</div>
+                <Link
+                    className="button_"
+                    to={`/groups`}
+                >Explore Groups</Link>
+            </div>
+
+            <br />
+            <br />
         </>
     );
 }

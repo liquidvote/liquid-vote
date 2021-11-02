@@ -28,7 +28,7 @@ export const Groups: FunctionComponent<{}> = ({ }) => {
             handle: liquidUser?.handle,
             notUsers: section === 'other'
         },
-        skip: !liquidUser
+        // skip: !liquidUser
     });
 
     // console.log({ authUser_data, yourGroups_data })
@@ -37,18 +37,20 @@ export const Groups: FunctionComponent<{}> = ({ }) => {
         <>
             <Header title="Groups" />
 
-            <ul className="nav d-flex flex-nowrap justify-content-around align-items-center mt-1 mx-n3">
-                <li className="nav-item">
-                    <Link className={`nav-link ${!section && 'active'}`} to={`/groups`}>
-                        Yours
-                    </Link>
-                </li>
-                <li className="nav-item">
-                    <Link className={`nav-link ${section === 'other' && 'active'}`} to={`/groups/other`}>
-                        Other
-                    </Link>
-                </li>
-            </ul>
+            {!!liquidUser && (
+                <ul className="nav d-flex flex-nowrap justify-content-around align-items-center mt-1 mx-n3">
+                    <li className="nav-item">
+                        <Link className={`nav-link ${!section && 'active'}`} to={`/groups`}>
+                            Yours
+                        </Link>
+                    </li>
+                    <li className="nav-item">
+                        <Link className={`nav-link ${section === 'other' && 'active'}`} to={`/groups/other`}>
+                            Other
+                        </Link>
+                    </li>
+                </ul>
+            )}
 
             {
                 !yourGroups_data && (

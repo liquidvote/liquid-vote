@@ -111,7 +111,7 @@ export const USER_REPRESENTED_BY = gql`
 `;
 
 export const USER_GROUPS = gql`
-  query($handle: String!, $representative: String, $notUsers: Boolean) {
+  query($handle: String, $representative: String, $notUsers: Boolean) {
     UserGroups(handle: $handle, representative: $representative, notUsers: $notUsers) {
         handle
         name

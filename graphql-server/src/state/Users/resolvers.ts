@@ -230,23 +230,31 @@ export const UserResolvers = {
 
         UserGroups: async (_source, { handle, representative, notUsers }, { mongoDB, AuthUser }) => {
 
-            const User = await mongoDB.collection("Users")
+            console.log({ handle, representative, notUsers });
+
+            const User = !!handle && await mongoDB.collection("Users")
                 .findOne({ 'LiquidUser.handle': handle });
 
-            const UserGroupMemberRelations = await mongoDB.collection("GroupMembers")
+            const UserGroupMemberRelations = !!User && await mongoDB.collection("GroupMembers")
                 .find({ 'userId': new ObjectId(User?._id) })
                 .toArray();
 
-            const YourGroupMemberRelations = !!AuthUser && await mongoDB.collection("GroupMembers")
-                .find({
-                    'userId': new ObjectId(AuthUser?._id),
-                    'groupId': {
-                        "$in": UserGroupMemberRelations.map(
-                            r => new ObjectId(r.groupId)
-                        )
-                    }
-                })
-                .toArray();
+            console.log({
+                User,
+                UserGroupMemberRelations
+            });
+
+            const YourGroupMemberRelations = (!!AuthUser && !!UserGroupMemberRelations) &&
+                await mongoDB.collection("GroupMembers")
+                    .find({
+                        'userId': new ObjectId(AuthUser?._id),
+                        'groupId': {
+                            "$in": UserGroupMemberRelations.map(
+                                r => new ObjectId(r.groupId)
+                            )
+                        }
+                    })
+                    .toArray();
 
             const Representative = await mongoDB.collection("Users")
                 .findOne({ 'LiquidUser.handle': representative });
@@ -254,17 +262,21 @@ export const UserResolvers = {
             const RepresentativeGroupMemberRelations = !!AuthUser && await mongoDB.collection("GroupMembers")
                 .find({
                     'userId': new ObjectId(Representative?._id),
-                    'groupId': {
-                        "$in": UserGroupMemberRelations.map(
-                            r => new ObjectId(r.groupId)
-                        )
+                    ...!!UserGroupMemberRelations && {
+                        'groupId': {
+                            "$in": UserGroupMemberRelations.map(
+                                r => new ObjectId(r.groupId)
+                            )
+                        }
                     }
                 })
                 .toArray();
 
             const Groups = await Promise.all((await mongoDB.collection("Groups").find({
-                "_id": {
-                    [`${notUsers ? '$nin' : '$in'}`]: UserGroupMemberRelations.map(r => new ObjectId(r.groupId))
+                ...!!UserGroupMemberRelations && {
+                    "_id": {
+                        [`${notUsers ? '$nin' : '$in'}`]: UserGroupMemberRelations.map(r => new ObjectId(r.groupId))
+                    }
                 }
             })
                 .toArray())
@@ -276,25 +288,27 @@ export const UserResolvers = {
                         groupId: g._id,
                         mongoDB
                     }),
-                    userMemberRelation: UserGroupMemberRelations?.find(
-                        r => r.groupId.toString() === g._id.toString()
-                    ),
-                    yourMemberRelation: YourGroupMemberRelations && YourGroupMemberRelations.find(
-                        r => r.groupId.toString() === g._id.toString()
-                    ),
-                    representativeRelation: await (async r => ({
-                        isGroupMember: !!r && r?.isMember,
-                        ...(!!r) && {
-                            ... await mongoDB.collection("UserRepresentations")
-                                .findOne({
-                                    representativeId: new ObjectId(Representative?._id),
-                                    representeeId: new ObjectId(User?._id),
-                                    groupId: new ObjectId(g?._id),
-                                })
-                        }
-                    }))(RepresentativeGroupMemberRelations && RepresentativeGroupMemberRelations.find(
-                        r => r.groupId.toString() === g._id.toString()
-                    )),
+                    ...!!UserGroupMemberRelations && {
+                        userMemberRelation: UserGroupMemberRelations?.find(
+                            r => r.groupId.toString() === g._id.toString()
+                        ),
+                        yourMemberRelation: YourGroupMemberRelations && YourGroupMemberRelations.find(
+                            r => r.groupId.toString() === g._id.toString()
+                        ),
+                        representativeRelation: await (async r => ({
+                            isGroupMember: !!r && r?.isMember,
+                            ...(!!r) && {
+                                ... await mongoDB.collection("UserRepresentations")
+                                    .findOne({
+                                        representativeId: new ObjectId(Representative?._id),
+                                        representeeId: new ObjectId(User?._id),
+                                        groupId: new ObjectId(g?._id),
+                                    })
+                            }
+                        }))(RepresentativeGroupMemberRelations && RepresentativeGroupMemberRelations.find(
+                            r => r.groupId.toString() === g._id.toString()
+                        ))
+                    }
                 })));
 
             return Groups;
