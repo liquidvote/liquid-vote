@@ -109,7 +109,7 @@ export const ListVoters: FunctionComponent<{}> = ({ }) => {
             <ModalHeader
                 title={
                     !!questionText ?
-                        `Votes on ${questionText}${!!choiceText && ": "}${!!choiceText && choiceText}` :
+                        `Votes on ${questionText}${!!choiceText ? ": " : ''}${!!choiceText ? choiceText : ''}` :
                         `Votes on ${group?.name}`
                 }
                 hideSubmitButton={true}
@@ -286,7 +286,7 @@ export const ListVoters: FunctionComponent<{}> = ({ }) => {
                         <hr className="mt-n4 mb-0 mx-0" />
                     </>
                 )}
-                
+
                 {(!!questionText && (!subsection || subsection === 'direct')) && (
                     <>
                         <ul className="nav d-flex justify-content-around">
@@ -494,8 +494,8 @@ export const ListVoters: FunctionComponent<{}> = ({ }) => {
                             showChart={false}
                             hideChoicesBesides={choiceText}
                             showTitle={!questionText}
-                            // hideGroup={true}
-                            // hideQuestionText={true}
+                        // hideGroup={true}
+                        // hideQuestionText={true}
                         />
                     ))}
                 </div>

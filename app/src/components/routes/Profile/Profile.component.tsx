@@ -14,6 +14,7 @@ import { timeAgo } from '@state/TimeAgo';
 import { USER, USER_GROUPS } from "@state/User/typeDefs";
 import useAuthUser from '@state/AuthUser/authUser.effect';
 import useUserGroups from "@state/User/userGroups.effect";
+import DropSVG from "@shared/Icons/Drop.svg";
 
 import ProfileVotes from "./ProfileVotes";
 import './style.sass';
@@ -168,26 +169,118 @@ export const Profile: FunctionComponent<{}> = ({ }) => {
                 )} */}
             </div>
 
-            {!!userGroups?.length && (
-                <div className="mt-2 mb-3 d-flex align-items-start flex-nowrap justify-content-between">
-                    <div className="d-flex flex-column">
-                        <div
-                            className="d-flex flex-wrap justify-content-start"
+            <div className="profile-stats-container mb-2 mt-2 flex-nowrap">
+                <div className="mr-1"><DropSVG /></div>
+
+                <div>
+                    <div className="d-flex flex-wrap">
+                        <Link
+                            to={`/profile/${profile?.handle}/votes/direct`}
+                            className="mr-2 pointer"
                         >
-                            <div data-tip="User Groups">
-                                <GroupSmallSvg />
-                            </div>
-                            {userGroups?.map((el: any, i: any) => (
+                            <b className="white">{(
+                                profile?.stats.directVotesMade
+                            ) || 0}</b> Direct Votes
+                        </Link>
+
+                        {!!profile?.yourStats && (
+                            <>
                                 <Link
-                                    to={`/group/${el.handle}`}
-                                    key={'s-' + el.name}
-                                    className={`badge inverted ml-1 mb-1 mt-1`}
-                                >{el.name}</Link>
-                            ))}
-                        </div>
+                                    to={`/profile/${profile?.handle}/votes/direct/same`}
+                                    className="mr-2 pointer"
+                                >
+                                    <b className="white forDirect px-1 rounded">{(
+                                        profile?.yourStats.directVotesInAgreement
+                                    ) || 0}</b> Same as yours
+                                </Link>
+                                <Link
+                                    to={`/profile/${profile?.handle}/votes/direct/different`}
+                                    className="mr-2 pointer"
+                                >
+                                    <b className="white againstDirect px-1 rounded">{(
+                                        profile?.yourStats.directVotesInDisagreement
+                                    ) || 0}</b> Different
+                                </Link>
+                            </>
+                        )}
+                    </div>
+                    <div className="d-flex flex-wrap">
+                        <Link
+                            to={`/profile/${profile?.handle}/votes/represented`}
+                            className="mr-2 pointer"
+                        >
+                            <b className="white">{(
+                                profile?.stats.indirectVotesMadeByUser
+                            ) || 0}</b> Represented Votes
+                        </Link>
+
+                        {!!profile?.yourStats && (
+                            <>
+                                <Link
+                                    to={`/profile/${profile?.handle}/votes/represented/byyou`}
+                                    className="mr-2 pointer"
+                                >
+                                    <b className="white">{(
+                                        profile?.yourStats.indirectVotesMadeByYou
+                                    ) || 0}</b> By You
+                                </Link>
+                                <Link
+                                    to={`/profile/${profile?.handle}/votes/represented/foryou`}
+                                    className="mr-2 pointer"
+                                >
+                                    <b className="white">{(
+                                        profile?.yourStats.indirectVotesMadeForYou
+                                    ) || 0}</b> For You
+                                </Link>
+                            </>
+                        )}
                     </div>
                 </div>
-            )}
+            </div>
+
+
+            {/* 
+            
+                // directVotesMade: 14
+                groupsJoined: 4
+                indirectVotesMadeByUser: 1
+                indirectVotesMadeForUser: 1
+                lastDirectVoteOn: "0"
+                representedBy: 3
+                representing: 1
+
+                // directVotesInAgreement: 4
+                directVotesInCommon: 11
+                // directVotesInDisagreement: 7
+                // indirectVotesMadeByYou: 1
+                // indirectVotesMadeForYou: 1
+                votesInCommon: 13
+            
+            */}
+
+
+            {
+                !!userGroups?.length && (
+                    <div className="mt-1 mb-3 d-flex align-items-start flex-nowrap justify-content-between">
+                        <div className="d-flex flex-column">
+                            <div
+                                className="d-flex flex-wrap justify-content-start"
+                            >
+                                <div data-tip="User Groups">
+                                    <GroupSmallSvg />
+                                </div>
+                                {userGroups?.map((el: any, i: any) => (
+                                    <Link
+                                        to={`/group/${el.handle}`}
+                                        key={'s-' + el.name}
+                                        className={`badge inverted ml-1 mb-1 mt-1`}
+                                    >{el.name}</Link>
+                                ))}
+                            </div>
+                        </div>
+                    </div>
+                )
+            }
 
             <br />
 

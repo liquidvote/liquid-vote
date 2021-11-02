@@ -289,7 +289,7 @@ export const Group: FunctionComponent<{}> = ({ }) => {
                                 <b className="white">{(
                                     group?.yourStats.directVotesMade +
                                     group?.yourStats.indirectVotesMadeByYou
-                                 ) || 0}</b> Votes by you
+                                 ) || 0}</b> By you
                             </div>
                             <div
                                 className="mr-2 pointer"
@@ -309,7 +309,7 @@ export const Group: FunctionComponent<{}> = ({ }) => {
                                     }
                                 }
                             >
-                                <b className="white">{group?.yourStats.indirectVotesMadeForYou || 0}</b> Votes for you
+                                <b className="white">{group?.yourStats.indirectVotesMadeForYou || 0}</b> For you
                             </div>
                         </>
                     )
