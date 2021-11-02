@@ -198,7 +198,7 @@ export default function Question() {
                                 )}
                         </div>
                         <small
-                            data-tip={`Poll launched ${!!question_data?.Question?.createdBy && `by ${question_data?.Question?.createdBy?.name}`} on`}
+                            data-tip={`Poll launched ${!!question_data?.Question?.createdBy ? `by ${question_data?.Question?.createdBy?.name}` : ''} on`}
                             className="d-flex justify-content-center align-items-center"
                         >
                             {/* <small className="time-ago" data-tip="Last vote was"> */}
