@@ -126,7 +126,7 @@ export default function Question() {
 
             {!!question_data?.Question?.description && (
                 <p className="pre-wrap white-links">
-                    {question_data?.Question?.description}
+                    {/* {question_data?.Question?.description} */}
                     <Linkify tagName="span">
                         {question_data?.Question?.description}
                     </Linkify>
