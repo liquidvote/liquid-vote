@@ -65,7 +65,7 @@ export const UserTypeDefs = gql`
             notSelf: Boolean
         ): [User]
         UserRepresenting(handle: String, groupHandle: String): [User] # Users that this user is representing
-        UserRepresentedBy(handle: String, groupHandle: String): [User] # Users that this user is represented by
+        UserRepresentedBy(handle: String, groupHandle: String, representativeHandle: String): [User] # Users that this user is represented by
         UserGroups(
             handle: String,
             representative: String,

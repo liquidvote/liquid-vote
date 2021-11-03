@@ -3,9 +3,9 @@ import { useQuery, useMutation } from "@apollo/client";
 import { USER_REPRESENTED_BY, USER_REPRESENTING } from "@state/User/typeDefs";
 
 export default function useUserRepresentedBy({
-    userHandle, groupHandle
+    userHandle, groupHandle, representativeHandle
 }: {
-    userHandle: string, groupHandle: string
+    userHandle: string, groupHandle: string, representativeHandle?: string
 }) {
     const {
         loading: user_represented_by_loading,
@@ -15,7 +15,8 @@ export default function useUserRepresentedBy({
     } = useQuery(USER_REPRESENTED_BY, {
         variables: {
             handle: userHandle,
-            groupHandle
+            groupHandle,
+            representativeHandle
         },
         skip: !userHandle
     });

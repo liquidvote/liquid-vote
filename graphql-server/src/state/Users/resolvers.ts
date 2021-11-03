@@ -171,11 +171,14 @@ export const UserResolvers = {
 
         UserRepresentedBy: async (
             _source,
-            { handle, groupHandle },
+            { handle, groupHandle, representativeHandle },
             { mongoDB, AuthUser }
         ) => {
             const User = await mongoDB.collection("Users")
                 .findOne({ 'LiquidUser.handle': handle });
+
+            const RepresentativeUser = !!representativeHandle && await mongoDB.collection("Users")
+                .findOne({ 'LiquidUser.handle': representativeHandle });
 
             const group = !!groupHandle && await mongoDB.collection("Groups")
                 .findOne({ 'handle': groupHandle });
@@ -189,6 +192,9 @@ export const UserResolvers = {
                                 "isRepresentingYou": true,
                                 ...!!group && {
                                     groupId: new ObjectId(group._id)
+                                },
+                                ...!!RepresentativeUser && {
+                                    representativeId: new ObjectId(RepresentativeUser._id)
                                 }
                             }
                         }, {

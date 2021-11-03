@@ -79,8 +79,8 @@ export const USER_REPRESENTING = gql`
 `;
 
 export const USER_REPRESENTED_BY = gql`
-  query($handle: String!, $groupHandle: String) {
-    UserRepresentedBy(handle: $handle, groupHandle: $groupHandle) {
+  query($handle: String!, $groupHandle: String, $representativeHandle: String) {
+    UserRepresentedBy(handle: $handle, groupHandle: $groupHandle, representativeHandle: $representativeHandle) {
         handle,
         name,
         bio,

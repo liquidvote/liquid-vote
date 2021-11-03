@@ -1218,3 +1218,9 @@ export const VoteResolvers = {
         },
     },
 };
+
+// update representeeVotes by representee and representative
+// update representeeVotes by vote and representative
+
+// update representeeVotes by representative //for debug
+// update representeeVotes by representatee //for debug
