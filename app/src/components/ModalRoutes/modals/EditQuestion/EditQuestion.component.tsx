@@ -195,7 +195,7 @@ export const EditQuestion: FunctionComponent<{}> = ({ }) => {
                         <TextAreaInput
                             name={name}
                             register={register(name, {
-                                required: true
+                                required: false
                             })}
                             value={watch(name)}
                             error={errors[name]}
