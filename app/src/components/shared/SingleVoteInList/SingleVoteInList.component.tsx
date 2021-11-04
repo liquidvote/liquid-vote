@@ -71,7 +71,7 @@ export const SingleVoteInList: FunctionComponent<{
                                     className="white mb-0"
                                     href={`/poll/${l.questionText}/${l.groupChannel?.group}`}
                                 >
-                                    <div className="text-truncate" title={l.questionText}>
+                                    <div className={`question-title-in-list ${showGroupAndTime && 'limit-right'}`} title={l.questionText}>
                                         {l.questionText}
                                         {showIntroMessage && '?'}
                                     </div>

@@ -60,7 +60,7 @@ export const MultiVoteInList: FunctionComponent<{
                         href={`/multipoll/${v.questionText}/${v.groupChannel?.group}`}
                     >
                         <div
-                            className="text-truncate mw-180-px-sm mr-2"
+                            className={`question-title-in-list ${showGroupAndTime && 'limit-right'}`}
                             title={v.questionText}
                         >{v.questionText}?</div>
                     </a>
