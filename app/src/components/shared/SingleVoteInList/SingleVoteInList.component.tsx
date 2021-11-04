@@ -62,7 +62,7 @@ export const SingleVoteInList: FunctionComponent<{
                 )} */}
                 <div>
                     {(showIntroMessage && !hideTitle) && (
-                        <small className="do-you d-flex mb-n1">{introMessage || 'Do you approve'}</small>
+                        <small className="do-you d-flex mb-n1">{introMessage || `Do you ${l?.startText || 'approve'}`}</small>
                     )}
                     <div className="bar-wrapper">
                         {(!!l.questionText && !hideTitle) && (
