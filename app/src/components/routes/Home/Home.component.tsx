@@ -18,7 +18,7 @@ export const Home: FunctionComponent<{}> = ({ }) => {
 
             <h2>Welcome to <b className="white">Liquid Vote</b></h2>
 
-            <p>The place for liquid voting.</p>
+            <p>The place for scaleable and organic opinion tracing.</p>
 
             <br />
 
@@ -78,12 +78,34 @@ export const Home: FunctionComponent<{}> = ({ }) => {
                     })}
                 >Create a Group</div>
                 <Link
-                    className="button_"
+                    className="button_ mr-3"
                     to={`/groups`}
                 >Explore Groups</Link>
+                <a
+                    className="button_ mr-3"
+                    // Edit with this tool: https://mailto.vercel.app
+                    href={`mailto:hello@liquid-vote.com?subject=I'd%20like%20to%20book%20a%20demo&body=Hi%20Pedro%2C%0AI'm%20free%20for%2030%20minutes%2C%20tomorrow%2C%2016pm%20London%20time%2C%20does%20that%20work%20for%20you%3F%0A%0ABest%20regards%2C%0AA%20curious%20person`}
+                    target="_blank"
+                >Request a Demo</a>
             </div>
 
             <br />
+            <br />
+
+            <hr />
+
+            <ul className="d-flex">
+                <li className="mr-3">
+                    <Link to="//twitter.com/liquid_vote" target="_blank">Twitter</Link>
+                </li>
+                <li className="mr-3">
+                    <Link to="//discord.gg/vbC5dJHZ" target="_blank">Discord</Link>
+                </li>
+                <li className="mr-3">
+                    <Link to="//www.linkedin.com/company/liquid-vote/" target="_blank">LinkedIn</Link>
+                </li>
+            </ul>
+
             <br />
         </>
     );
