@@ -226,113 +226,119 @@ export const Group: FunctionComponent<{}> = ({ }) => {
                     <div>Group created {timeAgo.format(new Date(Number(group?.createdOn)))}</div>
                 </div>
             </div>
-            <div className="profile-stats-container mt-3">
+            <div className="profile-stats-container flex-nowrap mt-3">
                 <div className="mr-1"><ProfileSmallSVG /></div>
-                <Link className="mr-2" to={`/group-people/${group?.handle}/members`}>
-                    <b className="white">{group?.stats?.members || 0}</b> Member{group?.stats?.members !== 1 && 's'}
-                </Link>
-                {
-                    group?.yourStats && (
-                        <>
-                            <Link className="mr-2" to={`/group-people/${group?.handle}/representingYou`}>
-                                <b className="white">{group?.yourStats.representing || 0}</b> Representing you
-                            </Link>
-                            <Link to={`/group-people/${group?.handle}/representedByYou`}>
-                                <b className="white">{group?.yourStats.representedBy || 0}</b> Represented by you
-                            </Link>
-                        </>
-                    )
-                }
-            </div>
-            <div className="profile-stats-container mb-4 mt-2">
-                <div className="mr-1"><DropSVG /></div>
-                <div
-                    className="mr-2 pointer"
-                    onClick={
-                        e => {
-                            e.stopPropagation();
-                            updateParams({
-                                paramsToAdd: {
-                                    modal: "ListVoters",
-                                    modalData: JSON.stringify({
-                                        groupHandle: group?.handle,
-                                        subsection: 'direct',
-                                    })
-                                }
-                            })
-                        }
+                <div className="d-flex flex-wrap">
+                    <Link className="mr-2" to={`/group-people/${group?.handle}/members`}>
+                        <b className="white">{group?.stats?.members || 0}</b> Member{group?.stats?.members !== 1 && 's'}
+                    </Link>
+                    {
+                        group?.yourStats && (
+                            <>
+                                <Link className="mr-2" to={`/group-people/${group?.handle}/representingYou`}>
+                                    <b className="white">{group?.yourStats.representing || 0}</b> Representing you
+                                </Link>
+                                <Link to={`/group-people/${group?.handle}/representedByYou`}>
+                                    <b className="white">{group?.yourStats.representedBy || 0}</b> Represented by you
+                                </Link>
+                            </>
+                        )
                     }
-                >
-                    <b className="white">{group?.stats?.directVotesMade || 0}</b> Vote{group?.stats?.directVotesMade !== 1 && 's'}
                 </div>
-                {
-                    group?.yourStats && (
-                        <>
-                            <div
-                                className="mr-2 pointer"
-                                onClick={
-                                    e => {
-                                        e.stopPropagation();
-                                        updateParams({
-                                            paramsToAdd: {
-                                                modal: "ListVoters",
-                                                modalData: JSON.stringify({
-                                                    groupHandle: group?.handle,
-                                                    subsection: 'represented',
-                                                    subsubsection: 'byyou'
-                                                })
-                                            }
+            </div>
+            <div className="profile-stats-container flex-nowrap mb-4 mt-2">
+                <div className="mr-1"><DropSVG /></div>
+                <div className="d-flex flex-wrap">
+                    <div
+                        className="mr-2 pointer"
+                        onClick={
+                            e => {
+                                e.stopPropagation();
+                                updateParams({
+                                    paramsToAdd: {
+                                        modal: "ListVoters",
+                                        modalData: JSON.stringify({
+                                            groupHandle: group?.handle,
+                                            subsection: 'direct',
                                         })
                                     }
-                                }
-                            >
-                                <b className="white">{(
-                                    group?.yourStats.directVotesMade +
-                                    group?.yourStats.indirectVotesMadeByYou
-                                 ) || 0}</b> By you
-                            </div>
-                            <div
-                                className="mr-2 pointer"
-                                onClick={
-                                    e => {
-                                        e.stopPropagation();
-                                        updateParams({
-                                            paramsToAdd: {
-                                                modal: "ListVoters",
-                                                modalData: JSON.stringify({
-                                                    groupHandle: group?.handle,
-                                                    subsection: 'represented',
-                                                    subsubsection: 'foryou'
-                                                })
-                                            }
-                                        })
+                                })
+                            }
+                        }
+                    >
+                        <b className="white">{group?.stats?.directVotesMade || 0}</b> Vote{group?.stats?.directVotesMade !== 1 && 's'}
+                    </div>
+                    {
+                        group?.yourStats && (
+                            <>
+                                <div
+                                    className="mr-2 pointer"
+                                    onClick={
+                                        e => {
+                                            e.stopPropagation();
+                                            updateParams({
+                                                paramsToAdd: {
+                                                    modal: "ListVoters",
+                                                    modalData: JSON.stringify({
+                                                        groupHandle: group?.handle,
+                                                        subsection: 'represented',
+                                                        subsubsection: 'byyou'
+                                                    })
+                                                }
+                                            })
+                                        }
                                     }
-                                }
-                            >
-                                <b className="white">{group?.yourStats.indirectVotesMadeForYou || 0}</b> For you
-                            </div>
-                        </>
-                    )
-                }
+                                >
+                                    <b className="white">{(
+                                        group?.yourStats.directVotesMade +
+                                        group?.yourStats.indirectVotesMadeByYou
+                                    ) || 0}</b> By you
+                                </div>
+                                <div
+                                    className="mr-2 pointer"
+                                    onClick={
+                                        e => {
+                                            e.stopPropagation();
+                                            updateParams({
+                                                paramsToAdd: {
+                                                    modal: "ListVoters",
+                                                    modalData: JSON.stringify({
+                                                        groupHandle: group?.handle,
+                                                        subsection: 'represented',
+                                                        subsubsection: 'foryou'
+                                                    })
+                                                }
+                                            })
+                                        }
+                                    }
+                                >
+                                    <b className="white">{group?.yourStats.indirectVotesMadeForYou || 0}</b> For you
+                                </div>
+                            </>
+                        )
+                    }
+                </div>
             </div>
 
-            {isMember && (
-                <div
-                    onClick={() => updateParams({
-                        paramsToAdd: {
-                            modal: "EditQuestion",
-                            modalData: JSON.stringify({
-                                questionText: 'new',
-                                groupHandle: handle,
-                            })
-                        }
-                    })}
-                    className="button_ mx-5 my-3 mb-4"
-                >
-                    <DropPlusSVG />
-                    <div className="ml-2">Create a new Poll</div>
-                </div>
-            )}
+            {
+                isMember && (
+                    <div
+                        onClick={() => updateParams({
+                            paramsToAdd: {
+                                modal: "EditQuestion",
+                                modalData: JSON.stringify({
+                                    questionText: 'new',
+                                    groupHandle: handle,
+                                })
+                            }
+                        })}
+                        className="button_ mx-5 my-3 mb-4"
+                    >
+                        <DropPlusSVG />
+                        <div className="ml-2">Create a new Poll</div>
+                    </div>
+                )
+            }
 
 
             <ul className="nav d-flex flex-nowrap justify-content-around align-items-center mt-1 mb-n4 mx-n3">
@@ -356,14 +362,18 @@ export const Group: FunctionComponent<{}> = ({ }) => {
 
             <hr />
 
-            {(!section || section === 'polls') && (
-                <div>
-                    <GroupPolls sortBy={sortBy} />
-                </div>
-            )}
-            {(section === 'votes') && (
-                <GroupVotes sortBy={sortBy} />
-            )}
+            {
+                (!section || section === 'polls') && (
+                    <div>
+                        <GroupPolls sortBy={sortBy} />
+                    </div>
+                )
+            }
+            {
+                (section === 'votes') && (
+                    <GroupVotes sortBy={sortBy} />
+                )
+            }
 
         </>
     );
