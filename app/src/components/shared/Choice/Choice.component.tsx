@@ -97,7 +97,7 @@ export const Choice: FunctionComponent<{
         const againstRepresentatives = yourVote?.representatives?.filter((r: any) => r.position === 'against');
 
         return (
-            <div>
+            <div className={`${!inList && 'not-in-list'}`}>
                 <div
                     className="d-flex d-flex flex-column mb-1"
                 // style={{
@@ -204,7 +204,7 @@ export const Choice: FunctionComponent<{
 
                 {showChart && (
                     <div className="d-flex d-flex justify-content-between mt-1">
-                        <div className="d-flex align-items-center">
+                        <div className="d-flex align-items-center c-on-tiny">
                             <div
                                 className={`button_ justify-content-between min-w mr-1 ${yourVote_ === 'for' && 'selected'} ${inList && 'small'}`}
                                 onClick={() => handleUserVote('for')}
@@ -320,7 +320,7 @@ export const Choice: FunctionComponent<{
                             />
                         )}
 
-                        <div className="d-flex align-items-center">
+                        <div className="d-flex align-items-center cr-on-tiny">
                             <div className="d-flex ml-2" data-tip={`Votes Against`}>
                                 {
                                     (
@@ -336,7 +336,8 @@ export const Choice: FunctionComponent<{
                                                 background: `url(${v?.avatar}) 50% 50% / cover no-repeat`
                                             }}
                                         ></Link>
-                                    ))}
+                                    ))
+                                }
 
                                 <div
                                     // to={`/${choiceText ? 'multipoll' : 'poll'}/${voteName}/${groupHandle}/timeline/direct/against`}

@@ -137,16 +137,18 @@ export const AcceptInvite: FunctionComponent<{}> = ({ }) => {
                                 />
                             </div>
                         ) : !isMember ? (
-                            <button
-                                className="button_ mx-5 my-4"
-                                onClick={acceptInvite}
-                                disabled={editGroupMemberChannelRelation_loading}
-                            >Join Group</button>
+                            <div className="d-flex align-items-center justify-content-center">
+                                <button
+                                    className="button_ mx-5 my-4"
+                                    onClick={acceptInvite}
+                                    disabled={editGroupMemberChannelRelation_loading}
+                                >Join Group</button>
+                            </div>
                         ) : (
                             <p className="mx-5 my-4 text-center"><b>You are now a member{!!representatives?.length ? ` and represented by ${user?.name}` : ''} 🎉</b></p>
                         )}
                         {isMember ? (
-                            <div className="d-flex flex-column">
+                            <div className="d-flex flex-column align-items-center">
                                 {editUserRepresentativeGroupRelation_loading ? (
                                     <div className="mx-5 my-4 text-center">
                                         <img

@@ -199,23 +199,28 @@ form
     display: flex
     justify-content: center
     align-items: center
-    padding: 6px 8px
-    border-radius: 20px
+    padding: 8px 16px
+    border-radius: 50px
     // margin: 0 0.25rem
     cursor: pointer
     font-weight: bold
     color: inherit
     background: inherit
-    white-space: nowrap
+    // white-space: nowrap
     height: fit-content
+    width: fit-content
     user-select: none
+    text-align: center
+    line-height: 14px
+    min-height: 40px
 
     &:hover:not([disabled], .inverted, .selected)
         background-color: rgba(0,0,0,0.1)
 
     &.small
         font-size: 12px
-        padding: 2px 8px
+        padding: 4px 8px
+        min-height: inherit
         // margin-bottom: 9px
 
     &.icon-contain
@@ -744,3 +749,6 @@ hr
 
     &.limit-right
         margin-right: 90px
+
+.w-fit
+    width: fit-content

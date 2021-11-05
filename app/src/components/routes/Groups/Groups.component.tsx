@@ -74,14 +74,16 @@ export const Groups: FunctionComponent<{}> = ({ }) => {
 
 
             {(!!liquidUser && !yourGroups_loading) && (
-                <div onClick={() => updateParams({
-                    paramsToAdd: {
-                        modal: 'EditGroup',
-                        modalData: JSON.stringify({ groupHandle: 'new' })
-                    }
-                })} className="button_ m-5">
-                    {/* <DropPlusSVG /> */}
-                    <div className="ml-2">Create a New Group</div>
+                <div className="d-flex justify-content-center">
+                    <div onClick={() => updateParams({
+                        paramsToAdd: {
+                            modal: 'EditGroup',
+                            modalData: JSON.stringify({ groupHandle: 'new' })
+                        }
+                    })} className="button_ m-5">
+                        {/* <DropPlusSVG /> */}
+                        <div className="ml-2">Create a New Group</div>
+                    </div>
                 </div>
             )}
         </>

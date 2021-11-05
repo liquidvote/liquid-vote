@@ -76,7 +76,7 @@ export default function Question() {
                     <p className="mb-0">Vote or {!!representatives?.length && 'be represented by'}</p>
 
                     {!!representatives?.length && (
-                        <div className="d-flex ml-2 pl-1 mr-1">
+                        <div className="d-flex ml-2 pl-1 mr-1 align-items-center">
                             {representatives?.map((r: any) => (
                                 <Link
                                     key={`representatives-${r.handle}`}

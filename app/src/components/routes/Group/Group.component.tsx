@@ -322,20 +322,22 @@ export const Group: FunctionComponent<{}> = ({ }) => {
 
             {
                 isMember && (
-                    <div
-                        onClick={() => updateParams({
-                            paramsToAdd: {
-                                modal: "EditQuestion",
-                                modalData: JSON.stringify({
-                                    questionText: 'new',
-                                    groupHandle: handle,
-                                })
-                            }
-                        })}
-                        className="button_ mx-5 my-3 mb-4"
-                    >
-                        <DropPlusSVG />
-                        <div className="ml-2">Create a new Poll</div>
+                    <div className="d-flex justify-content-center">
+                        <div
+                            onClick={() => updateParams({
+                                paramsToAdd: {
+                                    modal: "EditQuestion",
+                                    modalData: JSON.stringify({
+                                        questionText: 'new',
+                                        groupHandle: handle,
+                                    })
+                                }
+                            })}
+                            className="button_ mx-5 my-3 mb-4"
+                        >
+                            <DropPlusSVG />
+                            <div className="ml-2">Create a new Poll</div>
+                        </div>
                     </div>
                 )
             }

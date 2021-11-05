@@ -38,14 +38,16 @@ export const ProfileGroups: FunctionComponent<{}> = ({ }) => {
         <>
 
             {!!liquidUser && (
-                <div onClick={() => updateParams({
-                    paramsToAdd: {
-                        modal: 'EditGroup',
-                        modalData: JSON.stringify({ groupHandle: 'new' })
-                    }
-                })} className="button_ mx-5 my-3">
-                    {/* <DropPlusSVG /> */}
-                    <div className="ml-2">Create New Group</div>
+                <div className="d-flex justify-content-center">
+                    <div onClick={() => updateParams({
+                        paramsToAdd: {
+                            modal: 'EditGroup',
+                            modalData: JSON.stringify({ groupHandle: 'new' })
+                        }
+                    })} className="button_ mx-5 my-3">
+                        {/* <DropPlusSVG /> */}
+                        <div className="ml-2">Create New Group</div>
+                    </div>
                 </div>
             )}
 

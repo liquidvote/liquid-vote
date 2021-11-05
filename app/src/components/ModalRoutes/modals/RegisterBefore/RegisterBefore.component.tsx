@@ -51,12 +51,17 @@ export const RegisterBefore: FunctionComponent<{}> = ({ }) => {
                     </p>
                 </div>
 
-                <div
-                    className="button_ mx-5 my-5"
-                    onClick={loginWithPopup}
-                >
-                    Sign Up
+                <div className="d-flex align-items-center justify-content-center">
+                    <div
+                        className="button_ mx-5 my-4"
+                        onClick={loginWithPopup}
+                    >
+                        Sign Up
+                    </div>
                 </div>
+
+                <br />
+
             </div>
         </form>
     );
