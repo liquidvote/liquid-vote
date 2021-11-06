@@ -18,15 +18,35 @@ export const Home: FunctionComponent<{}> = ({ }) => {
 
             <h2>Welcome to <b className="white">Liquid Vote</b></h2>
 
-            <p>The place for scaleable and organic opinion tracing.</p>
+            <p>Scaleable, organic and, oh so easy, opinion tracing</p>
+
+            <br />
+
+            <h4>Who is it for?</h4>
+            <p>
+                From choosing the theme for a birthday party, to managing large condominiums. <br />
+                Liquid Vote helps tiny and large organizations quickly gather a group's opinions.
+            </p>
 
             <br />
 
             <h4>What is liquid voting?</h4>
-            <p>
-                A form of voting where you express your views by voting directly,
-                or by delegating to people you trust to represent you.
-            </p>
+            <div className="d-flex align-items-center">
+                <p className="mr-2">
+                    A form of voting where you express your views by voting directly,
+                    or by delegating to people you trust to represent you.
+                </p>
+                <iframe
+                    // width="560"
+                    // height="315"
+                    style={{ maxHeight: '100%', maxWidth: '48%' }}
+                    src="https://www.youtube.com/embed/fg0_Vhldz-8"
+                    title="YouTube video player"
+                    frameborder="0"
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                    allowfullscreen
+                ></iframe>
+            </div>
 
             <br />
 
@@ -40,6 +60,24 @@ export const Home: FunctionComponent<{}> = ({ }) => {
             </p>
 
             <br />
+
+            <h4>Ok ok, but why is this any better than voting on social media?</h4>
+            <p>
+                This is quicker to gather everyone's input on <b>no matter how many questions</b> you need answered.<br/>
+                By delegating votes, people instantly add weight to whatever their chosen representatives voted on already.
+            </p>
+
+            <br />
+
+            <h4>Why shouldn't I use this to directly run my new nation state?</h4>
+            <p>
+                Hey man, you do you, but: <br />
+                1. This is still in early development <br />
+                2. Such tools are great for gathering opinions, perhaps not for changing your nation state's laws in real time as people's minds change. 
+            </p>
+
+            <br />
+            
 
             <div className="bar-container-horizontal">
                 <VoteWrapper
@@ -63,6 +101,15 @@ export const Home: FunctionComponent<{}> = ({ }) => {
                     showColorLegend={true}
                 />
             </div>
+
+            <br />
+
+            <br />
+
+            <h4>Pricing</h4>
+            <p>
+               Free forever for any active group created before we start charging profitable businesses. 
+            </p>
 
             <br />
 
