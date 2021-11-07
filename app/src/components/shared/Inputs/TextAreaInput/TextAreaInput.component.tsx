@@ -46,7 +46,7 @@ export const TextAreaInput: FunctionComponent<Props> = ({
                     name={name}
                     placeholder={placeholder}
                     type={type || 'input'}
-                    // disabled={disabled}
+                    disabled={disabled}
                     // autoFocus={autoFocus || false}
                     onBlur={() => setIsFocused(false)}
                     onFocus={() => setIsFocused(true)}

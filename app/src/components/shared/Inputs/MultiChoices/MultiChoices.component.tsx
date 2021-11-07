@@ -56,10 +56,6 @@ export const MultiChoices: FunctionComponent<Props> = ({
                 {label || name}
             </label>
 
-
-            {/* <div className="letter-count">
-
-            </div> */}
             <div className="inputElementWrapper">
 
                 <input
@@ -67,8 +63,8 @@ export const MultiChoices: FunctionComponent<Props> = ({
                     {...register}
                     name={name}
                     type={'input'}
-                // disabled={disabled}
-                // autoFocus={autoFocus || false}
+                    disabled={disabled}
+                    // autoFocus={autoFocus || false}
                 />
 
                 <div className="d-flex justify-content-between m-2">
@@ -83,6 +79,7 @@ export const MultiChoices: FunctionComponent<Props> = ({
                                 onChange={e => handleChoiceChange({ i, text: e.target.value })}
                                 value={value[i]?.text}
                                 maxLength={20}
+                                disabled={disabled}
                             />
                         ))}
                     </div>

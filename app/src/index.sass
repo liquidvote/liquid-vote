@@ -37,9 +37,9 @@ $theme5-colors: ("bg": #0b414d, "primary": #08f3a5, "secondary": white, "border"
         border-right: 1px solid map-get($theme, "border")
 
     .for
-        fill: adjust-color(map-get($theme, "for"), $alpha: -0.2)
-        background: adjust-color(map-get($theme, "for"), $alpha: -0.2)
-        color: adjust-color(map-get($theme, "for"), $alpha: -0.2)
+        fill: adjust-color(map-get($theme, "for"), $alpha: -0.4)
+        background: adjust-color(map-get($theme, "for"), $alpha: -0.4)
+        color: adjust-color(map-get($theme, "for"), $alpha: -0.4)
 
     .forDirect
         fill: map-get($theme, "for")
@@ -47,9 +47,9 @@ $theme5-colors: ("bg": #0b414d, "primary": #08f3a5, "secondary": white, "border"
         color: map-get($theme, "for")
 
     .against
-        fill: adjust-color(map-get($theme, "against"), $alpha: -0.2)
-        background: adjust-color(map-get($theme, "against"), $alpha: -0.2)
-        color: adjust-color(map-get($theme, "against"), $alpha: -0.2)
+        fill: adjust-color(map-get($theme, "against"), $alpha: -0.4)
+        background: adjust-color(map-get($theme, "against"), $alpha: -0.4)
+        color: adjust-color(map-get($theme, "against"), $alpha: -0.4)
 
     .againstDirect
         fill: map-get($theme, "against")
@@ -72,6 +72,9 @@ $theme5-colors: ("bg": #0b414d, "primary": #08f3a5, "secondary": white, "border"
 
         input, textarea
             color: map-get($theme, "primary")
+
+            &[disabled]
+                color: adjust-color(map-get($theme, "primary"), $alpha: -0.3)
 
     .profile-avatar
         border: 4px solid map-get($theme, "bg")
@@ -206,6 +209,8 @@ form
     font-weight: bold
     color: inherit
     background: inherit
+    outline: none !important
+    // box-shadow: none
     // white-space: nowrap
     height: fit-content
     width: fit-content
@@ -234,6 +239,9 @@ form
         color: rgba(255,255,255, 0.5) !important
         cursor: default
         background: initial !important
+
+    &.no-events
+        pointer-events: none
 
     &.min-w
         min-width: 97px

@@ -92,7 +92,7 @@ export const GroupChannelPicker: FunctionComponent<Props> = ({
                     {...register}
                     name={name}
                     type={'input'}
-                // disabled={disabled}
+                    disabled={disabled}
                 // autoFocus={autoFocus || false}
                 />
 
@@ -107,6 +107,7 @@ export const GroupChannelPicker: FunctionComponent<Props> = ({
                             value={value?.group}
                             onBlur={() => setIsFocused(false)}
                             onFocus={() => setIsFocused(true)}
+                            disabled={disabled}
                         >
                             {yourGroups_data?.UserGroups?.map((g: any) => (
                                 <option

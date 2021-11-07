@@ -18,14 +18,15 @@ import './style.sass';
 interface IFormValues {
     questionType: 'single' | 'multi',
     questionText: string
-    description:  string
+    description: string
     startText: string,
     choices: { text: string }[]
     resultsOn: string,
     groupChannel: {
         group: string,
         channel: string
-    }
+    },
+    visibility: string
 }
 
 const startTextOptions = [
@@ -56,11 +57,28 @@ export const EditQuestion: FunctionComponent<{}> = ({ }) => {
         skip: modalData.questionText === "new"
     });
 
+    console.log({
+        question_data
+    });
+
     const [editQuestion, {
         loading: editQuestion_loading,
         error: editQuestion_error,
         data: editQuestion_data,
     }] = useMutation(EDIT_QUESTION);
+
+    useEffect(() => {
+        if(!!question_data?.Question) {
+            setValue('questionType', question_data?.Question?.questionType);
+            setValue('questionText', question_data?.Question?.questionText);
+            setValue('description', question_data?.Question?.description);
+            setValue('startText', question_data?.Question?.startText);
+            setValue('choices', question_data?.Question?.choices);
+            setValue('resultsOn', question_data?.Question?.resultsOn);
+            setValue('groupChannel', question_data?.Question?.groupChannel);
+            setValue('visibility', question_data?.Question?.visibility);
+        }
+    }, [question_data]);
 
     useEffect(() => {
         if (!!editQuestion_data?.editQuestion) {
@@ -95,7 +113,8 @@ export const EditQuestion: FunctionComponent<{}> = ({ }) => {
             groupChannel: {
                 group: modalData.groupHandle,
                 channel: undefined
-            }
+            },
+            visibility: 'live'
         }
     });
 
@@ -151,6 +170,7 @@ export const EditQuestion: FunctionComponent<{}> = ({ }) => {
                             value={watch(name)}
                             error={errors[name]}
                             setValue={setValue}
+                            disabled={modalData.questionText !== "new"}
                         />
                     ))('questionType')}
                 </div>
@@ -166,7 +186,8 @@ export const EditQuestion: FunctionComponent<{}> = ({ }) => {
                                 {...register("startText", {
                                     required: "Required"
                                 })}
-                                onClick={() => setNextStartText()}
+                                onClick={() => modalData.questionText !== "new" && setNextStartText()}
+                                disabled={modalData.questionText !== "new"}
                             />
                         </div>
                     </>
@@ -184,6 +205,7 @@ export const EditQuestion: FunctionComponent<{}> = ({ }) => {
                                 })}
                                 value={watch(name)}
                                 error={errors[name]}
+                                disabled={modalData.questionText !== "new"}
                             />
                         ))('questionText')}
                     </div>
@@ -218,11 +240,12 @@ export const EditQuestion: FunctionComponent<{}> = ({ }) => {
                             value={watch(name)}
                             error={errors[name]}
                             setValue={setValue}
+                            disabled={modalData.questionText !== "new"}
                         />
                     ))('choices')
                 ) : null}
 
-                <div className="my-3 mt-4">
+                <div className="my-4">
                     {((name: keyof IFormValues) => (
                         <GroupChannelPicker
                             name={name}
@@ -236,6 +259,7 @@ export const EditQuestion: FunctionComponent<{}> = ({ }) => {
                             value={watch(name)}
                             error={errors[name]}
                             setValue={setValue}
+                            disabled={modalData.questionText !== "new"}
                         />
                     ))('groupChannel')}
                 </div>
@@ -270,6 +294,30 @@ export const EditQuestion: FunctionComponent<{}> = ({ }) => {
                         />
                     ))('resultsOn')}
                 </div> */}
+
+                <div className="my-4">
+                    {((name: keyof IFormValues) => (
+                        <DropDownInput
+                            name={name}
+                            register={register(name, {
+                                required: true
+                            })}
+                            value={watch(name)}
+                            error={errors[name]}
+                            options={[
+                                {
+                                    value: 'hidden',
+                                    label: 'Hidden',
+                                    info: 'Only you can see this'
+                                }, {
+                                    value: 'live',
+                                    label: 'Live'
+                                }
+                            ]}
+                        />
+                    ))('visibility')}
+                </div>
+
 
                 <br />
                 {/* <br />

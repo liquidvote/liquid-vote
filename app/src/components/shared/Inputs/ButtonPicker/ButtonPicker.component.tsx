@@ -37,28 +37,30 @@ export const ButtonPicker: FunctionComponent<Props> = ({
 
 
             <div className="d-flex justify-content-around m-3 mx-5 px-5">
-                <div
-                    className={`button_ ${value === 'single' ? 'selected inverted' : ''}`}
-                    onClick={() => setValue(
+                <button
+                    className={`button_ ${value === 'single' ? 'selected inverted' : ''} ${disabled && 'no-events'}`}
+                    onClick={() => !disabled && setValue(
                         name,
                         'single',
                         { shouldValidate: true }
                     )}
+                    // disabled={disabled}
                 >
                     <DropSVG />{' '}
                     For or Against
-                </div>
-                <div
-                    className={`button_ ml-2 ${value === 'multi' ? 'selected inverted' : ''}`}
-                    onClick={() => setValue(
+                </button>
+                <button
+                    className={`button_ ml-2 ${value === 'multi' ? 'selected inverted' : ''} ${disabled && 'no-events'}`}
+                    onClick={() => !disabled && setValue(
                         name,
                         'multi',
                         { shouldValidate: true }
                     )}
+                    // disabled={disabled}
                 >
                     <MultiDropSVG />{' '}
                     Multiple Choices
-                </div>
+                </button>
             </div>
 
             {/* <div className="letter-count">
@@ -70,7 +72,7 @@ export const ButtonPicker: FunctionComponent<Props> = ({
                     {...register}
                     name={name}
                     type={'input'}
-                    // disabled={disabled}
+                    disabled={disabled}
                     // autoFocus={autoFocus || false}
                     onBlur={() => setIsFocused(false)}
                     onFocus={() => setIsFocused(true)}
