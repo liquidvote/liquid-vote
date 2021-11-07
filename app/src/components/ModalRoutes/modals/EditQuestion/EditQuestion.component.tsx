@@ -68,7 +68,7 @@ export const EditQuestion: FunctionComponent<{}> = ({ }) => {
     }] = useMutation(EDIT_QUESTION);
 
     useEffect(() => {
-        if(!!question_data?.Question) {
+        if (!!question_data?.Question) {
             setValue('questionType', question_data?.Question?.questionType);
             setValue('questionText', question_data?.Question?.questionText);
             setValue('description', question_data?.Question?.description);
@@ -183,10 +183,11 @@ export const EditQuestion: FunctionComponent<{}> = ({ }) => {
                             </h2>
 
                             <input
+                                className={`${modalData.questionText === "new" && 'pointer'}`}
                                 {...register("startText", {
                                     required: "Required"
                                 })}
-                                onClick={() => modalData.questionText !== "new" && setNextStartText()}
+                                onClick={() => modalData.questionText === "new" && setNextStartText()}
                                 disabled={modalData.questionText !== "new"}
                             />
                         </div>
@@ -295,7 +296,7 @@ export const EditQuestion: FunctionComponent<{}> = ({ }) => {
                     ))('resultsOn')}
                 </div> */}
 
-                <div className="my-4">
+                {/* <div className="my-4">
                     {((name: keyof IFormValues) => (
                         <DropDownInput
                             name={name}
@@ -316,7 +317,7 @@ export const EditQuestion: FunctionComponent<{}> = ({ }) => {
                             ]}
                         />
                     ))('visibility')}
-                </div>
+                </div> */}
 
 
                 <br />
