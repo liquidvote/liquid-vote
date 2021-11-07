@@ -163,7 +163,7 @@ export default function Question() {
 
                 <>
 
-                    <div className="mt-4 d-flex align-items-start flex-nowrap justify-content-between">
+                    <div className="mt-4 d-flex align-items-center flex-nowrap justify-content-between">
                         <div className="d-flex flex-nowrap">
                             <div data-tip="Selected groups"><GroupSmallSvg /></div>
                             <div className="d-flex flex-wrap justify-content-start">
