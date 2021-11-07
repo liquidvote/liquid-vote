@@ -112,6 +112,8 @@ const AuthWrapper: FunctionComponent<{}> = ({ }) => {
             domain="dev-pt9y9sro.eu.auth0.com"
             clientId="IcSZA266f1Ec3Ky6jImuLKvuqY0xlj7v"
             redirectUri={window.location.origin}
+            useRefreshTokens={true}
+            cacheLocation="localstorage"
         >
             <AppolloAppWrapper />
         </Auth0Provider>
