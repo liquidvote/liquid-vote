@@ -205,7 +205,7 @@ export default function Question() {
                             {!!question_data?.Question?.createdBy && (
                                 <Link to={`/profile/${question_data?.Question?.createdBy.handle}`}>
                                     <div
-                                        className="vote-avatar tiny none mr-1"
+                                        className="vote-avatar none mr-1"
                                         style={{
                                             background: question_data?.Question?.createdBy.avatar && `url(${question_data?.Question?.createdBy.avatar}) 50% 50% / cover no-repeat`
                                         }}
