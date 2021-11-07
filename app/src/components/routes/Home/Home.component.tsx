@@ -3,12 +3,15 @@ import { Link, useParams } from "react-router-dom";
 
 import VoteWrapper from "@shared/VoteWrapper";
 import useSearchParams from "@state/Global/useSearchParams.effect";
+import useAuthUser from '@state/AuthUser/authUser.effect';
 
 import './style.sass';
 
 export const Home: FunctionComponent<{}> = ({ }) => {
 
     const { allSearchParams, updateParams } = useSearchParams();
+
+    const { liquidUser } = useAuthUser();
 
     return (
         <>
@@ -117,12 +120,21 @@ export const Home: FunctionComponent<{}> = ({ }) => {
             <div className="d-flex">
                 <div
                     className="button_ mr-3"
-                    onClick={() => updateParams({
+                    onClick={() => !!liquidUser ? updateParams({
                         paramsToAdd: {
                             modal: 'EditGroup',
                             modalData: JSON.stringify({ groupHandle: 'new' })
                         }
-                    })}
+                    }) : (
+                        updateParams({
+                            paramsToAdd: {
+                                modal: "RegisterBefore",
+                                modalData: JSON.stringify({
+                                    toWhat: 'createGroup'
+                                })
+                            }
+                        })
+                    )}
                 >Create a Group</div>
                 <Link
                     className="button_ mr-3"

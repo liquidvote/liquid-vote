@@ -15,6 +15,7 @@ import { USER, USER_GROUPS } from "@state/User/typeDefs";
 import useAuthUser from '@state/AuthUser/authUser.effect';
 import useUserGroups from "@state/User/userGroups.effect";
 import DropSVG from "@shared/Icons/Drop.svg";
+import MetaTags from "@components/shared/MetaTags";
 
 import ProfileVotes from "./ProfileVotes";
 import './style.sass';
@@ -63,7 +64,14 @@ export const Profile: FunctionComponent<{}> = ({ }) => {
         </div>
     ) : user_error ? (<>Error</>) : (
         <>
-            <Header title={profile.name} />
+            <MetaTags
+                title={profile?.name}
+                description={profile?.bio}
+                image={profile?.avatar}
+                // url={``}
+            />
+
+            <Header title={profile?.name} />
 
             <div className="profile-top">
                 <div
