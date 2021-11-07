@@ -17,7 +17,7 @@ type Props = {
     error?: FieldError | undefined,
     disabled?: boolean,
     autoFocus?: boolean,
-    options: { value: string, label: string }[]
+    options: { value: string, label: string, info?: string }[]
 }
 
 export const DropDownInput: FunctionComponent<Props> = ({
@@ -44,7 +44,7 @@ export const DropDownInput: FunctionComponent<Props> = ({
             {/* <div className="letter-count">
 
             </div> */}
-            <div className="inputElementWrapper">
+            <div className="inputElementWrapper position-relative">
 
                 <select
                     {...register}
@@ -62,6 +62,12 @@ export const DropDownInput: FunctionComponent<Props> = ({
                     ))}
                     <option value='' disabled>--</option>
                 </select>
+
+                <div className="choice-info">
+                    <small>
+                        {options?.find(o => o.value ===value)?.info}
+                    </small>
+                </div>
 
             </div>
             {error && <div className="error">{(error as any).message}</div>}

@@ -6,7 +6,7 @@ import DropAnimation from "@components/shared/DropAnimation";
 import Header from "@shared/Header";
 import CalendarSVG from "@shared/Icons/Calendar.svg";
 import GroupSmallSvg from "@shared/Icons/Group-small.svg";
-import LinkSVG from "@shared/Icons/Link.svg";
+import LinkSVG from "@shared/Icons/Link-small.svg";
 import LocationSVG from "@shared/Icons/Location.svg";
 import ProfileSmallSVG from "@shared/Icons/Profile-small.svg";
 import useSearchParams from "@state/Global/useSearchParams.effect";

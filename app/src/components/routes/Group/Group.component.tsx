@@ -8,6 +8,7 @@ import VoteSortPicker from '@components/shared/VoteSortPicker';
 import Header from "@shared/Header";
 import CalendarSVG from "@shared/Icons/Calendar.svg";
 import DropPlusSVG from "@shared/Icons/Drop+.svg";
+import LinkSmallSVG from "@shared/Icons/Link-small.svg";
 import LinkSVG from "@shared/Icons/Link.svg";
 import LockSVG from "@shared/Icons/Lock.svg";
 import WorldSVG from "@shared/Icons/World.svg";
@@ -110,9 +111,9 @@ export const Group: FunctionComponent<{}> = ({ }) => {
                         <div className="ml-2 mt-n1">
                             {group?.privacy === "private" ? (
                                 <LockSVG />
-                            ) : (
+                            ) : group?.privacy === "public" ? (
                                 <WorldSVG />
-                            )}
+                            ) : <LinkSVG />}
                         </div>
                     </h4>
                     <p className="profile-handle">@{group?.handle}</p>
@@ -210,7 +211,7 @@ export const Group: FunctionComponent<{}> = ({ }) => {
                 </div> */}
                 {group?.externalLink && (
                     <div>
-                        <div className="mr-1"><LinkSVG /></div>
+                        <div className="mr-1"><LinkSmallSVG /></div>
                         <a
                             href={`//${group?.externalLink}`}
                             target="_blank"

@@ -5,7 +5,7 @@ import useAuthUser from '@state/AuthUser/authUser.effect';
 
 import LockSVG from "@shared/Icons/Lock.svg";
 import WorldSVG from "@shared/Icons/World.svg";
-import WorldlockSVG from "@shared/Icons/Worldlock.svg";
+import LinkSVG from "@shared/Icons/Link.svg";
 import useSearchParams from "@state/Global/useSearchParams.effect";
 import { EDIT_GROUP_MEMBER_CHANNEL_RELATION } from "@state/User/typeDefs";
 
@@ -49,11 +49,11 @@ export const GroupInList: FunctionComponent<{
                             <Link to={`/group/${group.handle}`}><b>{group.name}</b></Link>
                             {/* <small className="mt-n1">@DanPriceSeattle</small> */}
                             <div className="ml-2">
-                                {group.privacy === "private" ? (
+                                {group?.privacy === "private" ? (
                                     <LockSVG />
-                                ) : (
+                                ) : group?.privacy === "public" ? (
                                     <WorldSVG />
-                                )}
+                                ) : <LinkSVG />}
                             </div>
                         </div>
                         <div className="d-flex mb-1 ml-n1">

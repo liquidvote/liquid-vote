@@ -242,13 +242,13 @@ export const UserResolvers = {
                 .findOne({ 'LiquidUser.handle': handle });
 
             const UserGroupMemberRelations = !!User && await mongoDB.collection("GroupMembers")
-                .find({ 'userId': new ObjectId(User?._id) })
+                .find({ 'userId': new ObjectId(User?._id), 'isMember': true })
                 .toArray();
 
-            console.log({
-                User,
-                UserGroupMemberRelations
-            });
+            // console.log({
+            //     User,
+            //     UserGroupMemberRelations
+            // });
 
             const YourGroupMemberRelations = (!!AuthUser && !!UserGroupMemberRelations) &&
                 await mongoDB.collection("GroupMembers")
@@ -258,7 +258,8 @@ export const UserResolvers = {
                             "$in": UserGroupMemberRelations.map(
                                 r => new ObjectId(r.groupId)
                             )
-                        }
+                        },
+                        'isMember': true
                     })
                     .toArray();
 
@@ -273,8 +274,9 @@ export const UserResolvers = {
                             "$in": UserGroupMemberRelations.map(
                                 r => new ObjectId(r.groupId)
                             )
-                        }
-                    }
+                        },
+                        'isMember': true
+                    },
                 })
                 .toArray();
 
@@ -282,6 +284,9 @@ export const UserResolvers = {
                 ...!!UserGroupMemberRelations && {
                     "_id": {
                         [`${notUsers ? '$nin' : '$in'}`]: UserGroupMemberRelations.map(r => new ObjectId(r.groupId))
+                    },
+                    ...(notUsers || !(!!handle)) && {
+                        privacy: 'public'
                     }
                 }
             })

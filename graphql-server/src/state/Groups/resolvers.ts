@@ -100,8 +100,12 @@ export const GroupResolvers = {
     Mutation: {
         editGroup: async (_source, { Group, handle }, { mongoDB, AuthUser }) => {
 
+            if(!AuthUser) return;
+
             const Group_ = await mongoDB.collection("Groups")
                 .findOne({ 'handle': handle });
+
+            if(!!Group_ && !Group_.admins.find(u => u.handle === AuthUser.LiquidUser.handle)) return;
 
             const savedGroup = (AuthUser && handle === 'new') ?
                 (await mongoDB.collection("Groups").insertOne({
@@ -141,26 +145,37 @@ export const GroupResolvers = {
                     { returnDocument: 'after' }
                 ))?.value : null;
 
-            if (AuthUser && handle === 'new') {
+            const adminsIds = (await Promise.all(
+                await mongoDB.collection("Users").find({
+                    "LiquidUser.handle": {
+                        "$in": savedGroup?.admins?.map(u => u.handle)
+                    }
+                }).toArray()
+            ))?.map((u: any) => u._id);
 
-                // const GroupMemberRelation = await mongoDB.collection("GroupMembers")
-                //     .find({
-                //         'userId': new ObjectId(AuthUser._id),
-                //         'groupId': new ObjectId(Group_._id)
-                //     })
-                //     .toArray();
-
-                const GroupsMemberRelation = (await mongoDB
-                    .collection("GroupMembers")
-                    .insertOne({
-                        groupId: savedGroup._id,
-                        userId: AuthUser._id,
-                        joinedOn: Date.now(),
-                        lastEditOn: Date.now(),
-                        isMember: true,
-                        channels: ['general']
-                    }))?.ops[0];
-            }
+            const MakeAdminsMembers = await Promise.all(adminsIds
+                .map(async (admin) => {
+                    const adminMemberRelation = (await mongoDB.collection("GroupMembers")
+                        .findOneAndUpdate({
+                            groupId: new ObjectId(savedGroup._id),
+                            userId: new ObjectId(admin),
+                        }, {
+                            $set: {},
+                            $setOnInsert: {
+                                groupId: new ObjectId(savedGroup._id),
+                                userId: new ObjectId(admin),
+                                joinedOn: Date.now(),
+                                lastEditOn: Date.now(),
+                                isMember: true,
+                            }
+                        },
+                            {
+                                upsert: true,
+                                returnDocument: 'after'
+                            }
+                        ))?.value;
+                })
+            );
 
             return {
                 ...savedGroup,

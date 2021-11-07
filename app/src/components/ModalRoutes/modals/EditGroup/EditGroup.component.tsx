@@ -55,7 +55,8 @@ export const EditGroup: FunctionComponent<{}> = ({ }) => {
                 Group: {
                     ...values,
                     // avatar: !!values.avatar && typeof values.avatar === 'string' ? values.avatar : await uploadFile({ file: values.avatar }),
-                    cover: !!values.cover && typeof values.cover === 'string' ? values.cover : await uploadFile({ file: values.cover })
+                    cover: !!values.cover && typeof values.cover === 'string' ? values.cover : await uploadFile({ file: values.cover }),
+                    admins: values.admins.filter(u => !u.remove)
 
                 },
                 handle: modalData.groupHandle
@@ -66,18 +67,18 @@ export const EditGroup: FunctionComponent<{}> = ({ }) => {
     useEffect(() => {
         setValue('handle', group?.handle);
         setValue('name', group?.name);
-        setValue('bio', group?.bio);
+        setValue('bio', group?.bio || '🌱');
         setValue('externalLink', group?.externalLink);
         // setValue('avatar', group?.avatar);
-        setValue('cover', group?.cover);
+        setValue('cover', group?.cover || 'http://images.liquid-vote.com/system/placeholderCover1.jpeg');
         setValue('channels', group?.channels || ['general']);
         setValue('admins', group?.admins || [{
             handle: liquidUser?.handle,
             name: liquidUser?.name,
             avatar: liquidUser?.avatar,
         }]);
-        setValue('privacy', group?.privacy);
-    }, [group]);
+        setValue('privacy', group?.privacy || 'public');
+    }, [group, liquidUser]);
 
     useEffect(() => {
         if (!!editedGroup) {
@@ -190,20 +191,7 @@ export const EditGroup: FunctionComponent<{}> = ({ }) => {
                         ))('admins')}
                     </div>
 
-                    {/* <div className="my-3">
-                    {((name: keyof IFormValues) => (
-                        <TextInput
-                            name={name}
-                            register={register(name, {
-                                required: true
-                            })}
-                            value={watch(name)}
-                            error={errors[name]}
-                        />
-                    ))('cover')}
-                </div> */}
-
-                    {/* <div className="my-3">
+                    <div className="my-3">
                         {((name: keyof IFormValues) => (
                             <DropDownInput
                                 name={name}
@@ -215,21 +203,21 @@ export const EditGroup: FunctionComponent<{}> = ({ }) => {
                                 options={[
                                     {
                                         value: 'private',
-                                        label: 'Private'
+                                        label: 'Private',
+                                        info: 'Only found by invite, hidden to non members'
+                                    }, {
+                                        value: 'linkonly',
+                                        label: 'Link Only',
+                                        info: 'Visible with direct link, but not Searchable'
                                     }, {
                                         value: 'public',
-                                        label: 'Public'
+                                        label: 'Public',
+                                        info: 'Searchable on Liquid Vote and Google'
                                     }
                                 ]}
                             />
                         ))('privacy')}
-                    </div> */}
-
-                    {/* <select {...register("privacy")}>
-                    <option value="female">female</option>
-                    <option value="male">male</option>
-                    <option value="other">other</option>
-                </select> */}
+                    </div>
 
                     <br />
                     <br />

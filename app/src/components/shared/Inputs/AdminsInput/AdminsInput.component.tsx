@@ -7,6 +7,7 @@ import { FieldError } from 'react-hook-form';
 import { useQuery } from "@apollo/client";
 
 import { SEARCH_USERS } from "@state/User/typeDefs";
+import XSVG from "@shared/Icons/X.svg";
 
 import './style.sass';
 
@@ -52,6 +53,22 @@ export const AdminsInput: FunctionComponent<Props> = ({
         );
     }
 
+    const removeAdmin = (u) => {
+        setValue(
+            name,
+            [
+                ...value
+                    .filter(u_ => !(u_.preSave && u.handle === u_.handle))
+                    .map(u_ => ({
+                        ...u_,
+                        ...u.handle === u_.handle && {
+                            remove: true
+                        }
+                    })),
+            ]
+        );
+    }
+
     return (
         <div className={
             `InputWrapper ${value && 'hasValue'} ${error && 'hasError'} ${isFocused && 'isFocused'}`
@@ -65,19 +82,33 @@ export const AdminsInput: FunctionComponent<Props> = ({
             <div className="inputElementWrapper">
                 <ul className="adminsInputList">
                     {value?.map((v: any, i: Number) => (
-                        <li key={v.name + i} className="d-flex mb-2 position-relative">
-                            <div>
-                                <img className="vote-avatar" src={v.avatar} />
-                            </div>
-                            <div className="ml-2">
-                                <p className="m-0">{v.name}</p>
-                                <small>@{v.handle}</small>
-                            </div>
-                            {v.preSave && (
-                                <div className="ml-auto">
-                                    <small className="badge">admin on save</small>
+                        <li key={v.name + i} className="d-flex mb-2 justify-content-between">
+                            <div className="d-flex">
+                                <div>
+                                    <img className="vote-avatar" src={v.avatar} />
                                 </div>
-                            )}
+                                <div className="ml-2">
+                                    <p className="m-0">{v.name}</p>
+                                    <small>@{v.handle}</small>
+                                </div>
+                            </div>
+                            <div className="d-flex">
+                                {v.preSave && (
+                                    <div className="ml-2">
+                                        <small className="badge">admin on save</small>
+                                    </div>
+                                )}
+                                {v.remove && (
+                                    <div className="ml-2">
+                                        <small className="badge">removed on save</small>
+                                    </div>
+                                )}
+                                {(!v.remove && i !== 0) && (
+                                    <div className="ml-2 pointer" onClick={() => removeAdmin(v)}>
+                                        <XSVG />
+                                    </div>
+                                )}
+                            </div>
                         </li>
                     ))}
                     <li>
@@ -106,7 +137,7 @@ export const AdminsInput: FunctionComponent<Props> = ({
                                 />
                             </div>
                             {!!newAdminSearch && !!searchUsers_data && (
-                                <ul className="admin-search-results position-absolute w-100 bg mt-1">
+                                <ul className="admin-search-results position-absolute w-100 bg mt-1 on-top">
                                     {searchUsers_data?.SearchUsers?.
                                         filter(u => !value.find(a => a.handle === u.handle)).
                                         map(
