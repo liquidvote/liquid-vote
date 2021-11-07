@@ -103,23 +103,24 @@ export const EditGroup: FunctionComponent<{}> = ({ }) => {
             {!isSubmitting ? (
                 <div className="Modal-Content">
 
-                    {modalData.groupHandle === "new" && (
-                        <div className="my-3">
-                            {((name: keyof IFormValues) => (
-                                <TextInput
-                                    name={name}
-                                    register={register(name, {
-                                        required: true,
-                                        validate: {
-                                            tooBig: v => v.length < 15 || 'should be smaller than 15 characters',
-                                        }
-                                    })}
-                                    value={watch(name)}
-                                    error={errors[name]}
-                                />
-                            ))('handle')}
-                        </div>
-                    )}
+                    {/* {modalData.groupHandle === "new" && ( */}
+                    <div className="my-3">
+                        {((name: keyof IFormValues) => (
+                            <TextInput
+                                name={name}
+                                register={register(name, {
+                                    required: true,
+                                    validate: {
+                                        tooBig: v => v.length < 15 || 'should be smaller than 15 characters',
+                                    }
+                                })}
+                                value={watch(name)}
+                                error={errors[name]}
+                                disabled={modalData.groupHandle !== "new"}
+                            />
+                        ))('handle')}
+                    </div>
+                    {/* )} */}
 
                     <div className="my-3">
                         {((name: keyof IFormValues) => (

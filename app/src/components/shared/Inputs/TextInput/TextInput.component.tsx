@@ -49,7 +49,7 @@ export const TextInput: FunctionComponent<Props> = ({
                     {...register}
                     name={name}
                     type={type || 'input'}
-                    // disabled={disabled}
+                    disabled={disabled}
                     // autoFocus={autoFocus || false}
                     onBlur={() => setIsFocused(false)}
                     onFocus={() => setIsFocused(true)}
