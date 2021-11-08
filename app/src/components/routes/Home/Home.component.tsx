@@ -21,7 +21,7 @@ export const Home: FunctionComponent<{}> = ({ }) => {
 
             <h2>Welcome to <b className="white">Liquid Vote</b></h2>
 
-            <p>Scaleable, organic and, oh so easy, opinion tracing</p>
+            <p>Where opinions are found</p>
 
             <br />
 

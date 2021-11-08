@@ -3,6 +3,13 @@
   <head>
     <meta charset="utf-8" />
     <title>Liquid Vote</title>
+    <meta name="description" content="Where opinions are found" />
+    <meta property="og:title" content="Liquid Vote" />
+    <meta property="og:description" content="Where opinions are found" />
+    <meta property="og:image" content="https://images.liquid-vote.com/system/logo.png" />
+    <meta property="og:url" content="https://liquid-vote.com" />
+    <meta name="twitter:card" content="summary_large_image" />
+
     <meta
       name="viewport"
       content="width=device-width, height=device-height, initial-scale=1"
@@ -15,5 +22,22 @@
   </head>
   <body class="theme3">
     <div id="app"></div>
+
+    <% if (env == 'production') { %>
+    <!-- Global site tag (gtag.js) - Google Analytics -->
+    <script
+      async
+      src="https://www.googletagmanager.com/gtag/js?id=G-1RF9CER86Z"
+    ></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag() {
+        dataLayer.push(arguments);
+      }
+      gtag("js", new Date());
+
+      gtag("config", "G-1RF9CER86Z");
+    </script>
+    <% } %>
   </body>
 </html>

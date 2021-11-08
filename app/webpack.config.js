@@ -6,8 +6,8 @@ const { resolveTsAliases } = require("resolve-ts-aliases");
 const isProd = process.env.NODE_ENV === "production";
 
 console.log({
-    e: process.env.NODE_ENV,
-    __dirname
+  e: process.env.NODE_ENV,
+  __dirname,
 });
 
 const config = {
@@ -15,12 +15,12 @@ const config = {
   entry: {
     index: "./src/index.tsx",
   },
-  devtool: isProd ? 'source-map' : 'inline-source-map',
+  devtool: isProd ? "source-map" : "inline-source-map",
   output: {
     path: `${__dirname}/dist`,
     publicPath: "/",
     filename: "[name].[contenthash].js",
-    chunkFilename: '[id].chunk.[chunkhash].js',
+    chunkFilename: "[id].chunk.[chunkhash].js",
   },
   resolve: {
     extensions: [".js", ".jsx", ".ts", ".tsx"],
@@ -50,6 +50,9 @@ const config = {
   plugins: [
     new HtmlWebpackPlugin({
       template: "src/index.html",
+      templateParameters: {
+        env: process.env.NODE_ENV,
+      },
       favicon: "src/assets/favicon.ico",
     }),
     new webpack.DefinePlugin({
@@ -65,14 +68,14 @@ if (isProd) {
   };
 } else {
   config.devServer = {
-    https: process.env.NODE_ENV === 'development' ? false : true,
+    https: process.env.NODE_ENV === "development" ? false : true,
     port: 8080,
     open: true,
     hot: true,
     compress: true,
     historyApiFallback: {
       disableDotRule: true,
-    }
+    },
   };
 }
 
