@@ -236,7 +236,7 @@ export const UserResolvers = {
 
         UserGroups: async (_source, { handle, representative, notUsers }, { mongoDB, AuthUser }) => {
 
-            console.log({ handle, representative, notUsers });
+            console.log({ handle, representative, notUsers, c: !(!!handle) });
 
             const User = !!handle && await mongoDB.collection("Users")
                 .findOne({ 'LiquidUser.handle': handle });
@@ -285,9 +285,9 @@ export const UserResolvers = {
                     "_id": {
                         [`${notUsers ? '$nin' : '$in'}`]: UserGroupMemberRelations.map(r => new ObjectId(r.groupId))
                     },
-                    ...(notUsers || !(!!handle)) && {
-                        privacy: 'public'
-                    }
+                },
+                ...(notUsers || !(!!handle)) && {
+                    privacy: 'public'
                 }
             })
                 .toArray())
