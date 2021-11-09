@@ -155,6 +155,7 @@ export const EditProfile: FunctionComponent<{}> = ({ }) => {
                                 loading={UserForHandle_loading}
                                 value={watch(name)}
                                 error={errors[name]}
+                                precedingText="@"
                             />
                         ))('handle')}
                     </div>
@@ -194,6 +195,7 @@ export const EditProfile: FunctionComponent<{}> = ({ }) => {
                                 })}
                                 value={watch(name)}
                                 error={errors[name]}
+                                precedingText="www."
                             />
                         ))('externalLink')}
                     </div>
