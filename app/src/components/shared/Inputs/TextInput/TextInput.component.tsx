@@ -17,11 +17,12 @@ type Props = {
     error?: FieldError | undefined,
     disabled?: boolean,
     autoFocus?: boolean,
-    loading?: boolean
+    loading?: boolean,
+    precedingText?: string
 }
 
 export const TextInput: FunctionComponent<Props> = ({
-    register, labelName, name, value, type = 'input', error, disabled, autoFocus, loading
+    register, labelName, name, value, type = 'input', error, disabled, autoFocus, loading, precedingText
 }) => {
 
     const [isFocused, setIsFocused] = useState(false);
@@ -53,8 +54,12 @@ export const TextInput: FunctionComponent<Props> = ({
                     // autoFocus={autoFocus || false}
                     onBlur={() => setIsFocused(false)}
                     onFocus={() => setIsFocused(true)}
+                    style={{
+                        ...!!precedingText && { paddingLeft: `${precedingText.length * 8 + 20}px` }
+                    }}
                 />
             </div>
+            {!!precedingText && <span className="preceding-text">{precedingText}</span>}
             {/* <pre>{JSON.stringify(error, null, 2)}</pre> */}
             {error && <div className="error">{(error as any).message}</div>}
         </div>

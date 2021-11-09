@@ -103,7 +103,6 @@ export const EditGroup: FunctionComponent<{}> = ({ }) => {
             {!isSubmitting ? (
                 <div className="Modal-Content">
 
-                    {/* {modalData.groupHandle === "new" && ( */}
                     <div className="my-3">
                         {((name: keyof IFormValues) => (
                             <TextInput
@@ -111,16 +110,14 @@ export const EditGroup: FunctionComponent<{}> = ({ }) => {
                                 register={register(name, {
                                     required: true,
                                     validate: {
-                                        tooBig: v => v.length < 15 || 'should be smaller than 15 characters',
+                                        tooBig: v => v.length < 35 || 'should be smaller than 35 characters',
                                     }
                                 })}
                                 value={watch(name)}
                                 error={errors[name]}
-                                disabled={modalData.groupHandle !== "new"}
                             />
-                        ))('handle')}
+                        ))('name')}
                     </div>
-                    {/* )} */}
 
                     <div className="my-3">
                         {((name: keyof IFormValues) => (
@@ -132,10 +129,12 @@ export const EditGroup: FunctionComponent<{}> = ({ }) => {
                                         tooBig: v => v.length < 15 || 'should be smaller than 15 characters',
                                     }
                                 })}
+                                precedingText="@"
                                 value={watch(name)}
                                 error={errors[name]}
+                                disabled={modalData.groupHandle !== "new"}
                             />
-                        ))('name')}
+                        ))('handle')}
                     </div>
 
                     <div className="my-3">
@@ -160,6 +159,7 @@ export const EditGroup: FunctionComponent<{}> = ({ }) => {
                                 })}
                                 value={watch(name)}
                                 error={errors[name]}
+                                precedingText="www."
                             />
                         ))('externalLink')}
                     </div>
