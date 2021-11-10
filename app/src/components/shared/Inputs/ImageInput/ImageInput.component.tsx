@@ -7,6 +7,7 @@ import { FieldError } from 'react-hook-form';
 import { useDropzone } from 'react-dropzone';
 
 import './style.sass';
+import { Link } from 'react-router-dom';
 
 type Props = {
     // ref: any,
@@ -71,7 +72,21 @@ export const ImageInput: FunctionComponent<Props> = ({
 
                     <div {...getRootProps({ className: 'dropzone d-flex justify-content-between input-element' })}>
                         <input {...getInputProps()} />
-                        <small className="baseColors">Drop your {name} here, or select it</small>
+                        <div className="d-flex flex-column">
+                            <small className="baseColors">Drop or select your {name}</small>
+                            {name === 'cover' && (
+                                <small>
+                                    Amazing covers:{' '}
+                                    <a
+                                        href="https://unsplash.com/"
+                                        target="_blank"
+                                        onClick={e => e.stopPropagation()}
+                                    >
+                                        Unsplash.com
+                                    </a>
+                                </small>
+                            )}
+                        </div>
                         {(!!image || (!!value && typeof value === 'string')) && (
                             <img src={image || value} />
                         )}

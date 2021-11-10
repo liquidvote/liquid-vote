@@ -32,7 +32,7 @@ export const TextInput: FunctionComponent<Props> = ({
             `InputWrapper ${value && 'hasValue'} ${error && 'hasError'} ${isFocused && 'isFocused'}`
         }>
             <label>
-                {name}
+                {labelName || name}
             </label>
 
             {(loading || error?.type === 'loading') && (

@@ -122,7 +122,7 @@ export const EditProfile: FunctionComponent<{}> = ({ }) => {
                                 register={register(name, {
                                     required: true,
                                     validate: {
-                                        tooBig: v => v.length < 25 || 'should be smaller than 25 characters',
+                                        tooBig: v => v.length < 35 || 'should be smaller than 35 characters',
                                     }
                                 })}
                                 value={watch(name)}
@@ -138,7 +138,7 @@ export const EditProfile: FunctionComponent<{}> = ({ }) => {
                                 register={register(name, {
                                     required: true,
                                     validate: {
-                                        tooBig: v => v.length < 15 || 'should be smaller than 15 characters',
+                                        tooBig: v => v.length < 20 || 'should be smaller than 20 characters',
                                         existingHandle: async v => {
                                             if (v?.length === 0) return 'can\'t be blank';
                                             if (user_data?.User?.handle === v) return true;
@@ -190,6 +190,7 @@ export const EditProfile: FunctionComponent<{}> = ({ }) => {
                         {((name: keyof IFormValues) => (
                             <TextInput
                                 name={name}
+                                labelName="External Link"
                                 register={register(name, {
                                     // required: true
                                 })}
