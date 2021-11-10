@@ -71,7 +71,7 @@ export const ImageInput: FunctionComponent<Props> = ({
 
                     <div {...getRootProps({ className: 'dropzone d-flex justify-content-between input-element' })}>
                         <input {...getInputProps()} />
-                        <small className="baseColors">Drag 'n' drop your {name} here, or click to select it</small>
+                        <small className="baseColors">Drop your {name} here, or select it</small>
                         {(!!image || (!!value && typeof value === 'string')) && (
                             <img src={image || value} />
                         )}

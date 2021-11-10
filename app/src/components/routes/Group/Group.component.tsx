@@ -105,10 +105,10 @@ export const Group: FunctionComponent<{}> = ({ }) => {
                 />
             </div>
             <div className="d-flex flex-wrap mt-2 mb-n1 justify-content-between flex-nowrap">
-                <div className="d-flex flex-column mb-1 mr-1 flex-nowrap flex-shrink-0">
-                    <h4 className="d-flex align-items-center m-0">
+                <div className="d-flex flex-column mb-1 mr-1 flex-nowrap">
+                    <h4 className="d-flex align-items-start m-0">
                         {group?.name}
-                        <div className="ml-2 mt-n1">
+                        <div className="ml-2">
                             {group?.privacy === "private" ? (
                                 <LockSVG />
                             ) : group?.privacy === "public" ? (
@@ -118,7 +118,7 @@ export const Group: FunctionComponent<{}> = ({ }) => {
                     </h4>
                     <p className="profile-handle">@{group?.handle}</p>
                 </div>
-                <div className="d-flex mb-n1 ml-n1 flex-wrap justify-content-end">
+                <div className="d-flex mb-n1 ml-n1 flex-wrap align-content-start justify-content-end">
                     {isMember && (
                         <>
                             <div

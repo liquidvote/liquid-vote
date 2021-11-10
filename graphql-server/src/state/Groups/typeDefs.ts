@@ -19,9 +19,9 @@ export const GroupTypeDefs = gql`
         representedBy: Int
         directVotesMade: Int
         
-        directVotesInAgreement: Int
-        directVotesInDisagreement: Int
-        indirectVotesMadeByYou: Int
+        directVotesInAgreement: Int         # hum, this isn't useful
+        directVotesInDisagreement: Int      # hum, this isn't useful
+        indirectVotesMadeByYou: Int         
         indirectVotesMadeForYou: Int
     }
 

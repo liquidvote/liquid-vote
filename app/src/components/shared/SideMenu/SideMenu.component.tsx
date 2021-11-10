@@ -1,5 +1,5 @@
 import React, { FunctionComponent, useEffect } from 'react';
-import { Link } from "react-router-dom";
+import { Link, useHistory } from "react-router-dom";
 import { useAuth0 } from "@auth0/auth0-react";
 import { useQuery } from "@apollo/client";
 
@@ -9,6 +9,7 @@ import DropPlusSVG from "@shared/Icons/Drop+.svg";
 import NotificationSvg from "@shared/Icons/Notification.svg";
 import TrendingSvg from "@shared/Icons/Trending.svg";
 import GroupSvg from "@shared/Icons/Group.svg";
+import ThreeDotsSVG from '@shared/Icons/ThreeDots.svg';
 import LoginIcon from "@shared/Icons/LoginIcon.svg";
 import Popper from "@shared/Popper";
 import useSearchParams from "@state/Global/useSearchParams.effect";
@@ -18,11 +19,16 @@ import './style.sass';
 
 export const SideMenu: FunctionComponent<{}> = ({ }) => {
 
+    const history = useHistory();
     const { allSearchParams, updateParams } = useSearchParams();
 
     const { user, isAuthenticated, isLoading, loginWithRedirect, logout, loginWithPopup } = useAuth0();
 
     const { liquidUser, liquidUser_refetch } = useAuthUser();
+
+    console.log({
+        p: history?.location?.pathname
+    });
 
     useEffect(() => {
         if (!!isAuthenticated) {
@@ -37,7 +43,7 @@ export const SideMenu: FunctionComponent<{}> = ({ }) => {
                 if (!g?.data?.authUser) {
                     setTimeout(() => tryToGetUser(), 100 + (count * 50));
                 }
-                
+
             };
             tryToGetUser();
         }
@@ -75,29 +81,46 @@ export const SideMenu: FunctionComponent<{}> = ({ }) => {
             </div>
             {isAuthenticated && user && (
                 <>
-                    <Popper
-                        rightOnSmall={true}
-                        button={<div>
+                    {history?.location?.pathname !== `/profile/${liquidUser?.handle}` ? (
+                        <Link to={`/profile/${liquidUser?.handle}`}>
                             <img
                                 className="vote-avatar"
                                 src={liquidUser?.avatar || 'http://images.liquid-vote.com/system/loading.gif'}
                                 alt={liquidUser?.name || 'loading'}
                             />
-                        </div>}
-                        popperContent={
-                            <ul className="p-0 m-0">
-                                <li>
-                                    {!!liquidUser ?
-                                        <Link to={`/profile/${liquidUser?.handle}`}>Visit Profile</Link> :
-                                        'loading...'
-                                    }
-                                </li>
-                                <li className="pointer" onClick={() => logout({
-                                    returnTo: window.location.origin
-                                })}>Logout</li>
-                            </ul>
-                        }
-                    />
+                        </Link>
+
+                    ) : (
+                        <Popper
+                            rightOnSmall={true}
+                            button={<div>
+                                {/* <img
+                                    className="vote-avatar"
+                                    src={liquidUser?.avatar || 'http://images.liquid-vote.com/system/loading.gif'}
+                                    alt={liquidUser?.name || 'loading'}
+                                /> */}
+                                <ThreeDotsSVG />
+                            </div>}
+                            popperContent={
+                                <ul className="p-0 m-0">
+                                    <li
+                                        className="pointer"
+                                        onClick={() => updateParams({
+                                            paramsToAdd: {
+                                                modal: "EditProfile",
+                                                modalData: JSON.stringify({ userHandle: liquidUser?.handle })
+                                            }
+                                        })}
+                                    >
+                                        Edit Profile
+                                    </li>
+                                    <li className="pointer" onClick={() => logout({
+                                        returnTo: window.location.origin
+                                    })}>Logout</li>
+                                </ul>
+                            }
+                        />
+                    )}
                     <div
                         data-tip="Create Poll"
                         className="button_ inverted icon-contain hide-on-smaller-sideMenu mt-3"
