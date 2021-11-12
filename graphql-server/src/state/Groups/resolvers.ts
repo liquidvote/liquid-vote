@@ -551,11 +551,13 @@ const getYourGroupStats = async ({ groupId, groupHandle, AuthUser, mongoDB }) =>
             .find({
                 "groupId": new ObjectId(groupId),
                 "representeeId": new ObjectId(AuthUser._id),
+                isRepresentingYou: true
             }).count(),
         representedBy: await mongoDB.collection("UserRepresentations")
             .find({
                 "groupId": new ObjectId(groupId),
                 "representativeId": new ObjectId(AuthUser._id),
+                isRepresentingYou: true
             }).count(),
         directVotesMade: await mongoDB.collection("Votes")
             .find({

@@ -548,12 +548,14 @@ export const UserResolvers = {
                 })
             )?.ops[0] : null;
 
+            // update/create votes for representee, from representative's votes
+
             return updatedOrCreated;
         },
     },
 };
 
-const getUserStats = async ({ userId, mongoDB }) => {
+export const getUserStats = async ({ userId, mongoDB }) => {
 
     return ({
         lastDirectVoteOn: 0, // TODO

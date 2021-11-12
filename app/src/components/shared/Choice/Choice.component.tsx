@@ -210,7 +210,7 @@ export const Choice: FunctionComponent<{
                                 onClick={() => handleUserVote('for')}
                             >
                                 <span className="mr-1">
-                                    For
+                                    Yay
                                 </span>
                                 {
                                     (
@@ -406,7 +406,7 @@ export const Choice: FunctionComponent<{
                                     )
                                 }
                                 <span>
-                                    Against
+                                    Nay
                                 </span>
                             </div>
                         </div>

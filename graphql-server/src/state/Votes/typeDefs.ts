@@ -55,6 +55,7 @@ export const VoteTypeDefs = gql`
             type: String,
             sortBy: String
         ):  [Vote]
+        VotesTest(args: JSON): JSON
     }
 
     extend type Mutation {

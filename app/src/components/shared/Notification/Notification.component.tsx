@@ -104,7 +104,7 @@ export const Notification: FunctionComponent<{
                                                         <Link
                                                             key={`representatives-${r?.representativeHandle || i}`}
                                                             to={`/profile/${r?.representativeHandle}`}
-                                                            className={`vote-avatar tiny ${!!showAllChoices ? 'none': r?.position} ml-n2`}
+                                                            className={`vote-avatar tiny ${!!showAllChoices && v.question?.questionType === 'multi' ? 'none': r?.position} ml-n2`}
                                                             style={{
                                                                 background: `url(${r?.representativeAvatar}) 50% 50% / cover no-repeat`
                                                             }}

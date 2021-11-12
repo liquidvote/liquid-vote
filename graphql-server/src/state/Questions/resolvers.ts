@@ -27,10 +27,10 @@ export const QuestionResolvers = {
                     }
                 ])?.toArray())?.[0];
 
-            console.log({
-                Question,
-                // Question_: Question?.[0]
-            });
+            // console.log({
+            //     Question,
+            //     // Question_: Question?.[0]
+            // });
 
             return {
                 ...Question,
@@ -427,8 +427,7 @@ export const updateQuestionVotingStats = async ({
             }
         },
         {
-            returnNewDocument: true,
-            returnOriginal: false
+            returnDocument: 'after'
         }
     ))?.value
 

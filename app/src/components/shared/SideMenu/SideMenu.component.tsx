@@ -11,6 +11,7 @@ import TrendingSvg from "@shared/Icons/Trending.svg";
 import GroupSvg from "@shared/Icons/Group.svg";
 import ThreeDotsSVG from '@shared/Icons/ThreeDots.svg';
 import LoginIcon from "@shared/Icons/LoginIcon.svg";
+import HashTagSvg from "@shared/Icons/HashTag.svg";
 import Popper from "@shared/Popper";
 import useSearchParams from "@state/Global/useSearchParams.effect";
 import useAuthUser from '@state/AuthUser/authUser.effect';
@@ -62,11 +63,14 @@ export const SideMenu: FunctionComponent<{}> = ({ }) => {
                     {/* <Link to="/notifications" data-tip="Notifications">
                         <NotificationSvg />
                     </Link> */}
-                    <Link to="/groups" data-tip="Your Groups">
-                        <GroupSvg />
-                    </Link>
                 </>
             )}
+            <Link to="/groups" data-tip={ isAuthenticated ? "Your Groups" : " Groups" }>
+                <GroupSvg />
+            </Link>
+            <Link to="/tags" data-tip="Tags">
+                <HashTagSvg />
+            </Link>
             {/* <Link to="/feed">
                 <BookmarkSvg />
             </Link>

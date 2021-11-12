@@ -26,7 +26,8 @@ interface IFormValues {
         group: string,
         channel: string
     },
-    visibility: string
+    visibility: string,
+    tags: { name: string }[]
 }
 
 const startTextOptions = [
@@ -264,6 +265,25 @@ export const EditQuestion: FunctionComponent<{}> = ({ }) => {
                         />
                     ))('groupChannel')}
                 </div>
+
+                {/* <div className="my-4">
+                    {((name: keyof IFormValues) => (
+                        <TagsPicker
+                            name={name}
+                            label="Relevant tags"
+                            register={register(name, {
+                                // validate: {
+                                //     group: (v: any) => typeof v.group !== 'undefined' || 'please select a group and channel',
+                                //     // channel: (v: any) => typeof v.channel !=='undefined' || 'please select a channel',
+                                // }
+                            })}
+                            value={watch(name)}
+                            error={errors[name]}
+                            setValue={setValue}
+                            disabled={modalData.questionText !== "new"}
+                        />
+                    ))('tags')}
+                </div> */}
 
                 {/* <div className="my-3 mt-4">
                     {((name: keyof IFormValues) => (

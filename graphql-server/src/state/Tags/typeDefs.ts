@@ -32,28 +32,27 @@ export const TagTypeDefs = gql`
         lastEditOn: String
         userRelation: TagRelation
         yourRelation: TagRelation
-        representativeRelation: UserRepresentativeTagRelation
+        # representativeRelation: UserRepresentativeTagRelation
         stats: TagStats
         yourStats: yourTagStats
     }
 
-    type GroupMemberRelation {
-        groupId: String
+    type TagRelation {
+        tagId: String
         userId: String
+        isFollowing: Boolean
         createdOn: String
         lastEditOn: String
-        isMember: Boolean
-        channels: [String]
     }
 
     extend type Query {
-        Group(handle: String): Group
-        Groups(userHandle: String): [Group]
-        GroupMembers(handle: String): [User]
-        GroupQuestions(handle: String, channels: [String]): [Question]
+        Tag(handle: String): Tag
+        Tags(userHandle: String): [Tag]
+        # TagRepresentatives(handle: String): [User]
+        TagQuestions(handle: String, channels: [String]): [Question]
     }
 
     extend type Mutation {
-        editGroup(handle: String, Group: JSON): JSON
+        editTag(name: String, Tag: JSON): JSON
     }
 `;
