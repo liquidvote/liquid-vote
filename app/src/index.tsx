@@ -8,10 +8,24 @@ import { persistCache, LocalStorageWrapper } from 'apollo3-cache-persist';
 import localforage from "localforage";
 import { useAuth0 } from "@auth0/auth0-react";
 import env from '@env';
+import * as Sentry from "@sentry/react";
+import { Integrations } from "@sentry/tracing";
 
 import { AUTH_USER, AUTH_USER_LOGGEDIN } from '@state/AuthUser/typeDefs';
 import App from './App';
 import './index.sass';
+
+if (env?.environment === 'production') {
+    Sentry.init({
+        dsn: "https://4a194e29ed7d4f55ab8dd0d51fe7b701@o1069562.ingest.sentry.io/6064301",
+        integrations: [new Integrations.BrowserTracing()],
+
+        // Set tracesSampleRate to 1.0 to capture 100%
+        // of transactions for performance monitoring.
+        // We recommend adjusting this value in production
+        tracesSampleRate: 1.0,
+    });
+}
 
 const AppolloAppWrapper: FunctionComponent<{}> = ({ }) => {
 
