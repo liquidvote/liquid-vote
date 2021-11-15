@@ -1,0 +1,811 @@
+{
+  "QueryJSON": [
+    {
+      "$match": {
+        "questionText": "lt-1",
+        "groupChannel.group": "test",
+        "position": {
+          "$ne": null
+        }
+      }
+    },
+    {
+      "$addFields": {
+        "representatives": {
+          "$cond": [
+            {
+              "$eq": [
+                "$position",
+                "delegated"
+              ]
+            },
+            {
+              "$filter": {
+                "input": "$representatives",
+                "as": "r",
+                "cond": {
+                  "$ne": [
+                    "$$r.position",
+                    null
+                  ]
+                }
+              }
+            },
+            []
+          ]
+        }
+      }
+    },
+    {
+      "$lookup": {
+        "from": "Votes",
+        "let": {
+          "userId": "619237d3ce3c58eb64cdeb19",
+          "questionText": "$questionText",
+          "choiceText": "$choiceText",
+          "group": "$groupChannel.group"
+        },
+        "pipeline": [
+          {
+            "$match": {
+              "$and": [
+                {
+                  "$expr": {
+                    "$eq": [
+                      "$user",
+                      {
+                        "$toObjectId": "$$userId"
+                      }
+                    ]
+                  }
+                },
+                {
+                  "$expr": {
+                    "$eq": [
+                      "$questionText",
+                      "$$questionText"
+                    ]
+                  }
+                },
+                {
+                  "$expr": {
+                    "$eq": [
+                      "$choiceText",
+                      "$$choiceText"
+                    ]
+                  }
+                },
+                {
+                  "$expr": {
+                    "$eq": [
+                      "$groupChannel.group",
+                      "$$group"
+                    ]
+                  }
+                }
+              ]
+            }
+          }
+        ],
+        "as": "yourVote"
+      }
+    },
+    {
+      "$addFields": {
+        "yourVote": {
+          "$first": "$yourVote"
+        },
+        "userVote": "$$ROOT"
+      }
+    },
+    {
+      "$addFields": {
+        "youAndUserDetails": {
+          "bothDirect": {
+            "$and": [
+              {
+                "$eq": [
+                  "$isDirect",
+                  true
+                ]
+              },
+              {
+                "$eq": [
+                  "$yourVote.isDirect",
+                  true
+                ]
+              }
+            ]
+          },
+          "InAgreement": {
+            "$and": [
+              {
+                "$eq": [
+                  "$isDirect",
+                  true
+                ]
+              },
+              {
+                "$eq": [
+                  "$yourVote.isDirect",
+                  true
+                ]
+              },
+              {
+                "$eq": [
+                  "$position",
+                  "$yourVote.position"
+                ]
+              }
+            ]
+          },
+          "InDisagreement": {
+            "$and": [
+              {
+                "$eq": [
+                  "$isDirect",
+                  true
+                ]
+              },
+              {
+                "$eq": [
+                  "$yourVote.isDirect",
+                  true
+                ]
+              },
+              {
+                "$ne": [
+                  "$position",
+                  "$yourVote.position"
+                ]
+              }
+            ]
+          },
+          "yourVoteMadeByUser": {
+            "$cond": {
+              "if": {
+                "$or": [
+                  {
+                    "$not": [
+                      "$yourVote"
+                    ]
+                  },
+                  {
+                    "$eq": [
+                      "$yourVote.isDirect",
+                      true
+                    ]
+                  }
+                ]
+              },
+              "then": false,
+              "else": {
+                "$gte": [
+                  {
+                    "$size": {
+                      "$filter": {
+                        "input": "$yourVote.representatives",
+                        "as": "r",
+                        "cond": {
+                          "$and": [
+                            {
+                              "$eq": [
+                                "$$r.representativeId",
+                                "$user"
+                              ]
+                            }
+                          ]
+                        }
+                      }
+                    }
+                  },
+                  1
+                ]
+              }
+            }
+          },
+          "yourVoteMadeForUser": {
+            "$cond": {
+              "if": {
+                "$eq": [
+                  "$isDirect",
+                  true
+                ]
+              },
+              "then": false,
+              "else": {
+                "$gte": [
+                  {
+                    "$size": {
+                      "$filter": {
+                        "input": "$representatives",
+                        "as": "r",
+                        "cond": {
+                          "$eq": [
+                            "$$r.representativeId",
+                            "60ba506d2e7efed1c46e1837"
+                          ]
+                        }
+                      }
+                    }
+                  },
+                  1
+                ]
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "$match": {}
+    },
+    {
+      "$unwind": {
+        "path": "$representatives",
+        "preserveNullAndEmptyArrays": true
+      }
+    },
+    {
+      "$lookup": {
+        "from": "Users",
+        "localField": "representatives.representativeId",
+        "foreignField": "_id",
+        "as": "representativeUser"
+      }
+    },
+    {
+      "$addFields": {
+        "representativeUser": {
+          "$first": "$representativeUser.LiquidUser"
+        }
+      }
+    },
+    {
+      "$addFields": {
+        "representatives.representativeHandle": "$representativeUser.handle",
+        "representatives.representativeName": "$representativeUser.name",
+        "representatives.representativeAvatar": "$representativeUser.avatar"
+      }
+    },
+    {
+      "$group": {
+        "_id": {
+          "user": "$user",
+          "questionText": "$questionText",
+          "choiceText": "$choiceText",
+          "groupChannel": "$groupChannel"
+        },
+        "questionText": {
+          "$first": "$questionText"
+        },
+        "choiceText": {
+          "$first": "$choiceText"
+        },
+        "groupChannel": {
+          "$first": "$groupChannel"
+        },
+        "lastEditOn": {
+          "$first": "$lastEditOn"
+        },
+        "userVote": {
+          "$first": "$userVote"
+        },
+        "yourVote": {
+          "$first": "$yourVote"
+        },
+        "youAndUserDetails": {
+          "$first": "$youAndUserDetails"
+        },
+        "representatives": {
+          "$push": "$representatives"
+        },
+        "user": {
+          "$first": "$user"
+        }
+      }
+    },
+    {
+      "$addFields": {
+        "representatives": {
+          "$filter": {
+            "input": "$representatives",
+            "as": "r",
+            "cond": {
+              "$gt": [
+                "$$r",
+                {}
+              ]
+            }
+          }
+        }
+      }
+    },
+    {
+      "$addFields": {
+        "userVote.representatives": "$representatives"
+      }
+    },
+    {
+      "$lookup": {
+        "as": "representeeVotes",
+        "from": "Votes",
+        "let": {
+          "representativeId": {
+            "$toObjectId": "$user"
+          },
+          "questionText": "$questionText",
+          "choiceText": "$choiceText",
+          "group": "$groupChannel.group"
+        },
+        "pipeline": [
+          {
+            "$match": {
+              "$and": [
+                {
+                  "isDirect": false
+                },
+                {
+                  "position": {
+                    "$ne": null
+                  }
+                },
+                {
+                  "$expr": {
+                    "$eq": [
+                      "$questionText",
+                      "$$questionText"
+                    ]
+                  }
+                },
+                {
+                  "$expr": {
+                    "$eq": [
+                      "$choiceText",
+                      "$$choiceText"
+                    ]
+                  }
+                },
+                {
+                  "$expr": {
+                    "$eq": [
+                      "$groupChannel.group",
+                      "$$group"
+                    ]
+                  }
+                }
+              ]
+            }
+          },
+          {
+            "$match": {
+              "$expr": {
+                "$gte": [
+                  {
+                    "$size": {
+                      "$filter": {
+                        "input": "$representatives",
+                        "as": "r",
+                        "cond": {
+                          "$eq": [
+                            "$$r.representativeId",
+                            "$$representativeId"
+                          ]
+                        }
+                      }
+                    }
+                  },
+                  1
+                ]
+              }
+            }
+          },
+          {
+            "$lookup": {
+              "from": "Users",
+              "localField": "user",
+              "foreignField": "_id",
+              "as": "user"
+            }
+          },
+          {
+            "$addFields": {
+              "user": {
+                "$first": "$user.LiquidUser"
+              }
+            }
+          }
+        ]
+      }
+    },
+    {
+      "$addFields": {
+        "representeeCount": {
+          "$size": "$representeeVotes"
+        },
+        "userVote.representeeVotes": "$representeeVotes"
+      }
+    },
+    {
+      "$sort": {
+        "lastEditOn": -1
+      }
+    },
+    {
+      "$group": {
+        "_id": {
+          "user": "$user",
+          "questionText": "$questionText",
+          "groupChannel": "$groupChannel"
+        },
+        "questionText": {
+          "$first": "$questionText"
+        },
+        "groupChannel": {
+          "$first": "$groupChannel"
+        },
+        "choiceVotes": {
+          "$push": {
+            "userVote": "$userVote",
+            "yourVote": "$yourVote"
+          }
+        },
+        "lastEditOn": {
+          "$last": "$lastEditOn"
+        },
+        "representeeVotes": {
+          "$push": "$representeeVotes"
+        },
+        "representatives": {
+          "$push": "$representatives"
+        },
+        "user": {
+          "$first": "$user"
+        },
+        "yourVote": {
+          "$first": "$yourVote"
+        },
+        "userVote": {
+          "$first": "$userVote"
+        },
+        "youAndUserDetails": {
+          "$first": "$youAndUserDetails"
+        },
+        "youAndUserDetailsCounts_bothDirect": {
+          "$sum": {
+            "$cond": [
+              "$youAndUserDetails.bothDirect",
+              1,
+              0
+            ]
+          }
+        },
+        "youAndUserDetailsCounts_InAgreement": {
+          "$sum": {
+            "$cond": [
+              "$youAndUserDetails.InAgreement",
+              1,
+              0
+            ]
+          }
+        },
+        "youAndUserDetailsCounts_InDisagreement": {
+          "$sum": {
+            "$cond": [
+              "$youAndUserDetails.InDisagreement",
+              1,
+              0
+            ]
+          }
+        },
+        "youAndUserDetailsCounts_yourVoteMadeByUser": {
+          "$sum": {
+            "$cond": [
+              "$youAndUserDetails.yourVoteMadeByUser",
+              1,
+              0
+            ]
+          }
+        },
+        "youAndUserDetailsCounts_yourVoteMadeForUser": {
+          "$sum": {
+            "$cond": [
+              "$youAndUserDetails.yourVoteMadeForUser",
+              1,
+              0
+            ]
+          }
+        },
+        "Count_directFor": {
+          "$sum": {
+            "$switch": {
+              "branches": [
+                {
+                  "case": {
+                    "$eq": [
+                      "$userVote.position",
+                      "for"
+                    ]
+                  },
+                  "then": 1
+                }
+              ],
+              "default": 0
+            }
+          }
+        },
+        "Count_direct": {
+          "$sum": {
+            "$cond": [
+              "$userVote.isDirect",
+              1,
+              0
+            ]
+          }
+        },
+        "Count_delegated": {
+          "$sum": {
+            "$switch": {
+              "branches": [
+                {
+                  "case": {
+                    "$eq": [
+                      "$userVote.position",
+                      "delegated"
+                    ]
+                  },
+                  "then": 1
+                }
+              ],
+              "default": 0
+            }
+          }
+        },
+        "Count_directAgainst": {
+          "$sum": {
+            "$switch": {
+              "branches": [
+                {
+                  "case": {
+                    "$eq": [
+                      "$userVote.position",
+                      "against"
+                    ]
+                  },
+                  "then": 1
+                }
+              ],
+              "default": 0
+            }
+          }
+        }
+      }
+    },
+    {
+      "$addFields": {
+        "youAndUserDetailsCount": {
+          "bothDirect": "$youAndUserDetailsCounts_bothDirect",
+          "InAgreement": "$youAndUserDetailsCounts_InAgreement",
+          "InDisagreement": "$youAndUserDetailsCounts_InDisagreement",
+          "yourVoteMadeByUser": "$youAndUserDetailsCounts_yourVoteMadeByUser",
+          "yourVoteMadeForUser": "$youAndUserDetailsCounts_yourVoteMadeForUser"
+        },
+        "Count": {
+          "directFor": "$Count_directFor",
+          "direct": "$Count_direct",
+          "delegated": "$Count_delegated",
+          "directAgainst": "$Count_directAgainst"
+        }
+      }
+    },
+    {
+      "$unwind": {
+        "path": "$representatives",
+        "preserveNullAndEmptyArrays": true
+      }
+    },
+    {
+      "$unwind": {
+        "path": "$representatives",
+        "preserveNullAndEmptyArrays": true
+      }
+    },
+    {
+      "$group": {
+        "_id": {
+          "user": "$_id.user",
+          "questionText": "$_id.questionText",
+          "groupChannel": "$_id.groupChannel",
+          "representativeId": "$representatives.representativeId"
+        },
+        "root": {
+          "$first": "$$ROOT"
+        }
+      }
+    },
+    {
+      "$group": {
+        "_id": {
+          "user": "$_id.user",
+          "questionText": "$_id.questionText",
+          "groupChannel": "$_id.groupChannel"
+        },
+        "questionText": {
+          "$first": "$root.questionText"
+        },
+        "groupChannel": {
+          "$first": "$root.groupChannel"
+        },
+        "choiceVotes": {
+          "$first": "$root.choiceVotes"
+        },
+        "lastEditOn": {
+          "$first": "$root.lastEditOn"
+        },
+        "representeeVotes": {
+          "$first": "$root.representeeVotes"
+        },
+        "representatives": {
+          "$push": "$root.representatives"
+        },
+        "user": {
+          "$first": "$root.user"
+        },
+        "yourVote": {
+          "$first": "$root.yourVote"
+        },
+        "userVote": {
+          "$first": "$root.userVote"
+        },
+        "youAndUserDetailsCount": {
+          "$first": "$root.youAndUserDetailsCount"
+        },
+        "Count": {
+          "$first": "$root.Count"
+        }
+      }
+    },
+    {
+      "$unwind": {
+        "path": "$representeeVotes",
+        "preserveNullAndEmptyArrays": true
+      }
+    },
+    {
+      "$unwind": {
+        "path": "$representeeVotes",
+        "preserveNullAndEmptyArrays": true
+      }
+    },
+    {
+      "$group": {
+        "_id": {
+          "user": "$_id.user",
+          "questionText": "$_id.questionText",
+          "groupChannel": "$_id.groupChannel",
+          "representeeHandle": "$representeeVotes.user.handle"
+        },
+        "root": {
+          "$first": "$$ROOT"
+        }
+      }
+    },
+    {
+      "$group": {
+        "_id": {
+          "user": "$_id.user",
+          "questionText": "$_id.questionText",
+          "groupChannel": "$_id.groupChannel"
+        },
+        "questionText": {
+          "$first": "$root.questionText"
+        },
+        "groupChannel": {
+          "$first": "$root.groupChannel"
+        },
+        "choiceVotes": {
+          "$first": "$root.choiceVotes"
+        },
+        "lastEditOn": {
+          "$first": "$root.lastEditOn"
+        },
+        "representeeVotes": {
+          "$push": "$root.representeeVotes"
+        },
+        "representatives": {
+          "$first": "$root.representatives"
+        },
+        "user": {
+          "$first": "$root.user"
+        },
+        "yourVote": {
+          "$first": "$root.yourVote"
+        },
+        "userVote": {
+          "$first": "$root.userVote"
+        },
+        "youAndUserDetailsCount": {
+          "$first": "$root.youAndUserDetailsCount"
+        },
+        "Count": {
+          "$first": "$root.Count"
+        }
+      }
+    },
+    {
+      "$match": {
+        "Count.directAgainst": {
+          "$gt": 0
+        }
+      }
+    },
+    {
+      "$addFields": {
+        "representeeVotesCount": {
+          "$size": "$representeeVotes"
+        }
+      }
+    },
+    {
+      "$sort": {
+        "representeeVotesCount": -1
+      }
+    },
+    {
+      "$lookup": {
+        "from": "Questions",
+        "let": {
+          "questionText": "$questionText",
+          "group": "$groupChannel.group"
+        },
+        "pipeline": [
+          {
+            "$match": {
+              "$and": [
+                {
+                  "$expr": {
+                    "$eq": [
+                      "$questionText",
+                      "$$questionText"
+                    ]
+                  }
+                },
+                {
+                  "$expr": {
+                    "$eq": [
+                      "$groupChannel.group",
+                      "$$group"
+                    ]
+                  }
+                }
+              ]
+            }
+          }
+        ],
+        "as": "question"
+      }
+    },
+    {
+      "$addFields": {
+        "question": {
+          "$first": "$question"
+        }
+      }
+    },
+    {
+      "$lookup": {
+        "from": "Users",
+        "localField": "user",
+        "foreignField": "_id",
+        "as": "user"
+      }
+    },
+    {
+      "$addFields": {
+        "user": {
+          "$first": "$user.LiquidUser"
+        }
+      }
+    }
+  ]
+}
