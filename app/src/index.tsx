@@ -18,7 +18,9 @@ import './index.sass';
 if (env?.environment === 'production') {
     Sentry.init({
         dsn: "https://4a194e29ed7d4f55ab8dd0d51fe7b701@o1069562.ingest.sentry.io/6064301",
-        integrations: [new Integrations.BrowserTracing()],
+        integrations: [new Integrations.BrowserTracing({
+            tracingOrigins: ["::1"],
+        })],
 
         // Set tracesSampleRate to 1.0 to capture 100%
         // of transactions for performance monitoring.

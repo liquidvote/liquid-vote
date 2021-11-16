@@ -1,3 +1,4 @@
+import { JSONInput } from '@aws-sdk/client-s3';
 import { ObjectId } from 'mongodb';
 const { promises: fs } = require("fs");
 
@@ -1174,6 +1175,58 @@ export const VoteResolvers = {
     },
 };
 
+export const updateRepresentedVote = async ({
+    questionText,
+    choiceText,
+    groupHandle,
+    representeeId,
+    representativesVotes,
+    existingVote,
+
+    AuthUser,
+    mongoDB
+}) => {
+
+    const dbDoc = !!AuthUser && (await mongoDB.collection("Votes")
+        .findOneAndUpdate({
+            'questionText': questionText,
+            'choiceText': choiceText,
+            'groupChannel': { group: groupHandle },
+            'user': new ObjectId(representeeId)
+        }, {
+            $set: {
+                'position': existingVote?.isDirect ? existingVote.position : 'delegated',
+                'forWeight': existingVote?.isDirect ? existingVote.forWeight :
+                    (representativesVotes.reduce(
+                        (acc, curr) => acc + curr.forWeight, 0
+                    ) / representativesVotes.length) || 0,
+                'againstWeight': existingVote?.isDirect ? existingVote.againstWeight :
+                    (representativesVotes.reduce(
+                        (acc, curr) => acc + curr.againstWeight, 0
+                    ) / representativesVotes.length) || 0,
+                'representatives': representativesVotes,
+
+                lastEditOn: Date.now()
+            },
+            $setOnInsert: {
+                'questionText': questionText,
+                'choiceText': choiceText,
+                'groupChannel': { group: groupHandle },
+                'user': new ObjectId(representeeId),
+                isDirect: false,
+                createdOn: Date.now()
+            }
+        },
+            {
+                upsert: true,
+                returnDocument: 'after'
+            }
+        ))?.value;
+
+    return dbDoc;
+};
+
+// Update ALL representeeS votes for a SINGLE Vote
 export const updateRepresenteesVote = async ({
     efficientOrThorough = "efficient",
     // efficient - gets other representatives from a previously calculated list
@@ -1328,47 +1381,162 @@ export const updateRepresenteesVote = async ({
                     ]
                 );
 
-            const dbDoc = !!AuthUser && (await mongoDB.collection("Votes")
-                .findOneAndUpdate({
-                    'questionText': questionText,
-                    'choiceText': choiceText,
-                    'groupChannel': { group: groupHandle },
-                    'user': new ObjectId(r.representeeId)
-                }, {
-                    $set: {
-                        'position': RepresenteeVote?.isDirect ? RepresenteeVote.position : 'delegated',
-                        'forWeight': RepresenteeVote?.isDirect ? RepresenteeVote.forWeight :
-                            (representativesToUpdate.reduce(
-                                (acc, curr) => acc + curr.forWeight, 0
-                            ) / representativesToUpdate.length) || 0,
-                        'againstWeight': RepresenteeVote?.isDirect ? RepresenteeVote.againstWeight :
-                            (representativesToUpdate.reduce(
-                                (acc, curr) => acc + curr.againstWeight, 0
-                            ) / representativesToUpdate.length) || 0,
-                        'representatives': representativesToUpdate,
+            return await updateRepresentedVote({
+                questionText,
+                choiceText,
+                groupHandle,
+                representeeId: r.representeeId,
+                representativesVotes: representativesToUpdate,
+                existingVote: RepresenteeVote,
 
-                        lastEditOn: Date.now()
-                    },
-                    $setOnInsert: {
-                        'questionText': questionText,
-                        'choiceText': choiceText,
-                        'groupChannel': { group: groupHandle },
-                        'user': new ObjectId(r.representeeId),
-                        isDirect: false,
-                        createdOn: Date.now()
-                    }
-                },
-                    {
-                        upsert: true,
-                        returnDocument: 'after'
-                    }
-                ))?.value;
-
-            return dbDoc;
+                AuthUser,
+                mongoDB
+            })
         }));
 
     return updatedRepresenteesVotes;
 };
+
+// Update a SINGLE representee's voteS for ALL group/tag votes made by representative
+export const updateRepresenteesVotes = async ({
+    efficientOrThorough = "efficient",
+    // efficient - gets other representatives from a previously calculated list
+    // thorough - gets other representatives from a query
+
+    representeeId,
+    representativeId,
+    isRepresentingYou, // false, for when removing vote
+    groupId,
+    groupHandle,
+
+    AuthUser,
+    mongoDB,
+}) => {
+    console.log("updateRepresenteesVotes");
+
+    const representativeVotes = !!representativeId && (
+        await mongoDB.collection("Votes")
+            .aggregate([
+                {
+                    $match: {
+                        'groupChannel.group': groupHandle,
+                        questionText: 'lt-1',
+                        $expr: {
+                            $eq: [
+                                "$user",
+                                { "$toObjectId": representativeId }
+                            ]
+                        }
+                    }
+                },
+                {
+                    $lookup: {
+                        as: 'RepresenteeVote',
+                        from: 'Votes',
+                        let: {
+                            questionText: "$questionText",
+                            choiceText: "$choiceText",
+                            group: "$groupChannel.group"
+                        },
+                        pipeline: [
+                            {
+                                $match: {
+                                    $expr: {
+                                        $and: [
+                                            { $eq: ["$questionText", "$$questionText"] },
+                                            { $eq: ["$choiceText", "$$choiceText"] },
+                                            { $eq: ["$groupChannel.group", "$$group"] },
+                                            { $eq: ["$user", { "$toObjectId": representeeId }] }
+                                        ]
+                                    }
+                                }
+                            },
+                        ]
+                    }
+                },
+                {
+                    $addFields: {
+                        RepresenteeVote: {
+                            '$first': '$RepresenteeVote',
+                        }
+
+                    }
+                },
+                ...(efficientOrThorough === 'thorough') ? [{
+                    $lookup: {
+                        as: 'RepresenteeRepresentativesVotes',
+                        from: 'UserRepresentations',
+                        let: {
+                            questionText: "$questionText",
+                            choiceText: "$choiceText",
+                            group: "$groupChannel.group"
+                        },
+                        pipeline: [
+                            {
+                                $match: {
+                                    $expr: {
+                                        $eq: [
+                                            "$representeeId",
+                                            { "$toObjectId": representeeId }
+                                        ]
+                                    },
+                                    groupId: ObjectId(groupId),
+                                    isRepresentingYou: true // HUM!
+                                }
+                            },
+                            {
+                                $lookup: {
+                                    as: 'vote',
+                                    from: 'Votes',
+                                    let: {
+                                        representativeId: "$representativeId",
+                                        questionText: "$$questionText",
+                                        choiceText: "$$choiceText",
+                                        group: "$$group"
+                                    },
+                                    pipeline: [
+                                        {
+                                            $match: {
+                                                $expr: {
+                                                    $and: [
+                                                        { $eq: ["$questionText", "$$questionText"] },
+                                                        { $eq: ["$choiceText", "$$choiceText"] },
+                                                        { $eq: ["$groupChannel.group", "$$group"] },
+                                                        { $eq: ["$user", { "$toObjectId": "$$representativeId" }] }
+                                                    ]
+                                                }
+                                            }
+                                        },
+                                        {
+                                            $addFields: {
+                                                representativeId: "$$representativeId"
+                                            }
+                                        }
+                                    ]
+                                }
+                            },
+                            {
+                                $match: {
+                                    $expr: { $gt: [{ $size: "$vote" }, 0] }
+                                }
+                            },
+                            {
+                                $replaceRoot: {
+                                    newRoot: {
+                                        '$first': '$vote',
+                                    }
+                                }
+                            }
+                        ],
+                    }
+                }] : []
+            ])
+            .toArray()
+    );
+
+    console.log({ representativeVotes: JSON.stringify(representativeVotes, null, 2) });
+
+}
 
 
 

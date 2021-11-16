@@ -2,6 +2,7 @@ import { ObjectId } from 'mongodb';
 
 import { getGroupStats } from '../Groups/resolvers';
 import { updateInviteStatus } from '../Invites/resolvers';
+import { updateRepresenteesVotes } from '../Votes/resolvers';
 
 export const UserResolvers = {
     Query: {
@@ -519,38 +520,49 @@ export const UserResolvers = {
             const Group_ = await mongoDB.collection("Groups")
                 .findOne({ 'handle': Group });
 
-            const RepresentativeGroupRelation = await mongoDB.collection("UserRepresentations")
-                .findOne({
-                    representativeId: new ObjectId(Representative?._id),
-                    representeeId: new ObjectId(Representee?._id),
-                    groupId: new ObjectId(Group_?._id),
-                });
-
-            const updatedOrCreated = (isUser && !!RepresentativeGroupRelation) ? (
+            const UpdatedRepresentativeGroupRelation = isUser ? (
                 await mongoDB.collection("UserRepresentations").findOneAndUpdate(
-                    { _id: RepresentativeGroupRelation._id },
+                    {
+                        representativeId: new ObjectId(Representative?._id),
+                        representeeId: new ObjectId(Representee?._id),
+                        groupId: new ObjectId(Group_?._id),
+                    },
                     {
                         $set: {
                             isRepresentingYou: IsRepresentingYou,
-                            'lastEditOn': Date.now(),
+                            lastEditOn: Date.now(),
                         },
+                        $setOnInsert: {
+                            representativeId: new ObjectId(Representative?._id),
+                            representeeId: new ObjectId(Representee?._id),
+                            groupId: new ObjectId(Group_?._id),
+                            createdOn: Date.now()
+                        }
                     },
-                    { returnDocument: 'after' }
+                    {
+                        returnDocument: 'after',
+                        upsert: true
+                    }
                 )
-            )?.value : isUser ? (
-                await mongoDB.collection("UserRepresentations").insertOne({
-                    representativeId: new ObjectId(Representative?._id),
-                    representeeId: new ObjectId(Representee?._id),
-                    groupId: new ObjectId(Group_?._id),
-                    isRepresentingYou: IsRepresentingYou,
-                    createdOn: Date.now(),
-                    lastEditOn: Date.now(),
-                })
-            )?.ops[0] : null;
+            )?.value : null;
+
+
+            const updatedRepresenteesVotes = updateRepresenteesVotes ({
+                efficientOrThorough: "thorough",
+            
+                representeeId: Representee._id,
+                representativeId: Representative._id,
+                isRepresentingYou: IsRepresentingYou, // false, for when removing vote
+                groupId: Group_._id,
+                groupHandle: Group_.handle,
+            
+                AuthUser,
+                mongoDB,
+            })
 
             // update/create votes for representee, from representative's votes
 
-            return updatedOrCreated;
+            return UpdatedRepresentativeGroupRelation;
         },
     },
 };

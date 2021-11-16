@@ -1,64 +1,36 @@
 import { ObjectId } from 'mongodb';
 
+import { QuestionsAgg } from './agregationLogic';
+
 export const QuestionResolvers = {
     Query: {
         Question: async (_source, { questionText, group }, { mongoDB, AuthUser }) => {
 
             const Question = (await mongoDB.collection("Questions")
-                .aggregate([
-                    {
-                        '$match': {
-                            questionText,
-                            'groupChannel.group': group,
-                        }
-                    }, {
-                        '$lookup': {
-                            'from': 'Users',
-                            'localField': 'createdBy',
-                            'foreignField': '_id',
-                            'as': 'createdBy'
-                        }
-                    }, {
-                        '$addFields': {
-                            'createdBy': {
-                                '$first': '$createdBy.LiquidUser'
-                            }
-                        }
-                    }
-                ])?.toArray())?.[0];
+                .aggregate(QuestionsAgg({
+                    questionText,
+                    group,
+                    AuthUserId: AuthUser?._id
+                }))?.toArray())?.[0];
 
-            // console.log({
-            //     Question,
-            //     // Question_: Question?.[0]
-            // });
+            console.log({
+                Question
+            });
 
             return {
                 ...Question,
+                _id: Question?.id,
                 ...(Question?.questionType === 'single' && !!AuthUser) && {
-                    stats: Question?.stats,
-                    yourVote: {
-                        ...await mongoDB.collection("Votes").findOne({
-                            questionText: Question?.questionText,
-                            groupChannel: { group: Question?.groupChannel?.group },
-                            user: AuthUser?._id
-                        })
-                    }
+                    yourVote: Question?.choices[0]?.yourVote
                 },
                 ...(Question?.questionType === 'multi' && !!AuthUser) && {
                     // stats: Question?.stats,
                     choices: await Promise.all(Question?.choices?.map(async (c) => ({
-                        ...c,
-                        yourVote: {
-                            ...await mongoDB.collection("Votes").findOne({
-                                questionText: Question?.questionText,
-                                choiceText: c.text,
-                                groupChannel: { group: Question?.groupChannel?.group },
-                                user: AuthUser?._id
-                            })
-                        }
+                        ...c?.choice,
+                        yourVote: c?.yourVote
                     }))),
                 },
-                thisUserIsAdmin: Question?.createdBy === AuthUser?._id,
+                thisUserIsAdmin: Question?.createdBy?.handle === AuthUser?.LiquidUser?.handle,
             };
         },
         Questions: async (_source, {
@@ -69,11 +41,12 @@ export const QuestionResolvers = {
             const Questions = await mongoDB.collection("Questions")
                 .aggregate(
                     [
+                        ...QuestionsAgg({
+                            questionText: null,
+                            group,
+                            AuthUserId: AuthUser?._id
+                        }),
                         {
-                            '$match': {
-                                'groupChannel.group': group
-                            }
-                        }, {
                             '$addFields': {
                                 'stats.lastEditOrVote': {
                                     '$cond': [
@@ -89,16 +62,6 @@ export const QuestionResolvers = {
                                         '$stats.directVotes', '$stats.indirectVotes'
                                     ]
                                 },
-                                // 'thisUserIsAdmin': {
-                                //     '$eq': ['$createdBy', AuthUser?.LiquidUser?.handle]
-                                // }
-                            }
-                        }, {
-                            '$lookup': {
-                                'from': 'Users',
-                                'localField': 'createdBy',
-                                'foreignField': '_id',
-                                'as': 'createdBy'
                             }
                         },
                         ...(sortBy === 'weight') ? [
@@ -115,28 +78,19 @@ export const QuestionResolvers = {
                 )
                 .toArray();
 
-            // TODO: move this logic to the aggregation, it'll run much faster
             return await Promise.all(Questions.map(async (q) => ({
                 ...q,
-                // thisUserIsAdmin: q.createdBy === AuthUser?.LiquidUser?.handle,
+                _id: q?.id,
                 ...(q.questionType === 'single' && !!AuthUser) && {
-                    yourVote: await mongoDB.collection("Votes").findOne({
-                        questionText: q.questionText,
-                        groupChannel: { group: q?.groupChannel?.group },
-                        user: AuthUser?._id
-                    })
+                    yourVote: q?.choices[0]?.yourVote
                 },
                 ...(q.questionType === 'multi' && !!AuthUser) && {
-                    choices: await Promise.all(q.choices.map(async (c) => ({
-                        ...c,
-                        yourVote: await mongoDB.collection("Votes").findOne({
-                            questionText: q.questionText,
-                            choiceText: c.text,
-                            groupChannel: { group: q?.groupChannel?.group },
-                            user: AuthUser?._id
-                        })
+                    choices: await Promise.all(q?.choices?.map(async (c) => ({
+                        ...c?.choice,
+                        yourVote: c?.yourVote
                     })))
-                }
+                },
+                thisUserIsAdmin: q?.createdBy?.handle === AuthUser?.LiquidUser?.handle,
             })));
         }
     },
