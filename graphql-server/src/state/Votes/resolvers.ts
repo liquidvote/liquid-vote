@@ -4,6 +4,7 @@ const { promises: fs } = require("fs");
 
 import { updateQuestionVotingStats } from '../Questions/resolvers';
 import { getUserStats } from '../Users/resolvers';
+import { representeesAndVoteAgg, representativeVotesAgg } from './aggregationLogic';
 
 export const VoteResolvers = {
     Query: {
@@ -1246,118 +1247,22 @@ export const updateRepresenteesVote = async ({
 
     const representeesAndVote = !!representativeId && (
         await mongoDB.collection("UserRepresentations")
-            .aggregate([
-                {
-                    $match: {
-                        representativeId: new ObjectId(representativeId),
-                        // OR
-                        groupId: new ObjectId(groupId),
-                        // OR
-                        // TAGS
-                        isRepresentingYou
-                    }
-                },
-                // TODO: Ensure no repeat representatives (from group and tag(s))
-                {
-                    $lookup: {
-                        as: 'Vote',
-                        from: 'Votes',
-                        let: {
-                            representee: "$representeeId"
-                        },
-                        pipeline: [
-                            {
-                                $match: {
-                                    questionText,
-                                    choiceText,
-                                    'groupChannel.group': groupHandle,
-                                    $expr: {
-                                        $eq: [
-                                            "$user",
-                                            { "$toObjectId": "$$representee" }
-                                        ]
-                                    },
-                                    // isDirect: false
-                                    // saves even if direct,
-                                    // so that if representee changes to null
-                                    // we already have the representatives
-                                }
-                            }
-                        ]
-                    }
-                },
-                ...(efficientOrThorough === 'thorough') ? [{
-                    $lookup: {
-                        as: 'representatives',
-                        from: 'UserRepresentations',
-                        let: {
-                            representee: "$representeeId"
-                        },
-                        pipeline: [
-                            {
-                                $match: {
-                                    $expr: {
-                                        $eq: [
-                                            "$representeeId",
-                                            { "$toObjectId": "$$representee" }
-                                        ]
-                                    },
-                                    groupId: ObjectId(groupId),
-                                    isRepresentingYou: true
-                                }
-                            },
-                            {
-                                $lookup: {
-                                    as: 'vote',
-                                    from: 'Votes',
-                                    let: {
-                                        representativeId: "$representativeId"
-                                    },
-                                    pipeline: [
-                                        {
-                                            $match: {
-                                                questionText,
-                                                choiceText,
-                                                'groupChannel.group': groupHandle,
-                                                $expr: {
-                                                    $eq: [
-                                                        "$user",
-                                                        { "$toObjectId": "$$representativeId" }
-                                                    ]
-                                                }
-                                            }
-                                        },
-                                        {
-                                            $addFields: {
-                                                representativeId: "$$representativeId"
-                                            }
-                                        }
-                                    ]
-                                }
-                            },
-                            {
-                                $match: {
-                                    $expr: { $gt: [{ $size: "$vote" }, 0] }
-                                }
-                            },
-                            {
-                                $replaceRoot: {
-                                    newRoot: {
-                                        '$first': '$vote',
-                                    }
-                                }
-                            }
-                        ],
-                    }
-                }] : []
-            ])
+            .aggregate(representeesAndVoteAgg({
+                efficientOrThorough,
+                representativeId,
+                isRepresentingYou, // false, for when removing vote
+                groupId,
+                groupHandle,
+                questionText,
+                choiceText
+            }))
             .toArray()
     );
 
     const updatedRepresenteesVotes = !!representeesAndVote &&
         await Promise.all(representeesAndVote?.map(async (r) => {
 
-            const RepresenteeVote = r?.Vote?.[0];
+            const RepresenteeVote = r?.Vote;
 
             const representativesToUpdate = efficientOrThorough === 'thorough' ?
                 r?.representatives :
@@ -1416,121 +1321,13 @@ export const updateRepresenteesVotes = async ({
 
     const representativeVotes = !!representativeId && (
         await mongoDB.collection("Votes")
-            .aggregate([
-                {
-                    $match: {
-                        'groupChannel.group': groupHandle,
-                        questionText: 'lt-1',
-                        $expr: {
-                            $eq: [
-                                "$user",
-                                { "$toObjectId": representativeId }
-                            ]
-                        }
-                    }
-                },
-                {
-                    $lookup: {
-                        as: 'RepresenteeVote',
-                        from: 'Votes',
-                        let: {
-                            questionText: "$questionText",
-                            choiceText: "$choiceText",
-                            group: "$groupChannel.group"
-                        },
-                        pipeline: [
-                            {
-                                $match: {
-                                    $expr: {
-                                        $and: [
-                                            { $eq: ["$questionText", "$$questionText"] },
-                                            { $eq: ["$choiceText", "$$choiceText"] },
-                                            { $eq: ["$groupChannel.group", "$$group"] },
-                                            { $eq: ["$user", { "$toObjectId": representeeId }] }
-                                        ]
-                                    }
-                                }
-                            },
-                        ]
-                    }
-                },
-                {
-                    $addFields: {
-                        RepresenteeVote: {
-                            '$first': '$RepresenteeVote',
-                        }
-
-                    }
-                },
-                ...(efficientOrThorough === 'thorough') ? [{
-                    $lookup: {
-                        as: 'RepresenteeRepresentativesVotes',
-                        from: 'UserRepresentations',
-                        let: {
-                            questionText: "$questionText",
-                            choiceText: "$choiceText",
-                            group: "$groupChannel.group"
-                        },
-                        pipeline: [
-                            {
-                                $match: {
-                                    $expr: {
-                                        $eq: [
-                                            "$representeeId",
-                                            { "$toObjectId": representeeId }
-                                        ]
-                                    },
-                                    groupId: ObjectId(groupId),
-                                    isRepresentingYou: true // HUM!
-                                }
-                            },
-                            {
-                                $lookup: {
-                                    as: 'vote',
-                                    from: 'Votes',
-                                    let: {
-                                        representativeId: "$representativeId",
-                                        questionText: "$$questionText",
-                                        choiceText: "$$choiceText",
-                                        group: "$$group"
-                                    },
-                                    pipeline: [
-                                        {
-                                            $match: {
-                                                $expr: {
-                                                    $and: [
-                                                        { $eq: ["$questionText", "$$questionText"] },
-                                                        { $eq: ["$choiceText", "$$choiceText"] },
-                                                        { $eq: ["$groupChannel.group", "$$group"] },
-                                                        { $eq: ["$user", { "$toObjectId": "$$representativeId" }] }
-                                                    ]
-                                                }
-                                            }
-                                        },
-                                        {
-                                            $addFields: {
-                                                representativeId: "$$representativeId"
-                                            }
-                                        }
-                                    ]
-                                }
-                            },
-                            {
-                                $match: {
-                                    $expr: { $gt: [{ $size: "$vote" }, 0] }
-                                }
-                            },
-                            {
-                                $replaceRoot: {
-                                    newRoot: {
-                                        '$first': '$vote',
-                                    }
-                                }
-                            }
-                        ],
-                    }
-                }] : []
-            ])
+            .aggregate(representativeVotesAgg({
+                groupHandle,
+                groupId,
+                representativeId,
+                representeeId,
+                efficientOrThorough
+            }))
             .toArray()
     );
 
@@ -1538,10 +1335,5 @@ export const updateRepresenteesVotes = async ({
 
 }
 
-
-
-// update representeeVote for vote
-// update representeeVotes for vote representative votes
-
-// update representeeVotes by representative //for debug
-// update representeeVotes by representatee //for debug
+// Update All representeeS votes on a Specific Question
+// for when a tag is added/removed or debug

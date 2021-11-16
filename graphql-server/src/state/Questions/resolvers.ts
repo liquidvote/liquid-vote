@@ -1,6 +1,6 @@
 import { ObjectId } from 'mongodb';
 
-import { QuestionsAgg } from './agregationLogic';
+import { QuestionsAgg } from './aggregationLogic';
 
 export const QuestionResolvers = {
     Query: {
