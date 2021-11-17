@@ -3,6 +3,7 @@ import { ObjectId } from 'mongodb';
 import { getGroupStats } from '../Groups/resolvers';
 import { updateInviteStatus } from '../Invites/resolvers';
 import { updateRepresenteesVotes } from '../Votes/resolvers';
+import { updateQuestionVotingStats } from '../Questions/resolvers';
 
 export const UserResolvers = {
     Query: {
@@ -421,6 +422,8 @@ export const UserResolvers = {
     Mutation: {
         editUser: async (_source, { User }, { mongoDB, AuthUser }) => {
 
+            if(!AuthUser) return;
+
             const updated = (AuthUser && User) ? (
                 await mongoDB.collection("Users").findOneAndUpdate(
                     { _id: AuthUser._id },
@@ -449,6 +452,8 @@ export const UserResolvers = {
             IsMember,
             InviteId
         }, { mongoDB, AuthUser }) => {
+
+            if(!AuthUser) return;
 
             // console.log({
             //     UserHandle,
@@ -509,6 +514,8 @@ export const UserResolvers = {
             IsRepresentingYou
         }, { mongoDB, AuthUser }) => {
 
+            if(!AuthUser) return;
+
             const isUser = AuthUser?.LiquidUser?.handle === RepresenteeHandle;
 
             const Representee = await mongoDB.collection("Users")
@@ -547,7 +554,7 @@ export const UserResolvers = {
             )?.value : null;
 
 
-            const updatedRepresenteesVotes = updateRepresenteesVotes ({
+            const updatedRepresenteesVotes = await updateRepresenteesVotes ({
                 efficientOrThorough: "thorough",
             
                 representeeId: Representee._id,
@@ -558,7 +565,27 @@ export const UserResolvers = {
             
                 AuthUser,
                 mongoDB,
-            })
+            });
+
+            // console.log({
+            //     UpdatedRepresentativeGroupRelation,
+            //     updatedRepresenteesVotesL: updatedRepresenteesVotes?.length
+            // });
+
+            const updatedQuestionStats = await Promise.all(updatedRepresenteesVotes.map(async (q: any) => {
+                return await updateQuestionVotingStats({
+                    questionText: q.questionText,
+                    choiceText: q.choiceText,
+                    group: q.groupChannel.group,
+
+                    mongoDB,
+                    AuthUser
+                });
+            }));
+
+            console.log({
+                updatedQuestionStatsL: updatedQuestionStats?.length
+            });
 
             // update/create votes for representee, from representative's votes
 

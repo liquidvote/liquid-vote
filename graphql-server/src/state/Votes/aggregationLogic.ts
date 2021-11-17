@@ -108,7 +108,13 @@ export const representeesAndVoteAgg = ({
                     {
                         $replaceRoot: {
                             newRoot: {
-                                '$first': '$vote',
+                                // '$first': '$vote',
+                                representativeId: { '$first': '$vote.representativeId' },
+                                position: { '$first': '$vote.position' },
+                                forWeight: { '$first': '$vote.forWeight' },
+                                againstWeight: { '$first': '$vote.againstWeight' },
+                                lastEditOn: { '$first': '$vote.lastEditOn' },
+                                createdOn: { '$first': '$vote.createdOn' }
                             }
                         }
                     }
@@ -230,7 +236,13 @@ export const representativeVotesAgg = ({
                     {
                         $replaceRoot: {
                             newRoot: {
-                                '$first': '$vote',
+                                // '$first': '$vote',
+                                representativeId: { '$first': '$vote.representativeId' },
+                                position: { '$first': '$vote.position' },
+                                forWeight: { '$first': '$vote.forWeight' },
+                                againstWeight: { '$first': '$vote.againstWeight' },
+                                lastEditOn: { '$first': '$vote.lastEditOn' },
+                                createdOn: { '$first': '$vote.createdOn' }
                             }
                         }
                     }

@@ -778,7 +778,7 @@ export const VoteResolvers = {
                 ];
 
                 // const writeToDebugFile = fs.writeFile(
-                //     __dirname + '/test.json',
+                //     process.cwd() + '/debug' + '/votes.json',
                 //     JSON.stringify({ QueryJSON }, null, 2),
                 //     { encoding: 'utf8' }
                 // );
@@ -1049,7 +1049,6 @@ export const VoteResolvers = {
             console.log({ usersVoteQueryStats: usersVoteQueryStats?.length })
             // check group stats against Votes
 
-
             return {
                 users: usersVoteQueryStats?.map((u: any) => ({
                     handle: u?.LiquidUser?.handle,
@@ -1157,7 +1156,6 @@ export const VoteResolvers = {
                 questionText,
                 choiceText,
                 group,
-                // channel,
                 mongoDB,
                 AuthUser
             });
@@ -1181,12 +1179,37 @@ export const updateRepresentedVote = async ({
     choiceText,
     groupHandle,
     representeeId,
-    representativesVotes,
+    // representativesVotes,
     existingVote,
+
+    thoroughRepresentatives,
+    representativeVote,
+    isRepresentingYou,
 
     AuthUser,
     mongoDB
 }) => {
+
+    const representativesToUpdate = thoroughRepresentatives ||
+        (!!existingVote?.representatives?.length ? existingVote?.representatives : [])?.reduce(
+            (acc, curr) => [
+                ...acc,
+                // removes previous representative object
+                ...(
+                    curr.representativeId.toString() !== representativeVote.user.toString()
+                ) ? [curr] : []
+            ],
+            [
+                ...(!!isRepresentingYou) ? [{
+                    'representativeId': representativeVote.user,
+                    'position': representativeVote.position,
+                    'forWeight': representativeVote.forWeight,
+                    'againstWeight': representativeVote.againstWeight,
+                    'lastEditOn': Date.now(),
+                    'createdOn': representativeVote?.createdOn || Date.now(),
+                }] : []
+            ]
+        );
 
     const dbDoc = !!AuthUser && (await mongoDB.collection("Votes")
         .findOneAndUpdate({
@@ -1198,14 +1221,14 @@ export const updateRepresentedVote = async ({
             $set: {
                 'position': existingVote?.isDirect ? existingVote.position : 'delegated',
                 'forWeight': existingVote?.isDirect ? existingVote.forWeight :
-                    (representativesVotes.reduce(
+                    (representativesToUpdate.reduce(
                         (acc, curr) => acc + curr.forWeight, 0
-                    ) / representativesVotes.length) || 0,
+                    ) / representativesToUpdate.length) || 0,
                 'againstWeight': existingVote?.isDirect ? existingVote.againstWeight :
-                    (representativesVotes.reduce(
+                    (representativesToUpdate.reduce(
                         (acc, curr) => acc + curr.againstWeight, 0
-                    ) / representativesVotes.length) || 0,
-                'representatives': representativesVotes,
+                    ) / representativesToUpdate.length) || 0,
+                'representatives': representativesToUpdate,
 
                 lastEditOn: Date.now()
             },
@@ -1264,35 +1287,16 @@ export const updateRepresenteesVote = async ({
 
             const RepresenteeVote = r?.Vote;
 
-            const representativesToUpdate = efficientOrThorough === 'thorough' ?
-                r?.representatives :
-                (!!RepresenteeVote?.representatives?.length ? RepresenteeVote?.representatives : [])?.reduce(
-                    (acc, curr) => [
-                        ...acc,
-                        // removes previous representative object
-                        ...(
-                            curr.representativeId.toString() !== representativeId.toString()
-                        ) ? [curr] : []
-                    ],
-                    [
-                        ...(!!isRepresentingYou) ? [{
-                            'representativeId': representativeId,
-                            'position': representativeVote.position,
-                            'forWeight': representativeVote.forWeight,
-                            'againstWeight': representativeVote.againstWeight,
-                            'lastEditOn': Date.now(),
-                            'createdOn': representativeVote?.createdOn || Date.now(),
-                        }] : []
-                    ]
-                );
-
             return await updateRepresentedVote({
                 questionText,
                 choiceText,
                 groupHandle,
                 representeeId: r.representeeId,
-                representativesVotes: representativesToUpdate,
+                // representativesVotes: representativesToUpdate,
                 existingVote: RepresenteeVote,
+                thoroughRepresentatives: r?.representatives,
+                representativeVote,
+                isRepresentingYou,
 
                 AuthUser,
                 mongoDB
@@ -1317,8 +1321,6 @@ export const updateRepresenteesVotes = async ({
     AuthUser,
     mongoDB,
 }) => {
-    console.log("updateRepresenteesVotes");
-
     const representativeVotes = !!representativeId && (
         await mongoDB.collection("Votes")
             .aggregate(representativeVotesAgg({
@@ -1331,9 +1333,62 @@ export const updateRepresenteesVotes = async ({
             .toArray()
     );
 
-    console.log({ representativeVotes: JSON.stringify(representativeVotes, null, 2) });
+    // console.log("updateRepresenteesVotes: - representativeVotes.length: " + representativeVotes.length);
+    
+    // const writeToDebugFile = await fs.writeFile(
+    //     process.cwd() + '/debug' + '/representativeVotesAgg.json',
+    //     JSON.stringify({
+    //         representativeVotesAgg: representativeVotesAgg({
+    //             groupHandle,
+    //             groupId,
+    //             representativeId,
+    //             representeeId,
+    //             efficientOrThorough
+    //         })
+    //     }, null, 2),
+    //     { encoding: 'utf8' }
+    // );
 
+    // const writeToDebugFile2 = await fs.writeFile(
+    //     process.cwd() + '/debug' + '/representativeVotes.json',
+    //     JSON.stringify({ representativeVotes }, null, 2),
+    //     { encoding: 'utf8' }
+    // );
+
+    const updatedRepresenteeVotes = await Promise.all(representativeVotes.map(async (v) => {
+        return await updateRepresentedVote({
+            questionText: v.questionText,
+            choiceText: v.choiceText,
+            groupHandle: v.groupChannel.group,
+            representeeId: representeeId,
+            existingVote: v?.RepresenteeVote,
+
+            thoroughRepresentatives: v?.RepresenteeRepresentativesVotes,
+            representativeVote: v,
+            isRepresentingYou,
+
+            AuthUser,
+            mongoDB
+        })
+    }));
+
+    return updatedRepresenteeVotes;
 }
 
 // Update All representeeS votes on a Specific Question
 // for when a tag is added/removed or debug
+export const updateQuestionDelegatedVotes = async ({
+    efficientOrThorough = "efficient",
+    groupId,
+    groupHandle,
+    questionText,
+}) => {
+
+    // nullify indirect votes
+
+    // direct votes
+    // representees
+
+    // update representee votes
+
+}

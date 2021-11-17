@@ -65,7 +65,7 @@ export const SideMenu: FunctionComponent<{}> = ({ }) => {
                     </Link> */}
                 </>
             )}
-            <Link to="/groups" data-tip={ isAuthenticated ? "Your Groups" : " Groups" }>
+            <Link to="/groups" data-tip={isAuthenticated ? "Your Groups" : " Groups"}>
                 <GroupSvg />
             </Link>
             <Link to="/tags" data-tip="Tags">
@@ -96,6 +96,7 @@ export const SideMenu: FunctionComponent<{}> = ({ }) => {
 
                     ) : (
                         <Popper
+                            startVisible={true}
                             rightOnSmall={true}
                             button={<div>
                                 {/* <img
