@@ -163,6 +163,12 @@ export const Home: FunctionComponent<{}> = ({ }) => {
                 <li className="mr-3">
                     <Link to="//www.linkedin.com/company/liquid-vote/" target="_blank">LinkedIn</Link>
                 </li>
+                <li className="ml-auto">
+                    <a
+                        href={`mailto:hello@liquid-vote.com?subject=I'd%20like%20to%20get%20Free%20Stickers&body=Hi%20Pedro%2C%0A%0AThanks%20for%20the%20free%20stickers!%0A%0AMy%20address%20is%3A%20%5BYour%20Address%5D%0A%0ABest%2C%0AA%20loving%20supporter`}
+                        target="_blank"
+                    >Get Free Stickers!</a>
+                </li>
             </ul>
 
             <br />
