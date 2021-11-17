@@ -94,7 +94,18 @@ export const AcceptInvite: FunctionComponent<{}> = ({ }) => {
             }
         })
             .then((r) => {
+                console.log('editUserRepresentativeGroupRelation');
                 representatives_refetch();
+
+                updateParams({
+                    paramsToAdd: { refetch: 'questions' }
+                });
+                setTimeout(() => {
+                    updateParams({
+                        paramsToAdd: { refetch: 'group' }
+                    });
+                });
+
             })
     }
 

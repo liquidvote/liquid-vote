@@ -32,8 +32,8 @@ export const GroupPolls: FunctionComponent<{
     });
 
     useEffect(() => {
-        if (allSearchParams.refetch === 'question') {
-            // questions_refetch();
+        if (allSearchParams.refetch === 'questions') {
+            questions_refetch();
             updateParams({ keysToRemove: ['refetch'] })
         }
     }, [allSearchParams.refetch]);

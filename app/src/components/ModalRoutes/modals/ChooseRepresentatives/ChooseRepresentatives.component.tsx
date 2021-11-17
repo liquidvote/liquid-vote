@@ -73,11 +73,21 @@ export const ChooseRepresentatives: FunctionComponent<{}> = ({ }) => {
                 IsRepresentingYou: true
             }
         })
-            .then((r) => {
+            .then(async (r) => {
                 representatives_refetch();
                 setUserHandlesAdding([
                     ...userHandlesAdding.filter(a => a !== user.handle)
                 ]);
+
+                updateParams({
+                    paramsToAdd: { refetch: 'questions' }
+                });
+                setTimeout(() => { updateParams({
+                    paramsToAdd: { refetch: 'group' }
+                }); });
+                setTimeout(() => { updateParams({
+                    paramsToAdd: { refetch: 'question' }
+                }); }, 2);
             })
     }
     const removeRepresentation = (user: any) => {
@@ -100,6 +110,15 @@ export const ChooseRepresentatives: FunctionComponent<{}> = ({ }) => {
                 setUserHandlesRemoving([
                     ...userHandlesRemoving.filter(a => a !== user.handle)
                 ]);
+
+                updateParams({
+                    paramsToAdd: { refetch: 'questions' }
+                });
+                setTimeout(() => {
+                    updateParams({
+                        paramsToAdd: { refetch: 'group' }
+                    });
+                });
             })
     }
 

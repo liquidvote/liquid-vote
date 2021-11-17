@@ -13,10 +13,6 @@ export const QuestionResolvers = {
                     AuthUserId: AuthUser?._id
                 }))?.toArray())?.[0];
 
-            console.log({
-                Question
-            });
-
             return {
                 ...Question,
                 _id: Question?.id,

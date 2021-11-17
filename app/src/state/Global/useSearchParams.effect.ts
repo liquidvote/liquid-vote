@@ -9,7 +9,7 @@ export default function useSearchParams() {
         theme?: '1' | '2' | '3',
         modal?: 'editProfile' | 'editGroup' | 'editQuestion' | 'listUsers' | 'listGroups',
         modalData?: any,
-        refetch?: 'user' | 'group' | 'question',
+        refetch?: 'user' | 'group' | 'question' | 'questions',
         inviteId?: string
     };
 

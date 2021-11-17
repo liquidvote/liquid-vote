@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { DiscussionEmbed } from 'disqus-react';
 import { Link, useParams } from "react-router-dom";
 import ReactTooltip from 'react-tooltip';
@@ -44,6 +44,13 @@ export default function Question() {
             // channel: groupChannel_.channel
         }
     });
+
+    useEffect(() => {
+        if (allSearchParams.refetch === 'question') {
+            question_refetch();
+            updateParams({ keysToRemove: ['refetch'] })
+        }
+    }, [allSearchParams.refetch]);
 
     const { liquidUser } = useAuthUser();
 

@@ -7,6 +7,8 @@ export const GroupResolvers = {
             const Group = await mongoDB.collection("Groups")
                 .findOne({ 'handle': handle });
 
+            if (!Group) return;
+
             const GroupMemberRelation = AuthUser ? (await mongoDB.collection("GroupMembers")
                 .findOne({
                     'userId': new ObjectId(AuthUser._id),
