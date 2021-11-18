@@ -72,7 +72,7 @@ export const Feed: FunctionComponent<{}> = ({ }) => {
                             <div className="poll-cover-overlay">
                             </div>
                             <div className="poll-cover-info">
-                                <Link to={'/group/${handle'}>
+                                <Link to={`/group/${v?.group?.handle}`}>
                                     <h5 className="white p-0 m-0">
                                         {v?.group?.name}
                                     </h5>
