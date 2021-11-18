@@ -192,6 +192,11 @@ export const USER_QUESTIONS = gql`
         createdOn
         lastEditOn
         thisUserIsAdmin
+        group {
+            handle
+            cover
+            name
+        }
     }
   }
 

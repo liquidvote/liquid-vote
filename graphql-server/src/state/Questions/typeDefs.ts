@@ -40,6 +40,7 @@ export const QuestionTypeDefs = gql`
         stats: QuestionStats
         userVote: Vote
         yourVote: Vote
+        group: Group
     }
 
     type Voter {

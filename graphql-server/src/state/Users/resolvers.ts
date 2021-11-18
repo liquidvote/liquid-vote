@@ -360,6 +360,19 @@ export const UserResolvers = {
                             }
                         }] : [],
                         {
+                            $lookup: {
+                                from: 'Groups',
+                                localField: 'groupChannel.group',
+                                foreignField: 'handle',
+                                as: 'group'
+                            }
+                        },
+                        {
+                            $addFields: {
+                                group: { $first: "$group"  }
+                            }
+                        },
+                        {
                             '$addFields': {
                                 'stats.lastEditOrVote': {
                                     '$cond': [
@@ -422,7 +435,7 @@ export const UserResolvers = {
     Mutation: {
         editUser: async (_source, { User }, { mongoDB, AuthUser }) => {
 
-            if(!AuthUser) return;
+            if (!AuthUser) return;
 
             const updated = (AuthUser && User) ? (
                 await mongoDB.collection("Users").findOneAndUpdate(
@@ -453,7 +466,7 @@ export const UserResolvers = {
             InviteId
         }, { mongoDB, AuthUser }) => {
 
-            if(!AuthUser) return;
+            if (!AuthUser) return;
 
             // console.log({
             //     UserHandle,
@@ -514,7 +527,7 @@ export const UserResolvers = {
             IsRepresentingYou
         }, { mongoDB, AuthUser }) => {
 
-            if(!AuthUser) return;
+            if (!AuthUser) return;
 
             const isUser = AuthUser?.LiquidUser?.handle === RepresenteeHandle;
 
@@ -554,15 +567,15 @@ export const UserResolvers = {
             )?.value : null;
 
 
-            const updatedRepresenteesVotes = await updateRepresenteesVotes ({
+            const updatedRepresenteesVotes = await updateRepresenteesVotes({
                 efficientOrThorough: "thorough",
-            
+
                 representeeId: Representee._id,
                 representativeId: Representative._id,
                 isRepresentingYou: IsRepresentingYou, // false, for when removing vote
                 groupId: Group_._id,
                 groupHandle: Group_.handle,
-            
+
                 AuthUser,
                 mongoDB,
             });

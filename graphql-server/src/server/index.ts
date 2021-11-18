@@ -39,9 +39,7 @@ const getDBConnection = async () => {
     }
 }
 
-
 export const configServer = async ({ ApolloServer, gql }) => {
-
     const QueryTypeDefs = gql`
         scalar JSON
 
