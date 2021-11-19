@@ -136,6 +136,9 @@ export const QuestionsAgg = ({
             'questionText': {
                 '$first': '$questionText'
             },
+            'description': {
+                '$first': '$description'
+            },
             'startText': {
                 '$first': '$startText'
             },
@@ -178,6 +181,9 @@ export const QuestionsAgg = ({
             },
             'questionText': {
                 '$first': '$questionText'
+            },
+            'description': {
+                '$first': '$description'
             },
             'startText': {
                 '$first': '$startText'
