@@ -418,15 +418,17 @@ export const UserResolvers = {
                         user: AuthUser?._id
                     })
                 },
-                ...(q.questionType === 'multi' && !!AuthUser) && {
+                ...(q.questionType === 'multi') && {
                     choices: await Promise.all(q.choices.map(async (c) => ({
                         ...c,
-                        yourVote: await mongoDB.collection("Votes").findOne({
-                            questionText: q.questionText,
-                            'groupChannel.group': q.groupChannel.group,
-                            choiceText: c.text,
-                            user: AuthUser?._id
-                        })
+                        ...(!!AuthUser) && {
+                            yourVote: await mongoDB.collection("Votes").findOne({
+                                questionText: q.questionText,
+                                'groupChannel.group': q.groupChannel.group,
+                                choiceText: c.text,
+                                user: AuthUser?._id
+                            })
+                        }
                     })))
                 }
             })));
