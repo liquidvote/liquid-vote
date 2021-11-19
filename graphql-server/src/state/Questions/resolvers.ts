@@ -19,14 +19,16 @@ export const QuestionResolvers = {
                 ...(Question?.questionType === 'single' && !!AuthUser) && {
                     yourVote: Question?.choices[0]?.yourVote
                 },
-                ...(Question?.questionType === 'multi' && !!AuthUser) && {
+                ...(Question?.questionType === 'multi') && {
                     // stats: Question?.stats,
                     choices: await Promise.all(Question?.choices?.map(async (c) => ({
                         ...c?.choice,
-                        yourVote: c?.yourVote
+                        ...(!!AuthUser) && {
+                            yourVote: c?.yourVote
+                        }
                     }))),
                 },
-                thisUserIsAdmin: Question?.createdBy?.handle === AuthUser?.LiquidUser?.handle,
+                thisUserIsAdmin: !!AuthUser && Question?.createdBy?.toString() === AuthUser?._id?.toString(),
             };
         },
         Questions: async (_source, {

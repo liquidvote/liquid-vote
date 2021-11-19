@@ -501,10 +501,6 @@ export const updateRepresentedVote = async ({
             ]
         );
 
-    console.log({
-        existingVote
-    });
-
     const dbDoc = !!AuthUser && (await mongoDB.collection("Votes")
         .findOneAndUpdate({
             'questionText': questionText,

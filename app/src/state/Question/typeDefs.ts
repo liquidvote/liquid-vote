@@ -48,6 +48,11 @@ export const QUESTION = gql`
             createdOn
             lastEditOn
             thisUserIsAdmin
+            group {
+                handle
+                cover
+                name
+            }
             stats {
                 lastVoteOn
                 forCount
