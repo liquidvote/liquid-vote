@@ -37,30 +37,38 @@ export const ButtonPicker: FunctionComponent<Props> = ({
 
 
             <div className="d-flex justify-content-around m-3 mx-5 px-5">
-                <button
+                <div
                     className={`button_ ${value === 'single' ? 'selected inverted' : ''} ${disabled && 'no-events'}`}
                     onClick={() => !disabled && setValue(
                         name,
                         'single',
-                        { shouldValidate: true }
+                        // {
+                        //     shouldValidate: false,
+                        //     shouldDirty: false,
+                        //     shouldTouch: false
+                        // }
                     )}
-                    // disabled={disabled}
+                // disabled={disabled}
                 >
                     <DropSVG />{' '}
                     For or Against
-                </button>
-                <button
+                </div>
+                <div
                     className={`button_ ml-2 ${value === 'multi' ? 'selected inverted' : ''} ${disabled && 'no-events'}`}
                     onClick={() => !disabled && setValue(
                         name,
                         'multi',
-                        { shouldValidate: true }
+                        // {
+                        //     shouldValidate: false,
+                        //     shouldDirty: false,
+                        //     shouldTouch: false
+                        // }
                     )}
-                    // disabled={disabled}
+                // disabled={disabled}
                 >
                     <MultiDropSVG />{' '}
                     Multiple Choices
-                </button>
+                </div>
             </div>
 
             {/* <div className="letter-count">

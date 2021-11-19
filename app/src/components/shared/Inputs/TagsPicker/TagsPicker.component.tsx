@@ -45,7 +45,7 @@ export const TagsPicker: FunctionComponent<Props> = ({
                 ...value?.map((c, i_) => i === i_ ? ({ text }) : c),
                 ...(i === value?.length - 1) ? [{ text: '' }] : []
             ],
-            { shouldValidate: true }
+            // { shouldValidate: true }
         );
     }
 

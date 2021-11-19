@@ -38,13 +38,18 @@ export const MultiChoices: FunctionComponent<Props> = ({
     const [isFocused, setIsFocused] = useState(false);
 
     const handleChoiceChange = ({ i, text }: { i: number, text: string }) => {
+        console.log({
+            i, 
+            text,
+            value
+        });
         setValue(
             name,
             [
                 ...value?.map((c, i_) => i === i_ ? ({ text }) : c),
                 ...(i === value?.length - 1) ? [{ text: '' }] : []
             ],
-            { shouldValidate: true }
+            // { shouldValidate: true }
         );
     }
 

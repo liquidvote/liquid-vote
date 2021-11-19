@@ -58,10 +58,6 @@ export const EditQuestion: FunctionComponent<{}> = ({ }) => {
         skip: modalData.questionText === "new"
     });
 
-    console.log({
-        question_data
-    });
-
     const [editQuestion, {
         loading: editQuestion_loading,
         error: editQuestion_error,
@@ -102,7 +98,7 @@ export const EditQuestion: FunctionComponent<{}> = ({ }) => {
     const {
         handleSubmit, register, formState: { errors, isValid }, watch, setValue
     } = useForm<IFormValues>({
-        mode: 'onChange',
+        mode: 'onSubmit',
         defaultValues: {
             questionType: 'single',
             startText: 'approve',
@@ -153,6 +149,8 @@ export const EditQuestion: FunctionComponent<{}> = ({ }) => {
         ReactTooltip.rebuild();
     }, []);
 
+    console.log({ errors });
+
     return (
         <form onSubmit={handleSubmit(onSubmit)} className="voteForm">
 
@@ -186,7 +184,7 @@ export const EditQuestion: FunctionComponent<{}> = ({ }) => {
                             <input
                                 className={`${modalData.questionText === "new" && 'pointer'}`}
                                 {...register("startText", {
-                                    required: "Required"
+                                    // required: "Required"
                                 })}
                                 onClick={() => modalData.questionText === "new" && setNextStartText()}
                                 disabled={modalData.questionText !== "new"}
@@ -203,7 +201,11 @@ export const EditQuestion: FunctionComponent<{}> = ({ }) => {
                                 noLabel={true}
                                 placeholder="Ask a question..."
                                 register={register(name, {
-                                    required: true
+                                    // required: true,
+                                    validate: {
+                                        minLength: v => v?.length > 5 || 'we need at least 5 characters here',
+                                        tooBig: v => v?.length < 80 || 'should be smaller than 80 characters',
+                                    }
                                 })}
                                 value={watch(name)}
                                 error={errors[name]}
@@ -211,8 +213,10 @@ export const EditQuestion: FunctionComponent<{}> = ({ }) => {
                             />
                         ))('questionText')}
                     </div>
-                    {errors?.questionText && <div className="error pl-0 mt-n2">{errors?.questionText.message}</div>}
+                    {/* {errors?.questionText && <div className="error pl-0 mt-n2">{errors?.questionText.message}</div>} */}
                 </div>
+
+                {/* <pre>{JSON.stringify(errors, null, 2)}</pre> */}
 
                 <div className="my-3">
                     {((name: keyof IFormValues) => (
