@@ -97,63 +97,64 @@ export const QuestionResolvers = {
             mongoDB, AuthUser
         }) => {
 
+            if (!AuthUser) return;
+
             const Question_ = await mongoDB.collection("Questions")
-                .findOne({ questionText, group });
+                .findOne({ questionText, 'groupChannel.group': group });
 
-            const savedQuestion = (AuthUser && questionText === 'new') ?
-                (await mongoDB.collection("Questions").insertOne({
-                    'questionType': Question.questionType,
-                    'questionText': Question.questionText,
-                    'description': Question.description,
-                    'startText': Question.startText,
-                    'choices': Question.choices
-                        .filter(c => c.text !== "")
-                        .map(c => ({
-                            ...c,
-                            'stats': {
-                                forCount: 0,
-                                forDirectCount: 0,
-                                againstCount: 0,
-                                againstDirectCount: 0,
-                                lastVoteOn: null,
-                            }
-                        })),
-                    'groupChannel': Question.groupChannel,
-                    'resultsOn': Question.resultsOn,
+            if (!!Question_ && AuthUser._id.toString() !== Question_?.createdBy.toString()) { return };
 
-                    'lastEditOn': Date.now(),
-                    'createdOn': Date.now(),
-                    'createdBy': AuthUser._id,
+            const dbDoc = !!AuthUser && (await mongoDB.collection("Questions")
+                .findOneAndUpdate({
+                    questionText: Question.questionText,
+                    'groupChannel.group': group,
+                }, {
+                    $set: {
+                        'description': Question.description,
 
-                    'stats': {
-                        forCount: 0,
-                        forDirectCount: 0,
-                        againstCount: 0,
-                        againstDirectCount: 0,
-                        lastVoteOn: null,
-                    }
-                }))?.ops[0] : (
-                    AuthUser &&
-                    Question_.createdBy === AuthUser._id
-                ) ? (await mongoDB.collection("Questions").findOneAndUpdate(
-                    { _id: Question_._id },
-                    {
-                        $set: {
-                            'questionType': Question.questionType,
-                            'questionText': Question.questionText,
-                            'description': Question.description,
-                            'startText': Question.startText,
-                            'choices': Question.choices.filter(c => c.text !== ""),
-                            'groupChannel': Question.groupChannel,
-                            'resultsOn': Question.resultsOn,
-                            'lastEditOn': Date.now(),
-                        },
+                        lastEditOn: Date.now()
                     },
-                    { returnDocument: 'after' }
-                ))?.value : null;
+                    $setOnInsert: {
+                        'questionType': Question.questionType,
+                        'questionText': Question.questionText,
+                        // 'description': Question.description,
+                        'startText': Question.startText,
+                        'choices': Question.choices
+                            .filter(c => c.text !== "")
+                            .map(c => ({
+                                ...c,
+                                'stats': {
+                                    forCount: 0,
+                                    forDirectCount: 0,
+                                    againstCount: 0,
+                                    againstDirectCount: 0,
+                                    lastVoteOn: null,
+                                }
+                            })),
+                        'groupChannel': Question.groupChannel,
+                        'resultsOn': Question.resultsOn,
+
+                        // 'lastEditOn': Date.now(),
+                        'createdOn': Date.now(),
+                        'createdBy': AuthUser._id,
+
+                        'stats': {
+                            forCount: 0,
+                            forDirectCount: 0,
+                            againstCount: 0,
+                            againstDirectCount: 0,
+                            lastVoteOn: null,
+                        }
+                    }
+                },
+                    {
+                        upsert: true,
+                        returnDocument: 'after'
+                    }
+                ))?.value;
 
             return {
-                ...savedQuestion,
+                ...dbDoc,
                 thisUserIsAdmin: true
             };
         },
