@@ -29,7 +29,7 @@ export const Feed: FunctionComponent<{}> = ({ }) => {
         variables: {
             handle: liquidUser?.handle || null,
             sortBy,
-            notUsers: section === 'other',
+            notUsers: section === 'other' || !liquidUser,
         }
         // skip: !liquidUser
     });

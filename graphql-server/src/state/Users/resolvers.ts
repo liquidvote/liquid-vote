@@ -247,11 +247,6 @@ export const UserResolvers = {
                 .find({ 'userId': new ObjectId(User?._id), 'isMember': true })
                 .toArray();
 
-            // console.log({
-            //     User,
-            //     UserGroupMemberRelations
-            // });
-
             const YourGroupMemberRelations = (!!AuthUser && !!UserGroupMemberRelations) &&
                 await mongoDB.collection("GroupMembers")
                     .find({
@@ -367,6 +362,11 @@ export const UserResolvers = {
                                 as: 'group'
                             }
                         },
+                        ...(!!notUsers || !handle) ? [{
+                            $match: {
+                                'group.privacy': 'public'
+                            }
+                        }]: [],
                         {
                             $addFields: {
                                 group: { $first: "$group"  }
