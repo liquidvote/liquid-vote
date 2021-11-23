@@ -2,6 +2,7 @@ const webpack = require("webpack");
 const HtmlWebpackPlugin = require("html-webpack-plugin");
 const TerserWebpackPlugin = require("terser-webpack-plugin");
 const { resolveTsAliases } = require("resolve-ts-aliases");
+const BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPlugin;
 
 const isProd = process.env.NODE_ENV === "production";
 
@@ -58,6 +59,7 @@ const config = {
     new webpack.DefinePlugin({
       "process.env.NODE_ENV": JSON.stringify(process.env.NODE_ENV),
     }),
+    new BundleAnalyzerPlugin()
   ],
 };
 
