@@ -6,6 +6,7 @@ const BundleAnalyzerPlugin =
   require("webpack-bundle-analyzer").BundleAnalyzerPlugin;
 const WorkboxPlugin = require("workbox-webpack-plugin");
 const WebpackPwaManifest = require("webpack-pwa-manifest");
+const CompressionPlugin = require("compression-webpack-plugin");
 
 const isProd = process.env.NODE_ENV === "production";
 
@@ -70,12 +71,14 @@ const config = {
 
       maximumFileSizeToCacheInBytes: 8 * 1024 * 1024,
     }),
-    new BundleAnalyzerPlugin(),
+    new CompressionPlugin(),
+    // new BundleAnalyzerPlugin(),
     new WebpackPwaManifest({
       name: "Liquid Vote",
-      short_name: "LiquidVote",
+      short_name: "Liquid Vote",
       description: "Where opinions are found",
       background_color: "#0b414d",
+      theme_color: "#0fded5",
       crossorigin: "use-credentials", //can be null, use-credentials or anonymous
       icons: [
         {
@@ -92,6 +95,7 @@ const config = {
           purpose: "maskable",
         },
       ],
+      start_url: "/"
     }),
   ],
 };
