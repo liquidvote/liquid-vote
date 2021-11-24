@@ -82,10 +82,12 @@ export const QuestionResolvers = {
                 ...(q.questionType === 'single' && !!AuthUser) && {
                     yourVote: q?.choices[0]?.yourVote
                 },
-                ...(q.questionType === 'multi' && !!AuthUser) && {
+                ...(q.questionType === 'multi') && {
                     choices: await Promise.all(q?.choices?.map(async (c) => ({
                         ...c?.choice,
-                        yourVote: c?.yourVote
+                        ...(!!AuthUser) && {
+                            yourVote: c?.yourVote
+                        }
                     })))
                 },
                 thisUserIsAdmin: q?.createdBy?.handle === AuthUser?.LiquidUser?.handle,
