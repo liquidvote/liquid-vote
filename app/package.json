@@ -7,7 +7,7 @@
     "serve:dev": "cross-env NODE_ENV=development webpack-dev-server --color --progress",
     "serve:staging": "cross-env NODE_ENV=staging webpack-dev-server --color --progress",
     "serve:production": "cross-env NODE_ENV=production webpack-dev-server --color --progress",
-    "serve:dist": "http-server -S -C cert.pem",
+    "serve:dist": "cd credentials; http-server ../dist -S -C cert.pem",
     "predeploystaging": "npm run build:staging",
     "predeployproduction": "npm run build:production",
     "deploystaging": "aws s3 sync ./dist s3://liquid-vote-app-prototype-3 --profile pedro",
@@ -86,6 +86,7 @@
     "webpack-bundle-analyzer": "^4.5.0",
     "webpack-cli": "^4.8.0",
     "webpack-dev-server": "^4.1.0",
-    "workbox-webpack-plugin": "^6.3.0"
+    "webpack-pwa-manifest": "^4.3.0",
+    "workbox-webpack-plugin": "^6.4.1"
   }
 }

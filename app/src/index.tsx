@@ -15,7 +15,11 @@ import { AUTH_USER, AUTH_USER_LOGGEDIN } from '@state/AuthUser/typeDefs';
 import App from './App';
 import './index.sass';
 
-if (env?.environment === 'production') {
+console.log({
+    env
+});
+
+if (env?.environment === "production") {
     Sentry.init({
         dsn: "https://4a194e29ed7d4f55ab8dd0d51fe7b701@o1069562.ingest.sentry.io/6064301",
         integrations: [new Integrations.BrowserTracing({
@@ -27,7 +31,18 @@ if (env?.environment === 'production') {
         // We recommend adjusting this value in production
         tracesSampleRate: 1.0,
     });
+    
+    if ('serviceWorker' in navigator) {
+        window.addEventListener('load', () => {
+            navigator.serviceWorker.register('/service-worker.js').then(registration => {
+                console.log('SW registered: ', registration);
+            }).catch(registrationError => {
+                console.log('SW registration failed: ', registrationError);
+            });
+        });
+    }
 }
+
 
 const AppolloAppWrapper: FunctionComponent<{}> = ({ }) => {
 

@@ -2,7 +2,10 @@ const webpack = require("webpack");
 const HtmlWebpackPlugin = require("html-webpack-plugin");
 const TerserWebpackPlugin = require("terser-webpack-plugin");
 const { resolveTsAliases } = require("resolve-ts-aliases");
-const BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPlugin;
+const BundleAnalyzerPlugin =
+  require("webpack-bundle-analyzer").BundleAnalyzerPlugin;
+const WorkboxPlugin = require("workbox-webpack-plugin");
+const WebpackPwaManifest = require("webpack-pwa-manifest");
 
 const isProd = process.env.NODE_ENV === "production";
 
@@ -59,7 +62,37 @@ const config = {
     new webpack.DefinePlugin({
       "process.env.NODE_ENV": JSON.stringify(process.env.NODE_ENV),
     }),
-    new BundleAnalyzerPlugin()
+    new WorkboxPlugin.GenerateSW({
+      // these options encourage the ServiceWorkers to get in there fast
+      // and not allow any straggling "old" SWs to hang around
+      clientsClaim: true,
+      skipWaiting: true,
+
+      maximumFileSizeToCacheInBytes: 8 * 1024 * 1024,
+    }),
+    new BundleAnalyzerPlugin(),
+    new WebpackPwaManifest({
+      name: "Liquid Vote",
+      short_name: "LiquidVote",
+      description: "Where opinions are found",
+      background_color: "#0b414d",
+      crossorigin: "use-credentials", //can be null, use-credentials or anonymous
+      icons: [
+        {
+          src: "src/assets/logo.png",
+          sizes: [96, 128, 192, 256, 384, 512], // multiple sizes
+        },
+        {
+          src: "src/assets/logo.png",
+          size: "1024x1024", // you can also use the specifications pattern
+        },
+        {
+          src: "src/assets/logo.png",
+          size: "1024x1024",
+          purpose: "maskable",
+        },
+      ],
+    }),
   ],
 };
 

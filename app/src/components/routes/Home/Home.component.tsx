@@ -45,9 +45,9 @@ export const Home: FunctionComponent<{}> = ({ }) => {
                     style={{ maxHeight: '100%', maxWidth: '48%' }}
                     src="https://www.youtube.com/embed/fg0_Vhldz-8"
                     title="YouTube video player"
-                    frameborder="0"
+                    frameBorder="0"
                     allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                    allowfullscreen
+                    allowFullScreen
                 ></iframe>
             </div>
 
