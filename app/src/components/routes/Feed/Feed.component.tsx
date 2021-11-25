@@ -36,9 +36,14 @@ export const Feed: FunctionComponent<{}> = ({ }) => {
 
     return (
         <>
-            <Header title="Home" />
+            <Header
+                title="Home"
+                // rightElement={
+                //     () => <VoteSortPicker updateSortInParent={setSortBy} initialSort={sortBy} />
+                // }
+            />
 
-            {
+            {/* {
                 !!liquidUser && (
                     <ul className="nav d-flex flex-nowrap justify-content-around align-items-center mt-1 mx-n3">
                         <li className="nav-item">
@@ -56,7 +61,7 @@ export const Feed: FunctionComponent<{}> = ({ }) => {
                         </li>
                     </ul>
                 )
-            }
+            } */}
 
             <div className="mt-3">
                 {questions_data?.UserQuestions?.map((v: any, i: any) => (

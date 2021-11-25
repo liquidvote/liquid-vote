@@ -16,6 +16,7 @@ import useGroup from '@state/Group/group.effect';
 import useUser from '@state/User/user.effect';
 import DropAnimation from '@components/shared/DropAnimation';
 import useUserRepresentedBy from "@state/User/userRepresentedBy.effect";
+import ChooseRepresentatives from '@components/shared/ChooseRepresentatives';
 
 import ModalHeader from "../../shared/ModalHeader";
 import './style.sass';
@@ -110,7 +111,7 @@ export const AcceptInvite: FunctionComponent<{}> = ({ }) => {
     }
 
     return (
-        <div>
+        <form>
             <ModalHeader
                 title={
                     modalData?.to === 'representation' ? `TODO` :
@@ -158,7 +159,7 @@ export const AcceptInvite: FunctionComponent<{}> = ({ }) => {
                         ) : (
                             <p className="mx-5 my-4 text-center"><b>You are now a member{!!representatives?.length ? ` and represented by ${user?.name}` : ''} 🎉</b></p>
                         )}
-                        {isMember ? (
+                        {/* {isMember ? (
                             <div className="d-flex flex-column align-items-center">
                                 {editUserRepresentativeGroupRelation_loading ? (
                                     <div className="mx-5 my-4 text-center">
@@ -191,7 +192,13 @@ export const AcceptInvite: FunctionComponent<{}> = ({ }) => {
                                     }
                                 </small>
                             </div>
-                        ) : null}
+                        ) : null} */}
+
+                        <div className={!isMember ? `faded no-events` : ''}>
+                            <h5 className="mb-n3 mx-2 mt-4">Delegate your unused votes to some people</h5>
+                            <ChooseRepresentatives inviterHandle={user?.handle} />
+                        </div>
+                        
                     </div>
                 ) : (
                     <div className="d-flex justify-content-center my-5">
@@ -201,7 +208,7 @@ export const AcceptInvite: FunctionComponent<{}> = ({ }) => {
 
                 <br />
             </div>
-        </div>
+        </form>
     );
 }
 
