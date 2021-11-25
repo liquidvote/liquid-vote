@@ -142,7 +142,7 @@ export default function Question() {
             </div>
 
             {question?.questionType === 'single' ? (
-                <h2 className="mb-0 mt-4">Do you approve</h2>
+                <h2 className="mb-0 mt-4">Do you {question?.startText || 'approve'}</h2>
             ) : (
                 <div className="mt-4"></div>
             )}

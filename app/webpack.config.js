@@ -63,40 +63,44 @@ const config = {
     new webpack.DefinePlugin({
       "process.env.NODE_ENV": JSON.stringify(process.env.NODE_ENV),
     }),
-    new WorkboxPlugin.GenerateSW({
-      // these options encourage the ServiceWorkers to get in there fast
-      // and not allow any straggling "old" SWs to hang around
-      clientsClaim: true,
-      skipWaiting: true,
+    ...(isProd
+      ? [
+          new CompressionPlugin(),
+          new WorkboxPlugin.GenerateSW({
+            // these options encourage the ServiceWorkers to get in there fast
+            // and not allow any straggling "old" SWs to hang around
+            clientsClaim: true,
+            skipWaiting: true,
 
-      maximumFileSizeToCacheInBytes: 8 * 1024 * 1024,
-    }),
-    new CompressionPlugin(),
-    // new BundleAnalyzerPlugin(),
-    new WebpackPwaManifest({
-      name: "Liquid Vote",
-      short_name: "Liquid Vote",
-      description: "Where opinions are found",
-      background_color: "#0b414d",
-      theme_color: "#0fded5",
-      crossorigin: "use-credentials", //can be null, use-credentials or anonymous
-      icons: [
-        {
-          src: "src/assets/logo.png",
-          sizes: [96, 128, 192, 256, 384, 512], // multiple sizes
-        },
-        {
-          src: "src/assets/logo.png",
-          size: "1024x1024", // you can also use the specifications pattern
-        },
-        {
-          src: "src/assets/logo.png",
-          size: "1024x1024",
-          purpose: "maskable",
-        },
-      ],
-      start_url: "/"
-    }),
+            maximumFileSizeToCacheInBytes: 8 * 1024 * 1024,
+          }),
+          // new BundleAnalyzerPlugin(),
+          new WebpackPwaManifest({
+            name: "Liquid Vote",
+            short_name: "Liquid Vote",
+            description: "Where opinions are found",
+            background_color: "#0b414d",
+            theme_color: "#0fded5",
+            crossorigin: "use-credentials", //can be null, use-credentials or anonymous
+            icons: [
+              {
+                src: "src/assets/logo.png",
+                sizes: [96, 128, 192, 256, 384, 512], // multiple sizes
+              },
+              {
+                src: "src/assets/logo.png",
+                size: "1024x1024", // you can also use the specifications pattern
+              },
+              {
+                src: "src/assets/logo.png",
+                size: "1024x1024",
+                purpose: "maskable",
+              },
+            ],
+            start_url: "/",
+          }),
+        ]
+      : []),
   ],
 };
 

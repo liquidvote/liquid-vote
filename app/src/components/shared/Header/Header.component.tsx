@@ -12,12 +12,14 @@ export const Header: FunctionComponent<{
     title: string,
     noBottom?: boolean,
     backLink?: string,
-    iconType?: string
+    iconType?: string,
+    rightElement?: any
 }> = ({
     title,
     noBottom,
     backLink,
-    iconType = 'none'
+    iconType = 'none',
+    rightElement
 }) => {
 
         const history = useHistory();
@@ -46,6 +48,11 @@ export const Header: FunctionComponent<{
                         'none': null
                     })[iconType])(iconType)}
                 </div> */}
+                {!!rightElement && (
+                    <div className="ml-auto">
+                        {rightElement()}
+                    </div>
+                )}
             </div>
         );
     }

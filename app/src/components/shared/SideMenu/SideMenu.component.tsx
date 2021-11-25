@@ -60,17 +60,19 @@ export const SideMenu: FunctionComponent<{}> = ({ }) => {
             </Link>
             {isAuthenticated && user && (
                 <>
-                    {/* <Link to="/notifications" data-tip="Notifications">
+                    <Link to="/notifications" data-tip="Notifications" className="notification-wrapper">
                         <NotificationSvg />
-                    </Link> */}
+                        <div className="notif-you forDirect white">4</div>
+                        <div className="notif-representatives for white">4</div>
+                    </Link>
                 </>
             )}
             <Link to="/groups" data-tip={isAuthenticated ? "Your Groups" : " Groups"}>
                 <GroupSvg />
             </Link>
-            <Link to="/tags" data-tip="Tags">
+            {/* <Link to="/tags" data-tip="Tags">
                 <HashTagSvg />
-            </Link>
+            </Link> */}
             {/* <Link to="/feed">
                 <BookmarkSvg />
             </Link>

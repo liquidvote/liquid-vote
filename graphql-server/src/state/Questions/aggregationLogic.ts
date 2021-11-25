@@ -156,6 +156,9 @@ export const QuestionsAgg = ({
                 },
                 'stats': {
                     '$first': '$stats'
+                },
+                'createdBy': {
+                    '$first': '$createdBy'
                 }
             }
         }, {
@@ -202,6 +205,9 @@ export const QuestionsAgg = ({
                 },
                 'stats': {
                     '$first': '$stats'
+                },
+                'createdBy': {
+                    '$first': '$createdBy'
                 }
             }
         }, {

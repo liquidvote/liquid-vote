@@ -36,6 +36,8 @@ export const VoteResolvers = {
                 choiceFilters = false
             }: any) => {
 
+                // TODO check if viewer has access to group
+
                 const AggregateLogic = VotersAgg({
                     questionText,
                     choiceText,

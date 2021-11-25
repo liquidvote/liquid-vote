@@ -44,6 +44,7 @@ export default function App() {
                         <Route path="/trending" component={loadable(() => import('./components/routes/Trending'))} />
                         <Route path="/home/:section" component={loadable(() => import('./components/routes/Feed'))} />
                         <Route path="/home" component={loadable(() => import('./components/routes/Feed'))} />
+                        <Route path="/notifications/:section" component={loadable(() => import('./components/routes/Notifications'))} />
                         <Route path="/notifications" component={loadable(() => import('./components/routes/Notifications'))} />
                         <Route path="/groups/:section" component={loadable(() => import('./components/routes/Groups'))} />
                         <Route path="/groups" component={loadable(() => import('./components/routes/Groups'))} />

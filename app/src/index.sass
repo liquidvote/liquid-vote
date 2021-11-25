@@ -13,7 +13,6 @@
 @import "~bootstrap/scss/_nav"
 @import "~bootstrap/scss/_badge"
 
-
 body,
 html
     font-family: "Quicksand", sans-serif
@@ -746,7 +745,6 @@ hr
         .poll-cover
             height: 100px
 
-
 .profile-top
     position: relative
 
@@ -812,3 +810,24 @@ hr
 
 .w-fit
     width: fit-content
+
+.notification-wrapper
+    position: relative
+
+    > [class^="notif-"]
+        position: absolute
+        border-radius: 20px
+        font-size: 10px
+        min-width: 16px
+        min-height: 16px
+        display: flex
+        align-items: center
+        justify-content: center
+
+    .notif-you
+        right: 19px
+        top: -2px
+
+    .notif-representatives
+        right: -8px
+        top: -2px

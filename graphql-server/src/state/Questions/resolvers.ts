@@ -1,4 +1,5 @@
 import { ObjectId } from 'mongodb';
+const { promises: fs } = require("fs");
 
 import { QuestionsAgg } from './aggregationLogic';
 
@@ -12,6 +13,22 @@ export const QuestionResolvers = {
                     group,
                     AuthUserId: AuthUser?._id
                 }))?.toArray())?.[0];
+
+            // const writeToDebugFile = fs.writeFile(
+            //     process.cwd() + '/debug' + '/Questions.json',
+            //     JSON.stringify({
+            //         QueryJSON: QuestionsAgg({
+            //             questionText,
+            //             group,
+            //             AuthUserId: AuthUser?._id
+            //         })
+            //     }, null, 2),
+            //     { encoding: 'utf8' }
+            // );
+
+            // console.log({
+            //     Question
+            // });
 
             return {
                 ...Question,
