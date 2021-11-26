@@ -102,12 +102,12 @@ export const GroupResolvers = {
     Mutation: {
         editGroup: async (_source, { Group, handle }, { mongoDB, AuthUser }) => {
 
-            if(!AuthUser) return;
+            if (!AuthUser) return;
 
             const Group_ = await mongoDB.collection("Groups")
                 .findOne({ 'handle': handle });
 
-            if(!!Group_ && !Group_.admins.find(u => u.handle === AuthUser.LiquidUser.handle)) return;
+            if (!!Group_ && !Group_.admins.find(u => u.handle === AuthUser.LiquidUser.handle)) return;
 
             const savedGroup = (AuthUser && handle === 'new') ?
                 (await mongoDB.collection("Groups").insertOne({
@@ -268,10 +268,12 @@ export const getGroupStats = async ({ groupId, groupHandle, mongoDB }) => {
         questions: await mongoDB.collection("Questions")
             .find({
                 "groupChannel.group": groupHandle,
+                "status": { "$ne": "deleted" }
             }).count(),
         representations: await mongoDB.collection("UserRepresentations")
             .find({
                 "groupId": new ObjectId(groupId),
+                "isRepresentingYou": true
             }).count(),
         directVotesMade: await mongoDB.collection("Votes")
             .find({

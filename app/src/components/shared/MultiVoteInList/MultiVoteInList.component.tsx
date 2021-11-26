@@ -61,7 +61,7 @@ export const MultiVoteInList: FunctionComponent<{
                                             }
                                         })}
                                     >
-                                        Delete Poll
+                                        Delete
                                     </li>
                                     <li
                                         className="pointer my-2"
