@@ -10,6 +10,9 @@ import './style.sass';
 import { valores } from "@state/Mock/Votes";
 import Choice from "@shared/Choice";
 import GroupSvg from "@shared/Icons/Group.svg";
+import ThreeDotsSmallSVG from '@shared/Icons/ThreeDots-small-horizontal.svg';
+import Popper from "@shared/Popper";
+import useSearchParams from "@state/Global/useSearchParams.effect";
 
 export const MultiVoteInList: FunctionComponent<{
     v: any,
@@ -23,18 +26,64 @@ export const MultiVoteInList: FunctionComponent<{
     showChart
 }) => {
 
+        const { allSearchParams, updateParams } = useSearchParams();
+
         // console.log({ v })
 
-        const sortedChoices = [...v.choices]?.
-            sort((a, b) => (b?.stats?.directVotes + b?.stats?.indirectVotes) - (a?.stats?.directVotes + a?.stats?.indirectVotes));
+        // const sortedChoices = [...v.choices]?.
+        //     sort((a, b) => (b?.stats?.directVotes + b?.stats?.indirectVotes) - (a?.stats?.directVotes + a?.stats?.indirectVotes));
 
-        const maxVoteCount = sortedChoices?.[0]?.stats?.directVotes + sortedChoices?.[0]?.stats?.indirectVotes;
+        // const maxVoteCount = sortedChoices?.[0]?.stats?.directVotes + sortedChoices?.[0]?.stats?.indirectVotes;
 
         return (
             <div className="position-relative">
                 <ReactTooltip place="bottom" type="dark" effect="solid" />
 
-                {!!showGroupAndTime && (
+                {/* <div className="time-ago d-flex flex-column justify-content-end pointer">
+                    <ThreeDotsSmallSVG />
+                </div> */}
+                {v.thisUserIsAdmin && (
+                    <div className="time-ago d-flex flex-column justify-content-end pointer">
+                        <Popper
+                            rightOnSmall={true}
+                            button={<div><ThreeDotsSmallSVG /></div>}
+                            popperContent={
+                                <ul className="p-0 m-0 mx-2">
+                                    <li
+                                        className="pointer my-2 text-danger"
+                                        onClick={() => updateParams({
+                                            paramsToAdd: {
+                                                modal: "DeletePoll",
+                                                modalData: JSON.stringify({
+                                                    questionText: v?.questionText,
+                                                    group: v?.groupChannel?.group
+                                                })
+                                            }
+                                        })}
+                                    >
+                                        Delete Poll
+                                    </li>
+                                    <li
+                                        className="pointer my-2"
+                                        onClick={() => updateParams({
+                                            paramsToAdd: {
+                                                modal: "EditQuestion",
+                                                modalData: JSON.stringify({
+                                                    questionText: v?.questionText,
+                                                    groupHandle: v?.groupChannel?.group,
+                                                })
+                                            }
+                                        })}
+                                    >
+                                        Edit
+                                    </li>
+                                </ul>
+                            }
+                        />
+                    </div>
+                )}
+
+                {/* {!!showGroupAndTime && (
                     <div className="time-ago d-flex flex-column justify-content-end">
                         <small className="text-right" data-tip="Last vote was">
                             {!!v?.stats?.lastVoteOn ?
@@ -43,7 +92,6 @@ export const MultiVoteInList: FunctionComponent<{
                             }
                         </small>
                         <div className="d-flex justify-content-end mt-n1">
-                            {/* <div className="tiny-svg-wrapper"><GroupSvg /></div> */}
                             <Link
                                 to={`/group/${v.groupChannel?.group}`}
                                 className="badge ml-1 mb-1 mt-1"
@@ -52,9 +100,9 @@ export const MultiVoteInList: FunctionComponent<{
                             </Link>
                         </div>
                     </div>
-                )}
+                )} */}
 
-                <div className="d-flex align-items-center flex-wrap mb-2">
+                <div className="d-flex align-items-center flex-wrap">
                     <a
                         className="white"
                         href={`/multipoll/${v.questionText}/${v.groupChannel?.group}`}
@@ -72,8 +120,19 @@ export const MultiVoteInList: FunctionComponent<{
                     )} */}
                 </div>
 
+                {showGroupAndTime && (
+                    <div className="d-flex flex-column justify-content-end mb-n1">
+                        <small className="tiny-text" data-tip="Last vote was">
+                            {!!v?.stats.lastVoteOn ?
+                                'last voted ' + timeAgo.format(new Date(Number(v?.stats?.lastVoteOn))) :
+                                'no votes yet'
+                            }
+                        </small>
+                    </div>
+                )}
+
                 <div>
-                    {sortedChoices?.
+                    {[...v.choices]?.
                         sort((a, b) => (b?.stats?.directVotes + b?.stats?.indirectVotes) - (a?.stats?.directVotes + a?.stats?.indirectVotes))
                         .map((c, i) => (
                             <div className="my-2" key={v.questionText + ' ' + c.text}>
@@ -85,7 +144,7 @@ export const MultiVoteInList: FunctionComponent<{
                                     yourVote={c.yourVote}
                                     userVote={c.userVote}
                                     inList={true}
-                                    maxVoteCount={maxVoteCount}
+                                    // maxVoteCount={maxVoteCount}
                                     user={user}
                                     showChart={showChart}
                                 />

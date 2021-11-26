@@ -24,6 +24,8 @@ import useGroup from '@state/Group/group.effect';
 
 import QuestionVotes from "./QuestionVotes";
 import QuestionArguments from "./QuestionArguments";
+import ThreeDotsSmallSVG from '@shared/Icons/ThreeDots-small-horizontal.svg';
+import Popper from "@shared/Popper";
 
 export default function Question() {
 
@@ -61,11 +63,13 @@ export default function Question() {
 
     const question = question_data?.Question;
 
-    const sortedChoices = question?.questionType === 'multi' ? [...question?.choices]?.
-        sort((a, b) => (b?.stats?.directVotes + b?.stats?.indirectVotes) - (a?.stats?.directVotes + a?.stats?.indirectVotes)) : [];
+    // const sortedChoices = question?.questionType === 'multi' ? [...question?.choices]?.
+    //     sort((a, b) => (b?.stats?.directVotes + b?.stats?.indirectVotes) - (a?.stats?.directVotes + a?.stats?.indirectVotes)) : [];
 
 
-    const maxVoteCount = question?.questionType === 'multi' && sortedChoices?.[0]?.stats?.directVotes + sortedChoices?.[0]?.stats?.indirectVotes;
+    // const maxVoteCount = question?.questionType === 'multi' && sortedChoices?.[0]?.stats?.directVotes + sortedChoices?.[0]?.stats?.indirectVotes;
+
+    console.log({ q: question?.choices });
 
     return question_loading ? (
         <div className="d-flex justify-content-center mt-5">
@@ -141,12 +145,57 @@ export default function Question() {
 
             </div>
 
-            {question?.questionType === 'single' ? (
-                <h2 className="mb-0 mt-4">Do you {question?.startText || 'approve'}</h2>
-            ) : (
-                <div className="mt-4"></div>
-            )}
-            <h2 className="mb-2 white pre-wrap"><b>{voteName}</b>?</h2>
+            <div className="position-relative">
+                {question?.questionType === 'single' ? (
+                    <h2 className="mb-0 mt-4">Do you {question?.startText || 'approve'}</h2>
+                ) : (
+                    <div className="mt-4"></div>
+                )}
+                <h2 className="mb-2 white pre-wrap"><b>{voteName}</b>?</h2>
+
+                {question.thisUserIsAdmin && (
+                    <div className="time-ago d-flex flex-column justify-content-end pointer">
+                        <Popper
+                            rightOnSmall={true}
+                            button={<div>
+                                <ThreeDotsSmallSVG />
+                            </div>}
+                            popperContent={
+                                <ul className="p-0 m-0 mx-2">
+                                    <li
+                                        className="pointer my-2 text-danger"
+                                        onClick={() => updateParams({
+                                            paramsToAdd: {
+                                                modal: "DeletePoll",
+                                                modalData: JSON.stringify({
+                                                    questionText: question?.questionText,
+                                                    group: question?.groupChannel?.group
+                                                })
+                                            }
+                                        })}
+                                    >
+                                        Delete
+                                    </li>
+                                    <li
+                                        className="pointer my-2"
+                                        onClick={() => updateParams({
+                                            paramsToAdd: {
+                                                modal: "EditQuestion",
+                                                modalData: JSON.stringify({
+                                                    questionText: question?.questionText,
+                                                    groupHandle: question?.groupChannel?.group,
+                                                })
+                                            }
+                                        })}
+                                    >
+                                        Edit
+                                    </li>
+                                </ul>
+                            }
+                        />
+                    </div>
+                )}
+            </div>
 
             {!!question?.description && (
                 <p className="pre-wrap white-links">
@@ -163,7 +212,7 @@ export default function Question() {
 
                 {
                     question?.questionType === 'multi' ?
-                        sortedChoices?.map(c => (
+                        [...question?.choices]?.map(c => (
                             <div key={c.text} className="my-3">
                                 <Choice
                                     choiceText={c.text}
@@ -171,7 +220,7 @@ export default function Question() {
                                     groupHandle={groupHandle}
                                     stats={c.stats}
                                     yourVote={c.yourVote}
-                                    maxVoteCount={maxVoteCount}
+                                // maxVoteCount={maxVoteCount}
                                 />
                             </div>
                         )) :
@@ -199,7 +248,7 @@ export default function Question() {
                                 </Link>
                             </div>
                         </div>
-                        <div className="d-flex justify-content-center">
+                        {/* <div className="d-flex justify-content-center">
                             {
                                 (
                                     question?.thisUserIsAdmin ||
@@ -220,9 +269,9 @@ export default function Question() {
                                         >Edit</div>
                                     </>
                                 )}
-                        </div>
+                        </div> */}
                         <small
-                            data-tip={`Poll launched ${!!question?.createdBy ? `by ${question?.createdBy?.name}` : ''} on`}
+                            // data-tip={`Poll launched ${!!question?.createdBy ? `by ${question?.createdBy?.name}` : ''} on`}
                             className="d-flex justify-content-center align-items-center"
                         >
                             {/* <small className="time-ago" data-tip="Last vote was"> */}
@@ -236,6 +285,7 @@ export default function Question() {
                                     ></div>
                                 </Link>
                             )}
+                            {' '}launched{' '}
                             {timeAgo.format(new Date(Number(question?.createdOn)))}
                         </small>
                         {/* <div onClick={() => setIsPollingInOtherGroup(true)} className="button_ small mb-0 mw-25">

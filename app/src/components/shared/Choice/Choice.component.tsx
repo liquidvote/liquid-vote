@@ -8,6 +8,7 @@ import Chart from "@shared/VoteGraph1/chart.svg";
 import { voteStatsMap } from '@state/Question/map';
 import useAuthUser from '@state/AuthUser/authUser.effect';
 import useSearchParams from "@state/Global/useSearchParams.effect";
+import { timeAgo } from '@state/TimeAgo';
 
 import './style.sass';
 
@@ -157,6 +158,18 @@ export const Choice: FunctionComponent<{
                             )}
                         </div>
                     )}
+
+                    {/* {showChart && (
+                        <div className="d-flex flex-column justify-content-end mb-1 mt-n1">
+                            <small className="tiny-text" data-tip="Last vote was">
+                                {!!stats?.lastVoteOn ?
+                                    'last vote ' + timeAgo.format(new Date(Number(stats?.lastVoteOn))) :
+                                    'no votes yet'
+                                }
+                            </small>
+                        </div>
+                    )} */}
+
                     {/* <pre>{JSON.stringify(userVote, null, 2)}</pre> */}
                     {showChart && (
                         <Chart

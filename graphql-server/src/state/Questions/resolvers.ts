@@ -26,10 +26,6 @@ export const QuestionResolvers = {
             //     { encoding: 'utf8' }
             // );
 
-            // console.log({
-            //     Question
-            // });
-
             return {
                 ...Question,
                 _id: Question?.id,
@@ -38,14 +34,18 @@ export const QuestionResolvers = {
                 },
                 ...(Question?.questionType === 'multi') && {
                     // stats: Question?.stats,
-                    choices: await Promise.all(Question?.choices?.map(async (c) => ({
+                    choices: (await Promise.all([...Question?.choices]?.map(async (c, i) => ({
                         ...c?.choice,
                         ...(!!AuthUser) && {
                             yourVote: c?.yourVote
-                        }
-                    }))),
+                        },
+                        i
+                    }))))?.sort((a: any, b: any) => a.i - b.i),
                 },
-                thisUserIsAdmin: !!AuthUser && Question?.createdBy?.toString() === AuthUser?._id?.toString(),
+                thisUserIsAdmin: !!AuthUser && (
+                    Question?.createdBy?.handle === AuthUser?.LiquidUser?.handle ||
+                    Question?.group?.admins?.map(a => a?.handle).includes(AuthUser?.LiquidUser?.handle || 'no user')
+                )
             };
         },
         Questions: async (_source, {
@@ -93,7 +93,7 @@ export const QuestionResolvers = {
                 )
                 .toArray();
 
-            return await Promise.all(Questions.map(async (q) => ({
+            return (await Promise.all(Questions.map(async (q, i) => ({
                 ...q,
                 _id: q?.id,
                 ...(q.questionType === 'single' && !!AuthUser) && {
@@ -107,8 +107,12 @@ export const QuestionResolvers = {
                         }
                     })))
                 },
-                thisUserIsAdmin: q?.createdBy?.handle === AuthUser?.LiquidUser?.handle,
-            })));
+                thisUserIsAdmin: !!AuthUser && (
+                    q?.createdBy?.handle === AuthUser?.LiquidUser?.handle ||
+                    q?.group?.admins?.map(a => a?.handle)?.includes(AuthUser?.LiquidUser?.handle)
+                ),
+                i
+            }))))?.sort((a: any, b: any) => a.i - b.i);
         }
     },
     Mutation: {
@@ -123,7 +127,18 @@ export const QuestionResolvers = {
             const Question_ = await mongoDB.collection("Questions")
                 .findOne({ questionText, 'groupChannel.group': group });
 
-            if (!!Question_ && AuthUser._id.toString() !== Question_?.createdBy.toString()) { return };
+            // TODO: GroupAdmins and QuestionUser wouldn't be needed if Admins object had userIds
+            const GroupAdmins = (
+                await mongoDB.collection("Groups")
+                    .findOne({ 'handle': group })
+            )?.admins;
+            const QuestionUser = !!Question_ && (await mongoDB.collection("Users")
+                .findOne({ '_id': ObjectId(Question_.createdBy) }));
+
+            const isGroupAdmin = GroupAdmins?.map(a => a?.handle).includes(QuestionUser?.LiquidUser?.handle);
+            const isQuestionCreator = AuthUser._id.toString() === Question_?.createdBy.toString();
+
+            if (!!Question_ && !(isGroupAdmin || isQuestionCreator)) { return };
 
             const dbDoc = !!AuthUser && (await mongoDB.collection("Questions")
                 .findOneAndUpdate({
@@ -132,6 +147,7 @@ export const QuestionResolvers = {
                 }, {
                     $set: {
                         'description': Question.description,
+                        'status': Question?.status || 'live',
 
                         lastEditOn: Date.now()
                     },

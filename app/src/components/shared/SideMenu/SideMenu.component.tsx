@@ -27,10 +27,6 @@ export const SideMenu: FunctionComponent<{}> = ({ }) => {
 
     const { liquidUser, liquidUser_refetch } = useAuthUser();
 
-    console.log({
-        p: history?.location?.pathname
-    });
-
     useEffect(() => {
         if (!!isAuthenticated) {
 

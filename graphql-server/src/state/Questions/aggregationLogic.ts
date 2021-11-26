@@ -6,7 +6,8 @@ export const QuestionsAgg = ({
         {
             '$match': {
                 ...questionText && { 'questionText': questionText },
-                'groupChannel.group': group
+                ...group && { 'groupChannel.group': group },
+                'status': { '$ne': 'deleted' }
             }
         }, {
             '$lookup': {
@@ -28,7 +29,8 @@ export const QuestionsAgg = ({
         }, {
             '$unwind': {
                 'path': '$choices',
-                'preserveNullAndEmptyArrays': true
+                'preserveNullAndEmptyArrays': true,
+                'includeArrayIndex': "i"
             }
         }, {
             '$addFields': {
@@ -159,12 +161,17 @@ export const QuestionsAgg = ({
                 },
                 'createdBy': {
                     '$first': '$createdBy'
+                },
+                'i': {
+                    '$first': '$i'
                 }
             }
         }, {
             '$addFields': {
                 'yourVote.representatives': '$yourVote_Representatives'
             }
+        }, {
+            '$sort': { 'i': 1 }
         }, {
             '$group': {
                 '_id': {

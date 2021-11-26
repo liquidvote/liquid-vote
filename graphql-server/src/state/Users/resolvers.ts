@@ -4,6 +4,7 @@ import { getGroupStats } from '../Groups/resolvers';
 import { updateInviteStatus } from '../Invites/resolvers';
 import { updateRepresenteesVotes } from '../Votes/resolvers';
 import { updateQuestionVotingStats } from '../Questions/resolvers';
+import { QuestionsAgg } from '../Questions/aggregationLogic';
 
 export const UserResolvers = {
     Query: {
@@ -344,34 +345,43 @@ export const UserResolvers = {
             const Questions = await mongoDB.collection("Questions")
                 .aggregate(
                     [
-                        ...(!!UserGroups && !notUsers) ? [{
-                            '$match': {
-                                'groupChannel.group': { '$in': UserGroups.map(g => g.handle) }
-                            }
-                        }] : [],
-                        ...(!!UserGroups && notUsers) ? [{
-                            '$match': {
-                                'groupChannel.group': { '$nin': UserGroups.map(g => g.handle) }
-                            }
-                        }] : [],
-                        {
-                            $lookup: {
-                                from: 'Groups',
-                                localField: 'groupChannel.group',
-                                foreignField: 'handle',
-                                as: 'group'
-                            }
-                        },
+                        // ...(!!UserGroups && !notUsers) ? [{
+                        //     '$match': {
+                        //         'groupChannel.group': { '$in': UserGroups.map(g => g.handle) }
+                        //     }
+                        // }] : [],
+                        // ...(!!UserGroups && notUsers) ? [{
+                        //     '$match': {
+                        //         'groupChannel.group': { '$nin': UserGroups.map(g => g.handle) }
+                        //     }
+                        // }] : [],
+                        ...QuestionsAgg({
+                            questionText: null,
+                            group: (!!UserGroups && !notUsers) ?
+                                { '$in': UserGroups.map(g => g.handle) } :
+                                (!!UserGroups && notUsers) ?
+                                    { '$nin': UserGroups.map(g => g.handle) } :
+                                    null,
+                            AuthUserId: AuthUser?._id
+                        }),
+                        // {
+                        //     $lookup: {
+                        //         from: 'Groups',
+                        //         localField: 'groupChannel.group',
+                        //         foreignField: 'handle',
+                        //         as: 'group'
+                        //     }
+                        // },
+                        // {
+                        //     $addFields: {
+                        //         group: { $first: "$group" }
+                        //     }
+                        // },
                         ...(!!notUsers || !handle) ? [{
                             $match: {
                                 'group.privacy': 'public'
                             }
-                        }]: [],
-                        {
-                            $addFields: {
-                                group: { $first: "$group"  }
-                            }
-                        },
+                        }] : [],
                         {
                             '$addFields': {
                                 'stats.lastEditOrVote': {
@@ -408,29 +418,25 @@ export const UserResolvers = {
                 .toArray();
 
             // TODO: move this logic to the aggregation, it'll run much faster
-            return await Promise.all(Questions.map(async (q) => ({
+            return await Promise.all(Questions.map(async (q, i) => ({
                 ...q,
-                // thisUserIsAdmin: q.createdBy === AuthUser?.LiquidUser?.handle,
+                _id: q?.id,
                 ...(q.questionType === 'single' && !!AuthUser) && {
-                    yourVote: await mongoDB.collection("Votes").findOne({
-                        questionText: q.questionText,
-                        'groupChannel.group': q.groupChannel.group,
-                        user: AuthUser?._id
-                    })
+                    yourVote: q?.choices[0]?.yourVote
                 },
                 ...(q.questionType === 'multi') && {
-                    choices: await Promise.all(q.choices.map(async (c) => ({
-                        ...c,
+                    choices: await Promise.all(q?.choices?.map(async (c) => ({
+                        ...c?.choice,
                         ...(!!AuthUser) && {
-                            yourVote: await mongoDB.collection("Votes").findOne({
-                                questionText: q.questionText,
-                                'groupChannel.group': q.groupChannel.group,
-                                choiceText: c.text,
-                                user: AuthUser?._id
-                            })
+                            yourVote: c?.yourVote
                         }
                     })))
-                }
+                },
+                thisUserIsAdmin: !!AuthUser && (
+                    q?.createdBy?.handle === AuthUser?.LiquidUser?.handle ||
+                    q?.group?.admins?.map(a => a?.handle)?.includes(AuthUser?.LiquidUser?.handle)
+                ),
+                i
             })));
         }
     },
