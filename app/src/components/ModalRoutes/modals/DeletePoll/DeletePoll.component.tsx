@@ -2,6 +2,7 @@ import React, { FunctionComponent, useEffect, useState } from 'react';
 import { useForm } from "react-hook-form";
 import { useQuery, useMutation } from "@apollo/client";
 import { useAuth0 } from "@auth0/auth0-react";
+import { useHistory } from "react-router-dom";
 
 import useSearchParams from "@state/Global/useSearchParams.effect";
 import useAuthUser from '@state/AuthUser/authUser.effect';
@@ -24,6 +25,7 @@ interface IFormValues {
 
 export const DeletePoll: FunctionComponent<{}> = ({ }) => {
 
+    const history = useHistory();
     const { allSearchParams, updateParams } = useSearchParams();
     const modalData = allSearchParams.modalData && JSON.parse(allSearchParams.modalData);
     const { liquidUser } = useAuthUser();
@@ -46,7 +48,21 @@ export const DeletePoll: FunctionComponent<{}> = ({ }) => {
         loading: editQuestion_loading,
         error: editQuestion_error,
         data: editQuestion_data,
-    }] = useMutation(EDIT_QUESTION);
+    }] = useMutation(EDIT_QUESTION,  {
+        update: cache => {
+            cache.evict({
+                id: `Question:${question_data?.Question?._id}`,
+                broadcast: true,
+            });
+            cache.gc();
+            
+            if (modalData.navToGroup) {
+                history.push(`/group/${modalData.group}`);
+            } else {
+                updateParams({ keysToRemove: ['modal', 'modalData'] });
+            }
+        }
+    });
 
     return (
         <form>

@@ -69,8 +69,6 @@ export default function Question() {
 
     // const maxVoteCount = question?.questionType === 'multi' && sortedChoices?.[0]?.stats?.directVotes + sortedChoices?.[0]?.stats?.indirectVotes;
 
-    console.log({ q: question?.choices });
-
     return question_loading ? (
         <div className="d-flex justify-content-center mt-5">
             <DropAnimation />
@@ -169,7 +167,8 @@ export default function Question() {
                                                 modal: "DeletePoll",
                                                 modalData: JSON.stringify({
                                                     questionText: question?.questionText,
-                                                    group: question?.groupChannel?.group
+                                                    group: question?.groupChannel?.group,
+                                                    navToGroup: true
                                                 })
                                             }
                                         })}
