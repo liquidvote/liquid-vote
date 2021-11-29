@@ -22,7 +22,7 @@ import useUserRepresentedBy from "@state/User/userRepresentedBy.effect";
 import useAuthUser from '@state/AuthUser/authUser.effect';
 import useGroup from '@state/Group/group.effect';
 
-import QuestionVotes from "./QuestionVotes";
+import QuestionsVotersAlsoVotedOn from "./QuestionsVotersAlsoVotedOn";
 import QuestionArguments from "./QuestionArguments";
 import ThreeDotsSmallSVG from '@shared/Icons/ThreeDots-small-horizontal.svg';
 import Popper from "@shared/Popper";
@@ -247,30 +247,7 @@ export default function Question() {
                                 </Link>
                             </div>
                         </div>
-                        {/* <div className="d-flex justify-content-center">
-                            {
-                                (
-                                    question?.thisUserIsAdmin ||
-                                    group?.thisUserIsAdmin
-                                ) && (
-                                    <>
-                                        <div
-                                            onClick={() => updateParams({
-                                                paramsToAdd: {
-                                                    modal: "EditQuestion",
-                                                    modalData: JSON.stringify({
-                                                        questionText: voteName,
-                                                        groupHandle: group.handle,
-                                                    })
-                                                }
-                                            })}
-                                            className={`button_ small mx-1`}
-                                        >Edit</div>
-                                    </>
-                                )}
-                        </div> */}
                         <small
-                            // data-tip={`Poll launched ${!!question?.createdBy ? `by ${question?.createdBy?.name}` : ''} on`}
                             className="d-flex justify-content-center align-items-center"
                         >
                             {/* <small className="time-ago" data-tip="Last vote was"> */}
@@ -297,20 +274,10 @@ export default function Question() {
 
                 <ul className="nav d-flex justify-content-around mt-1 mb-n4 mx-n3">
                     <li className="nav-item">
-                        <Link className={`nav-link ${(!section || section === 'arguments') && 'active'}`} to={`/poll/${voteName}/${groupHandle}/arguments`}>
+                        <Link className={`nav-link active`} to={`/poll/${voteName}/${groupHandle}`}>
                             Arguments
                         </Link>
                     </li>
-                    {/* <li className="nav-item">
-                        <Link className={`nav-link ${section === 'votesby' && 'active'}`} to={`/poll/${voteName}/${groupHandle}/votesby`}>
-                            Votes by 🧪
-                        </Link>
-                    </li>
-                    <li className="nav-item">
-                        <Link className={`nav-link ${(!section || section === 'timeline') && 'active'}`} to={`/poll/${voteName}/${groupHandle}/timeline`}>
-                            Votes
-                        </Link>
-                    </li> */}
                 </ul>
 
                 <br />
@@ -320,108 +287,18 @@ export default function Question() {
                     <QuestionArguments />
                 )}
 
-                {(section === 'votesby') && (
-                    <div>
-                        <h5 onClick={() => openStats("Sub Groups")}>Sub Groups</h5>
-                        <div className="bar-container">
-                            {byGroups.yourGroup.map((l, i) => (
-                                <div key={i} className="bar-wrapper" style={{ flex: l.flexSize }}>
-                                    <VoteGraph1 key={`a-${i}`} {...l} group="SubGroups" />
-                                </div>
-                            ))}
-                        </div>
+                <ul className="nav d-flex justify-content-around mt-1 mx-n3">
+                    <li className="nav-item">
+                        <Link className={`nav-link active`} to={`/poll/${voteName}/${groupHandle}`}>
+                            Voters also voted on
+                        </Link>
+                    </li>
+                </ul>
 
-                        <br />
-                        <h4 onClick={() => openStats("Your Representatives")}>Your Representatives</h4>
-                        <div className="bar-container">
-                            {byGroups.yourRepresentatives.map((l, i) => (
-                                <div key={i} className="bar-wrapper" style={{ flex: l.flexSize }}>
-                                    <VoteGraph1 key={`a-${i}`} {...l} group="YourRepresentatives" />
-                                </div>
-                            ))}
-                        </div>
+                <QuestionsVotersAlsoVotedOn />
 
-                        {/* <br />
-                        <h4 onClick={() => openStats("People you Follow")}>People you Follow</h4>
-                        <div className="bar-container">
-                            {byGroups.yourRepresentatives.map((l, i) => (
-                                <div className="bar-wrapper" style={{ flex: l.flexSize }}>
-                                    <VoteGraph1 key={`a-${i}`} {...l} group="YourFollowees" />
-                                </div>
-                            ))}
-                        </div> */}
-
-                        {/* <br />
-                        <h4 onClick={() => openStats("Location")}>Locations</h4>
-                        <div className="bar-container">
-                            {byGroups.location.map((l, i) => (
-                                <div className="bar-wrapper" style={{ flex: l.flexSize }}>
-                                    <VoteGraph1 key={`a-${i}`} {...l} group="Location" />
-                                </div>
-                            ))}
-                        </div> */}
-
-                        <br />
-                        <h4 onClick={() => openStats("Age Groups")}>Age Groups</h4>
-                        <div className="bar-container">
-                            {byGroups.age.map((l, i) => (
-                                <div key={i} className="bar-wrapper" style={{ flex: l.flexSize }}>
-                                    <VoteGraph1 key={`a-${i}`} {...l} group="Age Groups" />
-                                </div>
-                            ))}
-                        </div>
-
-                        <br />
-                        <h4 onClick={() => openStats("Location")}>Occupations</h4>
-                        <div className="bar-container">
-                            {byGroups.occupation.map((l, i) => (
-                                <div key={i} className="bar-wrapper" style={{ flex: l.flexSize }}>
-                                    <VoteGraph1 key={`a-${i}`} {...l} />
-                                </div>
-                            ))}
-                        </div>
-
-
-                        <br />
-                        <h4 onClick={() => openStats("Approval on other topics")}>
-                            Correlations with other Votes 🧪
-                        </h4>
-                        <div className="bar-container">
-                            {byGroups.approvalOnOtherTopics.map((l, i) => (
-                                <div key={i} className="bar-wrapper" style={{ flex: l.flexSize }}>
-                                    <VoteGraph1 key={`b-${i}`} {...l} />
-                                </div>
-                            ))}
-                        </div>
-
-                        <br />
-                        <h4 onClick={() => openStats("Votes By")}>Voters</h4>
-                        <div className="bar-container">
-                            {votesBy.map((l, i) => (
-                                <div key={i} className="bar-wrapper" style={{ flex: l.flexSize }}>
-                                    <VoteGraph1 key={`c-${i}`} {...l} />
-                                </div>
-                            ))}
-                        </div>
-                    </div>
-                )}
-
-                {(section === 'timeline') && (
-                    <QuestionVotes />
-                )}
-
-                {(section === 'conversation') && (
-                    <DiscussionEmbed
-                        shortname='enronavoider'
-                        config={
-                            {
-                                url: `http://localhost:8080/`,
-                                identifier: `http://localhost:8080/`,
-                                title: 'test',
-                            }
-                        }
-                    ></DiscussionEmbed>
-                )}
+                <br />
+                <br />
 
             </div>
 

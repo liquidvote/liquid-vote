@@ -47,7 +47,7 @@ export const QuestionArguments: FunctionComponent<{}> = ({ }) => {
             )}
 
             {!arguments_data?.Arguments?.filter(a => a.user.handle !== liquidUser?.handle)?.length && (
-                <p className="py-5 text-center">No one else has made any arguments on this poll yet.</p>
+                <p className="py-2 pb-5 text-center">No one else has made any arguments on this poll yet.</p>
             )}
 
             {arguments_data?.Arguments?.filter(a => a.user.handle !== liquidUser?.handle)?.

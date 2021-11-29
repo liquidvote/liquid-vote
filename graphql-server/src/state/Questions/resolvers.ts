@@ -1,7 +1,7 @@
 import { ObjectId } from 'mongodb';
 const { promises: fs } = require("fs");
 
-import { QuestionsAgg } from './aggregationLogic';
+import { QuestionsAgg, QuestionsInCommonAgg } from './aggregationLogic';
 
 export const QuestionResolvers = {
     Query: {
@@ -113,7 +113,76 @@ export const QuestionResolvers = {
                 ),
                 i
             }))))?.sort((a: any, b: any) => a.i - b.i);
-        }
+        },
+        VotersAlsoVotedOn: async (_source, {
+            questionText,
+            group,
+            sortBy
+        }, { mongoDB, AuthUser }) => {
+
+            const Questions = await mongoDB.collection("Questions")
+                .aggregate(
+                    [
+                        ...QuestionsInCommonAgg({
+                            questionText,
+                            group
+                        }),
+                        ...QuestionsAgg({
+                            questionText: null,
+                            group: null,
+                            AuthUserId: AuthUser?._id
+                        }),
+                        {
+                            $match: {
+                                'group.privacy': 'public'
+                            }
+                        },
+                        {
+                            '$addFields': {
+                                'stats.lastEditOrVote': {
+                                    '$cond': [
+                                        {
+                                            '$gt': [
+                                                '$lastEditOn', '$stats.lastVoteOn'
+                                            ]
+                                        }, '$lastEditOn', '$stats.lastVoteOn'
+                                    ]
+                                },
+                                'stats.totalVotes': {
+                                    '$sum': [
+                                        '$stats.directVotes', '$stats.indirectVotes'
+                                    ]
+                                },
+                            }
+                        },
+                        {
+                            '$sort': { 'votersInCommonStats.voterCount': -1 }
+                        }
+                    ]
+                )
+                .toArray();
+
+            return (await Promise.all(Questions.map(async (q, i) => ({
+                ...q,
+                _id: q?.id,
+                ...(q.questionType === 'single' && !!AuthUser) && {
+                    yourVote: q?.choices[0]?.yourVote
+                },
+                ...(q.questionType === 'multi') && {
+                    choices: await Promise.all(q?.choices?.map(async (c) => ({
+                        ...c?.choice,
+                        ...(!!AuthUser) && {
+                            yourVote: c?.yourVote
+                        }
+                    })))
+                },
+                thisUserIsAdmin: !!AuthUser && (
+                    q?.createdBy?.handle === AuthUser?.LiquidUser?.handle ||
+                    q?.group?.admins?.map(a => a?.handle)?.includes(AuthUser?.LiquidUser?.handle)
+                ),
+                i
+            }))))?.sort((a: any, b: any) => a.i - b.i);
+        },
     },
     Mutation: {
         editQuestion: async (_source, {

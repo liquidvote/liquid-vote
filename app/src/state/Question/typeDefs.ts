@@ -237,6 +237,121 @@ export const QUESTIONS = gql`
     }
 `;
 
+export const QUESTIONS_VOTERS_ALSO_VOTED_ON = gql`
+    query($questionText: String!, $group: String!, $sortBy: String) {
+        VotersAlsoVotedOn(questionText: $questionText, group: $group, sortBy: $sortBy) {
+            _id
+            questionText
+            description
+            questionType
+            startText
+            choices {
+                text
+                stats {
+                    ...stats
+                }
+                yourVote {
+                    ...vote
+                }
+            }
+            groupChannel {
+                group
+                channel
+            }
+            resultsOn
+
+            stats {
+                ...stats
+            }
+            votersInCommonStats {
+                voterCount
+            }
+            yourVote {
+                ...vote
+            }
+            createdOn
+            lastEditOn
+            thisUserIsAdmin
+            createdBy {
+                name
+                handle
+                avatar
+            }
+            group {
+                handle
+                cover
+                name
+            }
+        }
+    }
+
+    fragment stats on QuestionStats {
+		lastVoteOn
+        forCount
+        forDirectCount
+        forMostRepresentingVoters {
+            handle
+            avatar
+            name
+            representeeCount
+        }
+        againstCount
+        againstMostRepresentingVoters {
+            handle
+            avatar
+            name
+            representeeCount
+        }
+        againstDirectCount
+        directVotes
+        indirectVotes
+    }
+
+    fragment vote on Vote {
+        # _id
+        questionText
+        choiceText
+        groupChannel {
+            group
+        }
+        position
+        isDirect
+        forWeight
+        againstWeight
+        representatives{
+            representativeHandle
+            representativeAvatar
+            representativeName
+            position
+            forWeight
+            againstWeight
+            createdOn
+            lastEditOn
+        }
+        createdOn
+        lastEditOn
+        representeeVotes {
+            questionText
+            choiceText
+            groupChannel {
+                group
+            }
+            isDirect
+            position
+            user {
+                handle
+                name
+                avatar
+            }
+        }
+        user {
+            handle
+            name
+            avatar
+        }
+    }
+`;
+
 export const EDIT_QUESTION = gql`
   mutation (
       $questionText: String!,

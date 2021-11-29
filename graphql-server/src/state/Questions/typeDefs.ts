@@ -41,6 +41,7 @@ export const QuestionTypeDefs = gql`
         userVote: Vote
         yourVote: Vote
         group: Group
+        votersInCommonStats: VotersInCommonStats
     }
 
     type Voter {
@@ -50,13 +51,21 @@ export const QuestionTypeDefs = gql`
         representeeCount: Int
     }
 
+    type VotersInCommonStats {
+        voterCount: Int
+    }
+
     extend type Query {
         Question(
             questionText: String,
-            group: String,
-            channel: String
+            group: String
         ): Question
         Questions(
+            group: String,
+            sortBy: String
+        ): [Question]
+        VotersAlsoVotedOn(
+            questionText: String,
             group: String,
             sortBy: String
         ): [Question]
