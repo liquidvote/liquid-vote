@@ -162,26 +162,28 @@ export const QuestionResolvers = {
                 )
                 .toArray();
 
-            return (await Promise.all(Questions.map(async (q, i) => ({
+            return Questions.map((q, i) => ({
                 ...q,
                 _id: q?.id,
                 ...(q.questionType === 'single' && !!AuthUser) && {
                     yourVote: q?.choices[0]?.yourVote
                 },
                 ...(q.questionType === 'multi') && {
-                    choices: await Promise.all(q?.choices?.map(async (c) => ({
+                    choices: q?.choices?.map((c) => ({
                         ...c?.choice,
                         ...(!!AuthUser) && {
                             yourVote: c?.yourVote
                         }
-                    })))
+                    }))
                 },
                 thisUserIsAdmin: !!AuthUser && (
                     q?.createdBy?.handle === AuthUser?.LiquidUser?.handle ||
                     q?.group?.admins?.map(a => a?.handle)?.includes(AuthUser?.LiquidUser?.handle)
                 ),
                 i
-            }))))?.sort((a: any, b: any) => a.i - b.i);
+            }))?.
+                sort((a: any, b: any) => a.i - b.i)?.
+                filter(q => q.questionText !== questionText);
         },
     },
     Mutation: {

@@ -290,7 +290,7 @@ export default function Question() {
                 <ul className="nav d-flex justify-content-around mt-1 mx-n3">
                     <li className="nav-item">
                         <Link className={`nav-link active`} to={`/poll/${voteName}/${groupHandle}`}>
-                            Voters also voted on
+                            People also voted on
                         </Link>
                     </li>
                 </ul>

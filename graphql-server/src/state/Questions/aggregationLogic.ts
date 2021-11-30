@@ -275,11 +275,15 @@ export const QuestionsInCommonAgg = ({ questionText, group }) => [
                         ]
                     }
                 }, {
-                    '$replaceRoot': {
-                        'newRoot': {
-                            'voter': '$user'
-                        }
+                    $group: {
+                        _id: {
+                            user: '$user'
+                        },
+                        count: { $sum: 1 }
                     }
+                },
+                {
+                    $replaceRoot: { newRoot: { voter: "$_id.user" } }
                 }
             ]
         }

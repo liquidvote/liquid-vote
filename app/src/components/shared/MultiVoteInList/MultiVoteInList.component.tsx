@@ -1,4 +1,4 @@
-import React, { FunctionComponent } from 'react';
+import React, { FunctionComponent, useState } from 'react';
 import { Link } from "react-router-dom";
 import numeral from 'numeral';
 import { format } from 'timeago.js';
@@ -27,6 +27,8 @@ export const MultiVoteInList: FunctionComponent<{
 }) => {
 
         const { allSearchParams, updateParams } = useSearchParams();
+
+        const [showAllChoices, setShowAllChoices] = useState(false);
 
         // console.log({ v })
 
@@ -133,6 +135,7 @@ export const MultiVoteInList: FunctionComponent<{
 
                 <div>
                     {[...v.choices]?.
+                        slice(0, showAllChoices ? v.choices?.length : 4)?.
                         sort((a, b) => (b?.stats?.directVotes + b?.stats?.indirectVotes) - (a?.stats?.directVotes + a?.stats?.indirectVotes))
                         .map((c, i) => (
                             <div className="my-2" key={v.questionText + ' ' + c.text}>
@@ -153,6 +156,17 @@ export const MultiVoteInList: FunctionComponent<{
 
                     {/* <pre style={{ 'color': 'white' }}>{JSON.stringify(v.choices, null, 2)}</pre> */}
                 </div>
+
+
+                {v.choices?.length > 4 && (
+                    <div className="d-flex justify-content-start mt-3">
+                        <div
+                            className="white pointer underline"
+                            onClick={() => setShowAllChoices(!showAllChoices)}
+                        >{showAllChoices ? 'Show less' : `Show ${v.choices?.length - 4} more`}</div>
+                    </div>
+                )}
+
 
                 {/* <pre>{JSON.stringify(v.choices, null, 2)}</pre> */}
             </div>
