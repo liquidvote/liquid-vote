@@ -60,7 +60,7 @@ export const TextInput: FunctionComponent<Props> = ({
                 />
             </div>
             {!!precedingText && <span className="preceding-text">{precedingText}</span>}
-            {console.log({error})}
+            {/* {console.log({error})} */}
             {error && <div className="error">{(error as any).message}</div>}
         </div>
     );
