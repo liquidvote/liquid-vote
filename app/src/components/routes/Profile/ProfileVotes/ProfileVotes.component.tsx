@@ -18,7 +18,7 @@ export const ProfileVotes: FunctionComponent<{}> = ({ }) => {
 
     let { section, subsection, subsubsection, handle } = useParams<any>();
 
-    const [sortBy, setSortBy] = useState('weight');
+    const [sortBy, setSortBy] = useState('time');
 
     const { liquidUser } = useAuthUser();
 

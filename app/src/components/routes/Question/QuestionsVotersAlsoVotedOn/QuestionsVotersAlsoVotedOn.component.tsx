@@ -19,8 +19,6 @@ export const QuestionsVotersAlsoVotedOn: FunctionComponent<{}> = ({ }) => {
 
     let { voteName, groupHandle, section, subsection, subsubsection } = useParams<any>();
 
-    const [sortBy, setSortBy] = useState('weight');
-
     const {
         loading: questions_loading,
         error: questions_error,
@@ -29,8 +27,7 @@ export const QuestionsVotersAlsoVotedOn: FunctionComponent<{}> = ({ }) => {
     } = useQuery(QUESTIONS_VOTERS_ALSO_VOTED_ON, {
         variables: {
             questionText: voteName,
-            group: groupHandle,
-            sortBy
+            group: groupHandle
         }
     });
 

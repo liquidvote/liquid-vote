@@ -20,7 +20,7 @@ export const ListVoters: FunctionComponent<{}> = ({ }) => {
     const modalData = JSON.parse(allSearchParams.modalData);
     const { questionText, choiceText, groupHandle, subsection, subsubsection } = modalData;
 
-    const [sortBy, setSortBy] = useState('weight');
+    const [sortBy, setSortBy] = useState('time');
 
     const { liquidUser } = useAuthUser();
     const { group } = useGroup({ handle: groupHandle });

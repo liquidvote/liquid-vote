@@ -29,7 +29,7 @@ export const TextInput: FunctionComponent<Props> = ({
 
     return (
         <div className={
-            `InputWrapper ${value && 'hasValue'} ${error && 'hasError'} ${isFocused && 'isFocused'}`
+            `InputWrapper ${value && 'hasValue'} ${!!error && 'hasError'} ${isFocused && 'isFocused'}`
         }>
             <label>
                 {labelName || name}
@@ -60,7 +60,7 @@ export const TextInput: FunctionComponent<Props> = ({
                 />
             </div>
             {!!precedingText && <span className="preceding-text">{precedingText}</span>}
-            {/* <pre>{JSON.stringify(error, null, 2)}</pre> */}
+            {console.log({error})}
             {error && <div className="error">{(error as any).message}</div>}
         </div>
     );

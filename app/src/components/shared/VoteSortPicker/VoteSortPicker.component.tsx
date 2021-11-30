@@ -10,7 +10,7 @@ export const VoteSortPicker: FunctionComponent<{
     initialSort?: string
 }> = ({
     updateSortInParent,
-    initialSort = 'weight'
+    initialSort = 'time'
 }) => {
 
         const [sortBy, setSortBy] = useState(initialSort);

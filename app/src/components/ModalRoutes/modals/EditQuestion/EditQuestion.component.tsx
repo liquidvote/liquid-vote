@@ -6,6 +6,7 @@ import { useHistory } from "react-router-dom";
 
 import ButtonPicker from "@shared/Inputs/ButtonPicker";
 import TextAreaInput from "@shared/Inputs/TextAreaInput";
+import ToggleInput from "@shared/Inputs/ToggleInput";
 import useSearchParams from "@state/Global/useSearchParams.effect";
 import DropDownInput from "@shared/Inputs/DropDownInput";
 import GroupChannelPicker from "@shared/Inputs/GroupChannelPicker";
@@ -21,6 +22,7 @@ interface IFormValues {
     description: string
     startText: string,
     choices: { text: string }[]
+    allowNewChoices: boolean,
     resultsOn: string,
     groupChannel: {
         group: string,
@@ -58,6 +60,10 @@ export const EditQuestion: FunctionComponent<{}> = ({ }) => {
         skip: modalData.questionText === "new"
     });
 
+    console.log({
+        question_data
+    });
+
     const [editQuestion, {
         loading: editQuestion_loading,
         error: editQuestion_error,
@@ -71,6 +77,7 @@ export const EditQuestion: FunctionComponent<{}> = ({ }) => {
             setValue('description', question_data?.Question?.description);
             setValue('startText', question_data?.Question?.startText);
             setValue('choices', question_data?.Question?.choices);
+            setValue('allowNewChoices', question_data?.Question?.allowNewChoices);
             setValue('resultsOn', question_data?.Question?.resultsOn);
             setValue('groupChannel', question_data?.Question?.groupChannel);
             setValue('visibility', question_data?.Question?.visibility);
@@ -82,9 +89,9 @@ export const EditQuestion: FunctionComponent<{}> = ({ }) => {
 
             const savedQuestion = editQuestion_data?.editQuestion;
 
-            console.log({
-                savedQuestion
-            });
+            // console.log({
+            //     savedQuestion
+            // });
 
             if (savedQuestion.questionType === 'single') {
                 history.push(`/poll/${savedQuestion.questionText}/${savedQuestion.groupChannel.group}`);
@@ -148,8 +155,6 @@ export const EditQuestion: FunctionComponent<{}> = ({ }) => {
     useEffect(() => {
         ReactTooltip.rebuild();
     }, []);
-
-    console.log({ errors });
 
     return (
         <form onSubmit={handleSubmit(onSubmit)} className="voteForm">
@@ -232,23 +237,51 @@ export const EditQuestion: FunctionComponent<{}> = ({ }) => {
                 </div>
 
                 {watch('questionType') === 'multi' ? (
-                    ((name: any) => (
-                        <MultiChoices
-                            name={name}
-                            label="Choices"
-                            register={register(name, {
-                                validate: {
-                                    minimum2: (v) =>
-                                        v.reduce((acc: any, curr: any) => acc + !!curr.text, 0) >= 2 ||
-                                        'please present at least 2 choices',
-                                }
-                            })}
-                            value={watch(name)}
-                            error={errors[name]}
-                            setValue={setValue}
-                            disabled={modalData.questionText !== "new"}
-                        />
-                    ))('choices')
+                    <>
+                        {((name: any) => (
+                            <MultiChoices
+                                name={name}
+                                label="Choices"
+                                register={register(name, {
+                                    validate: {
+                                        minimum2: (v) =>
+                                            v.reduce((acc: any, curr: any) => acc + !!curr.text, 0) >= 2 ||
+                                            'please present at least 2 choices',
+                                    }
+                                })}
+                                value={watch(name)}
+                                error={errors[name]}
+                                setValue={setValue}
+                                disabled={modalData.questionText !== "new"}
+                            />
+                        ))('choices')}
+                        <div className="my-3 mt-4">
+                            {((name: any) => (
+                                <ToggleInput
+                                    name={name}
+                                    labelName="Allow new choices"
+                                    register={register(name, {
+                                        // validate: {
+                                        //     minimum2: (v) =>
+                                        //         v.reduce((acc: any, curr: any) => acc + !!curr.text, 0) >= 2 ||
+                                        //         'please present at least 2 choices',
+                                        // }
+                                    })}
+                                    value={watch(name)}
+                                    error={errors[name]}
+                                    setValue={setValue}
+                                    info={
+                                        watch('allowNewChoices') ? `
+                                            Group members may add more choices
+                                        ` : `
+                                            No one can add more choices
+                                        `}
+                                // disabled={modalData.questionText !== "new"}
+                                />
+                            ))('allowNewChoices')}
+                        </div>
+
+                    </>
                 ) : null}
 
                 <div className="my-4">

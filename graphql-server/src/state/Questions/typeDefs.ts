@@ -29,6 +29,7 @@ export const QuestionTypeDefs = gql`
         description: String
         startText: String
         choices: [Choice]
+        allowNewChoices: Boolean
         groupChannel: GroupChannel
         resultsOn: String
 
@@ -77,6 +78,11 @@ export const QuestionTypeDefs = gql`
             group: String,
             channel: String,
             Question: JSON
+        ): JSON,
+        addChoice(
+            questionText: String,
+            group: String,
+            newChoice: String
         ): JSON
     }
 `;

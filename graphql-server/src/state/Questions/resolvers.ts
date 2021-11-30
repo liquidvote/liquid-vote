@@ -219,6 +219,7 @@ export const QuestionResolvers = {
                     $set: {
                         'description': Question.description,
                         'status': Question?.status || 'live',
+                        'allowNewChoices': Question?.allowNewChoices,
 
                         lastEditOn: Date.now()
                     },
@@ -264,6 +265,52 @@ export const QuestionResolvers = {
             return {
                 ...dbDoc,
                 thisUserIsAdmin: true
+            };
+        },
+        addChoice: async (_source, {
+            questionText, group, newChoice
+        }, {
+            mongoDB, AuthUser
+        }) => {
+
+            if (!AuthUser) return;
+
+            const Question_ = await mongoDB.collection("Questions")
+                .findOne({ questionText, 'groupChannel.group': group });
+
+            const dbDoc =
+                !!AuthUser &&
+                !Question_.choices.find(c => c.text === newChoice) &&
+                !!Question_.allowNewChoices &&
+                (await mongoDB.collection("Questions")
+                .findOneAndUpdate({
+                    _id: ObjectId(Question_._id),
+                }, {
+                    $set: {
+                        'choices': [
+                            ...Question_.choices,
+                            ...[{
+                                text: newChoice,
+                                'stats': {
+                                    forCount: 0,
+                                    forDirectCount: 0,
+                                    againstCount: 0,
+                                    againstDirectCount: 0,
+                                    lastVoteOn: null,
+                                }
+                            }]
+                        ],
+                        lastEditOn: Date.now()
+                    },
+                },
+                    {
+                        upsert: false,
+                        returnDocument: 'after'
+                    }
+                ))?.value;
+
+            return {
+                ...dbDoc
             };
         },
     },

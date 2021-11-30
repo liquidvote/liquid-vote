@@ -522,7 +522,7 @@ export const updateRepresentedVote = async ({
                     ) / representativesToUpdate.length) || 0,
                 'representatives': representativesToUpdate,
 
-                lastEditOn: Date.now()
+                lastEditOn: existingVote?.isDirect ? existingVote?.lastEditOn : Date.now()
             },
             $setOnInsert: {
                 'questionText': questionText,
@@ -626,7 +626,7 @@ export const updateRepresenteesVotes = async ({
     );
 
     // console.log("updateRepresenteesVotes: - representativeVotes.length: " + representativeVotes.length);
-    
+
     // const writeToDebugFile = await fs.writeFile(
     //     process.cwd() + '/debug' + '/representativeVotesAgg.json',
     //     JSON.stringify({

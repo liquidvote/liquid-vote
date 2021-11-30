@@ -126,6 +126,9 @@ export const QuestionsAgg = ({
                 'choices': {
                     '$first': '$choices'
                 },
+                'allowNewChoices': {
+                    '$first': '$allowNewChoices'
+                },
                 'yourVote': {
                     '$first': '$yourVote'
                 },
@@ -185,6 +188,9 @@ export const QuestionsAgg = ({
                         'choice': '$choices',
                         'yourVote': '$yourVote'
                     }
+                },
+                'allowNewChoices': {
+                    '$first': '$allowNewChoices'
                 },
                 'id': {
                     '$first': '$id'

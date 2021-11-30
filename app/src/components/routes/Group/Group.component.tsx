@@ -31,7 +31,7 @@ export const Group: FunctionComponent<{}> = ({ }) => {
     let { handle, section, userHandle } = useParams<any>();
     const { allSearchParams, updateParams } = useSearchParams();
 
-    const [sortBy, setSortBy] = useState('representing');
+    const [sortBy, setSortBy] = useState('time');
 
     const { group, group_refetch } = useGroup({ handle });
 

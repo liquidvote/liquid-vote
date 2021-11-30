@@ -41,6 +41,7 @@ export const QUESTION = gql`
                     ...vote
                 }
             }
+            allowNewChoices
             groupChannel{
                 group
             }
@@ -147,6 +148,7 @@ export const QUESTIONS = gql`
                     ...vote
                 }
             }
+            allowNewChoices
             groupChannel {
                 group
                 channel
@@ -238,8 +240,8 @@ export const QUESTIONS = gql`
 `;
 
 export const QUESTIONS_VOTERS_ALSO_VOTED_ON = gql`
-    query($questionText: String!, $group: String!, $sortBy: String) {
-        VotersAlsoVotedOn(questionText: $questionText, group: $group, sortBy: $sortBy) {
+    query($questionText: String!, $group: String!) {
+        VotersAlsoVotedOn(questionText: $questionText, group: $group) {
             _id
             questionText
             description
@@ -254,6 +256,7 @@ export const QUESTIONS_VOTERS_ALSO_VOTED_ON = gql`
                     ...vote
                 }
             }
+            allowNewChoices
             groupChannel {
                 group
                 channel
@@ -355,15 +358,27 @@ export const QUESTIONS_VOTERS_ALSO_VOTED_ON = gql`
 export const EDIT_QUESTION = gql`
   mutation (
       $questionText: String!,
-      $group: String,
-      $channel: String,
+      $group: String!,
       $Question: JSON!
     ) {
         editQuestion(
             questionText: $questionText,
             group: $group,
-            channel: $channel,
             Question: $Question
+        )
+    }
+`;
+
+export const ADD_CHOICE = gql`
+    mutation (
+        $questionText: String!,
+        $group: String!,
+        $newChoice: String!
+    ) {
+        addChoice(
+            questionText: $questionText,
+            group: $group,
+            newChoice: $newChoice
         )
     }
 `;

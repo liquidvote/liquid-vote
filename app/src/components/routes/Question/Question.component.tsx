@@ -149,7 +149,7 @@ export default function Question() {
                 ) : (
                     <div className="mt-4"></div>
                 )}
-                <h2 className="mb-2 white pre-wrap"><b>{voteName}</b>?</h2>
+                <h2 className="mb-2 white pre-wrap mw-95"><b>{voteName}</b>?</h2>
 
                 {question.thisUserIsAdmin && (
                     <div className="time-ago d-flex flex-column justify-content-end pointer">
@@ -231,6 +231,26 @@ export default function Question() {
                             yourVote={question?.yourVote}
                             showPercentages={true}
                         />
+                }
+
+                {
+                    question?.questionType === 'multi' && !!question?.allowNewChoices && (
+                        <div className="d-flex justify-content-start mt-3">
+                            <div
+                                className="white pointer underline"
+                                onClick={() => updateParams({
+                                    paramsToAdd: {
+                                        modal: "AddChoice",
+                                        modalData: JSON.stringify({
+                                            questionText: question?.questionText,
+                                            group: question?.groupChannel?.group,
+                                            navToGroup: true
+                                        })
+                                    }
+                                })}
+                            >{`Add another choice`}</div>
+                        </div>
+                    )
                 }
 
                 <>
