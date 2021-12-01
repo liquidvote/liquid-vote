@@ -1,5 +1,5 @@
 import * as React from "react";
-import { useHistory } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import numeral from 'numeral';
 
 import './style.sass';
@@ -31,10 +31,10 @@ export default function Chart({
     | null;
 }) {
 
-    const history = useHistory();
+    const navigate = useNavigate();
 
     const navigateTo = (to: any) => {
-        history.push(`/poll/${to}`);
+        navigate(`/poll/${to}`);
     };
 
     const forPercentage = (!forCount && !againstCount) ? 50 : (forCount / (forCount + againstCount)) * 100;

@@ -98,7 +98,7 @@ export const SingleVoteInList: FunctionComponent<{
                             <div className="mb-1 d-flex align-items-center">
                                 <a
                                     className="white mb-0"
-                                    href={`/poll/${l.questionText}/${l.groupChannel?.group}`}
+                                    href={`/poll/${encodeURIComponent(l.questionText)}/${l.groupChannel?.group}`}
                                 >
                                     <div className={`question-title-in-list ${showGroupAndTime && 'limit-right'}`} title={l.questionText}>
                                         {l.questionText}

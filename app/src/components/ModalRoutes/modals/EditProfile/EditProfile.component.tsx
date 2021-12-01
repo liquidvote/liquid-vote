@@ -1,7 +1,6 @@
 import React, { FunctionComponent, useEffect, useState } from 'react';
 import { useForm } from "react-hook-form";
 import { useQuery, useMutation } from "@apollo/client";
-import { useHistory } from "react-router-dom";
 
 import TextInput from "@shared/Inputs/TextInput";
 import TextAreaInput from "@shared/Inputs/TextAreaInput";
@@ -27,7 +26,6 @@ interface IFormValues {
 
 export const EditProfile: FunctionComponent<{}> = ({ }) => {
 
-    const history = useHistory();
     const { allSearchParams, updateParams } = useSearchParams();
     const { uploadFile } = useFileUploader();
     const modalData = JSON.parse(allSearchParams.modalData);

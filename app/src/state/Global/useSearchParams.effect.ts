@@ -1,9 +1,9 @@
 import { useState, useEffect } from 'react';
-import { useLocation, useHistory } from "react-router-dom";
+import { useLocation, useSearchParams } from "react-router-dom";
 
-export default function useSearchParams() {
+export default function useSearchParams_() {
     const location = useLocation();
-    const history = useHistory();
+    let [searchParams, setSearchParams] = useSearchParams();
 
     const allSearchParams = Object.fromEntries(new URLSearchParams(location.search)) as {
         theme?: '1' | '2' | '3',
@@ -31,14 +31,18 @@ export default function useSearchParams() {
         keysToRemove?: Array<string>,
         paramsToAdd?: Object
     }) =>
-        history.replace({
-            pathname: location.pathname,
-            search: getNewSearchParamsString({
-                keysToRemove,
-                paramsToAdd
-            }),
+        // history.replace({
+        //     pathname: location.pathname,
+        //     search: getNewSearchParamsString({
+        //         keysToRemove,
+        //         paramsToAdd
+        //     }),
 
-        })
+        // })
+        setSearchParams(getNewSearchParamsString({
+            keysToRemove,
+            paramsToAdd
+        }));
 
     return {
         allSearchParams,

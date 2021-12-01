@@ -1,65 +1,86 @@
-import React, { FunctionComponent, useEffect } from 'react';
+import React, { FunctionComponent, useEffect, lazy, Suspense } from 'react';
 import {
-    BrowserRouter as Router,
-    Switch,
+    BrowserRouter,
+    Routes,
     Route,
-    Redirect,
     useLocation,
-    useParams
+    useParams,
 } from 'react-router-dom';
-import loadable from '@loadable/component';
+// import loadable from '@loadable/component';
 import ReactTooltip from 'react-tooltip';
 
+import DropAnimation from "@components/shared/DropAnimation";
 import SideMenu from "@shared/SideMenu";
 import ModalRoutes from "@components/ModalRoutes";
 
 export default function App() {
 
+    const Loader = ({ component }: any) =>
+        <Suspense fallback={
+            <div className="d-flex justify-content-center my-5">
+                <DropAnimation />
+            </div>
+        }>
+            {component}
+        </Suspense>;
+    const Home = lazy(() => import('@components/routes/Home'));
+    const Group = lazy(() => import('./components/routes/Group'));
+    const Question = lazy(() => import('./components/routes/Question'));
+    const Profile = lazy(() => import('./components/routes/Profile'));
+    const ProfilePeople = lazy(() => import('./components/routes/ProfilePeople'));
+    // const Trending = lazy(() => import('./components/routes/Trending'));
+    const Feed = lazy(() => import('./components/routes/Feed'));
+    const Notifications = lazy(() => import('./components/routes/Notifications'));
+    const Groups = lazy(() => import('./components/routes/Groups'));
+    const GroupPeople = lazy(() => import('./components/routes/GroupPeople'));
+
     return (
         <div className={`AppContainer theme3`}>
             <ReactTooltip place="bottom" type="dark" effect="solid" />
-            <Router>
-                <ScrollToTop />
-                <SideMenu />
-                <div className="App border-sides">
-                    <Switch>
-                        <Route path="/invite/by/:userHandle/to/group/:handle" component={loadable(() => import('./components/routes/Group'))} />
-                        <Route path="/invite/by/:userHandle/to/group/:handle/:forRepresentation" component={loadable(() => import('./components/routes/Group'))} />
-                        <Route path="/invite/by/:userHandle/to/vote/:voteName/:groupHandle" component={loadable(() => import('./components/routes/Question'))} />
-                        
-                        <Route path="/poll/:voteName/:groupHandle/:section/:subsection/:subsubsection" component={loadable(() => import('@components/routes/Question'))} />
-                        <Route path="/poll/:voteName/:groupHandle/:section/:subsection" component={loadable(() => import('./components/routes/Question'))} />
-                        <Route path="/poll/:voteName/:groupHandle/:section" component={loadable(() => import('./components/routes/Question'))} />
-                        <Route path="/poll/:voteName/:groupHandle" component={loadable(() => import('./components/routes/Question'))} />
-                        <Route path="/multipoll/:voteName/:groupHandle/:section/:subsection/:subsubsection" component={loadable(() => import('./components/routes/Question'))} />
-                        <Route path="/multipoll/:voteName/:groupHandle/:section/:subsection" component={loadable(() => import('./components/routes/Question'))} />
-                        <Route path="/multipoll/:voteName/:groupHandle/:section" component={loadable(() => import('./components/routes/Question'))} />
-                        <Route path="/multipoll/:voteName/:groupHandle" component={loadable(() => import('./components/routes/Question'))} />
-                        <Route path="/profile/:handle/:section/:subsection/:subsubsection" component={loadable(() => import('./components/routes/Profile'))} />
-                        <Route path="/profile/:handle/:section/:subsection" component={loadable(() => import('./components/routes/Profile'))} />
-                        <Route path="/profile/:handle/:section" component={loadable(() => import('./components/routes/Profile'))} />
-                        <Route path="/profile/:handle" component={loadable(() => import('./components/routes/Profile'))} />
-                        <Route path="/profile" component={loadable(() => import('./components/routes/Profile'))} />
-                        <Route path="/profile-people/:handle/:which" component={loadable(() => import('./components/routes/ProfilePeople'))} />
-                        <Route path="/trending" component={loadable(() => import('./components/routes/Trending'))} />
-                        <Route path="/home/:section" component={loadable(() => import('./components/routes/Feed'))} />
-                        <Route path="/home" component={loadable(() => import('./components/routes/Feed'))} />
-                        <Route path="/notifications/:section" component={loadable(() => import('./components/routes/Notifications'))} />
-                        <Route path="/notifications" component={loadable(() => import('./components/routes/Notifications'))} />
-                        <Route path="/groups/:section" component={loadable(() => import('./components/routes/Groups'))} />
-                        <Route path="/groups" component={loadable(() => import('./components/routes/Groups'))} />
-                        <Route path="/group/:handle/:section/:subsection/:subsubsection" component={loadable(() => import('./components/routes/Group'))} />
-                        <Route path="/group/:handle/:section/:subsection" component={loadable(() => import('./components/routes/Group'))} />
-                        <Route path="/group/:handle/:section" component={loadable(() => import('./components/routes/Group'))} />
-                        <Route path="/group/:handle" component={loadable(() => import('./components/routes/Group'))} />
-                        <Route path="/group-people/:handle/:which" component={loadable(() => import('./components/routes/GroupPeople'))} />
-                        <Route path="/" component={loadable(() => import('./components/routes/Home'))} />
-                    </Switch>
-                    <div className="p-4 d-md-none"></div>
-                </div>
-                {/* <SideInfo /> */}
-                <ModalRoutes />
-            </Router>
+            <BrowserRouter>
+                <>
+                    <ScrollToTop />
+                    <SideMenu />
+                    <div className="App border-sides">
+                        <Routes>
+                            <Route path="/invite/by/:userHandle/to/group/:handle" element={<Loader component={<Group />} />} />
+                            <Route path="/invite/by/:userHandle/to/group/:handle/:forRepresentation" element={<Loader component={<Group />} />} />
+                            <Route path="/invite/by/:userHandle/to/vote/:voteName/:groupHandle" element={<Loader component={<Question />} />} />
+
+                            <Route path="/poll/:voteName/:groupHandle/:section/:subsection/:subsubsection" element={<Loader component={<Question />} />} />
+                            <Route path="/poll/:voteName/:groupHandle/:section/:subsection" element={<Loader component={<Question />} />} />
+                            <Route path="/poll/:voteName/:groupHandle/:section" element={<Loader component={<Question />} />} />
+                            <Route path="/poll/:voteName/:groupHandle" element={<Loader component={<Question />} />} />
+                            <Route path="/multipoll/:voteName/:groupHandle/:section/:subsection/:subsubsection" element={<Loader component={<Question />} />} />
+                            <Route path="/multipoll/:voteName/:groupHandle/:section/:subsection" element={<Loader component={<Question />} />} />
+                            <Route path="/multipoll/:voteName/:groupHandle/:section" element={<Loader component={<Question />} />} />
+                            <Route path="/multipoll/:voteName/:groupHandle" element={<Loader component={<Question />} />} />
+                            <Route path="/profile/:handle/:section/:subsection/:subsubsection" element={<Loader component={<Profile />} />} />
+                            <Route path="/profile/:handle/:section/:subsection" element={<Loader component={<Profile />} />} />
+                            <Route path="/profile/:handle/:section" element={<Loader component={<Profile />} />} />
+                            <Route path="/profile/:handle" element={<Loader component={<Profile />} />} />
+                            <Route path="/profile" element={<Loader component={<Profile />} />} />
+                            <Route path="/profile-people/:handle/:which" element={<Loader component={<ProfilePeople />} />} />
+                            {/* <Route path="/trending" element={<>{loadable(() => import('./components/routes/Trending'))}</>} /> */}
+                            <Route path="/home/:section" element={<Loader component={<Feed />} />} />
+                            <Route path="/home" element={<Loader component={<Feed />} />} />
+                            <Route path="/notifications/:section" element={<Loader component={<Notifications />} />} />
+                            <Route path="/notifications" element={<Loader component={<Notifications />} />} />
+                            <Route path="/groups/:section" element={<Loader component={<Groups />} />} />
+                            <Route path="/groups" element={<Loader component={<Groups />} />} />
+                            <Route path="/group/:handle/:section/:subsection/:subsubsection" element={<Loader component={<Group />} />} />
+                            <Route path="/group/:handle/:section/:subsection" element={<Loader component={<Group />} />} />
+                            <Route path="/group/:handle/:section" element={<Loader component={<Group />} />} />
+                            <Route path="/group/:handle" element={<Loader component={<Group />} />} />
+                            <Route path="/group-people/:handle/:which" element={<Loader component={<GroupPeople />} />} />
+                            <Route path="/" element={<Loader component={<Home />} />} />
+                        </Routes>
+                        <div className="p-4 d-md-none"></div>
+                    </div>
+                    {/* <SideInfo /> */}
+                    <ModalRoutes />
+                </>
+            </BrowserRouter>
         </div>
     );
 }

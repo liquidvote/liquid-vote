@@ -1,5 +1,5 @@
 import React, { FunctionComponent } from 'react';
-import { useHistory } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 
 import BackArrowSVG from "@shared/Icons/BackArrow.svg";
 import GroupSvg from "@shared/Icons/Group.svg";
@@ -22,13 +22,13 @@ export const Header: FunctionComponent<{
     rightElement
 }) => {
 
-        const history = useHistory();
+        const navigate = useNavigate();
 
         const goBack = () => {
             if (backLink) {
-                history.push(backLink);
+                navigate(backLink);
             } else {
-                history.goBack()
+                navigate(-1)
             }
         }
 

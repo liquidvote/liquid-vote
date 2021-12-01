@@ -107,7 +107,7 @@ export const MultiVoteInList: FunctionComponent<{
                 <div className="d-flex align-items-center flex-wrap">
                     <a
                         className="white"
-                        href={`/multipoll/${v.questionText}/${v.groupChannel?.group}`}
+                        href={`/multipoll/${encodeURIComponent(v.questionText)}/${v.groupChannel?.group}`}
                     >
                         <div
                             className={`question-title-in-list ${showGroupAndTime && 'limit-right'}`}

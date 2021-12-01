@@ -2,7 +2,7 @@ import React, { FunctionComponent, useEffect, useState } from 'react';
 import { useForm } from "react-hook-form";
 import { useQuery, useMutation } from "@apollo/client";
 import { useAuth0 } from "@auth0/auth0-react";
-import { useHistory } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 
 import useSearchParams from "@state/Global/useSearchParams.effect";
 import useAuthUser from '@state/AuthUser/authUser.effect';
@@ -25,7 +25,7 @@ interface IFormValues {
 
 export const DeletePoll: FunctionComponent<{}> = ({ }) => {
 
-    const history = useHistory();
+    let navigate = useNavigate();
     const { allSearchParams, updateParams } = useSearchParams();
     const modalData = allSearchParams.modalData && JSON.parse(allSearchParams.modalData);
     const { liquidUser } = useAuthUser();
@@ -57,7 +57,7 @@ export const DeletePoll: FunctionComponent<{}> = ({ }) => {
             cache.gc();
             
             if (modalData.navToGroup) {
-                history.push(`/group/${modalData.group}`);
+                navigate(`/group/${modalData.group}`);
             } else {
                 updateParams({ keysToRemove: ['modal', 'modalData'] });
             }

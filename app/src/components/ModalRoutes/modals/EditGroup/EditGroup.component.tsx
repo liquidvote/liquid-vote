@@ -1,7 +1,7 @@
 import React, { FunctionComponent, useEffect, useState } from 'react';
 import { useForm } from "react-hook-form";
 import { useQuery, useMutation } from "@apollo/client";
-import { useHistory } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 
 import TextInput from "@shared/Inputs/TextInput";
 import ImageInput from "@shared/Inputs/ImageInput";
@@ -32,7 +32,7 @@ interface IFormValues {
 
 export const EditGroup: FunctionComponent<{}> = ({ }) => {
 
-    const history = useHistory();
+    const navigate = useNavigate();
     const { allSearchParams, updateParams } = useSearchParams();
     const modalData = JSON.parse(allSearchParams.modalData);
     const { uploadFile } = useFileUploader();
@@ -85,7 +85,7 @@ export const EditGroup: FunctionComponent<{}> = ({ }) => {
 
             if (modalData.groupHandle === "new") {
                 // console.log("push!!", { g: editedGroup });
-                history.push(`/group/${editedGroup?.handle}`);
+                navigate(`/group/${editedGroup?.handle}`);
             } else {
                 updateParams({
                     keysToRemove: ['modal', 'modalData'],

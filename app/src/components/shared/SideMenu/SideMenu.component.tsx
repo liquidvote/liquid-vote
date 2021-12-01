@@ -1,5 +1,5 @@
 import React, { FunctionComponent, useEffect } from 'react';
-import { Link, useHistory } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import { useAuth0 } from "@auth0/auth0-react";
 import { useQuery } from "@apollo/client";
 
@@ -20,7 +20,7 @@ import './style.sass';
 
 export const SideMenu: FunctionComponent<{}> = ({ }) => {
 
-    const history = useHistory();
+    const location = useLocation();
     const { allSearchParams, updateParams } = useSearchParams();
 
     const { user, isAuthenticated, isLoading, loginWithRedirect, logout, loginWithPopup } = useAuth0();
@@ -83,7 +83,7 @@ export const SideMenu: FunctionComponent<{}> = ({ }) => {
             </div>
             {isAuthenticated && user && (
                 <>
-                    {history?.location?.pathname !== `/profile/${liquidUser?.handle}` ? (
+                    {location?.pathname !== `/profile/${liquidUser?.handle}` ? (
                         <Link to={`/profile/${liquidUser?.handle}`}>
                             <img
                                 className="vote-avatar"

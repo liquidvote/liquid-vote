@@ -2,7 +2,7 @@ import React, { FunctionComponent, useEffect } from 'react';
 import { useForm } from "react-hook-form";
 import ReactTooltip from 'react-tooltip';
 import { useQuery, useMutation } from "@apollo/client";
-import { useHistory } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 
 import ButtonPicker from "@shared/Inputs/ButtonPicker";
 import TextAreaInput from "@shared/Inputs/TextAreaInput";
@@ -41,7 +41,7 @@ const startTextOptions = [
 
 export const EditQuestion: FunctionComponent<{}> = ({ }) => {
 
-    const history = useHistory();
+    const navigate = useNavigate();
 
     const { allSearchParams, updateParams } = useSearchParams();
     const modalData = JSON.parse(allSearchParams.modalData);
@@ -94,9 +94,9 @@ export const EditQuestion: FunctionComponent<{}> = ({ }) => {
             // });
 
             if (savedQuestion.questionType === 'single') {
-                history.push(`/poll/${savedQuestion.questionText}/${savedQuestion.groupChannel.group}`);
+                navigate(`/poll/${encodeURIComponent(savedQuestion.questionText)}/${savedQuestion.groupChannel.group}`);
             } else {
-                history.push(`/multipoll/${savedQuestion.questionText}/${savedQuestion.groupChannel.group}`);
+                navigate(`/multipoll/${encodeURIComponent(savedQuestion.questionText)}/${savedQuestion.groupChannel.group}`);
             }
         }
     }, [editQuestion_data]);
@@ -211,7 +211,7 @@ export const EditQuestion: FunctionComponent<{}> = ({ }) => {
                                     validate: {
                                         minLength: v => v?.length > 5 || 'we need at least 5 characters here',
                                         tooBig: v => v?.length < 80 || 'should be smaller than 80 characters',
-                                        noSpecialCharacters: v => /^[_A-z0-9]*((-|\s|%|\?)*[_A-z0-9])*$/.test(v) || 'no special characters'
+                                        // noSpecialCharacters: v => /^[_A-z0-9]*((-|\s|%|\?)*[_A-z0-9])*$/.test(v) || 'no special characters'
                                     }
                                 })}
                                 value={watch(name)}

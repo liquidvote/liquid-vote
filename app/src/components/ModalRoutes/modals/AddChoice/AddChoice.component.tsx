@@ -1,7 +1,6 @@
 import React, { FunctionComponent, useEffect, useState } from 'react';
 import { useForm } from "react-hook-form";
 import { useQuery, useMutation } from "@apollo/client";
-import { useHistory } from "react-router-dom";
 
 import useSearchParams from "@state/Global/useSearchParams.effect";
 import useAuthUser from '@state/AuthUser/authUser.effect';
@@ -17,7 +16,6 @@ interface IFormValues {
 
 export const AddChoice: FunctionComponent<{}> = ({ }) => {
 
-    const history = useHistory();
     const { allSearchParams, updateParams } = useSearchParams();
     const modalData = allSearchParams.modalData && JSON.parse(allSearchParams.modalData);
     const { liquidUser } = useAuthUser();

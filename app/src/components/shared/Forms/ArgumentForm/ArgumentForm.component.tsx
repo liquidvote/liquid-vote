@@ -2,7 +2,6 @@ import React, { FunctionComponent, useEffect } from 'react';
 import { useForm } from "react-hook-form";
 import ReactTooltip from 'react-tooltip';
 import { useQuery, useMutation } from "@apollo/client";
-import { useHistory } from "react-router-dom";
 import { Link, useParams } from "react-router-dom";
 
 import ButtonPicker from "@shared/Inputs/ButtonPicker";

@@ -1,5 +1,5 @@
 import React, { FunctionComponent, useEffect, useState } from 'react';
-import { Link, useParams, useHistory } from 'react-router-dom';
+import { Link, useParams, useNavigate } from 'react-router-dom';
 import ReactTooltip from 'react-tooltip';
 import { useMutation, useQuery } from "@apollo/client";
 
@@ -27,7 +27,7 @@ import './style.sass';
 
 export const Group: FunctionComponent<{}> = ({ }) => {
 
-    const history = useHistory();
+    const navigate = useNavigate();
     let { handle, section, userHandle } = useParams<any>();
     const { allSearchParams, updateParams } = useSearchParams();
 
@@ -77,8 +77,8 @@ export const Group: FunctionComponent<{}> = ({ }) => {
 
                 })
             }).toString()}`;
-
-            history.replace(link);
+            
+            navigate(link, { replace: true });
         }
     }, [userHandle]);
 
