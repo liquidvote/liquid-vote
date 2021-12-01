@@ -239,8 +239,6 @@ export const UserResolvers = {
 
         UserGroups: async (_source, { handle, representative, notUsers }, { mongoDB, AuthUser }) => {
 
-            console.log({ handle, representative, notUsers, c: !(!!handle) });
-
             const User = !!handle && await mongoDB.collection("Users")
                 .findOne({ 'LiquidUser.handle': handle });
 
