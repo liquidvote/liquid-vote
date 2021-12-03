@@ -66,7 +66,7 @@ export const AcceptInvite: FunctionComponent<{}> = ({ }) => {
                         IsMember: true
                     }
                 }).then(() => {
-                    setAcceptInviteOnLogin(false);
+                    // setAcceptInviteOnLogin(false);
                     // updateParams({
                     //     keysToRemove: ['modal', 'modalData'],
                     //     paramsToAdd: { refetch: 'group' }
@@ -78,37 +78,6 @@ export const AcceptInvite: FunctionComponent<{}> = ({ }) => {
             loginWithPopup();
         }
     };
-
-    const [editUserRepresentativeGroupRelation, {
-        loading: editUserRepresentativeGroupRelation_loading,
-        error: editUserRepresentativeGroupRelation_error,
-        data: editUserRepresentativeGroupRelation_data,
-    }] = useMutation(EDIT_USER_REPRESENTATIVE_GROUP_RELATION);
-
-    const toggleRepresentation = (to = true) => {
-        editUserRepresentativeGroupRelation({
-            variables: {
-                RepresenteeHandle: liquidUser?.handle,
-                RepresentativeHandle: user?.handle,
-                Group: modalData?.groupHandle,
-                IsRepresentingYou: to
-            }
-        })
-            .then((r) => {
-                console.log('editUserRepresentativeGroupRelation');
-                representatives_refetch();
-
-                updateParams({
-                    paramsToAdd: { refetch: 'questions' }
-                });
-                setTimeout(() => {
-                    updateParams({
-                        paramsToAdd: { refetch: 'group' }
-                    });
-                });
-
-            })
-    }
 
     return (
         <form>
@@ -141,14 +110,16 @@ export const AcceptInvite: FunctionComponent<{}> = ({ }) => {
                             </p>
                         </div>
 
-                        {acceptInviteOnLogin ? (
+                        {((!isMember && (acceptInviteOnLogin || editGroupMemberChannelRelation_loading)) || !group || !user) ? (
                             <div className="mx-5 my-4 text-center">
                                 <img
                                     className="vote-avatar"
                                     src={'http://images.liquid-vote.com/system/loading.gif'}
                                 />
                             </div>
-                        ) : !isMember ? (
+                        ) : (!!isMember && !!group && !!user) ? (
+                            <p className="mx-5 my-4 text-center"><b>You are now a member 🎉</b></p>
+                        ) : (
                             <div className="d-flex align-items-center justify-content-center">
                                 <button
                                     className="button_ mx-5 my-4"
@@ -156,8 +127,6 @@ export const AcceptInvite: FunctionComponent<{}> = ({ }) => {
                                     disabled={editGroupMemberChannelRelation_loading}
                                 >Join Group</button>
                             </div>
-                        ) : (
-                            <p className="mx-5 my-4 text-center"><b>You are now a member{!!representatives?.length ? ` and represented by ${user?.name}` : ''} 🎉</b></p>
                         )}
                         {/* {isMember ? (
                             <div className="d-flex flex-column align-items-center">
@@ -198,7 +167,7 @@ export const AcceptInvite: FunctionComponent<{}> = ({ }) => {
                             <h5 className="mb-n3 mx-2 mt-4">Delegate your unused votes to some people</h5>
                             <ChooseRepresentatives inviterHandle={user?.handle} />
                         </div>
-                        
+
                     </div>
                 ) : (
                     <div className="d-flex justify-content-center my-5">
