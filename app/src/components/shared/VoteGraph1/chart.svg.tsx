@@ -12,7 +12,8 @@ export default function Chart({
     againstDirectCount,
     againstCount,
     userVote = null,
-    userDelegatedVotes = null
+    userDelegatedVotes = null,
+    inList,
 }: {
     name: string | null,
     showNameInside?: boolean,
@@ -28,7 +29,8 @@ export default function Chart({
             vote: boolean;
         }
     ]
-    | null;
+    | null,
+    inList?: boolean
 }) {
 
     const navigate = useNavigate();
@@ -43,7 +45,7 @@ export default function Chart({
     const againstDirectPercentage = (againstDirectCount / (forCount + againstCount)) * 100 || 50;
 
     return (
-        <svg className={`chart1 ${name === null && 'main'}`} width="100%" height="100%">
+        <svg className={`chart1 ${name === null && 'main'} ${inList && 'small'}`} width="100%" height="100%">
             <defs>
                 <pattern
                     id="image"

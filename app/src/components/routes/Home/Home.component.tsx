@@ -31,7 +31,7 @@ export const Home: FunctionComponent<{}> = ({ }) => {
                 Liquid Vote helps tiny and large organizations quickly gather a group's opinions.
             </p>
 
-            <br />
+            {/* <br />
 
             <h4>What is liquid voting?</h4>
             <div className="d-flex align-items-center">
@@ -49,7 +49,7 @@ export const Home: FunctionComponent<{}> = ({ }) => {
                     allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
                     allowFullScreen
                 ></iframe>
-            </div>
+            </div> */}
 
             <br />
 
@@ -79,7 +79,7 @@ export const Home: FunctionComponent<{}> = ({ }) => {
                 2. Such tools are great for gathering opinions, perhaps not for changing your nation state's laws in real time as people's minds change. 
             </p>
 
-            <br />
+            {/* <br />
             
 
             <div className="bar-container-horizontal">
@@ -103,9 +103,7 @@ export const Home: FunctionComponent<{}> = ({ }) => {
                     introMessage="Do you Believe"
                     showColorLegend={true}
                 />
-            </div>
-
-            <br />
+            </div> */}
 
             <br />
 

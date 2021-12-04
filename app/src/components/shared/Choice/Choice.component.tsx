@@ -171,7 +171,7 @@ export const Choice: FunctionComponent<{
                     )} */}
 
                     {/* <pre>{JSON.stringify(userVote, null, 2)}</pre> */}
-                    {/* {showChart && (
+                    {showChart && (
                         <Chart
                             name={choiceText || null}
                             forDirectCount={stats_.forDirectCount}
@@ -180,8 +180,9 @@ export const Choice: FunctionComponent<{
                             againstCount={stats_.againstCount}
                             yourVote={null}
                             userDelegatedVotes={null}
+                            inList={inList}
                         />
-                    )} */}
+                    )}
                 </div>
 
                 {showPercentages && (
