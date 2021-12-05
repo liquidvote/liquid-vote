@@ -94,19 +94,19 @@ export const TopPageInvite: FunctionComponent<{
             }
         };
 
-        console.log({
-            user,
-            isAuthenticated,
-            isLoading
-            // acceptOnLogin: !!acceptOnLogin,
-            // inviterHandle,
-            // groupHandle,
-            // to,
-            // isMember,
-            // editGroupMemberChannelRelation_loading,
-            // group,
-            // user
-        });
+        // console.log({
+        //     user,
+        //     isAuthenticated,
+        //     isLoading
+        //     // acceptOnLogin: !!acceptOnLogin,
+        //     // inviterHandle,
+        //     // groupHandle,
+        //     // to,
+        //     // isMember,
+        //     // editGroupMemberChannelRelation_loading,
+        //     // group,
+        //     // user
+        // });
 
         return (
             <div className="position-relative">
