@@ -1,7 +1,7 @@
 import { GROUP, EDIT_GROUP } from "@state/Group/typeDefs";
 import { useQuery, useMutation } from "@apollo/client";
 
-export default function useGroup({ handle }: { handle: string }) {
+export default function useGroup({ handle }: { handle?: string }) {
     const {
         loading: group_loading,
         error: group_error,

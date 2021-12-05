@@ -43,7 +43,6 @@ if (env?.environment === "production") {
     }
 }
 
-
 const AppolloAppWrapper: FunctionComponent<{}> = ({ }) => {
 
     const { user, isLoading } = useAuth0();

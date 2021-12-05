@@ -20,6 +20,7 @@ import useGroup from '@state/Group/group.effect';
 import useUserRepresentedBy from "@state/User/userRepresentedBy.effect";
 import { timeAgo } from '@state/TimeAgo';
 import { EDIT_GROUP_MEMBER_CHANNEL_RELATION } from "@state/User/typeDefs";
+import TopPageInvite from '@components/shared/TopPageInvite';
 
 import GroupPolls from './GroupPolls';
 import GroupVotes from './GroupVotes';
@@ -59,28 +60,28 @@ export const Group: FunctionComponent<{}> = ({ }) => {
         ReactTooltip.rebuild();
     }, [group]);
 
-    useEffect(() => {
-        if (!!userHandle) {
-            const link = `/group/${handle}?${new URLSearchParams({
-                modal: 'AcceptInvite',
-                modalData: JSON.stringify({
-                    // toWhat: 'group',
-                    // groupName: groupName,
-                    // groupHandle: groupHandle,
-                    // fromWhomAvatar: fromWhomAvatar,
-                    // fromWhomName: fromWhomName,
-                    // fromWhomHandle: fromWhomHandle
+    // useEffect(() => {
+    //     if (!!userHandle) {
+    //         const link = `/group/${handle}?${new URLSearchParams({
+    //             modal: 'AcceptInvite',
+    //             modalData: JSON.stringify({
+    //                 // toWhat: 'group',
+    //                 // groupName: groupName,
+    //                 // groupHandle: groupHandle,
+    //                 // fromWhomAvatar: fromWhomAvatar,
+    //                 // fromWhomName: fromWhomName,
+    //                 // fromWhomHandle: fromWhomHandle
 
-                    to: 'group',
-                    by: userHandle,
-                    groupHandle: handle
+    //                 to: 'group',
+    //                 by: userHandle,
+    //                 groupHandle: handle
 
-                })
-            }).toString()}`;
+    //             })
+    //         }).toString()}`;
             
-            navigate(link, { replace: true });
-        }
-    }, [userHandle]);
+    //         navigate(link, { replace: true });
+    //     }
+    // }, [userHandle]);
 
     const isMember =
         !!liquidUser && (
@@ -95,6 +96,14 @@ export const Group: FunctionComponent<{}> = ({ }) => {
     ) : (
         <>
             <Header title={group?.name} iconType="group" />
+
+            {!!userHandle && (
+                <TopPageInvite
+                    inviterHandle={userHandle}
+                    groupHandle={handle}
+                    to="group"
+                />
+            )}
 
             <div className="profile-top">
                 <div

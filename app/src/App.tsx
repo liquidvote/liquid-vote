@@ -44,6 +44,7 @@ export default function App() {
                     <div className="App border-sides">
                         <Routes>
                             <Route path="/invite/by/:userHandle/to/group/:handle" element={<Loader component={<Group />} />} />
+                            <Route path="/invite/by/:userHandle/to/group/:handle/:acceptOnLogin" element={<Loader component={<Group />} />} />
                             <Route path="/invite/by/:userHandle/to/group/:handle/:forRepresentation" element={<Loader component={<Group />} />} />
                             <Route path="/invite/by/:userHandle/to/vote/:voteName/:groupHandle" element={<Loader component={<Question />} />} />
 
