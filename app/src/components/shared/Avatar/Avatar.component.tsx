@@ -3,17 +3,19 @@ import AgreementMeter from './AgreementMeter';
 
 import './style.sass';
 
-export const Avatar: FunctionComponent<{ avatarURL?: string }> = ({ avatarURL }) => {
+export const Avatar: FunctionComponent<{
+    avatarURL?: string, type?: 'profile' | 'small'
+}> = ({
+    avatarURL, type ='small'
+}) => {
     return (
-        <>
+        <div className='position-relative'>
             <div
-                className="profile-avatar bg"
-                style={{
-                    background: avatarURL && `url(${avatarURL}) 50% 50% / cover no-repeat`
-                }}
+                className={`${type}-avatar bg`}
+                style={{ background: avatarURL && `url(${avatarURL}) 50% 50% / cover no-repeat` }}
             />
-            <AgreementMeter />
-        </>
+            <AgreementMeter type={type} />
+        </div>
     );
 }
 

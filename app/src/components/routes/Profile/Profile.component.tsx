@@ -81,7 +81,9 @@ export const Profile: FunctionComponent<{}> = ({ }) => {
                         background: profile.cover && `url(${profile.cover}) 50% 50% / cover no-repeat`
                     }}
                 />
-                <Avatar avatarURL={profile.avatar} />
+                <div className="avatar-wrapper">
+                    <Avatar avatarURL={profile.avatar} type="profile" />
+                </div>
                 <div className="profile-buttons-container">
                     {profile.isThisUser ? (
                         <>

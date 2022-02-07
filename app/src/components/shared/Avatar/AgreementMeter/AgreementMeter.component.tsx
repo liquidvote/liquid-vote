@@ -2,7 +2,7 @@ import React, { FunctionComponent } from 'react';
 
 import './style.sass';
 
-export const AgreementMeter: FunctionComponent<{}> = ({ }) => {
+export const AgreementMeter: FunctionComponent<{ type?: 'profile' | 'small' }> = ({ type ='small' }) => {
 
     const circlePath = (cx: number, cy: number, r: number) => {
         return (
@@ -18,7 +18,7 @@ export const AgreementMeter: FunctionComponent<{}> = ({ }) => {
     const red = circle - blue - 13 - nn * 3;
 
     return (
-        <div className="circles">
+        <div className={`circles ${type}`}>
             <svg viewBox="0 0 150 150">
                 {/* <path className="bg" d={path} fill="none" /> */}
                 <path

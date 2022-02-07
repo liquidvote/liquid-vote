@@ -1,23 +1,15 @@
 import React, { FunctionComponent, useMemo } from 'react';
 import { Link } from "react-router-dom";
-
-import GroupSmallSvg from "@shared/Icons/Group-small.svg";
+import Avatar from '@components/shared/Avatar';
 
 import './style.sass';
 
 export const PersonInList: FunctionComponent<{ person: any }> = ({ person }) => {
 
-    const [isRepresenting, setIsRepresenting] = React.useState(false);
-
     return (
         <div className="d-flex relative border-bottom py-2">
             <Link to={`/profile/${person.handle}`}>
-                <div
-                    className="small-avatar bg"
-                    style={{
-                        background: person.avatar && `url(${person.avatar}) 50% 50% / cover no-repeat`
-                    }}
-                ></div>
+                <Avatar avatarURL={person.avatar} type="small" />
             </Link>
             <div className="flex-fill">
                 <div className="d-flex justify-content-between align-items-center flex-wrap">

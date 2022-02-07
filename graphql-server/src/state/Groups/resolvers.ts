@@ -54,6 +54,8 @@ export const GroupResolvers = {
                     "_id": {
                         "$in": GroupMemberRelations.map(r => new ObjectId(r.userId))
                     }
+                    // TODO: sort by Agreeability
+                        // TODO: sort by % votes in common
                 }).toArray()
             )?.map(u => u?.LiquidUser);
 
