@@ -16,6 +16,7 @@ import useAuthUser from '@state/AuthUser/authUser.effect';
 import useUserGroups from "@state/User/userGroups.effect";
 import DropSVG from "@shared/Icons/Drop.svg";
 import MetaTags from "@components/shared/MetaTags";
+import Avatar from "@components/shared/Avatar";
 
 import ProfileVotes from "./ProfileVotes";
 import './style.sass';
@@ -80,12 +81,7 @@ export const Profile: FunctionComponent<{}> = ({ }) => {
                         background: profile.cover && `url(${profile.cover}) 50% 50% / cover no-repeat`
                     }}
                 />
-                <div
-                    className="profile-avatar bg"
-                    style={{
-                        background: profile.avatar && `url(${profile.avatar}) 50% 50% / cover no-repeat`
-                    }}
-                />
+                <Avatar avatarURL={profile.avatar} />
                 <div className="profile-buttons-container">
                     {profile.isThisUser ? (
                         <>

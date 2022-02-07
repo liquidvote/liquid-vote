@@ -52,6 +52,7 @@ $theme5-colors: ("bg": #0b414d, "primary": #08f3a5, "secondary": white, "border"
         fill: adjust-color(map-get($theme, "for"), $alpha: -0.4)
         background: adjust-color(map-get($theme, "for"), $alpha: -0.4)
         color: adjust-color(map-get($theme, "for"), $alpha: -0.4)
+        stroke: adjust-color(map-get($theme, "for"), $alpha: -0.4)
 
     .forDirect
         fill: map-get($theme, "for")
@@ -67,6 +68,12 @@ $theme5-colors: ("bg": #0b414d, "primary": #08f3a5, "secondary": white, "border"
         fill: map-get($theme, "against")
         background: map-get($theme, "against")
         color: map-get($theme, "against")
+
+    .for-stroke
+        stroke: adjust-color(map-get($theme, "for"))
+
+    .against-stroke
+        stroke: adjust-color(map-get($theme, "against"))
 
     .icon, .icon-large, .icon-small, .icon-tiny
         *
