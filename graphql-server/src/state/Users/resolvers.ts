@@ -689,6 +689,7 @@ const getYourUserStats = async ({ userId, AuthUser, mongoDB }) => {
                     }
                 }, {
                     '$lookup': {
+                        'as': 'userVote',
                         'from': 'Votes',
                         'let': {
                             'userId': userId,
@@ -726,8 +727,7 @@ const getYourUserStats = async ({ userId, AuthUser, mongoDB }) => {
                                     ]
                                 }
                             }
-                        ],
-                        'as': 'userVote'
+                        ]
                     }
                 }, {
                     '$match': {

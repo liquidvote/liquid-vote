@@ -1,4 +1,5 @@
 import { ObjectId } from 'mongodb';
+import { votesInCommonPipelineForVotes } from '../Users/aggregationLogic';
 
 export const GroupResolvers = {
     Query: {
@@ -38,26 +39,60 @@ export const GroupResolvers = {
         },
         GroupMembers: async (_source, { handle }, { mongoDB, AuthUser }) => {
 
-            const Group = await mongoDB.collection("Groups")
+            const group = await mongoDB.collection("Groups")
                 .findOne({ 'handle': handle });
 
-            const GroupMemberRelations = (
-                await mongoDB.collection("GroupMembers")
-                    .find({
-                        'groupId': new ObjectId(Group._id),
-                        'isMember': true
-                    }).toArray()
-            );
+            const Members = await mongoDB.collection("GroupMembers")
+                .aggregate([
+                    {
+                        '$match': {
+                            'groupId': new ObjectId(group._id),
+                            'isMember': true
+                        },
+                    }, {
+                        '$lookup': {
+                            'from': 'Users',
+                            'localField': 'userId',
+                            'foreignField': '_id',
+                            'as': 'member'
+                        }
+                    }, {
+                        '$addFields': {
+                            'member': { '$first': '$member.LiquidUser' }
+                        }
+                    }, {
+                        '$replaceRoot': {
+                            newRoot: {
+                                $mergeObjects: [
+                                    { userId: "$userId" },
+                                    "$member"
+                                ]
+                            }
+                        }
+                    },
+                    ...(!!AuthUser?._id) ? [{
+                        '$lookup': {
+                            'as': 'yourStats',
+                            'from': 'Votes',
+                            'let': {
+                                'userId': '$userId',
+                            },
+                            'pipeline': [
+                                ...votesInCommonPipelineForVotes({
+                                    groupHandle: group.handle,
+                                    authUserId: AuthUser._id
+                                })
+                            ]
+                        }
+                    }, {
+                        '$addFields': {
+                            'yourStats': { '$first': '$yourStats' }
+                        }
+                    }] : [],
+                ])?.toArray();
 
-            const Members = (
-                await mongoDB.collection("Users").find({
-                    "_id": {
-                        "$in": GroupMemberRelations.map(r => new ObjectId(r.userId))
-                    }
-                    // TODO: sort by Agreeability
-                        // TODO: sort by % votes in common
-                }).toArray()
-            )?.map(u => u?.LiquidUser);
+            // TODO: sort by Agreeability
+            // TODO: sort by % votes in common
 
             return Members;
         },
