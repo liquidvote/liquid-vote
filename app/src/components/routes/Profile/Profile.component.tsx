@@ -82,7 +82,7 @@ export const Profile: FunctionComponent<{}> = ({ }) => {
                     }}
                 />
                 <div className="avatar-wrapper">
-                    <Avatar avatarURL={profile.avatar} type="profile" />
+                    <Avatar person={profile} type="profile" />
                 </div>
                 <div className="profile-buttons-container">
                     {profile.isThisUser ? (
@@ -137,6 +137,7 @@ export const Profile: FunctionComponent<{}> = ({ }) => {
             <div className="profile-description pre-wrap">
                 {profile.bio}
             </div>
+            {/* <pre>{JSON.stringify(profile, null, 2)}</pre> */}
             <div className="profile-icons-container d-flex">
                 <div>
                     <div className="mr-1"><LocationSVG /></div>

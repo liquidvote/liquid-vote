@@ -9,7 +9,7 @@ export const PersonInList: FunctionComponent<{ person: any }> = ({ person }) => 
     return (
         <div className="d-flex relative border-bottom py-2">
             <Link to={`/profile/${person.handle}`}>
-                <Avatar avatarURL={person.avatar} type="small" />
+                <Avatar person={person} type="small" />
             </Link>
             <div className="flex-fill">
                 <div className="d-flex justify-content-between align-items-center flex-wrap">
@@ -32,6 +32,11 @@ export const PersonInList: FunctionComponent<{ person: any }> = ({ person }) => 
                         </div>
                     </div> */}
                 </div>
+                {!!person?.yourStats?.directVotesInCommon && (
+                    <small className="d-flex mb-0">
+                        <b className='white mr-1'>{' '}{person?.yourStats?.directVotesInCommon}</b> votes in common on [GROUP]
+                    </small>
+                )}
                 <small className="d-flex mb-0">
                     {person.bio}
                 </small>
@@ -59,6 +64,10 @@ export const PersonInList: FunctionComponent<{ person: any }> = ({ person }) => 
                     {' '}<b className="white againstDirect px-1 rounded">{useMemo(() => Math.floor(Math.random() * 100), [])}</b>
                     {' '}🧪
                 </small> */}
+                {/* <pre>{JSON.stringify({
+                    yourStats: person.yourStats,
+                    'stats.directVotesMade': person.stats?.directVotesMade,
+                }, null, 2)}</pre> */}
             </div>
         </div>
     );

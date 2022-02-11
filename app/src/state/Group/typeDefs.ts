@@ -83,6 +83,13 @@ export const GROUP_MEMBERS = gql`
             indirectVotesMadeByUser
             indirectVotesMadeForUser
         }
+        yourStats {
+            directVotesInCommon
+            directVotesInAgreement
+            directVotesInDisagreement
+            indirectVotesMadeByYou
+            indirectVotesMadeForYou
+        }
     }
   }
 `;

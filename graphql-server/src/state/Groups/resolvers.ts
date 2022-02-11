@@ -70,6 +70,66 @@ export const GroupResolvers = {
                             }
                         }
                     },
+                    // directVotesMade: await mongoDB.collection("Votes")
+                    // .find({
+                    //     "isDirect": true,
+                    //     'position': { $ne: null },
+                    //     "user": new ObjectId(userId)
+                    // }).count(),
+                    {
+                        '$lookup': {
+                            'as': 'directVotesMade',
+                            'from': 'Votes',
+                            'let': {
+                                'userId': '$userId',
+                            },
+                            'pipeline': [
+                                {
+                                    '$match': {
+                                        '$and': [
+                                            {
+                                                '$expr': {
+                                                    '$eq': [
+                                                        '$user', '$$userId'
+                                                    ]
+                                                }
+                                            },
+                                            {
+                                                '$expr': {
+                                                    '$eq': [
+                                                        '$isDirect', true
+                                                    ]
+                                                }
+                                            },
+                                            {
+                                                '$expr': {
+                                                    '$ne': [
+                                                        '$position', null
+                                                    ]
+                                                }
+                                            },
+                                            {
+                                                '$expr': {
+                                                    '$eq': [
+                                                        '$groupChannel.group', group.handle
+                                                    ]
+                                                }
+                                            },
+                                        ],
+                                    }
+                                },
+                            ]
+                        }
+                    },
+                    {
+                        '$addFields': {
+                            'stats': {
+                                'directVotesMade': {
+                                    $size: '$directVotesMade'
+                                }
+                            }
+                        }
+                    },
                     ...(!!AuthUser?._id) ? [{
                         '$lookup': {
                             'as': 'yourStats',
@@ -88,6 +148,8 @@ export const GroupResolvers = {
                         '$addFields': {
                             'yourStats': { '$first': '$yourStats' }
                         }
+                    }, {
+                        $sort: { 'yourStats.directVotesInCommon': -1 }
                     }] : [],
                 ])?.toArray();
 

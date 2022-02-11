@@ -54,7 +54,7 @@ export const SideMenu: FunctionComponent<{}> = ({ }) => {
             <Link to="/home" data-tip="Home">
                 <HomeSvg />
             </Link>
-            {isAuthenticated && user && (
+            {/* {isAuthenticated && user && (
                 <>
                     <Link to="/notifications" data-tip="Notifications" className="notification-wrapper">
                         <NotificationSvg />
@@ -62,7 +62,7 @@ export const SideMenu: FunctionComponent<{}> = ({ }) => {
                         <div className="notif-representatives for white">4</div>
                     </Link>
                 </>
-            )}
+            )} */}
             <Link to="/groups" data-tip={isAuthenticated ? "Your Groups" : " Groups"}>
                 <GroupSvg />
             </Link>
