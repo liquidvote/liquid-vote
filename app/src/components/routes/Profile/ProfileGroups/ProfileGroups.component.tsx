@@ -1,14 +1,14 @@
 import React, { FunctionComponent, useEffect } from 'react';
 import { Link, useParams } from "react-router-dom";
-import { useQuery } from "@apollo/client";
+import { useQuery, useMutation } from "@apollo/client";
 
-import GroupInList from "@shared/GroupInList";
+import GroupInProfileList from "./GroupInProfileList";
 import { groups } from "@state/Mock/Groups";
 import DropPlusSVG from "@shared/Icons/Drop+.svg";
 import useSearchParams from "@state/Global/useSearchParams.effect";
-import { USER_GROUPS } from "@state/User/typeDefs";
+import { USER, USER_GROUPS, EDIT_USER_REPRESENTATIVE_GROUP_RELATION } from "@state/User/typeDefs";
 import useAuthUser from '@state/AuthUser/authUser.effect';
-
+import useUserGroups from '@state/User/userGroups.effect';
 import './style.sass';
 
 export const ProfileGroups: FunctionComponent<{}> = ({ }) => {
@@ -19,23 +19,75 @@ export const ProfileGroups: FunctionComponent<{}> = ({ }) => {
     const { liquidUser } = useAuthUser();
 
     const {
-        loading: profileGroups_loading,
-        error: profileGroups_error,
-        data: profileGroups_data,
-        refetch: profileGroups_refetch
-    } = useQuery(USER_GROUPS, { variables: { handle } });
+        userGroups,
+        userGroups_refetch
+    } = useUserGroups({
+        userHandle: handle,
+        representative: handle
+    });
 
-    console.log({ profileGroups_data });
+    const {
+        loading: user_loading,
+        error: user_error,
+        data: user_data,
+        refetch: user_refetch
+    } = useQuery(USER, {
+        variables: { handle }
+    });
+
+    console.log({ userGroups });
 
     useEffect(() => {
         if (allSearchParams.refetch === 'group') {
-            profileGroups_refetch();
+            userGroups_refetch();
             updateParams({ keysToRemove: ['refetch'] })
         }
     }, [allSearchParams.refetch]);
 
+    const [editUserRepresentativeGroupRelation, {
+        loading: editUserRepresentativeGroupRelation_loading,
+        error: editUserRepresentativeGroupRelation_error,
+        data: editUserRepresentativeGroupRelation_data,
+    }] = useMutation(EDIT_USER_REPRESENTATIVE_GROUP_RELATION);
+
     return (
         <>
+            {userGroups?.map((g: any, i: Number) => (
+                <GroupInProfileList
+                    key={g.name + i}
+                    group={g}
+                    alternativeButton={(
+                        g.yourMemberRelation?.isMember ?
+                            <div
+                                onClick={
+                                    () => editUserRepresentativeGroupRelation({
+                                        variables: {
+                                            RepresenteeHandle: liquidUser?.handle,
+                                            RepresentativeHandle: user_data?.User?.handle,
+                                            Group: g.handle,
+                                            IsRepresentingYou: !g.representativeRelation?.isRepresentingYou
+                                        }
+                                    })
+                                        .then((r) => {
+                                            userGroups_refetch();
+                                            updateParams({ paramsToAdd: { refetch: 'user' } })
+                                        })
+                                }
+                                className={`
+                            button_ small ml-1 mb-0
+                            ${g.representativeRelation?.isRepresentingYou ? 'selected' : null}
+                        `}
+                            >
+                                {
+                                    g.representativeRelation?.isRepresentingYou ?
+                                        `Represents you` :
+                                        `Delegate to ${user_data?.User?.name}`
+                                }
+                            </div> :
+                            null
+                    )}
+                />
+            ))}
 
             {!!liquidUser && (
                 <div className="d-flex justify-content-center">
@@ -46,14 +98,10 @@ export const ProfileGroups: FunctionComponent<{}> = ({ }) => {
                         }
                     })} className="button_ mx-5 my-3">
                         {/* <DropPlusSVG /> */}
-                        <div className="ml-2">Create New Group</div>
+                        <div className="ml-2">Start a new cause</div>
                     </div>
                 </div>
             )}
-
-            {profileGroups_data?.UserGroups?.map((el: any, i: Number) => (
-                <GroupInList key={el.name + i} group={el} />
-            ))}
         </>
     );
 }

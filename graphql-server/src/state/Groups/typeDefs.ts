@@ -13,7 +13,7 @@ export const GroupTypeDefs = gql`
         mostRepresentingMembers: [User]
     }
 
-    type yourGroupStats {
+    type YourGroupStats {
         lastDirectVoteOn: String
         representing: Int
         representedBy: Int
@@ -42,7 +42,8 @@ export const GroupTypeDefs = gql`
         yourMemberRelation: GroupMemberRelation
         representativeRelation: UserRepresentativeGroupRelation
         stats: GroupStats
-        yourStats: yourGroupStats
+        yourStats: YourGroupStats
+        yourUserStats: YourUserStats
     }
 
     type Channel {

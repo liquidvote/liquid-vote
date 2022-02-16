@@ -20,6 +20,7 @@ import Avatar from "@components/shared/Avatar";
 
 import ProfileVotes from "./ProfileVotes";
 import './style.sass';
+import ProfileGroups from "./ProfileGroups";
 
 export const Profile: FunctionComponent<{}> = ({ }) => {
 
@@ -178,7 +179,7 @@ export const Profile: FunctionComponent<{}> = ({ }) => {
                 )} */}
             </div>
 
-            <div className="profile-stats-container mb-2 mt-2 flex-nowrap">
+            {/* <div className="profile-stats-container mb-2 mt-2 flex-nowrap">
                 <div className="mr-1"><DropSVG /></div>
 
                 <div>
@@ -245,7 +246,7 @@ export const Profile: FunctionComponent<{}> = ({ }) => {
                         )}
                     </div>
                 </div>
-            </div>
+            </div> */}
 
 
             {/* 
@@ -267,8 +268,7 @@ export const Profile: FunctionComponent<{}> = ({ }) => {
             
             */}
 
-
-            {
+            {/* {
                 !!userGroups?.length && (
                     <div className="mt-1 mb-3 d-flex align-items-start flex-nowrap justify-content-between">
                         <div className="d-flex flex-column">
@@ -289,11 +289,28 @@ export const Profile: FunctionComponent<{}> = ({ }) => {
                         </div>
                     </div>
                 )
-            }
+            } */}
 
             <br />
 
-            {(!section || section === 'votes') && <ProfileVotes />}
+            <ul className="nav d-flex justify-content-around mt-n2 mx-n3">
+                <li className="nav-item">
+                    <Link className={`nav-link ${(!section || section === 'groups') && 'active'}`} to={`/profile/${handle}/groups`}>
+                        <b>{profile?.stats?.groupsJoined}</b> Causes
+                    </Link>
+                </li>
+                <li className="nav-item">
+                    <Link className={`nav-link ${section === 'votes' && 'active'}`} to={`/profile/${handle}/votes`}>
+                        <b>{profile?.stats?.directVotesMade}</b> Votes
+                    </Link>
+                </li>
+            </ul>
+
+            <hr className="mt-n4" />
+
+            {(!section || section === 'groups') && <ProfileGroups />}
+
+            {(section === 'votes') && <ProfileVotes />}
         </>
     );
 }

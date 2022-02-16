@@ -5,7 +5,7 @@ import { USER_GROUPS } from "@state/User/typeDefs";
 export default function useUserGroups({
     userHandle, representative
 }: {
-    userHandle: string, representative?: string
+    userHandle?: string, representative?: string
 }) {
     const {
         loading: userGroups_loading,

@@ -5,15 +5,43 @@ import { updateInviteStatus } from '../Invites/resolvers';
 import { updateRepresenteesVotes } from '../Votes/resolvers';
 import { updateQuestionVotingStats } from '../Questions/resolvers';
 import { QuestionsAgg } from '../Questions/aggregationLogic';
+import { votesInCommonPipelineForVotes } from './aggregationLogic';
 
 export const UserResolvers = {
     Query: {
         User: async (_source, { handle }, { mongoDB, AuthUser }) => {
 
-            const User = await mongoDB.collection("Users")
-                .findOne({ 'LiquidUser.handle': handle });
+            const User = (await mongoDB.collection("Users")
+                .aggregate([
+                    {
+                        '$match': {
+                            'LiquidUser.handle': handle
+                        }
+                    },
+                    ...(!!AuthUser?._id) ? [{
+                        '$lookup': {
+                            'as': 'yourStats',
+                            'from': 'Votes',
+                            'let': {
+                                'userId': '$_id',
+                            },
+                            'pipeline': [
+                                ...votesInCommonPipelineForVotes({
+                                    groupHandle: null,
+                                    authUserId: AuthUser._id
+                                })
+                            ]
+                        }
+                    }, {
+                        '$addFields': {
+                            'yourStats': { '$first': '$yourStats' }
+                        }
+                    }] : [],
+                ]).toArray()
+            )?.[0];
 
             return !!User ? {
+                id: User?._id,
                 ...User?.LiquidUser,
                 isThisUser: !!AuthUser && AuthUser?.Auth0User?.sub === User?.Auth0User?.sub,
                 isRepresentingYou: (await mongoDB.collection("UserRepresentations")
@@ -24,7 +52,7 @@ export const UserResolvers = {
                     }).count()) || 0,
                 stats: await getUserStats({ userId: User._id, mongoDB }),
                 ...!!AuthUser && (AuthUser._id.toString() !== User._id.toString()) && {
-                    yourStats: await getYourUserStats({ userId: User._id, AuthUser, mongoDB }),
+                    yourStats: User?.yourStats,
                 }
             } : {};
         },
@@ -276,47 +304,71 @@ export const UserResolvers = {
                 })
                 .toArray();
 
-            const Groups = await Promise.all((await mongoDB.collection("Groups").find({
-                ...!!UserGroupMemberRelations && {
-                    "_id": {
-                        [`${notUsers ? '$nin' : '$in'}`]: UserGroupMemberRelations.map(r => new ObjectId(r.groupId))
-                    },
-                },
-                ...(notUsers || !(!!handle)) && {
-                    privacy: 'public'
-                }
-            })
-                .toArray())
-                .map(async (g) => ({
-                    ...g,
-                    thisUserIsAdmin: !!g.admins.find(u => u.handle === AuthUser?.LiquidUser?.handle),
-                    stats: await getGroupStats({
-                        groupHandle: g.handle,
-                        groupId: g._id,
-                        mongoDB
-                    }),
-                    ...!!UserGroupMemberRelations && {
-                        userMemberRelation: UserGroupMemberRelations?.find(
-                            r => r.groupId.toString() === g._id.toString()
-                        ),
-                        yourMemberRelation: YourGroupMemberRelations && YourGroupMemberRelations.find(
-                            r => r.groupId.toString() === g._id.toString()
-                        ),
-                        representativeRelation: await (async r => ({
-                            isGroupMember: !!r && r?.isMember,
-                            ...(!!r) && {
-                                ... await mongoDB.collection("UserRepresentations")
-                                    .findOne({
-                                        representativeId: new ObjectId(Representative?._id),
-                                        representeeId: new ObjectId(User?._id),
-                                        groupId: new ObjectId(g?._id),
-                                    })
+            const Groups = await Promise.all((
+                (await mongoDB.collection("Groups").aggregate([
+                    {
+                        '$match': {
+                            ...!!UserGroupMemberRelations && {
+                                "_id": {
+                                    [`${notUsers ? '$nin' : '$in'}`]: UserGroupMemberRelations.map(r => new ObjectId(r.groupId))
+                                },
+                            },
+                            ...(notUsers || !(!!handle)) && {
+                                privacy: 'public'
                             }
-                        }))(RepresentativeGroupMemberRelations && RepresentativeGroupMemberRelations.find(
-                            r => r.groupId.toString() === g._id.toString()
-                        ))
-                    }
-                })));
+                        },
+                        // ...(!!AuthUser?._id) ? [{
+                        //     '$lookup': {
+                        //         'as': 'yourUserStats',
+                        //         'from': 'Votes',
+                        //         'let': {
+                        //             'userId': '$_id',
+                        //         },
+                        //         'pipeline': [
+                        //             ...votesInCommonPipelineForVotes({
+                        //                 groupHandle: null, // TODO: Get this to work with Var inside Agg
+                        //                 authUserId: AuthUser._id
+                        //             })
+                        //         ]
+                        //     }
+                        // }, {
+                        //     '$addFields': {
+                        //         'yourUserStats': { '$first': '$yourUserStats' }
+                        //     }
+                        // }] : [],
+                    },
+                ])
+                    .toArray())
+                    .map(async (g) => ({
+                        ...g,
+                        thisUserIsAdmin: !!g.admins.find(u => u.handle === AuthUser?.LiquidUser?.handle),
+                        stats: await getGroupStats({
+                            groupHandle: g.handle,
+                            groupId: g._id,
+                            mongoDB
+                        }),
+                        ...!!UserGroupMemberRelations && {
+                            userMemberRelation: UserGroupMemberRelations?.find(
+                                r => r.groupId.toString() === g._id.toString()
+                            ),
+                            yourMemberRelation: YourGroupMemberRelations && YourGroupMemberRelations.find(
+                                r => r.groupId.toString() === g._id.toString()
+                            ),
+                            representativeRelation: await (async r => ({
+                                isGroupMember: !!r && r?.isMember,
+                                ...(!!r) && {
+                                    ... await mongoDB.collection("UserRepresentations")
+                                        .findOne({
+                                            representativeId: new ObjectId(Representative?._id),
+                                            representeeId: new ObjectId(AuthUser?._id),
+                                            groupId: new ObjectId(g?._id),
+                                        })
+                                }
+                            }))(RepresentativeGroupMemberRelations && RepresentativeGroupMemberRelations.find(
+                                r => r.groupId.toString() === g._id.toString()
+                            ))
+                        }
+                    }))));
 
             return Groups;
         },
@@ -679,240 +731,39 @@ export const getUserStats = async ({ userId, mongoDB }) => {
 
 const getYourUserStats = async ({ userId, AuthUser, mongoDB }) => {
 
+    console.log({ userId });
+
     const votesInCommon = (
         await mongoDB.collection("Votes")
             .aggregate([
                 {
-                    '$match': {
-                        'user': new ObjectId(AuthUser._id),
-                        'position': { $ne: null }
-                    }
-                }, {
                     '$lookup': {
-                        'as': 'userVote',
+                        'as': 'yourStats',
                         'from': 'Votes',
                         'let': {
-                            'userId': userId,
-                            'questionText': '$questionText',
-                            'choiceText': '$choiceText',
-                            'group': '$groupChannel.group',
+                            'userId': new ObjectId(userId),
                         },
                         'pipeline': [
-                            {
-                                '$match': {
-                                    '$and': [
-                                        {
-                                            '$expr': {
-                                                '$eq': [
-                                                    '$user', {
-                                                        '$toObjectId': '$$userId'
-                                                    }
-                                                ]
-                                            }
-                                        },
-                                        {
-                                            '$expr': {
-                                                '$eq': [
-                                                    '$questionText', '$$questionText'
-                                                ]
-                                            }
-                                        },
-                                        {
-                                            '$expr': {
-                                                '$eq': [
-                                                    '$choiceText', '$$choiceText'
-                                                ]
-                                            }
-                                        }
-                                    ]
-                                }
-                            }
+                            ...votesInCommonPipelineForVotes({
+                                groupHandle: null,
+                                authUserId: AuthUser._id
+                            })
                         ]
                     }
                 }, {
-                    '$match': {
-                        'userVote': {
-                            '$gte': {
-                                '$size': 1
-                            }
-                        }
-                    }
-                }, {
                     '$addFields': {
-                        'userVote': {
-                            '$first': '$userVote'
-                        }
-                    }
-                }, {
-                    '$project': {
-                        'bothDirect': {
-                            '$and': [
-                                {
-                                    '$eq': [
-                                        '$isDirect', true
-                                    ]
-                                }, {
-                                    '$eq': [
-                                        '$userVote.isDirect', true
-                                    ]
-                                }
-                            ]
-                        },
-                        'InAgreement': {
-                            '$and': [
-                                {
-                                    '$eq': [
-                                        '$position', '$userVote.position'
-                                    ]
-                                }
-                            ]
-                        },
-                        'userVoteMadeByYou': {
-                            '$and': [
-                                {
-
-                                    '$eq': [
-                                        '$userVote.isDirect', false
-                                    ]
-                                },
-                                {
-                                    '$gte': [
-                                        {
-                                            '$size': {
-                                                '$filter': {
-                                                    'input': '$userVote.representatives',
-                                                    'as': 'r',
-                                                    'cond': {
-                                                        '$eq': [
-                                                            '$$r.representativeId', '$user'
-                                                        ]
-                                                    }
-                                                }
-                                            }
-                                        }, 1
-                                    ]
-                                }
-                            ]
-                        },
-                        'userVoteMadeForYou': {
-                            '$and': [
-                                {
-
-                                    '$eq': [
-                                        '$isDirect', false
-                                    ]
-                                },
-                                {
-                                    '$gte': [
-                                        {
-                                            '$size': {
-                                                '$filter': {
-                                                    'input': '$representatives',
-                                                    'as': 'r',
-                                                    'cond': {
-                                                        '$eq': [
-                                                            '$$r.representativeId', '$userVote.user'
-                                                        ]
-                                                    }
-                                                }
-                                            }
-                                        }, 1
-                                    ]
-                                }
-                            ]
-                        }
-                    }
-                }, {
-                    '$group': {
-                        '_id': null,
-                        'votesInCommon': {
-                            '$sum': 1
-                        },
-                        'directVotesInCommon': {
-                            '$sum': {
-                                '$cond': [
-                                    {
-                                        '$eq': [
-                                            '$bothDirect', true
-                                        ]
-                                    }, 1, 0
-                                ]
-                            }
-                        },
-                        'directVotesInAgreement': {
-                            '$sum': {
-                                '$cond': [
-                                    {
-                                        '$and': [
-                                            {
-                                                '$eq': [
-                                                    '$InAgreement', true
-                                                ]
-                                            }, {
-                                                '$eq': [
-                                                    '$bothDirect', true
-                                                ]
-                                            }
-                                        ]
-                                    }, 1, 0
-                                ]
-                            }
-                        },
-                        'directVotesInDisagreement': {
-                            '$sum': {
-                                '$cond': [
-                                    {
-                                        '$and': [
-                                            {
-                                                '$eq': [
-                                                    '$InAgreement', false
-                                                ]
-                                            }, {
-                                                '$eq': [
-                                                    '$bothDirect', true
-                                                ]
-                                            }
-                                        ]
-                                    }, 1, 0
-                                ]
-                            }
-                        },
-                        'indirectVotesMadeByYou': {
-                            '$sum': {
-                                '$cond': [
-                                    {
-                                        '$eq': [
-                                            '$userVoteMadeByYou', true
-                                        ]
-                                    }, 1, 0
-                                ]
-                            }
-                        },
-                        'indirectVotesMadeForYou': {
-                            '$sum': {
-                                '$cond': [
-                                    {
-                                        '$eq': [
-                                            '$userVoteMadeForYou', true
-                                        ]
-                                    }, 1, 0
-                                ]
-                            }
-                        }
+                        'yourStats': { '$first': '$yourStats' }
                     }
                 }
             ])
             .toArray()
     )?.[0];
 
+    console.log({
+        votesInCommon
+    })
+
     return {
-        votesInCommon: votesInCommon?.votesInCommon || 0, // count
-        directVotesInCommon: votesInCommon?.directVotesInCommon || 0, // count it both direct
-
-        directVotesInAgreement: votesInCommon?.directVotesInAgreement || 0, // count if positions are the same & both direct
-        directVotesInDisagreement: votesInCommon?.directVotesInDisagreement || 0, // count if positions differ & both direct
-
-        indirectVotesMadeByYou: votesInCommon?.indirectVotesMadeByYou || 0, // count if user made indirect vote and you represented him
-        indirectVotesMadeForYou: votesInCommon?.indirectVotesMadeForYou || 0, // count if you made an indirect vote and he represented you
+        ...votesInCommon?.yourStats
     }
 }

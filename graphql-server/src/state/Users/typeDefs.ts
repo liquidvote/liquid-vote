@@ -15,7 +15,7 @@ export const UserTypeDefs = gql`
     type YourUserStats {
         # groupsInCommon: Int
         votesInCommon: Int
-        directVotesInCommon: Int
+        directVotesInCommon: Int                # inUse
         votesInAgreement: Int                   
         votesInDisagreement: Int
         

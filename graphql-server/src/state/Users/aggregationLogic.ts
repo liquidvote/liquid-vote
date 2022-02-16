@@ -14,13 +14,13 @@ export const votesInCommonPipelineForVotes = ({
                             ]
                         }
                     },
-                    {
+                    ...!!groupHandle ? [{
                         '$expr': {
                             '$eq': [
                                 '$groupChannel.group', groupHandle
                             ]
                         }
-                    },
+                    }] : [],
                 ],
             }
         },

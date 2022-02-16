@@ -158,6 +158,14 @@ export const USER_GROUPS = gql`
                 handle
             }
         }
+        yourUserStats {
+            votesInCommon
+            directVotesInCommon
+            directVotesInAgreement
+            directVotesInDisagreement
+            indirectVotesMadeByYou
+            indirectVotesMadeForYou
+        }
     }
   }
 `;
