@@ -138,10 +138,27 @@ export const GroupResolvers = {
                                 'userId': '$userId',
                             },
                             'pipeline': [
-                                ...votesInCommonPipelineForVotes({
-                                    groupHandle: group.handle,
-                                    authUserId: AuthUser._id
-                                })
+                                {
+                                    '$match': {
+                                        '$and': [
+                                            {
+                                                '$expr': {
+                                                    '$eq': [
+                                                        '$user', new ObjectId(AuthUser._id)
+                                                    ]
+                                                }
+                                            },
+                                            {
+                                                '$expr': {
+                                                    '$eq': [
+                                                        '$groupChannel.group', group.handle
+                                                    ]
+                                                }
+                                            },
+                                        ],
+                                    }
+                                },
+                                ...votesInCommonPipelineForVotes()
                             ]
                         }
                     }, {

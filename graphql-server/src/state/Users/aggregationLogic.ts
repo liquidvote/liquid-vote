@@ -1,29 +1,6 @@
 import { ObjectId } from 'mongodb';
 
-export const votesInCommonPipelineForVotes = ({
-    groupHandle,
-    authUserId
-}) => [
-        {
-            '$match': {
-                '$and': [
-                    {
-                        '$expr': {
-                            '$eq': [
-                                '$user', new ObjectId(authUserId)
-                            ]
-                        }
-                    },
-                    ...!!groupHandle ? [{
-                        '$expr': {
-                            '$eq': [
-                                '$groupChannel.group', groupHandle
-                            ]
-                        }
-                    }] : [],
-                ],
-            }
-        },
+export const votesInCommonPipelineForVotes = () => [
         {
             '$lookup': {
                 'as': 'userVote',
