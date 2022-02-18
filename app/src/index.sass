@@ -48,6 +48,9 @@ $theme5-colors: ("bg": #0b414d, "primary": #08f3a5, "secondary": white, "border"
         border-left: 1px solid map-get($theme, "border")
         border-right: 1px solid map-get($theme, "border")
 
+    .primary-color
+        color: map-get($theme, "primary")
+
     .for
         fill: adjust-color(map-get($theme, "for"), $alpha: -0.4)
         background: adjust-color(map-get($theme, "for"), $alpha: -0.4)
@@ -59,6 +62,13 @@ $theme5-colors: ("bg": #0b414d, "primary": #08f3a5, "secondary": white, "border"
         background: map-get($theme, "for")
         color: map-get($theme, "for")
 
+    .forDirectBg
+        background: map-get($theme, "for") !important
+        color: map-get($theme, "bg")
+
+    .forDirectBorder
+        border: 2px solid map-get($theme, "for") !important
+
     .against
         fill: adjust-color(map-get($theme, "against"), $alpha: -0.4)
         background: adjust-color(map-get($theme, "against"), $alpha: -0.4)
@@ -68,6 +78,13 @@ $theme5-colors: ("bg": #0b414d, "primary": #08f3a5, "secondary": white, "border"
         fill: map-get($theme, "against")
         background: map-get($theme, "against")
         color: map-get($theme, "against")
+
+    .againstDirectBg
+        background: map-get($theme, "against") !important
+        color: map-get($theme, "bg")
+
+    .againstDirectBorder
+        border: 2px solid map-get($theme, "against") !important
 
     .for-stroke
         stroke: adjust-color(map-get($theme, "for"))
@@ -757,6 +774,43 @@ hr
         display: flex
         // justify-content: center
         align-items: center
+
+    &.on-poll
+        margin: 0px -15px 5px
+
+        .poll-cover
+            height: 100px
+
+.groupInProfile-cover-container
+    position: relative
+    margin: 0px -15px 5px
+    width: calc(100% + 30px)
+    margin-left: -15px
+
+    .poll-cover
+        position: absolute
+        top: 0
+        left: 0
+        width: 100%
+        height: 100%
+        opacity: 0.2
+
+    .poll-cover-overlay
+        display: none
+        position: absolute
+        top: 0
+        left: 0
+        width: 100%
+        height: 100%
+        background-color: rgba(0,0,0,0.5)
+
+    .poll-cover-info
+        padding: 0 15px
+        display: flex
+        // justify-content: center
+        align-items: center
+        position: relative
+        color: white
 
     &.on-poll
         margin: 0px -15px 5px

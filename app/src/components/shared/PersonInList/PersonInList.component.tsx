@@ -14,7 +14,7 @@ export const PersonInList: FunctionComponent<{ person: any }> = ({ person }) => 
             <div className="flex-fill">
                 <div className="d-flex justify-content-between align-items-center flex-wrap">
                     <Link to={`/profile/${person.handle}`} className="d-flex flex-column mb-1">
-                        <b>{person.name}</b>
+                        <b className="white">{person.name}</b>
                         <small className="mt-n1">@{person.handle}</small>
                     </Link>
                     {/* <div className="d-flex mb-1 ml-n1">

@@ -179,7 +179,7 @@ export const EditQuestion: FunctionComponent<{}> = ({ }) => {
                         />
                     ))('questionType')}
                 </div>
-
+{/* 
                 {watch('questionType') === 'single' ? (
                     <>
                         <div className="d-flex input-override position-relative on-top">
@@ -197,7 +197,7 @@ export const EditQuestion: FunctionComponent<{}> = ({ }) => {
                             />
                         </div>
                     </>
-                ) : null}
+                ) : null} */}
 
                 <div>
                     <div className="questionMarkInputWrapper mt-n4 mx-n2 input-override">

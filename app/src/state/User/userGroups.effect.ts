@@ -18,6 +18,7 @@ export default function useUserGroups({
     });
     return {
         userGroups: userGroups_data?.UserGroups,
-        userGroups_refetch
+        userGroups_refetch,
+        userGroups_loading
     };
 }

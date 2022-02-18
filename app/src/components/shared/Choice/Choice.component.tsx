@@ -220,7 +220,7 @@ export const Choice: FunctionComponent<{
                     <div className="d-flex d-flex justify-content-between mt-1">
                         <div className="d-flex align-items-center c-on-tiny">
                             <div
-                                className={`button_ justify-content-between min-w mr-1 ${yourVote_ === 'for' && 'selected'} ${inList && 'small'}`}
+                                className={`button_ forDirectBorder justify-content-between min-w mr-1 ${yourVote_ === 'for' && 'forDirectBg'} ${inList && 'small'}`}
                                 onClick={() => handleUserVote('for')}
                             >
                                 <span className="mr-1">
@@ -377,7 +377,7 @@ export const Choice: FunctionComponent<{
                                 </div>
                             </div>
                             <div
-                                className={`button_ min-w justify-content-between text-right ml-1 ${yourVote_ === 'against' && 'selected'} ${inList && 'small'}`}
+                                className={`button_ againstDirectBorder min-w justify-content-between text-right ml-1 ${yourVote_ === 'against' && 'againstDirectBg'} ${inList && 'small'}`}
                                 onClick={() => handleUserVote('against')}
                             >
                                 {

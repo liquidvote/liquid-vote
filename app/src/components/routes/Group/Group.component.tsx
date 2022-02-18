@@ -115,7 +115,7 @@ export const Group: FunctionComponent<{}> = ({ }) => {
             </div>
             <div className="d-flex flex-wrap mt-2 mb-n1 justify-content-between flex-nowrap">
                 <div className="d-flex flex-column mb-1 mr-1 flex-nowrap">
-                    <h4 className="d-flex align-items-start m-0">
+                    <h4 className="d-flex white align-items-start m-0">
                         {group?.name}
                         <div className="ml-2">
                             {group?.privacy === "private" ? (
@@ -213,7 +213,7 @@ export const Group: FunctionComponent<{}> = ({ }) => {
             <div className="profile-description pre-wrap">
                 {group?.bio}
             </div>
-            <div className="profile-icons-container d-flex">
+            <div className="profile-icons-container d-flex mt-2">
                 {/* <div>
                     <LocationSVG />
                     <div>{group?.bio}</div>
@@ -236,7 +236,7 @@ export const Group: FunctionComponent<{}> = ({ }) => {
                     <div>Group created {timeAgo.format(new Date(Number(group?.createdOn)))}</div>
                 </div>
             </div>
-            <div className="profile-stats-container flex-nowrap mt-3">
+            <div className="profile-stats-container flex-nowrap mt-2">
                 <div className="mr-1"><ProfileSmallSVG /></div>
                 <div className="d-flex flex-wrap">
                     <Link className="mr-2" to={`/group-people/${group?.handle}/members`}>

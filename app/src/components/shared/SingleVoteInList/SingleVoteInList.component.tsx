@@ -90,9 +90,9 @@ export const SingleVoteInList: FunctionComponent<{
                     </small>
                 )} */}
                 <div>
-                    {(showIntroMessage && !hideTitle) && (
+                    {/* {(showIntroMessage && !hideTitle) && (
                         <small className="do-you d-flex mb-n1">{introMessage || `Do you ${l?.startText || 'approve'}`}</small>
-                    )}
+                    )} */}
                     <div className="bar-wrapper">
                         {(!!l.questionText && !hideTitle) && (
                             <div className="mb-1 d-flex align-items-center">

@@ -8,12 +8,14 @@ export const Popper: FunctionComponent<{
     rightOnSmall?: boolean
     startVisible?: boolean
     bellow?: boolean
+    oulineInstead?: boolean
 }> = ({
     button,
     popperContent,
     rightOnSmall,
     startVisible = false,
-    bellow
+    bellow,
+    oulineInstead
 }) => {
         const [isVisible, setIsvisible] = useState(startVisible);
 
@@ -26,7 +28,7 @@ export const Popper: FunctionComponent<{
                     {button}
                 </div>
                 <div
-                    className={`popper-content-wrapper ${isVisible && 'is-visible'} ${rightOnSmall && 'rightOnSmall'} ${bellow && 'bellow'}`}
+                    className={`popper-content-wrapper ${oulineInstead && 'outline-instead'} ${isVisible && 'is-visible'} ${rightOnSmall && 'rightOnSmall'} ${bellow && 'bellow'}`}
                     onClick={() => setTimeout(() => setIsvisible(false), 200)}
                 >
                     {popperContent}

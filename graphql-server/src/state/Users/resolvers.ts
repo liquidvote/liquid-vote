@@ -328,43 +328,47 @@ export const UserResolvers = {
                             }
                         },
                     },
-                    ...(!!AuthUser?._id) ? [{
-                        '$lookup': {
-                            'as': 'yourUserStats',
-                            'from': 'Votes',
-                            'let': {
-                                'userId': new ObjectId(User._id),
-                                'groupHandle': '$handle'
-                            },
-                            'pipeline': [
-                                {
-                                    '$match': {
-                                        '$and': [
-                                            {
-                                                '$expr': {
-                                                    '$eq': [
-                                                        '$user', new ObjectId(AuthUser._id)
-                                                    ]
-                                                }
-                                            },
-                                            {
-                                                '$expr': {
-                                                    '$eq': [
-                                                        '$groupChannel.group', '$$groupHandle'
-                                                    ]
-                                                }
-                                            }
-                                        ],
-                                    }
+                    ...(!!AuthUser?._id) ? [
+                        {
+                            '$lookup': {
+                                'as': 'yourUserStats',
+                                'from': 'Votes',
+                                'let': {
+                                    'userId': new ObjectId(User._id),
+                                    'groupHandle': '$handle'
                                 },
-                                ...votesInCommonPipelineForVotes()
-                            ]
+                                'pipeline': [
+                                    {
+                                        '$match': {
+                                            '$and': [
+                                                {
+                                                    '$expr': {
+                                                        '$eq': [
+                                                            '$user', new ObjectId(AuthUser._id)
+                                                        ]
+                                                    }
+                                                },
+                                                {
+                                                    '$expr': {
+                                                        '$eq': [
+                                                            '$groupChannel.group', '$$groupHandle'
+                                                        ]
+                                                    }
+                                                }
+                                            ],
+                                        }
+                                    },
+                                    ...votesInCommonPipelineForVotes()
+                                ]
+                            }
+                        }, {
+                            '$addFields': {
+                                'yourUserStats': { '$first': '$yourUserStats' }
+                            }
+                        }, {
+                            $sort: { 'yourUserStats.directVotesInCommon': -1 }
                         }
-                    }, {
-                        '$addFields': {
-                            'yourUserStats': { '$first': '$yourUserStats' }
-                        }
-                    }] : [],
+                    ] : [],
                 ])
                     .toArray())
                     .map(async (g) => ({
@@ -399,152 +403,152 @@ export const UserResolvers = {
                         }
                     }))));
 
-return Groups;
+            return Groups;
         },
-UserQuestions: async (_source, {
-    handle,
-    sortBy,
-    notUsers
-}, { mongoDB, AuthUser }) => {
+        UserQuestions: async (_source, {
+            handle,
+            sortBy,
+            notUsers
+        }, { mongoDB, AuthUser }) => {
 
-    const User = !!handle && await mongoDB.collection("Users")
-        .findOne({ 'LiquidUser.handle': handle });
+            const User = !!handle && await mongoDB.collection("Users")
+                .findOne({ 'LiquidUser.handle': handle });
 
-    const UserGroupMemberRelations = !!User && await mongoDB.collection("GroupMembers")
-        .find({ 'userId': new ObjectId(User?._id) })
-        .toArray();
+            const UserGroupMemberRelations = !!User && await mongoDB.collection("GroupMembers")
+                .find({ 'userId': new ObjectId(User?._id) })
+                .toArray();
 
-    const UserGroups = !!UserGroupMemberRelations && await mongoDB.collection("Groups").find({
-        "_id": {
-            "$in": UserGroupMemberRelations.map(r => new ObjectId(r.groupId))
-        }
-    })
-        .toArray();
-
-    const Questions = await mongoDB.collection("Questions")
-        .aggregate(
-            [
-                // ...(!!UserGroups && !notUsers) ? [{
-                //     '$match': {
-                //         'groupChannel.group': { '$in': UserGroups.map(g => g.handle) }
-                //     }
-                // }] : [],
-                // ...(!!UserGroups && notUsers) ? [{
-                //     '$match': {
-                //         'groupChannel.group': { '$nin': UserGroups.map(g => g.handle) }
-                //     }
-                // }] : [],
-                ...QuestionsAgg({
-                    questionText: null,
-                    group: (!!UserGroups && !notUsers) ?
-                        { '$in': UserGroups.map(g => g.handle) } :
-                        (!!UserGroups && notUsers) ?
-                            { '$nin': UserGroups.map(g => g.handle) } :
-                            null,
-                    AuthUserId: AuthUser?._id
-                }),
-                // {
-                //     $lookup: {
-                //         from: 'Groups',
-                //         localField: 'groupChannel.group',
-                //         foreignField: 'handle',
-                //         as: 'group'
-                //     }
-                // },
-                // {
-                //     $addFields: {
-                //         group: { $first: "$group" }
-                //     }
-                // },
-                ...(!!notUsers || !handle) ? [{
-                    $match: {
-                        'group.privacy': 'public'
-                    }
-                }] : [],
-                {
-                    '$addFields': {
-                        'stats.lastEditOrVote': {
-                            '$cond': [
-                                {
-                                    '$gt': [
-                                        '$lastEditOn', '$stats.lastVoteOn'
-                                    ]
-                                }, '$lastEditOn', '$stats.lastVoteOn'
-                            ]
-                        },
-                        'stats.totalVotes': {
-                            '$sum': [
-                                '$stats.directVotes', '$stats.indirectVotes'
-                            ]
-                        },
-                        // 'thisUserIsAdmin': {
-                        //     '$eq': ['$createdBy', AuthUser?.LiquidUser?.handle]
-                        // }
-                    }
-                },
-                ...(sortBy === 'weight') ? [
-                    {
-                        '$sort': { 'stats.totalVotes': -1 }
-                    }
-                ] : [],
-                ...(sortBy === 'time') ? [
-                    {
-                        '$sort': { 'stats.lastEditOrVote': -1 }
-                    }
-                ] : []
-            ]
-        )
-        .toArray();
-
-    // TODO: move this logic to the aggregation, it'll run much faster
-    return await Promise.all(Questions.map(async (q, i) => ({
-        ...q,
-        _id: q?.id,
-        ...(q.questionType === 'single' && !!AuthUser) && {
-            yourVote: q?.choices[0]?.yourVote
-        },
-        ...(q.questionType === 'multi') && {
-            choices: await Promise.all(q?.choices?.map(async (c) => ({
-                ...c?.choice,
-                ...(!!AuthUser) && {
-                    yourVote: c?.yourVote
+            const UserGroups = !!UserGroupMemberRelations && await mongoDB.collection("Groups").find({
+                "_id": {
+                    "$in": UserGroupMemberRelations.map(r => new ObjectId(r.groupId))
                 }
-            })))
-        },
-        thisUserIsAdmin: !!AuthUser && (
-            q?.createdBy?.handle === AuthUser?.LiquidUser?.handle ||
-            q?.group?.admins?.map(a => a?.handle)?.includes(AuthUser?.LiquidUser?.handle)
-        ),
-        i
-    })));
-}
-    },
-Mutation: {
-    editUser: async (_source, { User }, { mongoDB, AuthUser }) => {
+            })
+                .toArray();
 
-        if (!AuthUser) return;
+            const Questions = await mongoDB.collection("Questions")
+                .aggregate(
+                    [
+                        // ...(!!UserGroups && !notUsers) ? [{
+                        //     '$match': {
+                        //         'groupChannel.group': { '$in': UserGroups.map(g => g.handle) }
+                        //     }
+                        // }] : [],
+                        // ...(!!UserGroups && notUsers) ? [{
+                        //     '$match': {
+                        //         'groupChannel.group': { '$nin': UserGroups.map(g => g.handle) }
+                        //     }
+                        // }] : [],
+                        ...QuestionsAgg({
+                            questionText: null,
+                            group: (!!UserGroups && !notUsers) ?
+                                { '$in': UserGroups.map(g => g.handle) } :
+                                (!!UserGroups && notUsers) ?
+                                    { '$nin': UserGroups.map(g => g.handle) } :
+                                    null,
+                            AuthUserId: AuthUser?._id
+                        }),
+                        // {
+                        //     $lookup: {
+                        //         from: 'Groups',
+                        //         localField: 'groupChannel.group',
+                        //         foreignField: 'handle',
+                        //         as: 'group'
+                        //     }
+                        // },
+                        // {
+                        //     $addFields: {
+                        //         group: { $first: "$group" }
+                        //     }
+                        // },
+                        ...(!!notUsers || !handle) ? [{
+                            $match: {
+                                'group.privacy': 'public'
+                            }
+                        }] : [],
+                        {
+                            '$addFields': {
+                                'stats.lastEditOrVote': {
+                                    '$cond': [
+                                        {
+                                            '$gt': [
+                                                '$lastEditOn', '$stats.lastVoteOn'
+                                            ]
+                                        }, '$lastEditOn', '$stats.lastVoteOn'
+                                    ]
+                                },
+                                'stats.totalVotes': {
+                                    '$sum': [
+                                        '$stats.directVotes', '$stats.indirectVotes'
+                                    ]
+                                },
+                                // 'thisUserIsAdmin': {
+                                //     '$eq': ['$createdBy', AuthUser?.LiquidUser?.handle]
+                                // }
+                            }
+                        },
+                        ...(sortBy === 'weight') ? [
+                            {
+                                '$sort': { 'stats.totalVotes': -1 }
+                            }
+                        ] : [],
+                        ...(sortBy === 'time') ? [
+                            {
+                                '$sort': { 'stats.lastEditOrVote': -1 }
+                            }
+                        ] : []
+                    ]
+                )
+                .toArray();
 
-        const updated = (AuthUser && User) ? (
-            await mongoDB.collection("Users").findOneAndUpdate(
-                { _id: AuthUser._id },
-                {
-                    $set: {
-                        'LiquidUser.name': User.name,
-                        'LiquidUser.location': User.location,
-                        'LiquidUser.bio': User.bio,
-                        'LiquidUser.externalLink': User.externalLink,
-                        'LiquidUser.avatar': User.avatar,
-                        'LiquidUser.cover': User.cover,
-                        'LiquidUser.email': User.email,
-                        'LiquidUser.lastEditOn': Date.now(),
-                    },
+            // TODO: move this logic to the aggregation, it'll run much faster
+            return await Promise.all(Questions.map(async (q, i) => ({
+                ...q,
+                _id: q?.id,
+                ...(q.questionType === 'single' && !!AuthUser) && {
+                    yourVote: q?.choices[0]?.yourVote
                 },
-                { returnDocument: 'after' }
-            )
-        )?.value : null;
-
-        return updated;
+                ...(q.questionType === 'multi') && {
+                    choices: await Promise.all(q?.choices?.map(async (c) => ({
+                        ...c?.choice,
+                        ...(!!AuthUser) && {
+                            yourVote: c?.yourVote
+                        }
+                    })))
+                },
+                thisUserIsAdmin: !!AuthUser && (
+                    q?.createdBy?.handle === AuthUser?.LiquidUser?.handle ||
+                    q?.group?.admins?.map(a => a?.handle)?.includes(AuthUser?.LiquidUser?.handle)
+                ),
+                i
+            })));
+        }
     },
+    Mutation: {
+        editUser: async (_source, { User }, { mongoDB, AuthUser }) => {
+
+            if (!AuthUser) return;
+
+            const updated = (AuthUser && User) ? (
+                await mongoDB.collection("Users").findOneAndUpdate(
+                    { _id: AuthUser._id },
+                    {
+                        $set: {
+                            'LiquidUser.name': User.name,
+                            'LiquidUser.location': User.location,
+                            'LiquidUser.bio': User.bio,
+                            'LiquidUser.externalLink': User.externalLink,
+                            'LiquidUser.avatar': User.avatar,
+                            'LiquidUser.cover': User.cover,
+                            'LiquidUser.email': User.email,
+                            'LiquidUser.lastEditOn': Date.now(),
+                        },
+                    },
+                    { returnDocument: 'after' }
+                )
+            )?.value : null;
+
+            return updated;
+        },
         editGroupMemberChannelRelation: async (_source, {
             UserHandle,
             GroupHandle,
@@ -607,90 +611,90 @@ Mutation: {
 
             return updatedOrCreated;
         },
-            editUserRepresentativeGroupRelation: async (_source, {
-                RepresenteeHandle,
-                RepresentativeHandle,
-                Group,
-                IsRepresentingYou
-            }, { mongoDB, AuthUser }) => {
+        editUserRepresentativeGroupRelation: async (_source, {
+            RepresenteeHandle,
+            RepresentativeHandle,
+            Group,
+            IsRepresentingYou
+        }, { mongoDB, AuthUser }) => {
 
-                if (!AuthUser) return;
+            if (!AuthUser) return;
 
-                const isUser = AuthUser?.LiquidUser?.handle === RepresenteeHandle;
+            const isUser = AuthUser?.LiquidUser?.handle === RepresenteeHandle;
 
-                const Representee = await mongoDB.collection("Users")
-                    .findOne({ 'LiquidUser.handle': RepresenteeHandle });
+            const Representee = await mongoDB.collection("Users")
+                .findOne({ 'LiquidUser.handle': RepresenteeHandle });
 
-                const Representative = await mongoDB.collection("Users")
-                    .findOne({ 'LiquidUser.handle': RepresentativeHandle });
+            const Representative = await mongoDB.collection("Users")
+                .findOne({ 'LiquidUser.handle': RepresentativeHandle });
 
-                const Group_ = await mongoDB.collection("Groups")
-                    .findOne({ 'handle': Group });
+            const Group_ = await mongoDB.collection("Groups")
+                .findOne({ 'handle': Group });
 
-                const UpdatedRepresentativeGroupRelation = isUser ? (
-                    await mongoDB.collection("UserRepresentations").findOneAndUpdate(
-                        {
+            const UpdatedRepresentativeGroupRelation = isUser ? (
+                await mongoDB.collection("UserRepresentations").findOneAndUpdate(
+                    {
+                        representativeId: new ObjectId(Representative?._id),
+                        representeeId: new ObjectId(Representee?._id),
+                        groupId: new ObjectId(Group_?._id),
+                    },
+                    {
+                        $set: {
+                            isRepresentingYou: IsRepresentingYou,
+                            lastEditOn: Date.now(),
+                        },
+                        $setOnInsert: {
                             representativeId: new ObjectId(Representative?._id),
                             representeeId: new ObjectId(Representee?._id),
                             groupId: new ObjectId(Group_?._id),
-                        },
-                        {
-                            $set: {
-                                isRepresentingYou: IsRepresentingYou,
-                                lastEditOn: Date.now(),
-                            },
-                            $setOnInsert: {
-                                representativeId: new ObjectId(Representative?._id),
-                                representeeId: new ObjectId(Representee?._id),
-                                groupId: new ObjectId(Group_?._id),
-                                createdOn: Date.now()
-                            }
-                        },
-                        {
-                            returnDocument: 'after',
-                            upsert: true
+                            createdOn: Date.now()
                         }
-                    )
-                )?.value : null;
+                    },
+                    {
+                        returnDocument: 'after',
+                        upsert: true
+                    }
+                )
+            )?.value : null;
 
 
-                const updatedRepresenteesVotes = await updateRepresenteesVotes({
-                    efficientOrThorough: "thorough",
+            const updatedRepresenteesVotes = await updateRepresenteesVotes({
+                efficientOrThorough: "thorough",
 
-                    representeeId: Representee._id,
-                    representativeId: Representative._id,
-                    isRepresentingYou: IsRepresentingYou, // false, for when removing vote
-                    groupId: Group_._id,
-                    groupHandle: Group_.handle,
+                representeeId: Representee._id,
+                representativeId: Representative._id,
+                isRepresentingYou: IsRepresentingYou, // false, for when removing vote
+                groupId: Group_._id,
+                groupHandle: Group_.handle,
 
-                    AuthUser,
+                AuthUser,
+                mongoDB,
+            });
+
+            // console.log({
+            //     UpdatedRepresentativeGroupRelation,
+            //     updatedRepresenteesVotesL: updatedRepresenteesVotes?.length
+            // });
+
+            const updatedQuestionStats = await Promise.all(updatedRepresenteesVotes.map(async (q: any) => {
+                return await updateQuestionVotingStats({
+                    questionText: q.questionText,
+                    choiceText: q.choiceText,
+                    group: q.groupChannel.group,
+
                     mongoDB,
+                    AuthUser
                 });
+            }));
 
-                // console.log({
-                //     UpdatedRepresentativeGroupRelation,
-                //     updatedRepresenteesVotesL: updatedRepresenteesVotes?.length
-                // });
+            console.log({
+                updatedQuestionStatsL: updatedQuestionStats?.length
+            });
 
-                const updatedQuestionStats = await Promise.all(updatedRepresenteesVotes.map(async (q: any) => {
-                    return await updateQuestionVotingStats({
-                        questionText: q.questionText,
-                        choiceText: q.choiceText,
-                        group: q.groupChannel.group,
+            // update/create votes for representee, from representative's votes
 
-                        mongoDB,
-                        AuthUser
-                    });
-                }));
-
-                console.log({
-                    updatedQuestionStatsL: updatedQuestionStats?.length
-                });
-
-                // update/create votes for representee, from representative's votes
-
-                return UpdatedRepresentativeGroupRelation;
-            },
+            return UpdatedRepresentativeGroupRelation;
+        },
     },
 };
 

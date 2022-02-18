@@ -133,13 +133,13 @@ export const Profile: FunctionComponent<{}> = ({ }) => {
                     )}
                 </div>
             </div>
-            <h2 className="profile-name">{profile.name}</h2>
+            <h2 className="profile-name white mt-2">{profile.name}</h2>
             <p className="profile-handle">@{profile.handle}</p>
             <div className="profile-description pre-wrap">
                 {profile.bio}
             </div>
             {/* <pre>{JSON.stringify(profile, null, 2)}</pre> */}
-            <div className="profile-icons-container d-flex">
+            <div className="profile-icons-container d-flex mt-2">
                 <div>
                     <div className="mr-1"><LocationSVG /></div>
                     <div>{profile.location}</div>
@@ -162,7 +162,7 @@ export const Profile: FunctionComponent<{}> = ({ }) => {
                     <div>Joined {timeAgo.format(new Date(Number(profile.joinedOn)))}</div>
                 </div>
             </div>
-            <div className="profile-stats-container mt-3 flex-nowrap">
+            <div className="profile-stats-container mt-1 flex-nowrap">
                 <div className="mr-1"><ProfileSmallSVG /></div>
                 <div className="d-flex flex-wrap">
                     <Link to={`/profile-people/${profile.handle}/representedBy`} className="mr-2">

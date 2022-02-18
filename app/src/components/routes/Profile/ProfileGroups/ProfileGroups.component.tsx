@@ -9,6 +9,9 @@ import useSearchParams from "@state/Global/useSearchParams.effect";
 import { USER, USER_GROUPS, EDIT_USER_REPRESENTATIVE_GROUP_RELATION } from "@state/User/typeDefs";
 import useAuthUser from '@state/AuthUser/authUser.effect';
 import useUserGroups from '@state/User/userGroups.effect';
+import DropAnimation from '@components/shared/DropAnimation';
+import ThreeDotsSmallSVG from '@shared/Icons/ThreeDots-small-horizontal.svg';
+import Popper from "@shared/Popper";
 import './style.sass';
 
 export const ProfileGroups: FunctionComponent<{}> = ({ }) => {
@@ -20,7 +23,8 @@ export const ProfileGroups: FunctionComponent<{}> = ({ }) => {
 
     const {
         userGroups,
-        userGroups_refetch
+        userGroups_refetch,
+        userGroups_loading
     } = useUserGroups({
         userHandle: handle,
         representative: handle
@@ -52,44 +56,23 @@ export const ProfileGroups: FunctionComponent<{}> = ({ }) => {
 
     return (
         <>
-            {userGroups?.map((g: any, i: Number) => (
-                <GroupInProfileList
-                    key={g.name + i}
-                    group={g}
-                    alternativeButton={(
-                        g.yourMemberRelation?.isMember ?
-                            <div
-                                onClick={
-                                    () => editUserRepresentativeGroupRelation({
-                                        variables: {
-                                            RepresenteeHandle: liquidUser?.handle,
-                                            RepresentativeHandle: user_data?.User?.handle,
-                                            Group: g.handle,
-                                            IsRepresentingYou: !g.representativeRelation?.isRepresentingYou
-                                        }
-                                    })
-                                        .then((r) => {
-                                            userGroups_refetch();
-                                            updateParams({ paramsToAdd: { refetch: 'user' } })
-                                        })
-                                }
-                                className={`
-                            button_ small ml-1 mb-0
-                            ${g.representativeRelation?.isRepresentingYou ? 'selected' : null}
-                        `}
-                            >
-                                {
-                                    g.representativeRelation?.isRepresentingYou ?
-                                        `Represents you` :
-                                        `Delegate to ${user_data?.User?.name}`
-                                }
-                            </div> :
-                            null
-                    )}
-                />
-            ))}
+            <div className="mt-n3">
+                {userGroups?.map((g: any, i: Number) => (
+                    <GroupInProfileList
+                        key={g.name + i}
+                        group={g}
+                        user={user_data?.User}
+                    />
+                ))}
+            </div>
 
-            {!!liquidUser && (
+            {userGroups_loading && (
+                <div className="d-flex justify-content-center mt-5">
+                    <DropAnimation />
+                </div>
+            )}
+
+            {!!liquidUser && liquidUser.handle === handle && (
                 <div className="d-flex justify-content-center">
                     <div onClick={() => updateParams({
                         paramsToAdd: {
