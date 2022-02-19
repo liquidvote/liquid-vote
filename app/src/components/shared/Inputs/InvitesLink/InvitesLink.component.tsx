@@ -10,16 +10,18 @@ type Props = {
     label?: string,
     groupHandle?: string,
     fromWhomHandle?: string,
+    inviteLink: string,
 }
 
 export const InvitesLink: FunctionComponent<Props> = ({
     label,
     groupHandle,
-    fromWhomHandle
+    fromWhomHandle,
+    inviteLink
 }) => {
     const [isFocused, setIsFocused] = useState(false);
 
-    const link = `${env.website}/invite/by/${fromWhomHandle}/to/group/${groupHandle}`;
+    // const link = `${env.website}/invite/by/${fromWhomHandle}/to/group/${groupHandle}`;
 
     return (
         <div className={
@@ -33,7 +35,7 @@ export const InvitesLink: FunctionComponent<Props> = ({
                 <div className="inputElementWrapper">
                     <input
                         type={'input'}
-                        value={link}
+                        value={inviteLink}
                         onClick={e => (e.target as any).select()}
                         onBlur={() => setIsFocused(false)}
                         onFocus={() => setIsFocused(true)}

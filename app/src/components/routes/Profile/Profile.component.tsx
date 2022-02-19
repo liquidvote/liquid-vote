@@ -24,7 +24,7 @@ import ProfileGroups from "./ProfileGroups";
 
 export const Profile: FunctionComponent<{}> = ({ }) => {
 
-    let { section, handle } = useParams<any>();
+    let { section, handle, groupHandle } = useParams<any>();
     const { allSearchParams, updateParams } = useSearchParams();
 
     const { liquidUser } = useAuthUser();
@@ -308,7 +308,7 @@ export const Profile: FunctionComponent<{}> = ({ }) => {
 
             <hr className="mt-n4" />
 
-            {(!section || section === 'groups') && <ProfileGroups />}
+            {(!section || section === 'groups' || !!groupHandle) && <ProfileGroups selectedGroup={groupHandle} />}
 
             {(section === 'votes') && <ProfileVotes />}
         </>

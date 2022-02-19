@@ -1,8 +1,9 @@
 import React, { FunctionComponent } from 'react';
 import { Link } from "react-router-dom";
 import { useQuery, useMutation } from "@apollo/client";
-import useAuthUser from '@state/AuthUser/authUser.effect';
 
+import env from '@env';
+import useAuthUser from '@state/AuthUser/authUser.effect';
 import LockSVG from "@shared/Icons/Lock-tiny.svg";
 import WorldSVG from "@shared/Icons/World-tiny.svg";
 import LinkSVG from "@shared/Icons/Link-tiny.svg";
@@ -17,11 +18,13 @@ import './style.sass';
 export const GroupInProfileList: FunctionComponent<{
     group: any,
     alternativeButton?: any,
-    user: any
+    user: any,
+    isSelected: boolean
 }> = ({
     group,
     alternativeButton,
-    user
+    user,
+    isSelected
 }) => {
 
         const { liquidUser } = useAuthUser();
@@ -45,7 +48,7 @@ export const GroupInProfileList: FunctionComponent<{
             editGroupMemberChannelRelation_data?.editGroupMemberChannelRelation?.isMember;
 
         return (
-            <div className="relative border-bottom pb-3 mx-n3 px-3">
+            <div className={`relative border-bottom pb-3 mx-n3 px-3 ${isSelected && 'forDirect'}`}>
                 <div className="groupInProfile-cover-container">
                     <div
                         className="poll-cover"
@@ -62,7 +65,7 @@ export const GroupInProfileList: FunctionComponent<{
                             </h5>
                         </Link> */}
 
-                        <Link className="position-relative" style={{ top: 10 }} to={`/profile/${user.handle}`}>
+                        <Link className="position-relative" style={{ top: 10 }} to={`/profile/${user.handle}/cause/${group.handle}`}>
                             <Avatar
                                 person={{
                                     ...user,
@@ -163,6 +166,38 @@ export const GroupInProfileList: FunctionComponent<{
                                                         {isMember ? "Joined" : "Join"}
                                                     </button>
                                                 </li>
+                                                {liquidUser.handle === user.handle && (
+                                                    <li className="d-flex mt-2 justify-content-center">
+                                                        <div
+                                                            className="button_ small ml-2"
+                                                            onClick={async () => {
+                                                                const inviteLink = `${env.website}/invite/by/${liquidUser?.handle}/to/causeOnProfile/${group.handle}`;
+
+                                                                try {
+                                                                    await navigator.share({
+                                                                        title: `Vote on ${group.name} with ${liquidUser?.name}`,
+                                                                        text: `${liquidUser?.name} is inviting you to vote on ${group.name} with him`,
+                                                                        url: inviteLink
+                                                                    })
+                                                                } catch (err) {
+                                                                    updateParams({
+                                                                        paramsToAdd: {
+                                                                            modal: "InviteFor",
+                                                                            modalData: JSON.stringify({
+                                                                                InviteType: 'toGroup',
+                                                                                groupHandle: group.handle,
+                                                                                groupName: group.name,
+                                                                                inviteLink
+                                                                            })
+                                                                        }
+                                                                    })
+                                                                }
+                                                            }}
+                                                        >
+                                                            Share Votes
+                                                        </div>
+                                                    </li>
+                                                )}
                                             </ul>
                                         }
                                     />

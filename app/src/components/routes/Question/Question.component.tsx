@@ -5,19 +5,16 @@ import ReactTooltip from 'react-tooltip';
 import { useQuery } from "@apollo/client";
 import Linkify from 'linkify-react';
 
+import env from '@env';
 import DropAnimation from "@components/shared/DropAnimation";
 import Choice from '@shared/Choice';
 import Header from "@shared/Header";
 import GroupSmallSvg from "@shared/Icons/Group-small.svg";
 import VoteGraph1 from "@shared/VoteGraph1";
 import useSearchParams from "@state/Global/useSearchParams.effect";
-import {
-    byGroups,
-    votesBy
-} from "@state/Mock/Votes";
+import TopPageInvite from '@components/shared/TopPageInvite';
 import { QUESTION } from '@state/Question/typeDefs';
 import { timeAgo } from '@state/TimeAgo';
-// import useGroup from '@state/Group/group.effect';
 import useUserRepresentedBy from "@state/User/userRepresentedBy.effect";
 import useAuthUser from '@state/AuthUser/authUser.effect';
 import useGroup from '@state/Group/group.effect';
@@ -29,7 +26,7 @@ import Popper from "@shared/Popper";
 
 export default function Question() {
 
-    let { voteName, groupHandle, section } = useParams<any>();
+    let { voteName, groupHandle, section, userHandle } = useParams<any>();
     const { allSearchParams, updateParams } = useSearchParams();
 
     const { group, group_refetch } = useGroup({ handle: groupHandle });
@@ -78,6 +75,15 @@ export default function Question() {
             <ReactTooltip place="bottom" type="dark" effect="solid" />
 
             <Header title="Opinion Poll" />
+
+            {!!userHandle && (
+                <TopPageInvite
+                    inviterHandle={userHandle}
+                    groupHandle={groupHandle}
+                    voteName={voteName}
+                    to="poll"
+                />
+            )}
 
             <div className="poll-cover-container on-poll">
                 <div
@@ -160,6 +166,37 @@ export default function Question() {
                             </div>}
                             popperContent={
                                 <ul className="p-0 m-0 mx-2">
+
+                                    <li
+                                        className="pointer my-2 "
+                                        onClick={async () => {
+                                            const inviteLink = `${env.website}/invite/by/${liquidUser?.handle}/to/voteOn/${voteName}/${groupHandle}`;
+
+                                            try {
+                                                await navigator.share({
+                                                    title: `Vote on ${voteName} with ${liquidUser?.name}`,
+                                                    text: `${liquidUser?.name} is inviting you to vote on ${voteName} with him`,
+                                                    url: inviteLink
+                                                })
+                                            } catch (err) {
+                                                updateParams({
+                                                    paramsToAdd: {
+                                                        modal: "InviteFor",
+                                                        modalData: JSON.stringify({
+                                                            InviteType: 'toVote',
+                                                            inviteLink,
+                                                            voteName
+                                                        })
+                                                    }
+                                                })
+                                            }
+                                        }}
+                                    >
+                                        Share Votes
+
+                                    </li>
+
+
                                     <li
                                         className="pointer my-2 text-danger"
                                         onClick={() => updateParams({
