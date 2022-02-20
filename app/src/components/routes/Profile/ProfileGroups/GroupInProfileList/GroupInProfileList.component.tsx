@@ -12,6 +12,7 @@ import { EDIT_GROUP_MEMBER_CHANNEL_RELATION, EDIT_USER_REPRESENTATIVE_GROUP_RELA
 import Avatar from '@components/shared/Avatar';
 import ThreeDotsSmallSVG from '@shared/Icons/ThreeDots-small-horizontal.svg';
 import Popper from "@shared/Popper";
+import GroupInProfileListVotes from "./GroupInProfileListVotes";
 
 import './style.sass';
 
@@ -48,7 +49,7 @@ export const GroupInProfileList: FunctionComponent<{
             editGroupMemberChannelRelation_data?.editGroupMemberChannelRelation?.isMember;
 
         return (
-            <div className={`relative border-bottom pb-3 mx-n3 px-3 ${isSelected && 'forDirect'}`}>
+            <div className={`relative border-bottom pb-3 mx-n3 px-3 ${isSelected && ''}`}>
                 <div className="groupInProfile-cover-container">
                     <div
                         className="poll-cover"
@@ -65,7 +66,11 @@ export const GroupInProfileList: FunctionComponent<{
                             </h5>
                         </Link> */}
 
-                        <Link className="position-relative" style={{ top: 10 }} to={`/profile/${user.handle}/cause/${group.handle}`}>
+                        <Link
+                            className="position-relative"
+                            style={{ top: 10 }}
+                            to={isSelected ? `/profile/${user.handle}` : `/profile/${user.handle}/cause/${group.handle}`}
+                        >
                             <Avatar
                                 person={{
                                     ...user,
@@ -239,6 +244,10 @@ export const GroupInProfileList: FunctionComponent<{
                     </div>
                     {/* <div style={{ marginRight: 2, marginTop: -5 }}>⬇</div> */}
                 </div>
+
+                {isSelected && (
+                    <GroupInProfileListVotes />
+                )}
             </div>
         );
     }

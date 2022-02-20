@@ -14,9 +14,9 @@ import ThreeDotsSmallSVG from '@shared/Icons/ThreeDots-small-horizontal.svg';
 import Popper from "@shared/Popper";
 import './style.sass';
 
-export const ProfileGroups: FunctionComponent<{ selectedGroup?: string }> = ({ selectedGroup }) => {
+export const ProfileGroups: FunctionComponent<{}> = () => {
 
-    let { handle } = useParams<any>();
+    let { handle, groupHandle } = useParams<any>();
     const { allSearchParams, updateParams } = useSearchParams();
 
     const { liquidUser } = useAuthUser();
@@ -62,7 +62,7 @@ export const ProfileGroups: FunctionComponent<{ selectedGroup?: string }> = ({ s
                         key={g.name + i}
                         group={g}
                         user={user_data?.User}
-                        isSelected={selectedGroup === g.handle}
+                        isSelected={groupHandle === g.handle}
                     />
                 ))}
             </div>

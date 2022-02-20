@@ -8,14 +8,17 @@ import MultiVoteInList from "@shared/MultiVoteInList";
 import Choice from "@shared/Choice";
 import './style.sass';
 import { timeAgo } from '@state/TimeAgo';
+import VotedExplanation from '@shared/VotedExplanation';
 
 export const Notification: FunctionComponent<{
     v: any,
+    showUser?: boolean,
     showChart?: boolean,
     hideChoicesBesides?: string,
     showTitle?: boolean
 }> = ({
     v,
+    showUser = true,
     showChart = false,
     hideChoicesBesides,
     showTitle = false,
@@ -27,104 +30,42 @@ export const Notification: FunctionComponent<{
             v.question?.choices?.find(c => c.text === hideChoicesBesides)?.userVote;
 
         console.log({
-            userVote
+            userVote,
+            user: v.user
         });
 
         return (
             <>
                 <div className="d-flex relative align-items-center">
-                    <Link to={`/profile/${v.user?.handle}`}>
-                        <div
-                            className={`small-avatar bg`}
-                            style={{
-                                background: v.user?.avatar && `url(${v.user?.avatar}) 50% 50% / cover no-repeat`
-                            }}
-                        ></div>
-                    </Link>
+                    {!!showUser && (
+                        <Link to={`/profile/${v.user?.handle}`}>
+                            <div
+                                className={`small-avatar bg`}
+                                style={{
+                                    background: v.user?.avatar && `url(${v.user?.avatar}) 50% 50% / cover no-repeat`
+                                }}
+                            ></div>
+                        </Link>
+                    )}
                     <div className="flex-fill">
                         <div className="mb-n1 flex-fill d-flex align-items-center justify-content-between">
                             <div className="w-75">
-                                <div className="d-flex align-items-end">
-                                    <Link to={`/profile/${v.user?.handle}`} className="d-block">
-                                        <b className="mr-1">{v.user?.name}</b>
-                                    </Link>
-                                </div>
+                                {!!showUser && (
+                                    <div className="d-flex align-items-end">
+                                        <Link to={`/profile/${v.user?.handle}`} className="d-block">
+                                            <b className="mr-1">{v.user?.name}</b>
+                                        </Link>
+                                    </div>
+                                )}
                                 <div className="d-flex flex-wrap align-items-center mt-0 mb-0">
-                                    {
-                                        (
-                                            !!showAllChoices && !v.representatives?.length ||
-                                            !showAllChoices && !userVote.representatives?.length
-                                        ) && (
-                                            <small className="d-inline-block mr-1">
-                                                Voted
-                                                {(v.question?.questionType === 'single' || !showAllChoices) && (
-                                                    <b className={`white ml-1 ${userVote?.position?.toLowerCase()}Direct px-1 rounded`}>
-                                                        {userVote?.position}
-                                                    </b>
-                                                )}
-                                            </small>
-                                        )
-                                    }
-                                    {/* <pre>{JSON.stringify({showAllChoices, userVote}, null, 2)}</pre> */}
-                                    {(
-                                        !!showAllChoices && v.representeeVotes?.length > 0 ||
-                                        !showAllChoices && userVote.representeeVotes?.length > 0
-                                    ) && (
-                                            <small className="d-flex align-items-center mr-1">
-                                                Representing
-                                                <div className="d-flex ml-2 pl-1 mr-1">
-                                                    {(!!showAllChoices ?
-                                                        v.representeeVotes :
-                                                        userVote.representeeVotes
-                                                    )?.map((r: any) => (
-                                                        <Link
-                                                            key={`representeeVotes-${r.user.handle}`}
-                                                            to={`/profile/${r.user.handle}`}
-                                                            className={`vote-avatar none tiny ml-n2`}
-                                                            style={{
-                                                                background: `url(${r.user.avatar}) 50% 50% / cover no-repeat`
-                                                            }}
-                                                            title={r.user.name}
-                                                        ></Link>
-                                                    ))}
-                                                </div>
-                                            </small>
-                                        )}
-                                    {(
-                                        !!showAllChoices && v.representatives?.length > 0 ||
-                                        !showAllChoices && userVote.representatives?.length > 0
-                                    ) && (
-                                            <small className="d-flex align-items-center d-inline-block mr-1">
-                                                Represented by
-                                                <span className="d-flex ml-2 pl-1">
-                                                    {(!!showAllChoices ?
-                                                        v.representatives :
-                                                        userVote.representatives
-                                                    )?.map((r: any, i: number) => (
-                                                        <Link
-                                                            key={`representatives-${r?.representativeHandle || i}`}
-                                                            to={`/profile/${r?.representativeHandle}`}
-                                                            className={`vote-avatar tiny ${!!showAllChoices && v.question?.questionType === 'multi' ? 'none': r?.position} ml-n2`}
-                                                            style={{
-                                                                background: `url(${r?.representativeAvatar}) 50% 50% / cover no-repeat`
-                                                            }}
-                                                            title={r?.representativeName}
-                                                        ></Link>
-                                                    ))}
-                                                </span>
-                                            </small>
-                                        )}
-
-                                    <>
-                                        {(showTitle && v.question?.questionType === 'single' && !showChart) ? (
-                                            <>
-                                                <small className="mr-1">on</small>
-                                                <Link
-                                                    to={`/${v.question?.choiceText ? 'multipoll' : 'poll'}/${v.questionText}/${v.groupChannel?.group}`}
-                                                ><b className="white">{v.question?.questionText}{v.question?.choiceText ? ':' + v.question?.choiceText : ''}</b></Link>
-                                            </>
-                                        ) : ''}
-                                    </>
+                                    {!showChart ? (
+                                        <VotedExplanation
+                                            position={userVote.position}
+                                            representeeVotes={userVote.representeeVotes}
+                                            representatives={userVote.representatives}
+                                            user={v.user}
+                                        />
+                                    ): 'Voted'} 
                                 </div>
                             </div>
                             {(
@@ -132,15 +73,14 @@ export const Notification: FunctionComponent<{
                                     <small className="text-right" data-tip={`Last vote by ${v?.user?.name} on`}>
                                         {timeAgo.format(new Date(Number(v?.lastEditOn)))}
                                     </small>
-                                    <div className="d-flex justify-content-end">
-                                        {/* <div className="tiny-svg-wrapper"><GroupSvg /></div> */}
+                                    {/* <div className="d-flex justify-content-end">
                                         <Link
                                             to={`/group/${v.groupChannel?.group}`}
                                             className="badge ml-1 mb-1 mt-1"
                                         >
                                             {v.groupChannel?.group}
                                         </Link>
-                                    </div>
+                                    </div> */}
                                 </div>
                             )}
                         </div>
@@ -167,6 +107,7 @@ export const Notification: FunctionComponent<{
                         <SingleVoteInList
                             key={`single-${v.questionText}`}
                             l={v.question}
+                            user={v.user}
                             showGroupAndTime={false}
                             showIntroMessage={true}
                             showChart={showChart}

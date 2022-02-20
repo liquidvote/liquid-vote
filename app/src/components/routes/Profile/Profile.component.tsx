@@ -308,7 +308,7 @@ export const Profile: FunctionComponent<{}> = ({ }) => {
 
             <hr className="mt-n4" />
 
-            {(!section || section === 'groups' || !!groupHandle) && <ProfileGroups selectedGroup={groupHandle} />}
+            {(!section || section === 'groups' || !!groupHandle) && <ProfileGroups />}
 
             {(section === 'votes') && <ProfileVotes />}
         </>

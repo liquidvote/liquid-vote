@@ -6,15 +6,13 @@ import useAuthUser from '@state/AuthUser/authUser.effect';
 import { USER } from "@state/User/typeDefs";
 import { VOTES } from "@state/Vote/typeDefs";
 import Notification from '@shared/Notification';
-import { VoteTimeline } from "@state/Mock/Notifications";
 import Popper from "@shared/Popper";
-import SortSmallSvg from "@shared/Icons/Sort-small.svg";
 import VoteSortPicker from '@components/shared/VoteSortPicker';
 import DropAnimation from '@components/shared/DropAnimation';
 
 import './style.sass';
 
-export const ProfileVotes: FunctionComponent<{}> = ({ }) => {
+export const GroupInProfileListVotes: FunctionComponent<{}> = ({ }) => {
 
     let { section, subsection, subsubsection, handle, groupHandle } = useParams<any>();
 
@@ -66,12 +64,14 @@ export const ProfileVotes: FunctionComponent<{}> = ({ }) => {
     });
 
     console.log({
-        user_votes_data
+        user_votes_data,
+        profile
     });
 
     return (
         <>
-            <ul className="nav d-flex justify-content-around mt-n2 mx-n3">
+
+            {/* <ul className="nav d-flex justify-content-around mt-n2 mx-n3">
                 <li className="nav-item">
                     <Link className={`nav-link ${(!subsection || subsection === 'direct') && 'active'}`} to={`/profile/${handle}/votes/direct`}>
                         <b>{profile?.stats?.directVotesMade}</b> Direct Votes
@@ -132,7 +132,7 @@ export const ProfileVotes: FunctionComponent<{}> = ({ }) => {
                     </ul>
                     <hr className="mt-n4" />
                 </>
-            )}
+            )} */}
 
             {user_votes_data?.Votes.length === 0 && (
                 <div className="p-4 text-center">
@@ -164,8 +164,9 @@ export const ProfileVotes: FunctionComponent<{}> = ({ }) => {
                     key={'notification-uservote' + n.questionText + type + n.choiceText + n.user.handle}
                     v={{
                         ...n,
-                        // user: profile
+                        user: profile
                     }}
+                    showUser={false}
                     showChart={true}
                 />
             ))}

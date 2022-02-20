@@ -15,11 +15,13 @@ import GroupSvg from "@shared/Icons/Group.svg";
 import { timeAgo } from '@state/TimeAgo';
 import ThreeDotsSmallSVG from '@shared/Icons/ThreeDots-small-horizontal.svg';
 import Popper from "@shared/Popper";
+import VotedExplanation from "@shared/VotedExplanation";
 
 import './style.sass';
 
 export const SingleVoteInList: FunctionComponent<{
     l: any,
+    user?: any,
     introMessage?: string,
     showIntroMessage?: boolean,
     showColorLegend?: boolean,
@@ -28,6 +30,7 @@ export const SingleVoteInList: FunctionComponent<{
     showChart?: boolean,
 }> = ({
     l,
+    user,
     introMessage,
     showIntroMessage,
     showColorLegend,
@@ -95,16 +98,24 @@ export const SingleVoteInList: FunctionComponent<{
                     )} */}
                     <div className="bar-wrapper">
                         {(!!l.questionText && !hideTitle) && (
-                            <div className="mb-1 d-flex align-items-center">
+                            <div className="d-flex align-items-center flex-wrap">
                                 <a
-                                    className="white mb-0"
+                                    className="white mr-2"
                                     href={`/poll/${encodeURIComponent(l.questionText)}/${l.groupChannel?.group}`}
                                 >
-                                    <div className={`question-title-in-list ${showGroupAndTime && 'limit-right'}`} title={l.questionText}>
+                                    <div className={`${showGroupAndTime && 'limit-right'}`} title={l.questionText}>
                                         {l.questionText}
                                         {showIntroMessage && '?'}
                                     </div>
                                 </a>
+                                {l.userVote && (
+                                    <VotedExplanation
+                                        position={l.userVote.position}
+                                        representeeVotes={l.userVote.representeeVotes}
+                                        representatives={l.userVote.representatives}
+                                        user={user}
+                                    />
+                                )}
                                 {/* {!!showGroupAndTime && (
                                     <Link to={`/group/${l.groupChannel.group}`}
                                         className="badge m-0 ml-2 text-truncate"
