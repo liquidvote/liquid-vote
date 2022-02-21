@@ -299,18 +299,18 @@ export const Profile: FunctionComponent<{}> = ({ }) => {
                         <b>{profile?.stats?.groupsJoined}</b> Causes
                     </Link>
                 </li>
-                <li className="nav-item">
+                {/* <li className="nav-item">
                     <Link className={`nav-link ${section === 'votes' && 'active'}`} to={`/profile/${handle}/votes`}>
                         <b>{profile?.stats?.directVotesMade}</b> Votes
                     </Link>
-                </li>
+                </li> */}
             </ul>
 
             <hr className="mt-n4" />
 
             {(!section || section === 'groups' || !!groupHandle) && <ProfileGroups />}
 
-            {(section === 'votes') && <ProfileVotes />}
+            {/* {(section === 'votes') && <ProfileVotes />} */}
         </>
     );
 }

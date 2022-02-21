@@ -63,13 +63,8 @@ export const GroupInProfileListVotes: FunctionComponent<{}> = ({ }) => {
         // fetchPolicy: "no-cache"
     });
 
-    console.log({
-        user_votes_data,
-        profile
-    });
-
     return (
-        <>
+        <div className="mx-2">
 
             {/* <ul className="nav d-flex justify-content-around mt-n2 mx-n3">
                 <li className="nav-item">
@@ -176,15 +171,12 @@ export const GroupInProfileListVotes: FunctionComponent<{}> = ({ }) => {
                     <DropAnimation />
                 </div>
             )}
-
-            <br />
-            <br />
             {/* <pre style={{ color: "white" }}>
                 {JSON.stringify(profile?.stats, null, 2)}
                 {JSON.stringify(profile?.yourStats, null, 2)}
             </pre> */}
 
-        </>
+        </div>
     );
 }
 

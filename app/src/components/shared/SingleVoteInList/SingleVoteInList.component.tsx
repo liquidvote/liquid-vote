@@ -108,14 +108,14 @@ export const SingleVoteInList: FunctionComponent<{
                                         {showIntroMessage && '?'}
                                     </div>
                                 </a>
-                                {l.userVote && (
+                                {/* {l.userVote && (
                                     <VotedExplanation
                                         position={l.userVote.position}
                                         representeeVotes={l.userVote.representeeVotes}
                                         representatives={l.userVote.representatives}
                                         user={user}
                                     />
-                                )}
+                                )} */}
                                 {/* {!!showGroupAndTime && (
                                     <Link to={`/group/${l.groupChannel.group}`}
                                         className="badge m-0 ml-2 text-truncate"
@@ -141,6 +141,7 @@ export const SingleVoteInList: FunctionComponent<{
                             stats={l.stats}
                             yourVote={l.yourVote}
                             userVote={l.userVote}
+                            user={user}
                             inList={true}
                             showChart={showChart}
                         />

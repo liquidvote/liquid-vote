@@ -11,7 +11,6 @@ export default function Chart({
     forCount,
     againstDirectCount,
     againstCount,
-    userVote = null,
     userDelegatedVotes = null,
     inList,
 }: {
@@ -21,7 +20,6 @@ export default function Chart({
     forCount: number,
     againstDirectCount: number
     againstCount: number,
-    userVote: boolean | null,
     userDelegatedVotes:
     | [
         {

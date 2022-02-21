@@ -112,7 +112,7 @@ export const Choice: FunctionComponent<{
                     {!!choiceText && (
                         <div className={`d-flex align-items-center mr-2 ${inList && 'small'}`}>
                             <b className="white">{choiceText}</b>
-                            {(!!user && !!userVote) && (
+                            {/* {(!!user && !!userVote) && (
                                 <div className="ml-2">
                                     <VotedExplanation
                                         position={userVote.position}
@@ -121,50 +121,7 @@ export const Choice: FunctionComponent<{
                                         user={user}
                                     />
                                 </div>
-                                // <div className={`d-flex align-items-center ml-3`}>
-                                //     {!!userVote.representatives?.length && (
-                                //         <div className="d-flex on-top">
-                                //             {userVote.representatives?.map((r: any, i: number) => (
-                                //                 <Link
-                                //                     data-tip={`${r?.representativeName} representing ${user.name} ${r?.position} `}
-                                //                     key={`representatives-${r?.representativeHandle || i}`}
-                                //                     to={`/profile/${r?.representativeHandle}`}
-                                //                     className={`vote-avatar tiny-big ${r?.position} ml-n2`}
-                                //                     style={{
-                                //                         background: `url(${r?.representativeAvatar}) 50% 50% / cover no-repeat`
-                                //                     }}
-                                //                 ></Link>
-                                //             ))}
-                                //             {/* <span className="ml-1 mr-2 pr-1">Representing</span> */}
-                                //         </div>
-                                //     )}
-                                //     <Link
-                                //         data-tip={
-                                //             !userVote?.representatives?.length ?
-                                //                 `${user.name} voted ${userVote?.position}` :
-                                //                 `${user.name} represented by ${userVote?.representatives.length === 1 ? userVote.representatives?.[0].representativeName : userVote?.representatives.length}`
-                                //         }
-                                //         key={`user-${user.handle}`}
-                                //         to={`/profile/${user.handle}`}
-                                //         className={`vote-avatar ${!userVote?.representatives?.length && 'on-top'} ${!!userVote.representatives?.length ? 'tiny' : 'tiny-big'} ${userVote?.position} ml-n2`}
-                                //         style={{
-                                //             background: `url(${user.avatar}) 50% 50% / cover no-repeat`
-                                //         }}
-                                //     ></Link>
-                                //     <div className="d-flex" data-tip={`Represented by ${user.name}`}>
-                                //         {!userVote?.representatives?.length && userVote?.representeeVotes?.map((r: any) => (
-                                //             <Link
-                                //                 key={`representeeVotes-${r.user.handle}`}
-                                //                 to={`/profile/${r.user.handle}`}
-                                //                 className={`vote-avatar light tiny none ml-n2`}
-                                //                 style={{
-                                //                     background: `url(${r.user.avatar}) 50% 50% / cover no-repeat`
-                                //                 }}
-                                //             ></Link>
-                                //         ))}
-                                //     </div>
-                                // </div>
-                            )}
+                            )} */}
                         </div>
                     )}
 
@@ -187,7 +144,6 @@ export const Choice: FunctionComponent<{
                             forCount={stats_.forCount}
                             againstDirectCount={stats_.againstDirectCount}
                             againstCount={stats_.againstCount}
-                            yourVote={null}
                             userDelegatedVotes={null}
                             inList={inList}
                         />
@@ -276,59 +232,49 @@ export const Choice: FunctionComponent<{
                                     )
                                 }
                             </div>
-                            <div className="d-flex ml-2" data-tip={`Votes For`}>
+                            <div
+                                className="d-flex ml-2"
+                                onClick={
+                                    e => {
+                                        e.stopPropagation();
+                                        updateParams({
+                                            paramsToAdd: {
+                                                modal: "ListVoters",
+                                                modalData: JSON.stringify({
+                                                    questionText: voteName,
+                                                    choiceText,
+                                                    groupHandle,
+                                                    subsection: 'direct',
+                                                    subsubsection: 'for'
+                                                })
+                                            }
+                                        })
+                                    }
+                                }
+                            >
                                 {(
-                                    !!editVote_data ?
-                                        editVote_data?.editVote?.QuestionStats?.forMostRepresentingVoters :
-                                        stats?.forMostRepresentingVoters
+                                    !!userVote ? [] :
+                                        !!editVote_data ?
+                                            editVote_data?.editVote?.QuestionStats?.forMostRepresentingVoters :
+                                            stats?.forMostRepresentingVoters
                                 )?.slice(0, 2).map((v: any) => (
-                                    <Link
+                                    <div
                                         key={`forMostRepresentingVoters-${v?.handle}`}
-                                        to={`/profile/${v?.handle}`}
-                                        onClick={e => e.stopPropagation()}
-                                        // onClick={
-                                        //     e => {
-                                        //         e.stopPropagation();
-                                        //         updateParams({
-                                        //             paramsToAdd: {
-                                        //                 modal: "ListVoters",
-                                        //                 modalData: JSON.stringify({
-                                        //                     questionText: voteName,
-                                        //                     choiceText,
-                                        //                     groupHandle,
-                                        //                     subsection: 'represented',
-                                        //                     subsubsection: 'foryou'
-                                        //                 })
-                                        //             }
-                                        //         })
-                                        //     }
-                                        // }
                                         className={`vote-avatar for ml-n2 ${inList && 'tiny'} pointer`}
-                                        style={{
-                                            background: `url(${v?.avatar}) 50% 50% / cover no-repeat`
-                                        }}
-                                    ></Link>
+                                        style={{ background: `url(${v?.avatar}) 50% 50% / cover no-repeat` }}
+                                    ></div>
                                 ))}
 
+                                {(
+                                    user && userVote?.position === "for" && (
+                                        <div
+                                            className={`vote-avatar for ml-n2 ${inList && 'tiny'} pointer`}
+                                            style={{ background: `url(${user.avatar}) 50% 50% / cover no-repeat` }}
+                                        ></div>
+                                    )
+                                )}
+
                                 <div
-                                    // to={`/${choiceText ? 'multipoll' : 'poll'}/${voteName}/${groupHandle}/timeline/direct/for`}
-                                    onClick={
-                                        e => {
-                                            e.stopPropagation();
-                                            updateParams({
-                                                paramsToAdd: {
-                                                    modal: "ListVoters",
-                                                    modalData: JSON.stringify({
-                                                        questionText: voteName,
-                                                        choiceText,
-                                                        groupHandle,
-                                                        subsection: 'direct',
-                                                        subsubsection: 'for'
-                                                    })
-                                                }
-                                            })
-                                        }
-                                    }
                                     className={`pointer vote-avatar text-decoration-none count for ml-n2 ${inList && 'tiny'}`}
                                 >
                                     {numeral(stats_.forCount).format('0a[.]0')}
@@ -347,9 +293,10 @@ export const Choice: FunctionComponent<{
                             <div className="d-flex ml-2" data-tip={`Votes Against`}>
                                 {
                                     (
-                                        !!editVote_data ?
-                                            editVote_data?.editVote?.QuestionStats?.againstMostRepresentingVoters :
-                                            stats?.againstMostRepresentingVoters
+                                        !!userVote ? [] :
+                                            !!editVote_data ?
+                                                editVote_data?.editVote?.QuestionStats?.againstMostRepresentingVoters :
+                                                stats?.againstMostRepresentingVoters
                                     )?.slice(0, 2).map((v: any) => (
                                         <Link
                                             key={`againstMostRepresentingVoters-${v?.handle}`}
@@ -361,6 +308,15 @@ export const Choice: FunctionComponent<{
                                         ></Link>
                                     ))
                                 }
+
+                                {(
+                                    user && userVote?.position === "against" && (
+                                        <div
+                                            className={`vote-avatar against ml-n2 ${inList && 'tiny'} pointer`}
+                                            style={{ background: `url(${user.avatar}) 50% 50% / cover no-repeat` }}
+                                        ></div>
+                                    )
+                                )}
 
                                 <div
                                     // to={`/${choiceText ? 'multipoll' : 'poll'}/${voteName}/${groupHandle}/timeline/direct/against`}
