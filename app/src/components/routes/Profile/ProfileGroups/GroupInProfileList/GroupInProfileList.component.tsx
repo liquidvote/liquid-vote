@@ -74,7 +74,8 @@ export const GroupInProfileList: FunctionComponent<{
                             <Avatar
                                 person={{
                                     ...user,
-                                    yourStats: group.yourUserStats
+                                    yourStats: group.yourUserStats,
+                                    stats: group.userStats
                                 }}
                                 type="small"
                             />
@@ -235,15 +236,25 @@ export const GroupInProfileList: FunctionComponent<{
                 </div>
 
                 <div className="d-flex justify-content-between">
-                    <div style={{ marginLeft: 58 }}>
+                    <div style={{ marginLeft: 58 }} className="d-flex">
+                        <small className="d-flex mb-0">
+                            <b className='white mr-1'>{' '}{group?.userStats?.directVotesMade}</b> votes
+                        </small>
                         {!!group?.yourUserStats?.directVotesInCommon && (
-                            <small className="d-flex mb-0">
-                                <b className='white mr-1'>{' '}{group?.yourUserStats?.directVotesInCommon}</b> votes in common
-                            </small>
+                            <>
+                                ・
+                                <small className="d-flex mb-0">
+                                    <b className='white mr-1'>{' '}{group?.yourUserStats?.directVotesInCommon}</b> in common
+                                </small>
+                            </>
                         )}
                     </div>
                     {/* <div style={{ marginRight: 2, marginTop: -5 }}>⬇</div> */}
                 </div>
+
+                {/* <pre>{JSON.stringify(group, null, 2)}</pre> */}
+                {/* <pre>{JSON.stringify(group.yourUserStats, null, 2)}</pre>
+                stats */}
 
                 {isSelected && (
                     <GroupInProfileListVotes />

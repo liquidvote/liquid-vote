@@ -158,6 +158,12 @@ export const USER_GROUPS = gql`
                 handle
             }
         }
+        userStats {
+            representing
+            representedBy
+            directVotesMade
+            indirectVotesMadeForUser
+        }
         yourUserStats {
             votesInCommon
             directVotesInCommon

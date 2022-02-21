@@ -40,6 +40,8 @@ export const PersonInList: FunctionComponent<{ person: any }> = ({ person }) => 
                 <small className="d-flex mb-0">
                     {person.bio}
                 </small>
+
+                {/* <pre>{JSON.stringify(person, null, 2)}</pre> */}
                 {/* {!!person.representationGroups && (
                     <div
                         className="d-flex flex-wrap justify-content-start"

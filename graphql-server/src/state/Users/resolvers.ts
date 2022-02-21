@@ -328,6 +328,61 @@ export const UserResolvers = {
                             }
                         },
                     },
+                    {
+                        '$lookup': {
+                            'as': 'directVotesMadeByUser',
+                            'from': 'Votes',
+                            'let': {
+                                'userId': new ObjectId(User?._id),
+                                'groupHandle': '$handle'
+                            },
+                            'pipeline': [
+                                {
+                                    '$match': {
+                                        '$and': [
+                                            {
+                                                '$expr': {
+                                                    '$eq': [
+                                                        '$user', '$$userId'
+                                                    ]
+                                                }
+                                            },
+                                            {
+                                                '$expr': {
+                                                    '$eq': [
+                                                        '$isDirect', true
+                                                    ]
+                                                }
+                                            },
+                                            {
+                                                '$expr': {
+                                                    '$ne': [
+                                                        '$position', null
+                                                    ]
+                                                }
+                                            },
+                                            {
+                                                '$expr': {
+                                                    '$eq': [
+                                                        '$groupChannel.group', '$$groupHandle'
+                                                    ]
+                                                }
+                                            },
+                                        ],
+                                    }
+                                },
+                            ]
+                        }
+                    },
+                    {
+                        '$addFields': {
+                            'userStats': {
+                                'directVotesMade': {
+                                    $size: '$directVotesMadeByUser'
+                                }
+                            }
+                        }
+                    },
                     ...(!!AuthUser?._id) ? [
                         {
                             '$lookup': {
@@ -400,6 +455,7 @@ export const UserResolvers = {
                                 r => r.groupId.toString() === g._id.toString()
                             )),
                             yourUserStats: g.yourUserStats,
+                            userStats: g.userStats
                         }
                     }))));
 

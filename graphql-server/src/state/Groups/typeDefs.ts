@@ -43,6 +43,7 @@ export const GroupTypeDefs = gql`
         representativeRelation: UserRepresentativeGroupRelation
         stats: GroupStats
         yourStats: YourGroupStats
+        userStats: UserStats
         yourUserStats: YourUserStats
     }
 

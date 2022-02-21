@@ -70,12 +70,6 @@ export const GroupResolvers = {
                             }
                         }
                     },
-                    // directVotesMade: await mongoDB.collection("Votes")
-                    // .find({
-                    //     "isDirect": true,
-                    //     'position': { $ne: null },
-                    //     "user": new ObjectId(userId)
-                    // }).count(),
                     {
                         '$lookup': {
                             'as': 'directVotesMade',
