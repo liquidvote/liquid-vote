@@ -177,7 +177,7 @@ export const GroupInProfileList: FunctionComponent<{
                                                             {isMember ? "Joined" : "Join"}
                                                         </button>
                                                     </li>
-                                                    {liquidUser.handle === user.handle && (
+                                                    {liquidUser?.handle === user.handle && (
                                                         <li className="d-flex mt-2 justify-content-center">
                                                             <div
                                                                 className="button_ small ml-2"

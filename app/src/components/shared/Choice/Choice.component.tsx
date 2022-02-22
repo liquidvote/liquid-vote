@@ -253,7 +253,7 @@ export const Choice: FunctionComponent<{
                                 }
                             >
                                 {(
-                                    !!userVote ? [] :
+                                    !!user ? [] :
                                         !!editVote_data ?
                                             editVote_data?.editVote?.QuestionStats?.forMostRepresentingVoters :
                                             stats?.forMostRepresentingVoters
@@ -293,7 +293,7 @@ export const Choice: FunctionComponent<{
                             <div className="d-flex ml-2" data-tip={`Votes Against`}>
                                 {
                                     (
-                                        !!userVote ? [] :
+                                        !!user ? [] :
                                             !!editVote_data ?
                                                 editVote_data?.editVote?.QuestionStats?.againstMostRepresentingVoters :
                                                 stats?.againstMostRepresentingVoters
