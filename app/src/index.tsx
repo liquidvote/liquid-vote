@@ -60,12 +60,12 @@ const AppolloAppWrapper: FunctionComponent<{}> = ({ }) => {
                 fields: {
                     representativeRelation: {
                         read(_, { args, toReference }) {
-                            return toReference({
+                            return args ? toReference({
                                 __typename: 'UserRepresentativeGroupRelation',
                                 groupId: args?.groupId,
                                 representativeId: args?.representativeId,
                                 representeeId: args?.representeeId,
-                            });
+                            }) : null;
                         }
                     },
                 }
