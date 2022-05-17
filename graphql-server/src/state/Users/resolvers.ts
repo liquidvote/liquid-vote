@@ -20,6 +20,91 @@ export const UserResolvers = {
                     },
                     ...(!!AuthUser?._id) ? [{
                         '$lookup': {
+                            'as': 'isFollowingYou',
+                            'from': 'UserFollows',
+                            'let': {
+                                'followedId': new ObjectId(AuthUser._id),
+                                'followingId': '$_id',
+                            },
+                            'pipeline': [
+                                {
+                                    '$match': {
+                                        '$and': [
+                                            {
+                                                '$expr': {
+                                                    '$eq': [
+                                                        '$followedId', {
+                                                            '$toObjectId': '$$followedId'
+                                                        }
+                                                    ]
+                                                }
+                                            },
+                                            {
+                                                '$expr': {
+                                                    '$eq': [
+                                                        '$followingId', {
+                                                            '$toObjectId': '$$followingId'
+                                                        }
+                                                    ]
+                                                }
+                                            },
+                                            {
+                                                '$expr': {
+                                                    '$eq': [
+                                                        '$isFollowing', true
+                                                    ]
+                                                }
+                                            },
+                                        ],
+                                    }
+                                },
+                            ]
+                        },
+                    }, {
+                        '$lookup': {
+                            'as': 'isYouFollowing',
+                            'from': 'UserFollows',
+                            'let': {
+                                'followedId': '$_id',
+                                'followingId': new ObjectId(AuthUser._id),
+                            },
+                            'pipeline': [
+                                {
+                                    '$match': {
+                                        '$and': [
+                                            {
+                                                '$expr': {
+                                                    '$eq': [
+                                                        '$followedId', {
+                                                            '$toObjectId': '$$followedId'
+                                                        }
+                                                    ]
+                                                }
+                                            },
+                                            {
+                                                '$expr': {
+                                                    '$eq': [
+                                                        '$followingId', {
+                                                            '$toObjectId': '$$followingId'
+                                                        }
+                                                    ]
+                                                }
+                                            },
+                                            {
+                                                '$expr': {
+                                                    '$eq': [
+                                                        '$isFollowing', true
+                                                    ]
+                                                }
+                                            },
+                                        ],
+                                    }
+                                },
+                            ]
+                        },
+                    }] : [],
+                    ...(!!AuthUser?._id) ? [{
+                        '$lookup': {
                             'as': 'yourStats',
                             'from': 'Votes',
                             'let': {
@@ -63,7 +148,9 @@ export const UserResolvers = {
                 stats: await getUserStats({ userId: User._id, mongoDB }),
                 ...!!AuthUser && (AuthUser._id.toString() !== User._id.toString()) && {
                     yourStats: User?.yourStats,
-                }
+                },
+                isFollowingYou: User.isFollowingYou?.length === 1,
+                isYouFollowing: User.isYouFollowing?.length === 1,
             } : {};
         },
 
@@ -750,6 +837,47 @@ export const UserResolvers = {
             // update/create votes for representee, from representative's votes
 
             return UpdatedRepresentativeGroupRelation;
+        },
+        editUserFollowingRelation: async (_source, {
+            FollowedHandle,
+            FollowingHandle,
+            IsFollowing
+        }, { mongoDB, AuthUser }) => {
+
+            if (!AuthUser) return;
+
+            const isFollower = AuthUser?.LiquidUser?.handle === FollowingHandle;
+
+            const FollowedUser = await mongoDB.collection("Users").findOne({ 'LiquidUser.handle': FollowedHandle });
+
+            const UpdatedUserFollowingRelation = isFollower ? (
+                await mongoDB.collection("UserFollows").findOneAndUpdate(
+                    {
+                        followedId: new ObjectId(FollowedUser._id),
+                        followingId: new ObjectId(AuthUser._id)
+                    },
+                    {
+                        $set: {
+                            isFollowing: IsFollowing,
+                            lastEditOn: Date.now(),
+                        },
+                        $setOnInsert: {
+                            followedId: new ObjectId(FollowedUser._id),
+                            followingId: new ObjectId(AuthUser._id),
+                            createdOn: Date.now()
+                        }
+                    },
+                    {
+                        returnDocument: 'after',
+                        upsert: true
+                    }
+                )
+            )?.value : null;
+
+            return {
+                id: UpdatedUserFollowingRelation._id,
+                ...UpdatedUserFollowingRelation
+            };
         },
     },
 };

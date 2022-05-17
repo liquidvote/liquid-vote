@@ -38,6 +38,8 @@ export const UserTypeDefs = gql`
         lastEditOn: String
         isThisUser: Boolean
         isRepresentingYou: Int
+        isFollowingYou: Boolean
+        isYouFollowing: Boolean
         stats: UserStats
         yourStats:  YourUserStats
 
@@ -52,6 +54,15 @@ export const UserTypeDefs = gql`
         channelNames: [String]
         isRepresentingYou: Boolean
         isGroupMember: Boolean
+        createdOn: String
+        lastEditOn: String
+    }
+
+    type UserFollowingRelation {
+        id: ID
+        followedId: String
+        followingId: String
+        isFollowing: Boolean
         createdOn: String
         lastEditOn: String
     }
@@ -97,5 +108,10 @@ export const UserTypeDefs = gql`
             Group: String,
             IsRepresentingYou: Boolean
         ): UserRepresentativeGroupRelation
+        editUserFollowingRelation(
+            FollowedHandle: String,
+            FollowingHandle: String,
+            IsFollowing: Boolean
+        ): UserFollowingRelation
     }
 `;

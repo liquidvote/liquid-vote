@@ -1,6 +1,6 @@
 import React, { FunctionComponent, useEffect } from "react";
 import { Link, useParams } from "react-router-dom";
-import { useQuery } from "@apollo/client";
+import { useQuery, useMutation } from "@apollo/client";
 
 import DropAnimation from "@components/shared/DropAnimation";
 import Header from "@shared/Header";
@@ -11,7 +11,7 @@ import LocationSVG from "@shared/Icons/Location.svg";
 import ProfileSmallSVG from "@shared/Icons/Profile-small.svg";
 import useSearchParams from "@state/Global/useSearchParams.effect";
 import { timeAgo } from '@state/TimeAgo';
-import { USER, USER_GROUPS } from "@state/User/typeDefs";
+import { USER, EDIT_USER_FOLLOWING_RELATION } from "@state/User/typeDefs";
 import useAuthUser from '@state/AuthUser/authUser.effect';
 import useUserGroups from "@state/User/userGroups.effect";
 import DropSVG from "@shared/Icons/Drop.svg";
@@ -40,18 +40,11 @@ export const Profile: FunctionComponent<{}> = ({ }) => {
 
     const profile = user_data?.User;
 
-    const {
-        userGroups,
-        // userGroups_refetch
-    } = useUserGroups({
-        userHandle: handle,
-        representative: liquidUser?.handle
-    });
-
-
-    const [isRepresenting, setIsRepresenting] = React.useState(false);
-
-    // console.log({ profile, authUser });
+    const [editUserFollowingRelation, {
+        loading: editUserFollowingRelation_loading,
+        error: editUserFollowingRelation_error,
+        data: editUserFollowingRelation_data,
+    }] = useMutation(EDIT_USER_FOLLOWING_RELATION);
 
     useEffect(() => {
         if (allSearchParams.refetch === 'user') {
@@ -70,7 +63,7 @@ export const Profile: FunctionComponent<{}> = ({ }) => {
                 title={profile?.name}
                 description={profile?.bio}
                 image={profile?.avatar}
-                // url={``}
+            // url={``}
             />
 
             <Header title={profile?.name} />
@@ -101,35 +94,70 @@ export const Profile: FunctionComponent<{}> = ({ }) => {
                             </div>
                         </>
                     ) : (
-                        <div
-                            // onClick={() => setIsRepresenting(!isRepresenting)}
-                            onClick={() => !!liquidUser ? updateParams({
-                                paramsToAdd: {
-                                    modal: "EditRepresentativeRelation",
-                                    modalData: JSON.stringify({
-                                        userHandle: profile.handle,
-                                        userName: profile.name
-                                    })
-                                }
-                            }) : (
-                                updateParams({
-                                    paramsToAdd: {
-                                        modal: "RegisterBefore",
-                                        modalData: JSON.stringify({
-                                            toWhat: 'delegating',
-                                            userName: profile.name
-                                        })
+                        <>
+                            <div
+                                // onClick={() => setIsRepresenting(!isRepresenting)}
+                                onClick={() => !!liquidUser ? editUserFollowingRelation({
+                                    variables: {
+                                        FollowedHandle: profile?.handle,
+                                        FollowingHandle: liquidUser?.handle,
+                                        IsFollowing: !profile.isYouFollowing
                                     }
                                 })
-                            )}
-                            className={`button_ small ${profile.isRepresentingYou ? "selected" : ""}`}
-                        >
-                            {
-                                profile.isRepresentingYou ?
-                                    `Represents you in ${profile.isRepresentingYou} group` :
-                                    "Delegate Votes To"
-                            }
-                        </div>
+                                    .then((r) => {
+                                        console.log({ r });
+                                        user_refetch();
+                                    }) : (
+                                    updateParams({
+                                        paramsToAdd: {
+                                            modal: "RegisterBefore",
+                                            modalData: JSON.stringify({
+                                                toWhat: 'followUser',
+                                                userName: profile.name
+                                            })
+                                        }
+                                    })
+                                )}
+                                className={`button_ small mr-2 ${profile.isYouFollowing ? "selected" : ""}`}
+                            >
+                                {
+                                    profile.isYouFollowing ?
+                                        "Following" :
+                                        "Follow"
+                                }
+                            </div>
+                            {profile.isRepresentingYou ? (
+                                <div
+                                    // onClick={() => setIsRepresenting(!isRepresenting)}
+                                    onClick={() => !!liquidUser ? updateParams({
+                                        paramsToAdd: {
+                                            modal: "EditRepresentativeRelation",
+                                            modalData: JSON.stringify({
+                                                userHandle: profile.handle,
+                                                userName: profile.name
+                                            })
+                                        }
+                                    }) : (
+                                        updateParams({
+                                            paramsToAdd: {
+                                                modal: "RegisterBefore",
+                                                modalData: JSON.stringify({
+                                                    toWhat: 'delegating',
+                                                    userName: profile.name
+                                                })
+                                            }
+                                        })
+                                    )}
+                                    className={`button_ small ${profile.isRepresentingYou ? "selected" : ""}`}
+                                >
+                                    {
+                                        profile.isRepresentingYou ?
+                                            `Represents you in ${profile.isRepresentingYou} group` :
+                                            "Delegate Votes To"
+                                    }
+                                </div>
+                            ) : null}
+                        </>
                     )}
                 </div>
             </div>

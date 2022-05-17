@@ -15,6 +15,8 @@ export const USER = gql`
         lastEditOn,
         isThisUser
         isRepresentingYou
+        isFollowingYou
+        isYouFollowing
         stats {
             lastDirectVoteOn
             representing
@@ -327,6 +329,27 @@ export const EDIT_USER_REPRESENTATIVE_GROUP_RELATION = gql`
             representeeId
             groupId
             isRepresentingYou
+            createdOn
+            lastEditOn
+        }
+  }
+`;
+
+export const EDIT_USER_FOLLOWING_RELATION = gql`
+  mutation (
+      $FollowedHandle: String!,
+      $FollowingHandle: String!,
+      $IsFollowing: Boolean!
+    ) {
+        editUserFollowingRelation(
+            FollowedHandle: $FollowedHandle,
+            FollowingHandle: $FollowingHandle,
+            IsFollowing: $IsFollowing
+        ) {
+            id
+            followedId
+            followingId
+            isFollowing
             createdOn
             lastEditOn
         }
