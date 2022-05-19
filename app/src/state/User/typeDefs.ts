@@ -174,6 +174,13 @@ export const USER_GROUPS = gql`
             indirectVotesMadeByYou
             indirectVotesMadeForYou
         }
+        yourStats {
+            membersYouFollow {
+                name
+                avatar
+                handle
+            }
+        }
     }
   }
 `;

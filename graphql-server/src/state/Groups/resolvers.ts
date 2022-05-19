@@ -19,16 +19,15 @@ export const GroupResolvers = {
             return {
                 ...Group,
                 thisUserIsAdmin: !!Group.admins.find(u => u.handle === AuthUser?.LiquidUser?.handle),
-                // channels: Group.channels.map((g) => ({
-                //     ...g,
-                //     // thisUserIsAdmin: !!g.admins.find(u => u.handle === AuthUser?.LiquidUser?.handle),
-                // }))
                 yourMemberRelation: GroupMemberRelation,
+                //TODO: replace with Aggregation
                 stats: await getGroupStats({
                     groupHandle: Group.handle,
                     groupId: Group._id,
-                    mongoDB
+                    mongoDB,
+                    AuthUser
                 }),
+                //TODO: replace with Aggregation
                 yourStats: !!AuthUser && await getYourGroupStats({
                     groupHandle: Group.handle,
                     groupId: Group._id,
@@ -202,7 +201,8 @@ export const GroupResolvers = {
                     stats: await getGroupStats({
                         groupHandle: g.handle,
                         groupId: g._id,
-                        mongoDB
+                        mongoDB,
+                        AuthUser
                     }),
                 })));
 
@@ -298,7 +298,7 @@ export const GroupResolvers = {
     },
 };
 
-export const getGroupStats = async ({ groupId, groupHandle, mongoDB }) => {
+export const getGroupStats = async ({ groupId, groupHandle, mongoDB, AuthUser }) => {
 
     const mostRepresentingMembers = (await mongoDB.collection("GroupMembers")
         .aggregate([
@@ -310,6 +310,7 @@ export const getGroupStats = async ({ groupId, groupHandle, mongoDB }) => {
             },
             {
                 '$lookup': {
+                    'as': 'representees',
                     'from': 'Votes',
                     'let': {
                         'representativeId': '$userId'
@@ -330,8 +331,7 @@ export const getGroupStats = async ({ groupId, groupHandle, mongoDB }) => {
                                 }
                             }
                         }
-                    ],
-                    'as': 'representees'
+                    ]
                 }
             }, {
                 '$project': {
@@ -356,17 +356,65 @@ export const getGroupStats = async ({ groupId, groupHandle, mongoDB }) => {
                     'as': 'user'
                 }
             }, {
+                "$replaceRoot": { newRoot: { "$first": "$user" } }
+            }, {
                 '$replaceRoot': {
-                    'newRoot': {
-                        '$first': '$user.LiquidUser'
+                    newRoot: {
+                        $mergeObjects: [
+                            { _id: "$_id" },
+                            "$LiquidUser"
+                        ]
                     }
                 }
             }, {
                 '$limit': 6
-            }
+            },
+            ...(!!AuthUser?._id ? [
+                {
+                    '$lookup': {
+                        'as': 'yourStats',
+                        'from': 'Votes',
+                        'let': {
+                            'userId': "$_id",
+                            'groupHandle': groupHandle
+                        },
+                        'pipeline': [
+                            {
+                                '$match': {
+                                    '$and': [
+                                        {
+                                            '$expr': {
+                                                '$eq': [
+                                                    '$user', new ObjectId(AuthUser._id)
+                                                ]
+                                            }
+                                        },
+                                        {
+                                            '$expr': {
+                                                '$eq': [
+                                                    '$groupChannel.group', '$$groupHandle'
+                                                ]
+                                            }
+                                        }
+                                    ],
+                                }
+                            },
+                            ...votesInCommonPipelineForVotes()
+                        ]
+                    }
+                }, {
+                    '$addFields': {
+                        'yourStats': { '$first': '$yourStats' }
+                    }
+                }, {
+                    $sort: { 'yourStats.directVotesInCommon': -1 }
+                }
+            ]: [])
         ])
         .toArray()
     )?.slice(0, 6);
+
+    console.log({ groupHandle, mostRepresentingMembers });
 
     return ({
         lastDirectVoteOn: 0,
@@ -660,7 +708,7 @@ const getYourGroupStats = async ({ groupId, groupHandle, AuthUser, mongoDB }) =>
     // });
 
     return ({
-        lastDirectVoteOn: 0,
+        lastDirectVoteOn: 0,    // TODO
         representing: await mongoDB.collection("UserRepresentations")
             .find({
                 "groupId": new ObjectId(groupId),

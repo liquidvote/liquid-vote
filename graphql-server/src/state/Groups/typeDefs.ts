@@ -21,8 +21,10 @@ export const GroupTypeDefs = gql`
         
         directVotesInAgreement: Int         # hum, this isn't useful
         directVotesInDisagreement: Int      # hum, this isn't useful
-        indirectVotesMadeByYou: Int         
+        indirectVotesMadeByYou: Int
         indirectVotesMadeForYou: Int
+
+        membersYouFollow: [User]
     }
 
     type Group {

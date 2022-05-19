@@ -470,7 +470,130 @@ export const UserResolvers = {
                             }
                         }
                     },
-                    ...(!!AuthUser?._id) ? [
+                    ...(!!AuthUser?._id && handle === AuthUser?.LiquidUser.handle) ? [
+                        {
+                            '$lookup': {
+                                as: "membersYouFollow",
+                                from: "UserFollows",
+                                let: {
+                                    'loggedInUser': new ObjectId(AuthUser._id),
+                                    'groupId': '$_id',
+                                    'groupHandle': '$handle'
+                                },
+                                'pipeline': [{
+                                    '$match': {
+                                        '$expr': {
+                                            '$eq': [
+                                                '$followingId', '$$loggedInUser'
+                                            ]
+                                        }
+                                    }
+                                }, {
+                                    "$lookup": {
+                                        "as": "isGroupMember",
+                                        "from": "GroupMembers",
+                                        let: {
+                                            'followedId': '$followedId',
+                                            'groupId': '$$groupId'
+                                        },
+                                        "pipeline": [
+                                            {
+                                                "$match": {
+                                                    '$and': [
+                                                        { "$expr": { "$eq": ["$userId", "$$followedId"] } },
+                                                        { "$expr": { "$eq": ["$groupId", "$$groupId"] } },
+                                                        { "$expr": { "$eq": ["$isMember", true] } }
+                                                    ]
+                                                }
+                                            }
+                                        ],
+                                    }
+                                },
+                                {
+                                    '$match': {
+                                        '$expr': {
+                                            '$eq': [
+                                                { "$size": "$isGroupMember" }, 1
+                                            ]
+                                        }
+                                    }
+                                },
+                                {
+                                    "$lookup": {
+                                        "as": "user",
+                                        "from": "Users",
+                                        let: {
+                                            'followedId': '$followedId',
+                                        },
+                                        "pipeline": [
+                                            {
+                                                "$match": {
+                                                    '$and': [
+                                                        { "$expr": { "$eq": ["$_id", "$$followedId"] } }
+                                                    ]
+                                                }
+                                            }
+                                        ],
+                                    }
+                                }, {
+                                    "$replaceRoot": { newRoot: { "$first": "$user" } }
+                                }, {
+                                    '$replaceRoot': {
+                                        newRoot: {
+                                            $mergeObjects: [
+                                                { _id: "$_id" },
+                                                "$LiquidUser"
+                                            ]
+                                        }
+                                    }
+                                }, { //
+                                    '$lookup': {
+                                        'as': 'yourStats',
+                                        'from': 'Votes',
+                                        'let': {
+                                            'userId': "$_id",
+                                            'groupHandle': '$$groupHandle'
+                                        },
+                                        'pipeline': [
+                                            {
+                                                '$match': {
+                                                    '$and': [
+                                                        {
+                                                            '$expr': {
+                                                                '$eq': [
+                                                                    '$user', new ObjectId(AuthUser._id)
+                                                                ]
+                                                            }
+                                                        },
+                                                        {
+                                                            '$expr': {
+                                                                '$eq': [
+                                                                    '$groupChannel.group', '$$groupHandle'
+                                                                ]
+                                                            }
+                                                        }
+                                                    ],
+                                                }
+                                            },
+                                            ...votesInCommonPipelineForVotes()
+                                        ]
+                                    }
+                                }, {
+                                    '$addFields': {
+                                        'yourStats': { '$first': '$yourStats' }
+                                    }
+                                }, {
+                                    $sort: { 'yourStats.directVotesInCommon': -1 }
+                                }]
+                            },
+                        },
+                        {
+                            '$addFields': {
+                                'yourStats': {'membersYouFollow': '$membersYouFollow' }
+                            }
+                        }
+                    ] : [],
+                    ...(!!AuthUser?._id && handle !== AuthUser?.LiquidUser.handle) ? [
                         {
                             '$lookup': {
                                 'as': 'yourUserStats',
@@ -519,7 +642,8 @@ export const UserResolvers = {
                         stats: await getGroupStats({
                             groupHandle: g.handle,
                             groupId: g._id,
-                            mongoDB
+                            mongoDB,
+                            AuthUser
                         }),
                         ...!!UserGroupMemberRelations && {
                             userMemberRelation: UserGroupMemberRelations?.find(
@@ -542,7 +666,8 @@ export const UserResolvers = {
                                 r => r.groupId.toString() === g._id.toString()
                             )),
                             yourUserStats: g.yourUserStats,
-                            userStats: g.userStats
+                            userStats: g.userStats,
+                            yourStats: g.yourStats      //TODO: are these really needed here?
                         }
                     }))));
 
@@ -946,6 +1071,7 @@ export const getUserStats = async ({ userId, mongoDB }) => {
     });
 }
 
+// delete?
 const getYourUserStats = async ({ userId, AuthUser, mongoDB }) => {
 
     console.log({ userId });
