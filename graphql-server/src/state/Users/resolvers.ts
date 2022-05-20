@@ -470,6 +470,7 @@ export const UserResolvers = {
                             }
                         }
                     },
+                    //  On Your Groups - membersYouFollow
                     ...(!!AuthUser?._id && handle === AuthUser?.LiquidUser.handle) ? [
                         {
                             '$lookup': {
@@ -583,16 +584,70 @@ export const UserResolvers = {
                                         'yourStats': { '$first': '$yourStats' }
                                     }
                                 }, {
+                                    '$lookup': {
+                                        'as': 'directVotesMadeByUser',
+                                        'from': 'Votes',
+                                        'let': {
+                                            'userId': "$_id",
+                                            'groupHandle': '$$groupHandle'
+                                        },
+                                        'pipeline': [
+                                            {
+                                                '$match': {
+                                                    '$and': [
+                                                        {
+                                                            '$expr': {
+                                                                '$eq': [
+                                                                    '$user', '$$userId'
+                                                                ]
+                                                            }
+                                                        },
+                                                        {
+                                                            '$expr': {
+                                                                '$eq': [
+                                                                    '$isDirect', true
+                                                                ]
+                                                            }
+                                                        },
+                                                        {
+                                                            '$expr': {
+                                                                '$ne': [
+                                                                    '$position', null
+                                                                ]
+                                                            }
+                                                        },
+                                                        {
+                                                            '$expr': {
+                                                                '$eq': [
+                                                                    '$groupChannel.group', '$$groupHandle'
+                                                                ]
+                                                            }
+                                                        },
+                                                    ],
+                                                }
+                                            },
+                                        ]
+                                    }
+                                }, {
+                                    '$addFields': {
+                                        'stats': {
+                                            'directVotesMade': {
+                                                $size: '$directVotesMadeByUser'
+                                            }
+                                        }
+                                    }
+                                }, {
                                     $sort: { 'yourStats.directVotesInCommon': -1 }
-                                }]
+                                },]
                             },
                         },
                         {
                             '$addFields': {
-                                'yourStats': {'membersYouFollow': '$membersYouFollow' }
+                                'yourStats': { 'membersYouFollow': '$membersYouFollow' }
                             }
-                        }
+                        },
                     ] : [],
+                    //  On Another User's Groups
                     ...(!!AuthUser?._id && handle !== AuthUser?.LiquidUser.handle) ? [
                         {
                             '$lookup': {

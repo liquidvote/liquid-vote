@@ -407,6 +407,59 @@ export const getGroupStats = async ({ groupId, groupHandle, mongoDB, AuthUser })
                         'yourStats': { '$first': '$yourStats' }
                     }
                 }, {
+                    '$lookup': {
+                        'as': 'directVotesMadeByUser',
+                        'from': 'Votes',
+                        'let': {
+                            'userId': "$_id",
+                            'groupHandle': groupHandle
+                        },
+                        'pipeline': [
+                            {
+                                '$match': {
+                                    '$and': [
+                                        {
+                                            '$expr': {
+                                                '$eq': [
+                                                    '$user', '$$userId'
+                                                ]
+                                            }
+                                        },
+                                        {
+                                            '$expr': {
+                                                '$eq': [
+                                                    '$isDirect', true
+                                                ]
+                                            }
+                                        },
+                                        {
+                                            '$expr': {
+                                                '$ne': [
+                                                    '$position', null
+                                                ]
+                                            }
+                                        },
+                                        {
+                                            '$expr': {
+                                                '$eq': [
+                                                    '$groupChannel.group', '$$groupHandle'
+                                                ]
+                                            }
+                                        },
+                                    ],
+                                }
+                            },
+                        ]
+                    }
+                }, {
+                    '$addFields': {
+                        'stats': {
+                            'directVotesMade': {
+                                $size: '$directVotesMadeByUser'
+                            }
+                        }
+                    }
+                }, {
                     $sort: { 'yourStats.directVotesInCommon': -1 }
                 }
             ]: [])
