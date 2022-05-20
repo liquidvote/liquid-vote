@@ -8,6 +8,7 @@ import WorldSVG from "@shared/Icons/World.svg";
 import LinkSVG from "@shared/Icons/Link.svg";
 import useSearchParams from "@state/Global/useSearchParams.effect";
 import { EDIT_GROUP_MEMBER_CHANNEL_RELATION } from "@state/User/typeDefs";
+import Avatar from '@components/shared/Avatar';
 
 import './style.sass';
 
@@ -105,7 +106,19 @@ export const GroupInList: FunctionComponent<{
                                 style={{
                                     background: `url(${m.avatar}) 50% 50% / cover no-repeat`
                                 }}
-                            ></Link>
+                            >
+
+                                <Avatar
+                                    person={{
+                                        ...m,
+                                        yourStats: group.yourStats,
+                                        stats: group.userStats
+                                    }}
+                                    type="small"
+                                />
+
+
+                            </Link>
                         ))}
                         <Link
                             to={`/group-people/${group.handle}/members`}
