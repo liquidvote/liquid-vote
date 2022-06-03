@@ -367,7 +367,7 @@ export const getGroupStats = async ({ groupId, groupHandle, mongoDB, AuthUser })
                     }
                 }
             }, {
-                '$limit': 6
+                '$limit': 12
             },
             ...(!!AuthUser?._id ? [
                 {
@@ -465,7 +465,7 @@ export const getGroupStats = async ({ groupId, groupHandle, mongoDB, AuthUser })
             ]: [])
         ])
         .toArray()
-    )?.slice(0, 6);
+    )?.slice(0, 12);
 
     console.log({ groupHandle, mostRepresentingMembers });
 

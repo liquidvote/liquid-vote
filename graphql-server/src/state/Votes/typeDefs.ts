@@ -11,6 +11,9 @@ export const VoteTypeDefs = gql`
         forWeight: Float
         againstWeight: Float
 
+        stats: UserStats
+        yourStats:  YourUserStats
+
         createdOn: String
         lastEditOn: String
     }

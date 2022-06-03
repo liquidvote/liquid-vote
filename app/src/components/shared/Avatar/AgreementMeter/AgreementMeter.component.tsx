@@ -3,7 +3,7 @@ import React, { FunctionComponent } from 'react';
 import './style.sass';
 
 export const AgreementMeter: FunctionComponent<{
-    type?: 'profile' | 'small', person?: any
+    type?: 'profile' | 'small' | 'vote', person?: any
 }> = ({
     type = 'small', person
 }) => {

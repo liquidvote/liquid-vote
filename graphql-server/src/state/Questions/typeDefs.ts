@@ -3,12 +3,14 @@ import { gql } from "apollo-server-lambda";
 export const QuestionTypeDefs = gql`
 
     type QuestionStats {
-        lastVoteOn: String                  #
-        forCount: Float                       #
-        forDirectCount: Float                 #
-        forMostRepresentingVoters: [Voter]
-        againstCount: Float                   #
-        againstMostRepresentingVoters: [Voter]   #
+        lastVoteOn: String                      #
+        forCount: Float                         #
+        forDirectCount: Float                   #
+        forMostRepresentingVoters: [Voter]      # TODO: Comparison Circles
+        forFollows: [Voter]                     # TODO: Comparison Circles
+        againstCount: Float                     #
+        againstMostRepresentingVoters: [Voter]  # TODO: Comparison Circles
+        againstFollows: [Voter]                 # TODO: Comparison Circles
         againstDirectCount: Float
         directVotes: Float
         indirectVotes: Float
@@ -50,6 +52,8 @@ export const QuestionTypeDefs = gql`
         avatar: String
         name: String
         representeeCount: Int
+        stats: UserStats
+        yourStats:  YourUserStats
     }
 
     type VotersInCommonStats {

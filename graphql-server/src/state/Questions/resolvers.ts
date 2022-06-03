@@ -53,6 +53,8 @@ export const QuestionResolvers = {
             sortBy
         }, { mongoDB, AuthUser }) => {
 
+            console.log("questions");
+
             const Questions = await mongoDB.collection("Questions")
                 .aggregate(
                     [

@@ -2,7 +2,7 @@
 // which helps us use both locally and not depend only on `sls offline` which is crazy slow.
 
 // The big drawback is that not all config options are available on both,
-// so only muttually available configs can be used
+// so only mutually available configs can be used
 
 const MongoClient = require("mongodb").MongoClient;
 

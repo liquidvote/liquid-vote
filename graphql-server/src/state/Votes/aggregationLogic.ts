@@ -1,5 +1,7 @@
 import { ObjectId } from 'mongodb';
 
+import { votesInCommonPipelineForVotes } from '../Users/aggregationLogic';
+
 export const VotersAgg = ({
     questionText,
     choiceText,

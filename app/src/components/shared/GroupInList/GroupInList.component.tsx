@@ -97,28 +97,26 @@ export const GroupInList: FunctionComponent<{
                         {group.bio}
                     </small>
                     <div className="d-flex ml-2 mt-2">
-                        {group?.stats?.mostRepresentingMembers?.slice(0, 6).map((m: any) => (
-                            <Link
-                                key={m.handle}
-                                to={`/profile/${m.handle}`}
-                                title={`${m.name}`}
-                                className="vote-avatar avatar-2 ml-n2"
-                                style={{
-                                    background: `url(${m.avatar}) 50% 50% / cover no-repeat`
+                        {[
+                            ...group.yourStats?.membersYouFollow,
+                            ...group?.stats?.mostRepresentingMembers.filter(
+                                (m: any) => !group.yourStats?.membersYouFollow.find((mm: any) => mm.handle === m.handle)
+                            )
+                        ].slice(0, 12).map((m: any) => (
+                        <Link
+                            key={m.handle}
+                            to={`/profile/${m.handle}/cause/${group.handle}`}
+                            title={`${m.name}`}
+                        >
+                            <Avatar
+                                person={{
+                                    ...m,
+                                    yourStats: m.yourStats,
+                                    stats: m.stats
                                 }}
-                            >
-
-                                <Avatar
-                                    person={{
-                                        ...m,
-                                        yourStats: group.yourStats,
-                                        stats: group.userStats
-                                    }}
-                                    type="small"
-                                />
-
-
-                            </Link>
+                                type="vote"
+                            />
+                        </Link>
                         ))}
                         <Link
                             to={`/group-people/${group.handle}/members`}

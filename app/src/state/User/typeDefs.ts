@@ -158,6 +158,16 @@ export const USER_GROUPS = gql`
                 name
                 avatar
                 handle
+                yourStats {
+                  directVotesInCommon
+                  directVotesInAgreement
+                  directVotesInDisagreement
+                  indirectVotesMadeByYou
+                  indirectVotesMadeForYou
+                }
+                stats {
+                    directVotesMade
+                }
             }
         }
         userStats {
@@ -179,6 +189,16 @@ export const USER_GROUPS = gql`
                 name
                 avatar
                 handle
+                yourStats {
+                  directVotesInCommon
+                  directVotesInAgreement
+                  directVotesInDisagreement
+                  indirectVotesMadeByYou
+                  indirectVotesMadeForYou
+                }
+                stats {
+                    directVotesMade
+                }
             }
         }
     }

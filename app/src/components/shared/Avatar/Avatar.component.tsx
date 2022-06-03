@@ -4,7 +4,7 @@ import AgreementMeter from './AgreementMeter';
 import './style.sass';
 
 export const Avatar: FunctionComponent<{
-    person?: any, type?: 'profile' | 'small'
+    person?: any, type?: 'profile' | 'small' | 'vote'
 }> = ({
     person, type ='small'
 }) => {
