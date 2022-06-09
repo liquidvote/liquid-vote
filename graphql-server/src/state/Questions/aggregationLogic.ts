@@ -124,12 +124,106 @@ export const QuestionsAgg = ({
                 'yourVote.representatives.representativeName': '$representativeUser.name',
                 'yourVote.representatives.representativeAvatar': '$representativeUser.avatar'
             }
-        }, {
+        },
+        ...(!!AuthUserId) ? [
+            {
+                '$lookup': {
+                    'as': 'directVotesMade_byRepresentative',
+                    'from': 'Votes',
+                    'let': {
+                        'userId': '$yourVote.representatives.representativeId',
+                        'group': '$groupChannel.group'
+                    },
+                    'pipeline': [
+                        {
+                            '$match': {
+                                '$and': [
+                                    {
+                                        '$expr': {
+                                            '$eq': [
+                                                '$user', '$$userId'
+                                            ]
+                                        }
+                                    },
+                                    {
+                                        '$expr': {
+                                            '$eq': [
+                                                '$isDirect', true
+                                            ]
+                                        }
+                                    },
+                                    {
+                                        '$expr': {
+                                            '$ne': [
+                                                '$position', null
+                                            ]
+                                        }
+                                    },
+                                    {
+                                        '$expr': {
+                                            '$eq': [
+                                                '$groupChannel.group', '$$group'
+                                            ]
+                                        }
+                                    },
+                                ],
+                            }
+                        },
+                    ]
+                }
+            },
+            {
+                '$addFields': {
+                    'yourVote.representatives.stats': {
+                        'directVotesMade': {
+                            $size: '$directVotesMade_byRepresentative'
+                        }
+                    }
+                }
+            },
+            {
+                '$lookup': {
+                    'as': 'yourStats_forRepresentative',
+                    'from': 'Votes',
+                    'let': {
+                        'userId': '$yourVote.representatives.representativeId',
+                        'group': "$groupChannel.group"
+                    },
+                    'pipeline': [
+                        {
+                            '$match': {
+                                '$and': [
+                                    {
+                                        '$expr': {
+                                            '$eq': [
+                                                '$user', new ObjectId(AuthUserId)
+                                            ]
+                                        }
+                                    },
+                                    {
+                                        '$expr': {
+                                            '$eq': [
+                                                '$groupChannel.group', '$$group'
+                                            ]
+                                        }
+                                    },
+                                ],
+                            }
+                        },
+                        ...votesInCommonPipelineForVotes()
+                    ]
+                }
+            }, {
+                '$addFields': {
+                    'yourVote.representatives.yourStats': { '$first': '$yourStats_forRepresentative' }
+                }
+            }
+        ] : [],
+        {
             '$addFields': {
                 'yourVote_Representatives': '$yourVote.representatives'
             }
         },
-        // TODO: grab representatives comparison circle stats here
         {
             '$group': {
                 '_id': {
