@@ -16,10 +16,15 @@ export const QuestionTypeDefs = gql`
         indirectVotes: Float
     }
 
+    type YourQuestionStats {
+        votersYouFollow: [Voter]
+    }
+
     type Choice {
         text: String,
 
         stats: QuestionStats
+        yourStats: YourQuestionStats
         userVote: Vote
         yourVote: Vote
     }
@@ -41,6 +46,7 @@ export const QuestionTypeDefs = gql`
         thisUserIsAdmin: Boolean
 
         stats: QuestionStats
+        yourStats: YourQuestionStats
         userVote: Vote
         yourVote: Vote
         group: Group

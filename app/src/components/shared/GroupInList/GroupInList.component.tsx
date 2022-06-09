@@ -98,7 +98,7 @@ export const GroupInList: FunctionComponent<{
                     </small>
                     <div className="d-flex ml-2 mt-2">
                         {[
-                            ...group.yourStats?.membersYouFollow,
+                            ...group.yourStats?.membersYouFollow || [],
                             ...group?.stats?.mostRepresentingMembers.filter(
                                 (m: any) => !group.yourStats?.membersYouFollow.find((mm: any) => mm.handle === m.handle)
                             )

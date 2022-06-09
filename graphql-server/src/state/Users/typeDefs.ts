@@ -41,7 +41,8 @@ export const UserTypeDefs = gql`
         isFollowingYou: Boolean
         isYouFollowing: Boolean
         stats: UserStats
-        yourStats:  YourUserStats
+        yourStats: YourUserStats
+        vote: Vote                          # for when used on 
 
         representationGroups: [Group]
     }
@@ -82,10 +83,6 @@ export const UserTypeDefs = gql`
             representative: String,
             notUsers: Boolean
         ): [Group],
-        # UserVotes(
-        #     handle: String,
-        #     type: String
-        # ):  [Vote]
         UserQuestions(
             handle: String,
             sortBy: String,
