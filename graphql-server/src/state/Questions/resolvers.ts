@@ -55,6 +55,18 @@ export const QuestionResolvers = {
 
             console.log("questions");
 
+            const writeToDebugFile = fs.writeFile(
+                process.cwd() + '/debug' + '/Questions.json',
+                JSON.stringify({
+                    QueryJSON: QuestionsAgg({
+                        questionText: null,
+                        group,
+                        AuthUserId: AuthUser?._id
+                    }),
+                }, null, 2),
+                { encoding: 'utf8' }
+            );
+
             const Questions = await mongoDB.collection("Questions")
                 .aggregate(
                     [
@@ -95,19 +107,7 @@ export const QuestionResolvers = {
                 )
                 .toArray();
 
-            // console.log({ Questions });
-
-            // const writeToDebugFile = fs.writeFile(
-            //     process.cwd() + '/debug' + '/Questions.json',
-            //     JSON.stringify({
-            //         QueryJSON: QuestionsAgg({
-            //             questionText: null,
-            //             group,
-            //             AuthUserId: AuthUser?._id
-            //         }),
-            //     }, null, 2),
-            //     { encoding: 'utf8' }
-            // );
+            console.log({ Questions });
 
             return (await Promise.all(Questions.map(async (q, i) => ({
                 ...q,
