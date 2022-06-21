@@ -4,7 +4,7 @@ import { getGroupStats } from '../Groups/resolvers';
 import { updateInviteStatus } from '../Invites/resolvers';
 import { updateRepresenteesVotes } from '../Votes/resolvers';
 import { updateQuestionVotingStats } from '../Questions/resolvers';
-import { QuestionsAgg } from '../Questions/aggregationLogic';
+import { QuestionsAgg } from '../Questions/aggregationLogic/QuestionsAgg';
 import { votesInCommonPipelineForVotes } from './aggregationLogic';
 
 export const UserResolvers = {

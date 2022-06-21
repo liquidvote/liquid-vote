@@ -1,7 +1,8 @@
 import { ObjectId } from 'mongodb';
 const { promises: fs } = require("fs");
 
-import { QuestionsAgg, QuestionsInCommonAgg } from './aggregationLogic';
+import { QuestionsAgg } from './aggregationLogic/QuestionsAgg';
+import { QuestionsInCommonAgg } from './aggregationLogic/QuestionsInCommonAgg';
 
 export const QuestionResolvers = {
     Query: {
