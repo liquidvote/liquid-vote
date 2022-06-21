@@ -107,7 +107,12 @@ export const QuestionResolvers = {
                 )
                 .toArray();
 
-            console.log({ Questions });
+            console.log({
+                Questions: Questions.map(q => ({
+                    b: q.questionType,
+                    a: q.stats,
+                }))
+            });
 
             return (await Promise.all(Questions.map(async (q, i) => ({
                 ...q,
@@ -299,31 +304,31 @@ export const QuestionResolvers = {
                 !Question_.choices.find(c => c.text === newChoice) &&
                 !!Question_.allowNewChoices &&
                 (await mongoDB.collection("Questions")
-                .findOneAndUpdate({
-                    _id: ObjectId(Question_._id),
-                }, {
-                    $set: {
-                        'choices': [
-                            ...Question_.choices,
-                            ...[{
-                                text: newChoice,
-                                'stats': {
-                                    forCount: 0,
-                                    forDirectCount: 0,
-                                    againstCount: 0,
-                                    againstDirectCount: 0,
-                                    lastVoteOn: null,
-                                }
-                            }]
-                        ],
-                        lastEditOn: Date.now()
+                    .findOneAndUpdate({
+                        _id: ObjectId(Question_._id),
+                    }, {
+                        $set: {
+                            'choices': [
+                                ...Question_.choices,
+                                ...[{
+                                    text: newChoice,
+                                    'stats': {
+                                        forCount: 0,
+                                        forDirectCount: 0,
+                                        againstCount: 0,
+                                        againstDirectCount: 0,
+                                        lastVoteOn: null,
+                                    }
+                                }]
+                            ],
+                            lastEditOn: Date.now()
+                        },
                     },
-                },
-                    {
-                        upsert: false,
-                        returnDocument: 'after'
-                    }
-                ))?.value;
+                        {
+                            upsert: false,
+                            returnDocument: 'after'
+                        }
+                    ))?.value;
 
             return {
                 ...dbDoc

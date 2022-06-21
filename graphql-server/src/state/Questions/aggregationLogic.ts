@@ -105,218 +105,12 @@ export const QuestionsAgg = ({
 
         ...getYourStatsForRepresentatives_On_QuestionsAgg({ AuthUserId }),
 
-        // ...getYourStatsForAgainstMostRepresentingVoters_On_QuestionsAgg({ AuthUserId }),
+        ...getYourStatsForAgainstMostRepresentingVoters_On_QuestionsAgg({ AuthUserId }),
 
-        ...(!!AuthUserId) ? [
-            {
-                '$lookup': {
-                    as: "votersYouFollow",
-                    from: "UserFollows",
-                    let: {
-                        'loggedInUser': AuthUserId,
-                        "questionText": "$questionText",
-                        "choiceText": "$choiceText",
-                        "group": "$groupChannel.group"
-                    },
-                    'pipeline': [
-                        {
-                            '$match': {
-                                '$expr': {
-                                    '$eq': [
-                                        '$followingId', {
-                                            '$toObjectId': '$$loggedInUser'
-                                        }
-                                    ]
-                                }
-                            }
-                        },
-                        {
-                            "$lookup": {
-                                "as": "user",
-                                "from": "Users",
-                                let: {
-                                    'followedId': '$followedId',
-                                },
-                                "pipeline": [
-                                    {
-                                        "$match": {
-                                            '$and': [
-                                                { "$expr": { "$eq": ["$_id", "$$followedId"] } }
-                                            ]
-                                        }
-                                    }
-                                ],
-                            }
-                        }, {
-                            "$replaceRoot": { newRoot: { "$first": "$user" } }
-                        }, {
-                            '$replaceRoot': {
-                                newRoot: {
-                                    $mergeObjects: [
-                                        { _id: "$_id" },
-                                        "$LiquidUser"
-                                    ]
-                                }
-                            }
-                        },
-                        {
-                            "$lookup": {
-                                "as": "vote",
-                                "from": "Votes",
-                                'let': {
-                                    'questionText': '$$questionText',
-                                    'choiceText': '$$choiceText',
-                                    'group': '$$group',
-                                    'voterId': '$_id'
-                                },
-                                'pipeline': [
-                                    {
-                                        '$match': {
-                                            '$expr': {
-                                                '$and': [
-                                                    {
-                                                        '$eq': [
-                                                            '$questionText', '$$questionText'
-                                                        ]
-                                                    }, {
-                                                        '$eq': [
-                                                            '$choiceText', '$$choiceText'
-                                                        ]
-                                                    }, {
-                                                        '$eq': [
-                                                            '$groupChannel.group', '$$group'
-                                                        ]
-                                                    }, {
-                                                        "$eq": ["$user", {
-                                                            "$toObjectId": "$$voterId"
-                                                        }]
-                                                    }, {
-                                                        "$ne": ['$position', 'delegated']
-                                                    }, {
-                                                        "$ne": ['$position', null]
-                                                    }
-                                                ]
-                                            }
-                                        }
-                                    }
-                                ]
-                            }
-                        },
-                        {
-                            '$match': {
-                                '$expr': {
-                                    '$eq': [
-                                        { "$size": "$vote" }, 1
-                                    ]
-                                }
-                            }
-                        },
-                        {
-                            '$addFields': {
-                                'vote': { '$first': '$vote' }
-                            }
-                        },
-                        {
-                            '$lookup': {
-                                'as': 'directVotesMade',
-                                'from': 'Votes',
-                                'let': {
-                                    'userId': '$_id',
-                                    'group': '$$group'
-                                },
-                                'pipeline': [
-                                    {
-                                        '$match': {
-                                            '$and': [
-                                                {
-                                                    '$expr': {
-                                                        '$eq': [
-                                                            '$user', '$$userId'
-                                                        ]
-                                                    }
-                                                },
-                                                {
-                                                    '$expr': {
-                                                        '$eq': [
-                                                            '$isDirect', true
-                                                        ]
-                                                    }
-                                                },
-                                                {
-                                                    '$expr': {
-                                                        '$ne': [
-                                                            '$position', null
-                                                        ]
-                                                    }
-                                                },
-                                                {
-                                                    '$expr': {
-                                                        '$eq': [
-                                                            '$groupChannel.group', '$$group'
-                                                        ]
-                                                    }
-                                                },
-                                            ],
-                                        }
-                                    },
-                                ]
-                            }
-                        },
-                        {
-                            '$addFields': {
-                                'stats': {
-                                    'directVotesMade': {
-                                        $size: '$directVotesMade'
-                                    }
-                                }
-                            }
-                        },
-                        {
-                            '$lookup': {
-                                'as': 'yourStats',
-                                'from': 'Votes',
-                                'let': {
-                                    'userId': '$_id',
-                                    'group': "$$group"
-                                },
-                                'pipeline': [
-                                    {
-                                        '$match': {
-                                            '$and': [
-                                                {
-                                                    '$expr': {
-                                                        '$eq': [
-                                                            '$user', new ObjectId(AuthUserId)
-                                                        ]
-                                                    }
-                                                },
-                                                {
-                                                    '$expr': {
-                                                        '$eq': [
-                                                            '$groupChannel.group', '$$group'
-                                                        ]
-                                                    }
-                                                },
-                                            ],
-                                        }
-                                    },
-                                    ...votesInCommonPipelineForVotes()
-                                ]
-                            }
-                        }, {
-                            '$addFields': {
-                                'yourStats': { '$first': '$yourStats' }
-                            }
-                        }
-                    ]
-                }
-            },
-            {
-                '$addFields': {
-                    'yourStats': { 'votersYouFollow': '$votersYouFollow' }
-                }
-            },
-        ] : [],
+        ...getYourStatsForAgainstMostRepresentingVoters_On_QuestionsChoicesAgg({ AuthUserId }),
+
+        ...votersYouFollow({ AuthUserId }),
+
         {
             '$group': {
                 '_id': {
@@ -762,11 +556,433 @@ const getYourStatsForAgainstMostRepresentingVoters_On_QuestionsAgg = ({ AuthUser
         }
     }, {
         '$addFields': {
-            'stats.againstMostRepresentingVoters': '$againstMostRepresentingVoters'
+            "stats.againstMostRepresentingVoters": {
+                "$cond": {
+                    "if": {
+                        $ne: ["$stats.againstMostRepresentingVoters", null]
+                    },
+                    "then": "$againstMostRepresentingVoters",
+                    "else": "$$REMOVE"
+                }
+            },
         }
     }, {
         '$sort': { 'i': 1 }
     },
+];
+
+const getYourStatsForAgainstMostRepresentingVoters_On_QuestionsChoicesAgg = ({ AuthUserId }) => [
+    {
+        '$unwind': {
+            'path': '$choices.stats.againstMostRepresentingVoters',
+            'preserveNullAndEmptyArrays': true
+        }
+    }, {
+        '$lookup': {
+            'as': 'againstMostRepresentingVoter',
+            'from': 'Users',
+            'localField': 'choices.stats.againstMostRepresentingVoters.handle',
+            'foreignField': 'LiquidUser.handle'
+        }
+    }, {
+        '$addFields': {
+            "againstMostRepresentingVoter": {
+                "$mergeObjects": [{
+                    _id: { "$first": "$againstMostRepresentingVoter._id" }
+                }, {
+                    "$first": "$againstMostRepresentingVoter.LiquidUser"
+                }]
+            }
+        }
+    },
+    ...(!!AuthUserId) ? [
+        {
+            '$lookup': {
+                'as': 'directVotesMade_byAgainstMostRepresentingVoter',
+                'from': 'Votes',
+                'let': {
+                    'userId': '$againstMostRepresentingVoter._id',
+                    'group': '$groupChannel.group'
+                },
+                'pipeline': [
+                    {
+                        '$match': {
+                            '$and': [
+                                {
+                                    '$expr': {
+                                        '$eq': [
+                                            '$user', '$$userId'
+                                        ]
+                                    }
+                                },
+                                {
+                                    '$expr': {
+                                        '$eq': [
+                                            '$isDirect', true
+                                        ]
+                                    }
+                                },
+                                {
+                                    '$expr': {
+                                        '$ne': [
+                                            '$position', null
+                                        ]
+                                    }
+                                },
+                                {
+                                    '$expr': {
+                                        '$eq': [
+                                            '$groupChannel.group', '$$group'
+                                        ]
+                                    }
+                                },
+                            ],
+                        }
+                    },
+                ]
+            }
+        },
+        {
+            '$addFields': {
+                'againstMostRepresentingVoter.stats': {
+                    'directVotesMade': {
+                        $size: '$directVotesMade_byAgainstMostRepresentingVoter'
+                    }
+                }
+            }
+        },
+        {
+            '$lookup': {
+                'as': 'yourStats_forAgainstMostRepresentingVoter',
+                'from': 'Votes',
+                'let': {
+                    'userId': '$againstMostRepresentingVoter._id',
+                    'group': "$groupChannel.group"
+                },
+                'pipeline': [
+                    {
+                        '$match': {
+                            '$and': [
+                                {
+                                    '$expr': {
+                                        '$eq': [
+                                            '$user', new ObjectId(AuthUserId)
+                                        ]
+                                    }
+                                },
+                                {
+                                    '$expr': {
+                                        '$eq': [
+                                            '$groupChannel.group', '$$group'
+                                        ]
+                                    }
+                                },
+                            ],
+                        }
+                    },
+                    ...votesInCommonPipelineForVotes()
+                ]
+            }
+        }, {
+            '$addFields': {
+                'againstMostRepresentingVoter.yourStats': { '$first': '$yourStats_forAgainstMostRepresentingVoter' }
+            }
+        }
+    ] : [],
+    {
+        '$group': {
+            '_id': {
+                'questionText': '$questionText',
+                'choiceText': '$choiceText'
+            },
+            'againstMostRepresentingVoters': {
+                '$push': '$againstMostRepresentingVoter'
+            },
+            'choices': {
+                '$first': '$choices'
+            },
+            'allowNewChoices': {
+                '$first': '$allowNewChoices'
+            },
+            'yourVote': {
+                '$first': '$yourVote'
+            },
+            'id': {
+                '$first': '$id'
+            },
+            'questionType': {
+                '$first': '$questionType'
+            },
+            'questionText': {
+                '$first': '$questionText'
+            },
+            'description': {
+                '$first': '$description'
+            },
+            'startText': {
+                '$first': '$startText'
+            },
+            'groupChannel': {
+                '$first': '$groupChannel'
+            },
+            'resultsOn': {
+                '$first': '$resultsOn'
+            },
+            'lastEditOn': {
+                '$first': '$lastEditOn'
+            },
+            'createdOn': {
+                '$first': '$createdOn'
+            },
+            'stats': {
+                '$first': '$stats'
+            },
+            'createdBy': {
+                '$first': '$createdBy'
+            },
+            'i': {
+                '$first': '$i'
+            },
+            'votersInCommonStats': {
+                '$first': '$votersInCommonStats'
+            },
+            'group': {
+                '$first': '$group'
+            },
+            "choiceText": {
+                "$first": "$choiceText"
+            }
+        }
+    },
+    {
+        '$addFields': {
+            "choices.stats.againstMostRepresentingVoters": {
+                "$cond": {
+                    "if": {
+                        $ne: ["$choices.stats.againstMostRepresentingVoters", null]
+                    },
+                    "then": "$againstMostRepresentingVoters",
+                    "else": "$$REMOVE"
+                }
+            },
+        }
+    },
+    {
+        '$sort': { 'i': 1 }
+    },
+];
+
+const votersYouFollow = ({ AuthUserId }) => [
+    ...(!!AuthUserId) ? [
+        {
+            '$lookup': {
+                as: "votersYouFollow",
+                from: "UserFollows",
+                let: {
+                    'loggedInUser': AuthUserId,
+                    "questionText": "$questionText",
+                    "choiceText": "$choiceText",
+                    "group": "$groupChannel.group"
+                },
+                'pipeline': [
+                    {
+                        '$match': {
+                            '$expr': {
+                                '$eq': [
+                                    '$followingId', {
+                                        '$toObjectId': '$$loggedInUser'
+                                    }
+                                ]
+                            }
+                        }
+                    },
+                    {
+                        "$lookup": {
+                            "as": "user",
+                            "from": "Users",
+                            let: {
+                                'followedId': '$followedId',
+                            },
+                            "pipeline": [
+                                {
+                                    "$match": {
+                                        '$and': [
+                                            { "$expr": { "$eq": ["$_id", "$$followedId"] } }
+                                        ]
+                                    }
+                                }
+                            ],
+                        }
+                    }, {
+                        "$replaceRoot": { newRoot: { "$first": "$user" } }
+                    }, {
+                        '$replaceRoot': {
+                            newRoot: {
+                                $mergeObjects: [
+                                    { _id: "$_id" },
+                                    "$LiquidUser"
+                                ]
+                            }
+                        }
+                    },
+                    {
+                        "$lookup": {
+                            "as": "vote",
+                            "from": "Votes",
+                            'let': {
+                                'questionText': '$$questionText',
+                                'choiceText': '$$choiceText',
+                                'group': '$$group',
+                                'voterId': '$_id'
+                            },
+                            'pipeline': [
+                                {
+                                    '$match': {
+                                        '$expr': {
+                                            '$and': [
+                                                {
+                                                    '$eq': [
+                                                        '$questionText', '$$questionText'
+                                                    ]
+                                                }, {
+                                                    '$eq': [
+                                                        '$choiceText', '$$choiceText'
+                                                    ]
+                                                }, {
+                                                    '$eq': [
+                                                        '$groupChannel.group', '$$group'
+                                                    ]
+                                                }, {
+                                                    "$eq": ["$user", {
+                                                        "$toObjectId": "$$voterId"
+                                                    }]
+                                                }, {
+                                                    "$ne": ['$position', 'delegated']
+                                                }, {
+                                                    "$ne": ['$position', null]
+                                                }
+                                            ]
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    {
+                        '$match': {
+                            '$expr': {
+                                '$eq': [
+                                    { "$size": "$vote" }, 1
+                                ]
+                            }
+                        }
+                    },
+                    {
+                        '$addFields': {
+                            'vote': { '$first': '$vote' }
+                        }
+                    },
+                    {
+                        '$lookup': {
+                            'as': 'directVotesMade',
+                            'from': 'Votes',
+                            'let': {
+                                'userId': '$_id',
+                                'group': '$$group'
+                            },
+                            'pipeline': [
+                                {
+                                    '$match': {
+                                        '$and': [
+                                            {
+                                                '$expr': {
+                                                    '$eq': [
+                                                        '$user', '$$userId'
+                                                    ]
+                                                }
+                                            },
+                                            {
+                                                '$expr': {
+                                                    '$eq': [
+                                                        '$isDirect', true
+                                                    ]
+                                                }
+                                            },
+                                            {
+                                                '$expr': {
+                                                    '$ne': [
+                                                        '$position', null
+                                                    ]
+                                                }
+                                            },
+                                            {
+                                                '$expr': {
+                                                    '$eq': [
+                                                        '$groupChannel.group', '$$group'
+                                                    ]
+                                                }
+                                            },
+                                        ],
+                                    }
+                                },
+                            ]
+                        }
+                    },
+                    {
+                        '$addFields': {
+                            'stats': {
+                                'directVotesMade': {
+                                    $size: '$directVotesMade'
+                                }
+                            }
+                        }
+                    },
+                    {
+                        '$lookup': {
+                            'as': 'yourStats',
+                            'from': 'Votes',
+                            'let': {
+                                'userId': '$_id',
+                                'group': "$$group"
+                            },
+                            'pipeline': [
+                                {
+                                    '$match': {
+                                        '$and': [
+                                            {
+                                                '$expr': {
+                                                    '$eq': [
+                                                        '$user', new ObjectId(AuthUserId)
+                                                    ]
+                                                }
+                                            },
+                                            {
+                                                '$expr': {
+                                                    '$eq': [
+                                                        '$groupChannel.group', '$$group'
+                                                    ]
+                                                }
+                                            },
+                                        ],
+                                    }
+                                },
+                                ...votesInCommonPipelineForVotes()
+                            ]
+                        }
+                    }, {
+                        '$addFields': {
+                            'yourStats': { '$first': '$yourStats' }
+                        }
+                    }
+                ]
+            }
+        },
+        {
+            '$addFields': {
+                'yourStats': { 'votersYouFollow': '$votersYouFollow' }
+            }
+        },
+    ] : []
 ];
 
 export const QuestionsInCommonAgg = ({ questionText, group }) => [

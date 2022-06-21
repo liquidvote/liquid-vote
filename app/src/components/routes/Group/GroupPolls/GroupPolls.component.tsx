@@ -38,6 +38,8 @@ export const GroupPolls: FunctionComponent<{
         }
     }, [allSearchParams.refetch]);
 
+    console.log({ questions_data });
+
     return (
         <>
             {questions_data?.Questions?.map((q: any, i: any) => (

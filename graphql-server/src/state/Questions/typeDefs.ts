@@ -7,10 +7,8 @@ export const QuestionTypeDefs = gql`
         forCount: Float                         #
         forDirectCount: Float                   #
         forMostRepresentingVoters: [Voter]      # TODO: Comparison Circles
-        forFollows: [Voter]                     # TODO: Comparison Circles
         againstCount: Float                     #
         againstMostRepresentingVoters: [Voter]  # TODO: Comparison Circles
-        againstFollows: [Voter]                 # TODO: Comparison Circles
         againstDirectCount: Float
         directVotes: Float
         indirectVotes: Float
@@ -60,6 +58,7 @@ export const QuestionTypeDefs = gql`
         representeeCount: Int
         stats: UserStats
         yourStats:  YourUserStats
+        vote: Vote
     }
 
     type VotersInCommonStats {
