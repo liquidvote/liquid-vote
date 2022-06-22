@@ -263,7 +263,7 @@ export const Choice: FunctionComponent<{
                                                 }
                                                 // to={`/${choiceText ? 'multipoll' : 'poll'}/${voteName}/${groupHandle}/timeline/representingYou`}
                                                 // onClick={e => e.stopPropagation()}
-                                                className={`text-decoration-none count for ml-n2 ${inList ? 'tiny-avatar': 'vote-avatar'}`}
+                                                className={`text-decoration-none count for ml-n2 ${inList ? 'tiny-avatar' : 'vote-avatar'}`}
                                             >{forRepresentatives.length}</div>
                                         </div>
                                     )
@@ -315,7 +315,7 @@ export const Choice: FunctionComponent<{
                                 {(
                                     user && userVote?.position === "for" && (
                                         <div
-                                            className={`for ml-n2 ${inList ? 'tiny-avatar': 'vote-avatar'} pointer`}
+                                            className={`for ml-n2 ${inList ? 'tiny-avatar' : 'vote-avatar'} pointer`}
                                             style={{ background: `url(${user.avatar}) 50% 50% / cover no-repeat` }}
                                         ></div>
                                     )
@@ -428,14 +428,14 @@ export const Choice: FunctionComponent<{
                                                         })
                                                     }
                                                 }
-                                                className={`text-decoration-none count against ml-n2 ${inList ? 'tiny-avatar': 'vote-avatar'}`}
+                                                className={`text-decoration-none count against ml-n2 ${inList ? 'tiny-avatar' : 'vote-avatar'}`}
                                             >{againstRepresentatives.length}</div>
                                         </div>
                                     )
                                 }
 
                                 {yourVote_ === 'against' && (
-                                    <div className="d-flex mr-1 my-n2">
+                                    <div className={`d-flex mr-1 my-n2 ${inList ? 'ml-n1' : 'ml-n2'}`}>
                                         <Avatar
                                             person={{
                                                 ...liquidUser
