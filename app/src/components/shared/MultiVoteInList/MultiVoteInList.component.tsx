@@ -145,6 +145,7 @@ export const MultiVoteInList: FunctionComponent<{
                                     groupHandle={v.groupChannel.group}
                                     stats={c.stats}
                                     yourVote={c.yourVote}
+                                    yourStats={c.yourStats}
                                     userVote={c.userVote}
                                     inList={true}
                                     // maxVoteCount={maxVoteCount}

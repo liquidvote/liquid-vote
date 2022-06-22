@@ -125,7 +125,8 @@ export const QuestionResolvers = {
                     choices: await Promise.all(q?.choices?.map(async (c) => ({
                         ...c?.choice,
                         ...(!!AuthUser) && {
-                            yourVote: c?.yourVote
+                            yourVote: c?.yourVote,
+                            yourStats: c?.yourStats
                         }
                     })))
                 },

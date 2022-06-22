@@ -10,6 +10,7 @@ import useAuthUser from '@state/AuthUser/authUser.effect';
 import useSearchParams from "@state/Global/useSearchParams.effect";
 import { timeAgo } from '@state/TimeAgo';
 import VotedExplanation from '@shared/VotedExplanation';
+import Avatar from '@components/shared/Avatar';
 
 import './style.sass';
 
@@ -19,6 +20,7 @@ export const Choice: FunctionComponent<{
     groupHandle: string,
     stats: any,
     yourVote: any,
+    yourStats: any,
     userVote: any,
     inList?: boolean,
     showPercentages?: boolean,
@@ -31,6 +33,7 @@ export const Choice: FunctionComponent<{
     groupHandle,
     stats,
     yourVote,
+    yourStats,
     userVote,
     inList,
     showPercentages,
@@ -97,6 +100,33 @@ export const Choice: FunctionComponent<{
 
         const forRepresentatives = yourVote?.representatives?.filter((r: any) => r.position === 'for');
         const againstRepresentatives = yourVote?.representatives?.filter((r: any) => r.position === 'against');
+
+        const forFollowees = yourStats?.votersYouFollow?.filter((r: any) => r?.vote?.position === 'for');
+        const againstFollowees = yourStats?.votersYouFollow?.filter((r: any) => r?.vote?.position === 'against');
+
+        const forDisplayed = [
+            ...yourStats?.votersYouFollow?.filter((r: any) => r?.vote?.position === 'for') || [],
+            ...(
+                !!editVote_data ? editVote_data?.editVote?.QuestionStats?.forMostRepresentingVoters : stats?.forMostRepresentingVoters
+            ).filter((u: any) => u.handle !== liquidUser.handle) || []
+        ];
+
+        const againstDisplayed = [
+            ...yourStats?.votersYouFollow?.filter((r: any) => r?.vote?.position === 'against') || [],
+            ...(
+                !!editVote_data ? editVote_data?.editVote?.QuestionStats?.againstMostRepresentingVoters : stats?.againstMostRepresentingVoters
+            ).filter((u: any) => u.handle !== liquidUser.handle) || []
+        ];
+
+        console.log({
+            yourVote,
+            forRepresentatives,
+            againstRepresentatives,
+            forFollowees,
+            againstFollowees,
+            forMostRepresenting: stats?.forMostRepresentingVoters,
+            againstMostRepresenting: stats?.againstMostRepresentingVoters,
+        })
 
         return (
             <div className={`${!inList && 'not-in-list'}`}>
@@ -201,11 +231,18 @@ export const Choice: FunctionComponent<{
                                             <Link
                                                 to={`/profile/${forRepresentatives[0].representativeHandle}`}
                                                 onClick={e => e.stopPropagation()}
-                                                className={`vote-avatar for ml-n2 ${inList && 'tiny'}`}
-                                                style={{
-                                                    background: `url(${forRepresentatives[0].representativeAvatar}) 50% 50% / cover no-repeat`,
-                                                }}
-                                            ></Link>
+                                            >
+                                                <Avatar
+                                                    person={{
+                                                        avatar: forRepresentatives[0].representativeAvatar,
+                                                        handle: forRepresentatives[0].representativeHandle,
+                                                        name: forRepresentatives[0].representativeName,
+                                                        yourStats: forRepresentatives[0].yourStats,
+                                                        stats: forRepresentatives[0].stats
+                                                    }}
+                                                    type={inList ? 'tiny' : 'vote'}
+                                                />
+                                            </Link>
                                             <div
                                                 onClick={
                                                     e => {
@@ -231,9 +268,20 @@ export const Choice: FunctionComponent<{
                                         </div>
                                     )
                                 }
+
+                                {yourVote_ === 'for' && (
+                                    <div className="d-flex ml-2 my-n2 mr-n1">
+                                        <Avatar
+                                            person={{
+                                                ...liquidUser
+                                            }}
+                                            type={inList ? 'tiny' : 'vote'}
+                                        />
+                                    </div>
+                                )}
                             </div>
                             <div
-                                className="d-flex ml-2"
+                                className="d-flex ml-1"
                                 onClick={
                                     e => {
                                         e.stopPropagation();
@@ -253,16 +301,14 @@ export const Choice: FunctionComponent<{
                                 }
                             >
                                 {(
-                                    !!user ? [] :
-                                        !!editVote_data ?
-                                            editVote_data?.editVote?.QuestionStats?.forMostRepresentingVoters :
-                                            stats?.forMostRepresentingVoters
-                                )?.slice(0, 2).map((v: any) => (
-                                    <div
-                                        key={`forMostRepresentingVoters-${v?.handle}`}
-                                        className={`vote-avatar for ml-n2 ${inList && 'tiny'} pointer`}
-                                        style={{ background: `url(${v?.avatar}) 50% 50% / cover no-repeat` }}
-                                    ></div>
+                                    !!user ? [] : forDisplayed
+                                )?.slice(0, 2).map((p: any) => (
+                                    <div key={`forDisplayedVoters-${p?.handle}`}>
+                                        <Avatar
+                                            person={p}
+                                            type={inList ? 'tiny' : 'vote'}
+                                        />
+                                    </div>
                                 ))}
 
                                 {(
@@ -293,19 +339,14 @@ export const Choice: FunctionComponent<{
                             <div className="d-flex ml-2" data-tip={`Votes Against`}>
                                 {
                                     (
-                                        !!user ? [] :
-                                            !!editVote_data ?
-                                                editVote_data?.editVote?.QuestionStats?.againstMostRepresentingVoters :
-                                                stats?.againstMostRepresentingVoters
-                                    )?.slice(0, 2).map((v: any) => (
-                                        <Link
-                                            key={`againstMostRepresentingVoters-${v?.handle}`}
-                                            to={`/profile/${v?.handle}`}
-                                            className={`vote-avatar against ml-n2 ${inList && 'tiny'}`}
-                                            style={{
-                                                background: `url(${v?.avatar}) 50% 50% / cover no-repeat`
-                                            }}
-                                        ></Link>
+                                        !!user ? [] : againstDisplayed
+                                    )?.slice(0, 2).map((p: any) => (
+                                        <div key={`againstDisplayedVoters-${p?.handle}`}>
+                                            <Avatar
+                                                person={p}
+                                                type={inList ? 'tiny' : 'vote'}
+                                            />
+                                        </div>
                                     ))
                                 }
 
@@ -354,12 +395,19 @@ export const Choice: FunctionComponent<{
                                         <div className="d-flex mr-1 my-n2 ml-1" data-tip={`Representing you`}>
                                             <Link
                                                 to={`/profile/${againstRepresentatives[0].representativeHandle}`}
-                                                className={`vote-avatar against ml-n2 ${inList && 'tiny'}`}
-                                                style={{
-                                                    background: `url(${againstRepresentatives[0].representativeAvatar}) 50% 50% / cover no-repeat`
-                                                }}
                                                 onClick={e => e.stopPropagation()}
-                                            ></Link>
+                                            >
+                                                <Avatar
+                                                    person={{
+                                                        avatar: againstRepresentatives[0].representativeAvatar,
+                                                        handle: againstRepresentatives[0].representativeHandle,
+                                                        name: againstRepresentatives[0].representativeName,
+                                                        yourStats: againstRepresentatives[0].yourStats,
+                                                        stats: againstRepresentatives[0].stats
+                                                    }}
+                                                    type={inList ? 'tiny' : 'vote'}
+                                                />
+                                            </Link>
                                             <div
                                                 // to={`/${choiceText ? 'multipoll' : 'poll'}/${voteName}/${groupHandle}/timeline/representingYou`}
                                                 onClick={
@@ -384,6 +432,18 @@ export const Choice: FunctionComponent<{
                                         </div>
                                     )
                                 }
+
+                                {yourVote_ === 'against' && (
+                                    <div className="d-flex mr-1 my-n2 ml-1">
+                                        <Avatar
+                                            person={{
+                                                ...liquidUser
+                                            }}
+                                            type={inList ? 'tiny' : 'vote'}
+                                        />
+                                    </div>
+                                )}
+
                                 <span>
                                     Nay
                                 </span>
