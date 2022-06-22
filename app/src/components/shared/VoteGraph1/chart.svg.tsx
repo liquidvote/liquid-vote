@@ -66,27 +66,31 @@ export default function Chart({
             {/* recatangles */}
             <rect
                 className="for"
-                x="0%"
-                width={forPercentage + "%"}
+                x={forDirectPercentage + "%"}
+                width={forPercentage - forDirectPercentage + "%"}
                 height="100%"
+                data-tip={`Delegated Yay`}
             />
             <rect
                 className="forDirect"
                 x="0%"
                 width={forDirectPercentage + "%"}
                 height="100%"
+                data-tip={`Direct Yay`}
             />
             <rect
                 className="against"
-                x={forPercentage + "%"}
-                width={againstPercentage + "%"}
+                x={forPercentage + againstDirectPercentage + "%"}
+                width={againstPercentage - againstDirectPercentage + "%"}
                 height="100%"
+                data-tip={`Delegated Nay`}
             />
             <rect
                 className="againstDirect"
                 x={forPercentage + "%"}
                 width={againstDirectPercentage + "%"}
                 height="100%"
+                data-tip={`Direct Nay`}
             />
 
             {showNameInside && (

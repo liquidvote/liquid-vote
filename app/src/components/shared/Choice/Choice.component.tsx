@@ -108,14 +108,14 @@ export const Choice: FunctionComponent<{
             ...yourStats?.votersYouFollow?.filter((r: any) => r?.vote?.position === 'for') || [],
             ...(
                 !!editVote_data ? editVote_data?.editVote?.QuestionStats?.forMostRepresentingVoters : stats?.forMostRepresentingVoters
-            ).filter((u: any) => u.handle !== liquidUser.handle) || []
+            )?.filter((u: any) => u?.handle !== liquidUser?.handle) || []
         ];
 
         const againstDisplayed = [
             ...yourStats?.votersYouFollow?.filter((r: any) => r?.vote?.position === 'against') || [],
             ...(
                 !!editVote_data ? editVote_data?.editVote?.QuestionStats?.againstMostRepresentingVoters : stats?.againstMostRepresentingVoters
-            ).filter((u: any) => u.handle !== liquidUser.handle) || []
+            )?.filter((u: any) => u?.handle !== liquidUser?.handle) || []
         ];
 
         console.log({
@@ -180,7 +180,7 @@ export const Choice: FunctionComponent<{
                     )}
                 </div>
 
-                {showPercentages && (
+                {/* {showPercentages && (
                     <div className="d-flex color-legend my-3">
                         <div>
                             <small>Direct For</small>
@@ -207,7 +207,7 @@ export const Choice: FunctionComponent<{
                             </div>
                         </div>
                     </div>
-                )}
+                )} */}
 
                 {/* <pre>{JSON.stringify(stats_, null, 2) }</pre> */}
 
@@ -263,7 +263,7 @@ export const Choice: FunctionComponent<{
                                                 }
                                                 // to={`/${choiceText ? 'multipoll' : 'poll'}/${voteName}/${groupHandle}/timeline/representingYou`}
                                                 // onClick={e => e.stopPropagation()}
-                                                className={`vote-avatar text-decoration-none count for ml-n2 ${inList && 'tiny'}`}
+                                                className={`text-decoration-none count for ml-n2 ${inList ? 'tiny-avatar': 'vote-avatar'}`}
                                             >{forRepresentatives.length}</div>
                                         </div>
                                     )
@@ -281,7 +281,7 @@ export const Choice: FunctionComponent<{
                                 )}
                             </div>
                             <div
-                                className="d-flex ml-1"
+                                className="d-flex ml-2"
                                 data-tip={`Voted Yay`}
                                 onClick={
                                     e => {
@@ -303,7 +303,7 @@ export const Choice: FunctionComponent<{
                             >
                                 {(
                                     !!user ? [] : forDisplayed
-                                )?.slice(0, 2).map((p: any) => (
+                                )?.slice(0, 3).map((p: any) => (
                                     <div key={`forDisplayedVoters-${p?.handle}`} className="ml-n1">
                                         <Avatar
                                             person={p}
@@ -315,14 +315,14 @@ export const Choice: FunctionComponent<{
                                 {(
                                     user && userVote?.position === "for" && (
                                         <div
-                                            className={`vote-avatar for ml-n2 ${inList && 'tiny'} pointer`}
+                                            className={`for ml-n2 ${inList ? 'tiny-avatar': 'vote-avatar'} pointer`}
                                             style={{ background: `url(${user.avatar}) 50% 50% / cover no-repeat` }}
                                         ></div>
                                     )
                                 )}
 
                                 <div
-                                    className={`pointer tiny-avatar text-decoration-none count for ml-n2 ${inList && 'tiny'}`}
+                                    className={`pointer text-decoration-none count for ml-n2 ${inList ? 'tiny-avatar' : 'vote-avatar'}`}
                                 >
                                     {numeral(stats_.forCount).format('0a[.]0')}
                                 </div>
@@ -341,8 +341,8 @@ export const Choice: FunctionComponent<{
                                 {
                                     (
                                         !!user ? [] : againstDisplayed
-                                    )?.slice(0, 2).map((p: any) => (
-                                        <div key={`againstDisplayedVoters-${p?.handle}`}>
+                                    )?.slice(0, 3).map((p: any) => (
+                                        <div key={`againstDisplayedVoters-${p?.handle}`} className="ml-n1">
                                             <Avatar
                                                 person={p}
                                                 type={inList ? 'tiny' : 'vote'}
@@ -379,7 +379,7 @@ export const Choice: FunctionComponent<{
                                             })
                                         }
                                     }
-                                    className={`vote-avatar text-decoration-none count against ml-n2 ${inList && 'tiny'}`}>
+                                    className={`text-decoration-none count against ml-n2 ${inList ? 'tiny-avatar' : 'vote-avatar'}`}>
                                     {numeral(stats_.againstCount).format('0a[.]0')}
                                 </div>
                             </div>
@@ -428,7 +428,7 @@ export const Choice: FunctionComponent<{
                                                         })
                                                     }
                                                 }
-                                                className={`vote-avatar text-decoration-none count against ml-n2 ${inList && 'tiny'}`}
+                                                className={`text-decoration-none count against ml-n2 ${inList ? 'tiny-avatar': 'vote-avatar'}`}
                                             >{againstRepresentatives.length}</div>
                                         </div>
                                     )

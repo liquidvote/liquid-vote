@@ -40,6 +40,26 @@ export const QUESTION = gql`
                 yourVote {
                     ...vote
                 }
+                yourStats {
+                  votersYouFollow {
+                    handle
+                    avatar
+                    name
+                    stats {
+                      directVotesMade
+                    }
+                    yourStats {
+                      directVotesInCommon
+                      directVotesInAgreement
+                      directVotesInDisagreement
+                      indirectVotesMadeByYou
+                      indirectVotesMadeForYou
+                    }
+                    vote {
+                      position
+                    }
+                  }
+                }
             }
             allowNewChoices
             groupChannel{
@@ -63,6 +83,16 @@ export const QUESTION = gql`
                     avatar
                     name
                     representeeCount
+                    stats{
+                        directVotesMade
+                    }
+                    yourStats {
+                        directVotesInCommon
+                        directVotesInAgreement
+                        directVotesInDisagreement
+                        indirectVotesMadeByYou
+                        indirectVotesMadeForYou
+                    }
                 }
                 againstCount
                 againstMostRepresentingVoters {
@@ -70,6 +100,16 @@ export const QUESTION = gql`
                     avatar
                     name
                     representeeCount
+                    stats{
+                        directVotesMade
+                    }
+                    yourStats {
+                        directVotesInCommon
+                        directVotesInAgreement
+                        directVotesInDisagreement
+                        indirectVotesMadeByYou
+                        indirectVotesMadeForYou
+                    }
                 }
                 againstDirectCount
                 directVotes
@@ -77,6 +117,26 @@ export const QUESTION = gql`
             }
             yourVote {
                 ...vote
+            }
+            yourStats {
+                votersYouFollow {
+                handle
+                avatar
+                name
+                stats {
+                    directVotesMade
+                }
+                yourStats {
+                    directVotesInCommon
+                    directVotesInAgreement
+                    directVotesInDisagreement
+                    indirectVotesMadeByYou
+                    indirectVotesMadeForYou
+                }
+                vote {
+                    position
+                }
+                }
             }
             createdBy {
                 name
@@ -106,6 +166,16 @@ export const QUESTION = gql`
             againstWeight
             createdOn
             lastEditOn
+            stats{
+                directVotesMade
+            }
+            yourStats {
+                directVotesInCommon
+                directVotesInAgreement
+                directVotesInDisagreement
+                indirectVotesMadeByYou
+                indirectVotesMadeForYou
+			}
         }
         createdOn
         lastEditOn
