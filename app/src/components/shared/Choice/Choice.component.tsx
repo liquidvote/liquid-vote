@@ -282,6 +282,7 @@ export const Choice: FunctionComponent<{
                             </div>
                             <div
                                 className="d-flex ml-1"
+                                data-tip={`Voted Yay`}
                                 onClick={
                                     e => {
                                         e.stopPropagation();
@@ -303,7 +304,7 @@ export const Choice: FunctionComponent<{
                                 {(
                                     !!user ? [] : forDisplayed
                                 )?.slice(0, 2).map((p: any) => (
-                                    <div key={`forDisplayedVoters-${p?.handle}`}>
+                                    <div key={`forDisplayedVoters-${p?.handle}`} className="ml-n1">
                                         <Avatar
                                             person={p}
                                             type={inList ? 'tiny' : 'vote'}
@@ -321,7 +322,7 @@ export const Choice: FunctionComponent<{
                                 )}
 
                                 <div
-                                    className={`pointer vote-avatar text-decoration-none count for ml-n2 ${inList && 'tiny'}`}
+                                    className={`pointer tiny-avatar text-decoration-none count for ml-n2 ${inList && 'tiny'}`}
                                 >
                                     {numeral(stats_.forCount).format('0a[.]0')}
                                 </div>
@@ -336,7 +337,7 @@ export const Choice: FunctionComponent<{
                         )}
 
                         <div className="d-flex align-items-center cr-on-tiny">
-                            <div className="d-flex ml-2" data-tip={`Votes Against`}>
+                            <div className="d-flex ml-2" data-tip={`Voted Nay`}>
                                 {
                                     (
                                         !!user ? [] : againstDisplayed
@@ -392,7 +393,7 @@ export const Choice: FunctionComponent<{
                                         yourVote?.position === 'delegated' &&
                                         (!editVote_data || editVote_data?.editVote?.position === 'delegated')
                                     ) && (
-                                        <div className="d-flex mr-1 my-n2 ml-1" data-tip={`Representing you`}>
+                                        <div className="d-flex mr-1 my-n2" data-tip={`Representing you`}>
                                             <Link
                                                 to={`/profile/${againstRepresentatives[0].representativeHandle}`}
                                                 onClick={e => e.stopPropagation()}
@@ -434,7 +435,7 @@ export const Choice: FunctionComponent<{
                                 }
 
                                 {yourVote_ === 'against' && (
-                                    <div className="d-flex mr-1 my-n2 ml-1">
+                                    <div className="d-flex mr-1 my-n2">
                                         <Avatar
                                             person={{
                                                 ...liquidUser
@@ -444,7 +445,7 @@ export const Choice: FunctionComponent<{
                                     </div>
                                 )}
 
-                                <span>
+                                <span className='ml-auto'>
                                     Nay
                                 </span>
                             </div>
