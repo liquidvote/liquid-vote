@@ -54,19 +54,19 @@ export const QuestionResolvers = {
             sortBy
         }, { mongoDB, AuthUser }) => {
 
-            console.log("questions");
+            // console.log("questions");
 
-            const writeToDebugFile = fs.writeFile(
-                process.cwd() + '/debug' + '/Questions.json',
-                JSON.stringify({
-                    QueryJSON: QuestionsAgg({
-                        questionText: null,
-                        group,
-                        AuthUserId: AuthUser?._id
-                    }),
-                }, null, 2),
-                { encoding: 'utf8' }
-            );
+            // const writeToDebugFile = fs.writeFile(
+            //     process.cwd() + '/debug' + '/Questions.json',
+            //     JSON.stringify({
+            //         QueryJSON: QuestionsAgg({
+            //             questionText: null,
+            //             group,
+            //             AuthUserId: AuthUser?._id
+            //         }),
+            //     }, null, 2),
+            //     { encoding: 'utf8' }
+            // );
 
             const Questions = await mongoDB.collection("Questions")
                 .aggregate(
@@ -108,12 +108,12 @@ export const QuestionResolvers = {
                 )
                 .toArray();
 
-            console.log({
-                Questions: Questions.map(q => ({
-                    b: q.questionType,
-                    a: q.stats,
-                }))
-            });
+            // console.log({
+            //     Questions: Questions.map(q => ({
+            //         b: q.questionType,
+            //         a: q.stats,
+            //     }))
+            // });
 
             return (await Promise.all(Questions.map(async (q, i) => ({
                 ...q,

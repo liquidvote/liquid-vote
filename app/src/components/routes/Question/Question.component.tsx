@@ -23,6 +23,7 @@ import QuestionsVotersAlsoVotedOn from "./QuestionsVotersAlsoVotedOn";
 import QuestionArguments from "./QuestionArguments";
 import ThreeDotsSmallSVG from '@shared/Icons/ThreeDots-small-horizontal.svg';
 import Popper from "@shared/Popper";
+import Avatar from '@components/shared/Avatar';
 
 export default function Question() {
 
@@ -55,8 +56,10 @@ export default function Question() {
 
     const { representatives } = useUserRepresentedBy({
         userHandle: liquidUser?.handle,
-        groupHandle: groupHandle
+        groupHandle
     });
+
+    console.log({ representatives });
 
     const question = question_data?.Question;
 
@@ -111,14 +114,19 @@ export default function Question() {
                         <div className="d-flex ml-2 pl-1 mr-1 align-items-center">
                             {representatives?.map((r: any) => (
                                 <Link
-                                    key={`representatives-${r.handle}`}
-                                    to={`/profile/${r.handle}`}
-                                    className={`vote-avatar tiny ml-n2`}
-                                    style={{
-                                        background: `url(${r.avatar}) 50% 50% / cover no-repeat`
-                                    }}
-                                    title={r.name}
-                                ></Link>
+                                    key={`representatives-${r.handle}-${question?.group?.handle}`}
+                                    to={`/profile/${r.handle}/cause/${question?.group?.handle}`}
+                                    // className={`vote-avatar tiny ml-n2`}
+                                    // style={{
+                                    //     background: `url(${r.avatar}) 50% 50% / cover no-repeat`
+                                    // }}
+                                    // title={r.name}
+                                >
+                                    <Avatar
+                                        person={r}
+                                        type='vote'
+                                    />
+                                </Link>
                             ))}
                         </div>
                     )}
@@ -150,12 +158,12 @@ export default function Question() {
             </div>
 
             <div className="position-relative">
-                {question?.questionType === 'single' ? (
+                {/* {question?.questionType === 'single' ? (
                     <h2 className="mb-0 mt-4">Do you {question?.startText || 'approve'}</h2>
                 ) : (
                     <div className="mt-4"></div>
-                )}
-                <h2 className="mb-2 white pre-wrap mw-95"><b>{voteName}</b>?</h2>
+                )} */}
+                <h2 className="mb-2 mt-4 white pre-wrap mw-95"><b>{voteName}</b>?</h2>
 
                 {question.thisUserIsAdmin && (
                     <div className="time-ago d-flex flex-column justify-content-end pointer">

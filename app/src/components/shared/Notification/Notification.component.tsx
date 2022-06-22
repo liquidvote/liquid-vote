@@ -65,12 +65,12 @@ export const Notification: FunctionComponent<{
                                             representatives={userVote.representatives}
                                             user={v.user}
                                         />
-                                    ): 'Voted'} 
+                                    ): ''} 
                                 </div>
                             </div>
                             {(
                                 <div className="d-flex flex-column justify-content-end mw-25" style={{ flex: 1 }}>
-                                    <small className="text-right" data-tip={`Last vote by ${v?.user?.name} on`}>
+                                    <small className="text-right" data-tip={`Last vote by ${v?.user?.name} was`}>
                                         {timeAgo.format(new Date(Number(v?.lastEditOn)))}
                                     </small>
                                     {/* <div className="d-flex justify-content-end">

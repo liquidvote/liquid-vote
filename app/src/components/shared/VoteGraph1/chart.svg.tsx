@@ -69,28 +69,28 @@ export default function Chart({
                 x={forDirectPercentage + "%"}
                 width={forPercentage - forDirectPercentage + "%"}
                 height="100%"
-                data-tip={`Delegated Yay`}
+                data-tip={`Delegated Yay: ${numeral(forPercentage - forDirectPercentage).format('0a[.]0') + "%"}`}
             />
             <rect
                 className="forDirect"
                 x="0%"
                 width={forDirectPercentage + "%"}
                 height="100%"
-                data-tip={`Direct Yay`}
+                data-tip={`Direct Yay: ${numeral(forDirectPercentage).format('0a[.]0') + "%"}`}
             />
             <rect
                 className="against"
                 x={forPercentage + againstDirectPercentage + "%"}
                 width={againstPercentage - againstDirectPercentage + "%"}
                 height="100%"
-                data-tip={`Delegated Nay`}
+                data-tip={`Delegated Nay: ${numeral(againstPercentage - againstDirectPercentage).format('0a[.]0') + "%"}`}
             />
             <rect
                 className="againstDirect"
                 x={forPercentage + "%"}
                 width={againstDirectPercentage + "%"}
                 height="100%"
-                data-tip={`Direct Nay`}
+                data-tip={`Direct Nay: ${numeral(againstDirectPercentage).format('0a[.]0') + "%"}`}
             />
 
             {showNameInside && (

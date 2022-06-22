@@ -104,6 +104,13 @@ export const USER_REPRESENTED_BY = gql`
             indirectVotesMadeByUser
             indirectVotesMadeForUser
         }
+        yourStats {
+            directVotesInCommon
+            directVotesInAgreement
+            directVotesInDisagreement
+            indirectVotesMadeByYou
+            indirectVotesMadeForYou
+        }
         representationGroups {
             handle
             name

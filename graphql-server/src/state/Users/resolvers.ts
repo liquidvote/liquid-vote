@@ -1,11 +1,13 @@
 import { ObjectId } from 'mongodb';
+const { promises: fs } = require("fs");
 
 import { getGroupStats } from '../Groups/resolvers';
 import { updateInviteStatus } from '../Invites/resolvers';
 import { updateRepresenteesVotes } from '../Votes/resolvers';
 import { updateQuestionVotingStats } from '../Questions/resolvers';
 import { QuestionsAgg } from '../Questions/aggregationLogic/QuestionsAgg';
-import { votesInCommonPipelineForVotes } from './aggregationLogic';
+import { votesInCommonPipelineForVotes } from './aggregationLogic/votesInCommonPipelineForVotes';
+import { userRepresentedByComparissons } from './aggregationLogic/userRepresentedByComparissons';
 
 export const UserResolvers = {
     Query: {
@@ -311,53 +313,66 @@ export const UserResolvers = {
             const group = !!groupHandle && await mongoDB.collection("Groups")
                 .findOne({ 'handle': groupHandle });
 
-            const representativesAndGroups = (
-                await mongoDB.collection("UserRepresentations").aggregate(
-                    [
-                        {
-                            $match: {
-                                "representeeId": new ObjectId(User?._id),
-                                "isRepresentingYou": true,
-                                ...!!group && {
-                                    groupId: new ObjectId(group._id)
-                                },
-                                ...!!RepresentativeUser && {
-                                    representativeId: new ObjectId(RepresentativeUser._id)
-                                }
-                            }
-                        }, {
-                            $group: {
-                                _id: {
-                                    representative: '$representativeId'
-                                },
-                                count: {
-                                    $sum: 1
-                                },
-                                groups: {
-                                    $push: "$groupId"
-                                }
-                            }
-                        }, {
-                            $lookup: {
-                                from: 'Groups',
-                                localField: 'groups',
-                                foreignField: '_id',
-                                as: 'groups'
-                            }
-                        }, {
-                            $lookup: {
-                                from: 'Users',
-                                localField: '_id.representative',
-                                foreignField: '_id',
-                                as: 'representativeUser'
-                            }
+            const representativesAndGroupsAgg = [
+                {
+                    $match: {
+                        "representeeId": new ObjectId(User?._id),
+                        "isRepresentingYou": true,
+                        ...!!group && {
+                            groupId: new ObjectId(group._id)
+                        },
+                        ...!!RepresentativeUser && {
+                            representativeId: new ObjectId(RepresentativeUser._id)
                         }
-                    ]
-                ).toArray())
+                    }
+                }, {
+                    $group: {
+                        _id: {
+                            representative: '$representativeId'
+                        },
+                        count: {
+                            $sum: 1
+                        },
+                        groups: {
+                            $push: "$groupId"
+                        }
+                    }
+                }, {
+                    $lookup: {
+                        from: 'Groups',
+                        localField: 'groups',
+                        foreignField: '_id',
+                        as: 'groups'
+                    }
+                }, {
+                    $lookup: {
+                        from: 'Users',
+                        localField: '_id.representative',
+                        foreignField: '_id',
+                        as: 'representativeUser'
+                    }
+                },
+                ...(!! AuthUser._id) ? [
+                    ...userRepresentedByComparissons({ groupHandle, AuthUserId: AuthUser._id })
+                ]: []
+            ];
+
+            const representativesAndGroups = (
+                await mongoDB.collection("UserRepresentations").aggregate(representativesAndGroupsAgg).toArray())
                 .map(r => ({
                     ...r?.representativeUser[0]?.LiquidUser,
-                    representationGroups: r?.groups
+                    representationGroups: r?.groups,
+                    stats: r?.stats,
+                    yourStats: r?.yourStats
                 }));
+
+            // const writeToDebugFile = fs.writeFile(
+            //     process.cwd() + '/debug' + '/representativesAndGroups.json',
+            //     JSON.stringify({
+            //         QueryJSON: representativesAndGroupsAgg,
+            //     }, null, 2),
+            //     { encoding: 'utf8' }
+            // );
 
             return representativesAndGroups;
         },
