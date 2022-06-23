@@ -29,10 +29,10 @@ export const Notification: FunctionComponent<{
         const userVote = v.question?.questionType === 'single' ? v.question?.userVote :
             v.question?.choices?.find(c => c.text === hideChoicesBesides)?.userVote;
 
-        console.log({
-            userVote,
-            user: v.user
-        });
+        // console.log({
+        //     userVote,
+        //     user: v.user
+        // });
 
         return (
             <>

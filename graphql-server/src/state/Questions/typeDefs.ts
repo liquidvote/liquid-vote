@@ -79,6 +79,10 @@ export const QuestionTypeDefs = gql`
             group: String,
             sortBy: String
         ): [Question]
+        QuestionsCreatedByUser(
+            handle: String,
+            sortBy: String
+        ):  [Question]
     }
 
     extend type Mutation {

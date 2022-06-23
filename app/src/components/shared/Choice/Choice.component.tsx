@@ -118,15 +118,15 @@ export const Choice: FunctionComponent<{
             )?.filter((u: any) => u?.handle !== liquidUser?.handle) || []
         ];
 
-        console.log({
-            yourVote,
-            forRepresentatives,
-            againstRepresentatives,
-            forFollowees,
-            againstFollowees,
-            forMostRepresenting: stats?.forMostRepresentingVoters,
-            againstMostRepresenting: stats?.againstMostRepresentingVoters,
-        })
+        // console.log({
+        //     yourVote,
+        //     forRepresentatives,
+        //     againstRepresentatives,
+        //     forFollowees,
+        //     againstFollowees,
+        //     forMostRepresenting: stats?.forMostRepresentingVoters,
+        //     againstMostRepresenting: stats?.againstMostRepresentingVoters,
+        // })
 
         return (
             <div className={`${!inList && 'not-in-list'}`}>
@@ -393,7 +393,7 @@ export const Choice: FunctionComponent<{
                                         yourVote?.position === 'delegated' &&
                                         (!editVote_data || editVote_data?.editVote?.position === 'delegated')
                                     ) && (
-                                        <div className="d-flex mr-1 my-n2" data-tip={`Representing you`}>
+                                        <div className={`d-flex mr-1 my-n2 ${inList ? 'ml-n1' : 'ml-n2'}`} data-tip={`Representing you`}>
                                             <Link
                                                 to={`/profile/${againstRepresentatives[0].representativeHandle}`}
                                                 onClick={e => e.stopPropagation()}

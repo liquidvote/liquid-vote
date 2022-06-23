@@ -23,20 +23,23 @@ export const TopPageInvite: FunctionComponent<{
     inviterHandle: string,
     groupHandle?: string,
     voteName?: string,
-    to: 'group' | 'poll'
+    userHandle?: string,
+    to: 'group' | 'poll' | 'compareWithProfile'
 }> = ({
     inviterHandle,
     groupHandle,
+    userHandle,
     voteName,
     to
 }) => {
 
         const navigate = useNavigate();
         const { updateParams } = useSearchParams();
-        let { handle, section, userHandle, acceptOnLogin } = useParams<any>();
+        let { handle, section, acceptOnLogin } = useParams<any>();
 
         const { liquidUser } = useAuthUser();
         const { user: inviter } = useUser({ userHandle: inviterHandle });
+        const { user: user_ } = useUser({ userHandle });
         const { group } = useGroup({ handle: groupHandle });
         const { loginWithPopup, user, isAuthenticated, isLoading } = useAuth0();
 
@@ -100,7 +103,12 @@ export const TopPageInvite: FunctionComponent<{
             <div className="position-relative">
                 <div
                     className="close-corner-x"
-                    onClick={() => to === 'poll' ? navigate(`/poll/${voteName}/${groupHandle}`) : navigate(`/group/${groupHandle}`)}
+                    onClick={() => 
+                            to === 'poll' ? navigate(`/poll/${voteName}/${groupHandle}`) :
+                            to === 'group' ? navigate(`/group/${groupHandle}`) :
+                            to === 'compareWithProfile' ? navigate(`/profile/${userHandle}`) :
+                            null
+                    }
                     role="button"
                 >
                     <XSVG />
@@ -122,6 +130,7 @@ export const TopPageInvite: FunctionComponent<{
                             <p className="m-0">
                                 {to === 'group' && `${inviter?.name} is inviting you to join ${group?.name}`}
                                 {to === 'poll' && `${inviter?.name} is inviting you to vote`}
+                                {to === 'compareWithProfile' && `${inviter?.name} is inviting you to compare with ${inviter?.handle === user_?.handle ? "him" : user_.name}`}
                             </p>
                         </div>
 

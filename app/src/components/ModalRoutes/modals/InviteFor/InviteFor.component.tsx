@@ -23,6 +23,7 @@ export const InviteFor: FunctionComponent<{}> = ({ }) => {
 
     const { allSearchParams, updateParams } = useSearchParams();
     const modalData = JSON.parse(allSearchParams.modalData);
+    const { liquidUser } = useAuthUser();
 
     const {
         handleSubmit, register, formState: { errors }, watch, setValue
@@ -44,6 +45,7 @@ export const InviteFor: FunctionComponent<{}> = ({ }) => {
                     modalData.InviteType === 'representation' ? `Invite others to be represented by you` :
                         modalData.InviteType === 'toGroup' ? `Invite others to join ${modalData.groupName}` :
                             modalData.InviteType === 'toVote' ? `Invite others to Vote on ${modalData.voteName}` :
+                                modalData.InviteType === 'toCompare' ? `Invite others to Compare with ${modalData.userHandle === liquidUser.handle ? 'You' : `${modalData.userName}`}` :
                                 ''
                 }
                 hideSubmitButton={true}
@@ -54,6 +56,7 @@ export const InviteFor: FunctionComponent<{}> = ({ }) => {
                 <p className="text-center mt-4 mb-n4">
                     {modalData.InviteType === 'toGroup' && `Share this link with whom you'd like to join ${modalData.groupName}`}
                     {modalData.InviteType === 'toVote' && `Share this link with whom you'd like to vote on ${modalData.voteName}`}
+                    {modalData.InviteType === 'toCompare' && `Share this link with whom you'd like to compare with ${modalData.userHandle === liquidUser.handle ? 'yourself' : `${modalData.userName}`}`}
                 </p>
 
                 <div className="my-5">

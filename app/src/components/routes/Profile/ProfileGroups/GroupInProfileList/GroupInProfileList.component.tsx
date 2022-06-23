@@ -96,18 +96,25 @@ export const GroupInProfileList: FunctionComponent<{
                             </Link> */}
                             <div className="flex-fill py-2">
                                 <div className="d-flex justify-content-between align-items-center flex-wrap">
-                                    <div className="d-flex align-items-center">
-                                        <Link to={`/group/${group.handle}`}><b>{group.name}</b></Link>
-                                        {/* <small className="mt-n1">@DanPriceSeattle</small> */}
-                                        <div className="ml-2">
-                                            {group?.privacy === "private" ? (
-                                                <LockSVG />
-                                            ) : group?.privacy === "public" ? (
-                                                <WorldSVG />
-                                            ) : <LinkSVG />}
+                                    <div className="d-flex flex-column">
+                                        <div className="d-flex align-items-center">
+                                            <Link to={`/group/${group.handle}`}><b>{group.name}</b></Link>
+                                            {/* <small className="mt-n1">@DanPriceSeattle</small> */}
+                                            <div className="ml-2 mt-n1">
+                                                {group?.privacy === "private" ? (
+                                                    <LockSVG />
+                                                ) : group?.privacy === "public" ? (
+                                                    <WorldSVG />
+                                                ) : <LinkSVG />}
+                                            </div>
                                         </div>
+                                        <small>
+                                            {group.representativeRelation?.isRepresentingYou && !group.youToHimRepresentativeRelation?.isRepresentingYou ? "represents you" : ""}
+                                            {!group.representativeRelation?.isRepresentingYou && group.youToHimRepresentativeRelation?.isRepresentingYou ? "represented by you" : ""}
+                                            {group.representativeRelation?.isRepresentingYou && group.youToHimRepresentativeRelation?.isRepresentingYou ? "you represent each other" : ""}
+                                        </small>
                                     </div>
-                                    <div className="d-flexml-n1">
+                                    <div className="d-flex ml-n1 justify-content-center">
                                         <Popper
                                             rightOnSmall={true}
                                             button={

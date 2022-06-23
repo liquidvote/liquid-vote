@@ -208,6 +208,95 @@ export const QuestionResolvers = {
                 sort((a: any, b: any) => a.i - b.i)?.
                 filter(q => q.questionText !== questionText);
         },
+        QuestionsCreatedByUser: async (_source, {
+            handle,
+            sortBy
+        }, { mongoDB, AuthUser }) => {
+
+            const User = !!handle && await mongoDB.collection("Users")
+                .findOne({ 'LiquidUser.handle': handle });
+
+            const Questions = await mongoDB.collection("Questions")
+                .aggregate(
+                    [
+                        // ...(!!UserGroups && !notUsers) ? [{
+                        //     '$match': {
+                        //         'groupChannel.group': { '$in': UserGroups.map(g => g.handle) }
+                        //     }
+                        // }] : [],
+                        // ...(!!UserGroups && notUsers) ? [{
+                        //     '$match': {
+                        //         'groupChannel.group': { '$nin': UserGroups.map(g => g.handle) }
+                        //     }
+                        // }] : [],
+                        {
+                            '$match': {
+                                "createdBy": new ObjectId(User._id),
+                                "status": { "$ne": "deleted" }
+                            }
+                        },
+                        ...QuestionsAgg({
+                            questionText: null,
+                            group: null,
+                            AuthUserId: AuthUser?._id
+                        }),
+                        {
+                            '$addFields': {
+                                'stats.lastEditOrVote': {
+                                    '$cond': [
+                                        {
+                                            '$gt': [
+                                                '$lastEditOn', '$stats.lastVoteOn'
+                                            ]
+                                        }, '$lastEditOn', '$stats.lastVoteOn'
+                                    ]
+                                },
+                                'stats.totalVotes': {
+                                    '$sum': [
+                                        '$stats.directVotes', '$stats.indirectVotes'
+                                    ]
+                                },
+                                // 'thisUserIsAdmin': {
+                                //     '$eq': ['$createdBy', AuthUser?.LiquidUser?.handle]
+                                // }
+                            }
+                        },
+                        ...(sortBy === 'weight') ? [
+                            {
+                                '$sort': { 'stats.totalVotes': -1 }
+                            }
+                        ] : [],
+                        ...(sortBy === 'time') ? [
+                            {
+                                '$sort': { 'stats.lastEditOrVote': -1 }
+                            }
+                        ] : []
+                    ]
+                )
+                .toArray();
+
+            // TODO: move this logic to the aggregation, it'll run much faster
+            return await Promise.all(Questions.map(async (q, i) => ({
+                ...q,
+                _id: q?.id,
+                ...(q.questionType === 'single' && !!AuthUser) && {
+                    yourVote: q?.choices[0]?.yourVote
+                },
+                ...(q.questionType === 'multi') && {
+                    choices: await Promise.all(q?.choices?.map(async (c) => ({
+                        ...c?.choice,
+                        ...(!!AuthUser) && {
+                            yourVote: c?.yourVote
+                        }
+                    })))
+                },
+                thisUserIsAdmin: !!AuthUser && (
+                    q?.createdBy?.handle === AuthUser?.LiquidUser?.handle ||
+                    q?.group?.admins?.map(a => a?.handle)?.includes(AuthUser?.LiquidUser?.handle)
+                ),
+                i
+            })));
+        }
     },
     Mutation: {
         editQuestion: async (_source, {

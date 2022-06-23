@@ -10,6 +10,7 @@ import DropAnimation from "@components/shared/DropAnimation";
 import Choice from '@shared/Choice';
 import Header from "@shared/Header";
 import GroupSmallSvg from "@shared/Icons/Group-small.svg";
+import InviteTinySvg from "@shared/Icons/Invite-tiny.svg";
 import VoteGraph1 from "@shared/VoteGraph1";
 import useSearchParams from "@state/Global/useSearchParams.effect";
 import TopPageInvite from '@components/shared/TopPageInvite';
@@ -157,7 +158,7 @@ export default function Question() {
 
             </div>
 
-            <div className="position-relative">
+            <div className="position-relative d-flex justify-content-between">
                 {/* {question?.questionType === 'single' ? (
                     <h2 className="mb-0 mt-4">Do you {question?.startText || 'approve'}</h2>
                 ) : (
@@ -166,77 +167,76 @@ export default function Question() {
                 <h2 className="mb-2 mt-4 white pre-wrap mw-95"><b>{voteName}</b>?</h2>
 
                 {question.thisUserIsAdmin && (
-                    <div className="time-ago d-flex flex-column justify-content-end pointer">
-                        <Popper
-                            rightOnSmall={true}
-                            button={<div>
-                                <ThreeDotsSmallSVG />
-                            </div>}
-                            popperContent={
-                                <ul className="p-0 m-0 mx-2">
+                    <div className='d-flex mt-3 justify-content-center'>
+                        <div
+                            className='d-flex justify-content-center pointer'
+                            role="button"
+                            onClick={async () => {
+                                const inviteLink = `${env.website}/invite/by/${liquidUser?.handle}/to/voteOn/${voteName}/${groupHandle}`;
+                                try {
+                                    await navigator.share({
+                                        title: `Vote on ${voteName} with ${liquidUser?.name}`,
+                                        text: `${liquidUser?.name} is inviting you to vote on ${voteName} with him`,
+                                        url: inviteLink
+                                    })
+                                } catch (err) {
+                                    updateParams({
+                                        paramsToAdd: {
+                                            modal: "InviteFor",
+                                            modalData: JSON.stringify({
+                                                InviteType: 'toVote',
+                                                inviteLink,
+                                                voteName
+                                            })
+                                        }
+                                    })
+                                }
+                            }}
+                        >
 
-                                    <li
-                                        className="pointer my-2 "
-                                        onClick={async () => {
-                                            const inviteLink = `${env.website}/invite/by/${liquidUser?.handle}/to/voteOn/${voteName}/${groupHandle}`;
-
-                                            try {
-                                                await navigator.share({
-                                                    title: `Vote on ${voteName} with ${liquidUser?.name}`,
-                                                    text: `${liquidUser?.name} is inviting you to vote on ${voteName} with him`,
-                                                    url: inviteLink
-                                                })
-                                            } catch (err) {
-                                                updateParams({
-                                                    paramsToAdd: {
-                                                        modal: "InviteFor",
-                                                        modalData: JSON.stringify({
-                                                            InviteType: 'toVote',
-                                                            inviteLink,
-                                                            voteName
-                                                        })
-                                                    }
-                                                })
-                                            }
-                                        }}
-                                    >
-                                        Share Votes
-
-                                    </li>
-
-
-                                    <li
-                                        className="pointer my-2 text-danger"
-                                        onClick={() => updateParams({
-                                            paramsToAdd: {
-                                                modal: "DeletePoll",
-                                                modalData: JSON.stringify({
-                                                    questionText: question?.questionText,
-                                                    group: question?.groupChannel?.group,
-                                                    navToGroup: true
-                                                })
-                                            }
-                                        })}
-                                    >
-                                        Delete
-                                    </li>
-                                    <li
-                                        className="pointer my-2"
-                                        onClick={() => updateParams({
-                                            paramsToAdd: {
-                                                modal: "EditQuestion",
-                                                modalData: JSON.stringify({
-                                                    questionText: question?.questionText,
-                                                    groupHandle: question?.groupChannel?.group,
-                                                })
-                                            }
-                                        })}
-                                    >
-                                        Edit
-                                    </li>
-                                </ul>
-                            }
-                        />
+                            <InviteTinySvg />
+                        </div>
+                        <div className="d-flex flex-column justify-content-center pointer ml-2">
+                            <Popper
+                                rightOnSmall={true}
+                                button={<div>
+                                    <ThreeDotsSmallSVG />
+                                </div>}
+                                popperContent={
+                                    <ul className="p-0 m-0 mx-2">
+                                        <li
+                                            className="pointer my-2 text-danger"
+                                            onClick={() => updateParams({
+                                                paramsToAdd: {
+                                                    modal: "DeletePoll",
+                                                    modalData: JSON.stringify({
+                                                        questionText: question?.questionText,
+                                                        group: question?.groupChannel?.group,
+                                                        navToGroup: true
+                                                    })
+                                                }
+                                            })}
+                                        >
+                                            Delete
+                                        </li>
+                                        <li
+                                            className="pointer my-2"
+                                            onClick={() => updateParams({
+                                                paramsToAdd: {
+                                                    modal: "EditQuestion",
+                                                    modalData: JSON.stringify({
+                                                        questionText: question?.questionText,
+                                                        groupHandle: question?.groupChannel?.group,
+                                                    })
+                                                }
+                                            })}
+                                        >
+                                            Edit
+                                        </li>
+                                    </ul>
+                                }
+                            />
+                        </div>
                     </div>
                 )}
             </div>

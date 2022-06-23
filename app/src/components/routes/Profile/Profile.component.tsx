@@ -17,14 +17,19 @@ import useUserGroups from "@state/User/userGroups.effect";
 import DropSVG from "@shared/Icons/Drop.svg";
 import MetaTags from "@components/shared/MetaTags";
 import Avatar from "@components/shared/Avatar";
+import InviteTinySvg from "@shared/Icons/Invite-tiny.svg";
+import env from '@env';
+import TopPageInvite from '@components/shared/TopPageInvite';
 
 import ProfileVotes from "./ProfileVotes";
 import './style.sass';
 import ProfileGroups from "./ProfileGroups";
+import ProfilePolls from "./ProfilePolls";
+import ProfileFollowings from "./ProfileFollowings";
 
 export const Profile: FunctionComponent<{}> = ({ }) => {
 
-    let { section, handle, groupHandle } = useParams<any>();
+    let { section, handle, groupHandle, inviterHandle } = useParams<any>();
     const { allSearchParams, updateParams } = useSearchParams();
 
     const { liquidUser } = useAuthUser();
@@ -53,6 +58,8 @@ export const Profile: FunctionComponent<{}> = ({ }) => {
         }
     }, [allSearchParams.refetch]);
 
+    console.log({ profile });
+
     return !profile ? (
         <div className="d-flex justify-content-center mt-5">
             <DropAnimation />
@@ -68,6 +75,16 @@ export const Profile: FunctionComponent<{}> = ({ }) => {
 
             <Header title={profile?.name} />
 
+            {!!inviterHandle && (
+                <div className="mb-3">
+                    <TopPageInvite
+                        inviterHandle={inviterHandle}
+                        userHandle={handle}
+                        to="compareWithProfile"
+                    />
+                </div>
+            )}
+
             <div className="profile-top">
                 <div
                     className="cover"
@@ -79,6 +96,35 @@ export const Profile: FunctionComponent<{}> = ({ }) => {
                     <Avatar person={profile} type="profile" />
                 </div>
                 <div className="profile-buttons-container">
+                    <div
+                        className="button_ small mb-2 mr-2"
+                        onClick={async () => {
+                            const inviteLink = `${env.website}/invite/by/${liquidUser?.handle}/toCompareWith/${profile.handle}`;
+
+                            try {
+                                await navigator.share({
+                                    title: `Compare with with ${profile.name}`,
+                                    text: `${liquidUser?.name} is inviting you to compare ${liquidUser?.handle === profile.handle ? 'with him' : `with ${profile.name}`}`,
+                                    url: inviteLink
+                                })
+
+                            } catch (err) {
+                                updateParams({
+                                    paramsToAdd: {
+                                        modal: "InviteFor",
+                                        modalData: JSON.stringify({
+                                            InviteType: 'toCompare',
+                                            userHandle: profile.handle,
+                                            userName: profile.name,
+                                            inviteLink
+                                        })
+                                    }
+                                })
+                            }
+                        }}
+                    >
+                        <InviteTinySvg />
+                    </div>
                     {profile.isThisUser ? (
                         <>
                             <div
@@ -162,7 +208,14 @@ export const Profile: FunctionComponent<{}> = ({ }) => {
                 </div>
             </div>
             <h2 className="profile-name white mt-2">{profile.name}</h2>
-            <p className="profile-handle">@{profile.handle}</p>
+            <div className="d-flex align-items-center">
+                <p className="profile-handle">@{profile.handle}</p>
+                {profile.followsYou ? (
+                    <small
+                        className={`badge ml-2 mt-n1`}
+                    >follows you</small>
+                ) : null}
+            </div>
             <div className="profile-description pre-wrap">
                 {profile.bio}
             </div>
@@ -192,20 +245,32 @@ export const Profile: FunctionComponent<{}> = ({ }) => {
             </div>
             <div className="profile-stats-container mt-1 flex-nowrap">
                 <div className="mr-1"><ProfileSmallSVG /></div>
-                <div className="d-flex flex-wrap">
-                    <Link to={`/profile-people/${profile.handle}/representedBy`} className="mr-2">
-                        Representing{' '}<b className="white">{profile?.stats?.representedBy}</b>
-                    </Link>
-                    <Link to={`/profile-people/${profile.handle}/representing`} className="mr-2">
-                        Represented by{' '}<b className="white">{profile?.stats?.representing}</b>
-                    </Link>
+                <div className="d-flex flex-column">
+                    <div className="d-flex flex-wrap align-items-center">
+                        <Link to={`/profile-people/${profile.handle}/representedBy`} className="mr-2">
+                            Following {' '}<b className="white">{profile?.stats?.following}</b>
+                        </Link>
+                        <Link to={`/profile-people/${profile.handle}/representing`} className="mr-2">
+                            Followed by{' '}<b className="white">{profile?.stats?.followedBy}</b>
+                        </Link>
+                    </div>
+                    {(profile?.stats?.representedBy || profile?.stats?.representing) ? (
+                        <div className="d-flex flex-wrap">
+                            <Link to={`/profile-people/${profile.handle}/representedBy`} className="mr-2">
+                                Representing{' '}<b className="white">{profile?.stats?.representedBy}</b>
+                            </Link>
+                            <Link to={`/profile-people/${profile.handle}/representing`} className="mr-2">
+                                Represented by{' '}<b className="white">{profile?.stats?.representing}</b>
+                            </Link>
+                        </div>
+                    ) : null}
                 </div>
-                {/* {profile?.yourStats?.groupsInCommon && (
+            </div>
+            {/* {profile?.yourStats?.groupsInCommon && (
                     <Link to={`/profile-people/${profile.handle}/groups`} className="mr-2">
                         <b>{profile?.yourStats?.groupsInCommon}</b> Groups in common
                     </Link>
                 )} */}
-            </div>
 
             {/* <div className="profile-stats-container mb-2 mt-2 flex-nowrap">
                 <div className="mr-1"><DropSVG /></div>
@@ -327,16 +392,20 @@ export const Profile: FunctionComponent<{}> = ({ }) => {
                         <b>{profile?.stats?.groupsJoined}</b> Causes
                     </Link>
                 </li>
-                {/* <li className="nav-item">
-                    <Link className={`nav-link ${section === 'votes' && 'active'}`} to={`/profile/${handle}/votes`}>
-                        <b>{profile?.stats?.directVotesMade}</b> Votes
-                    </Link>
-                </li> */}
+                {profile?.stats?.pollsCreated ? (
+                    <li className="nav-item">
+                        <Link className={`nav-link ${section === 'polls' && 'active'}`} to={`/profile/${handle}/polls`}>
+                            <b>{profile?.stats?.pollsCreated}</b> Polls Launched
+                        </Link>
+                    </li>
+                ) : null}
             </ul>
 
             <hr className="mt-n4" />
 
             {(!section || section === 'groups' || !!groupHandle) && <ProfileGroups />}
+            {(section === 'polls') && <ProfilePolls />}
+            {(section === 'followings') && <ProfileFollowings />}
 
             {/* {(section === 'votes') && <ProfileVotes />} */}
         </>

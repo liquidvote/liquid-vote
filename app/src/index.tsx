@@ -57,18 +57,19 @@ const AppolloAppWrapper: FunctionComponent<{}> = ({ }) => {
                 keyFields: [
                     "handle"
                 ],
-                fields: {
-                    representativeRelation: {
-                        read(_, { args, toReference }) {
-                            return args ? toReference({
-                                __typename: 'UserRepresentativeGroupRelation',
-                                groupId: args?.groupId,
-                                representativeId: args?.representativeId,
-                                representeeId: args?.representeeId,
-                            }) : null;
-                        }
-                    },
-                }
+                // fields: {
+                //     representativeRelation: {
+                //         read(_, { args, toReference }) {
+                //             return args ? toReference({
+                //                 __typename: 'UserRepresentativeGroupRelation',
+                //                 groupId: args?.groupId,
+                //                 representativeId: args?.representativeId,
+                //                 representeeId: args?.representeeId,
+                //                 createdOn: args?.createdOn
+                //             }) : null;
+                //         }
+                //     },
+                // }
             },
             // User: {
             //     keyFields: ["handle"],

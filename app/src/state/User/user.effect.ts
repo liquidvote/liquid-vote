@@ -5,7 +5,7 @@ import { USER } from "@state/User/typeDefs";
 export default function useUser({
     userHandle
 }: {
-    userHandle: string
+    userHandle?: string
 }) {
     const {
         loading: user_loading,

@@ -10,6 +10,9 @@ export const UserTypeDefs = gql`
         directVotesMade: Int                    # inUse
         indirectVotesMadeByUser: Int            
         indirectVotesMadeForUser: Int           # inUse
+        pollsCreated: Int
+        following: Int
+        followedBy: Int
     }
 
     type YourUserStats {
@@ -78,6 +81,8 @@ export const UserTypeDefs = gql`
         ): [User]
         UserRepresenting(handle: String, groupHandle: String): [User] # Users that this user is representing
         UserRepresentedBy(handle: String, groupHandle: String, representativeHandle: String): [User] # Users that this user is represented by
+        UserFollowing(handle: String, groupHandle: String): [User]
+        UserFollowedBy(handle: String, groupHandle: String, representativeHandle: String): [User]
         UserGroups(
             handle: String,
             representative: String,

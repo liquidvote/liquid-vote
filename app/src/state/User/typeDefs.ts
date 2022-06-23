@@ -25,6 +25,9 @@ export const USER = gql`
             directVotesMade
             indirectVotesMadeByUser
             indirectVotesMadeForUser
+            pollsCreated
+            following
+            followedBy
         }
         yourStats {
             votesInCommon
@@ -154,6 +157,15 @@ export const USER_GROUPS = gql`
             createdOn
             lastEditOn
         }
+        youToHimRepresentativeRelation {
+            representativeId
+            representeeId
+            groupId
+            isRepresentingYou
+            isGroupMember
+            createdOn
+            lastEditOn
+        }
         stats {
             lastDirectVoteOn
             members
@@ -215,7 +227,9 @@ export const USER_GROUPS = gql`
 export const USER_QUESTIONS = gql`
   query($handle: String, $sortBy: String, $notUsers: Boolean) {
     UserQuestions(handle: $handle, sortBy: $sortBy, notUsers: $notUsers) {
+        _id
         questionText
+        description
         questionType
         startText
         choices {
@@ -226,7 +240,28 @@ export const USER_QUESTIONS = gql`
             yourVote {
                 ...vote
             }
+            yourStats {
+                votersYouFollow {
+                handle
+                avatar
+                name
+                stats {
+                    directVotesMade
+                }
+                yourStats {
+                    directVotesInCommon
+                    directVotesInAgreement
+                    directVotesInDisagreement
+                    indirectVotesMadeByYou
+                    indirectVotesMadeForYou
+                }
+                vote {
+                    position
+                }
+                }
+            }
         }
+        allowNewChoices
         groupChannel {
             group
             channel
@@ -237,7 +272,27 @@ export const USER_QUESTIONS = gql`
             ...stats
         }
         yourVote {
-          ...vote
+            ...vote
+        }
+        yourStats {
+            votersYouFollow {
+                handle
+                avatar
+                name
+                stats {
+                    directVotesMade
+                }
+                yourStats {
+                    directVotesInCommon
+                    directVotesInAgreement
+                    directVotesInDisagreement
+                    indirectVotesMadeByYou
+                    indirectVotesMadeForYou
+                }
+                vote {
+                    position
+                }
+            }
         }
         createdOn
         lastEditOn
@@ -247,74 +302,110 @@ export const USER_QUESTIONS = gql`
             cover
             name
         }
-    }
-  }
-
-  fragment stats on QuestionStats {
-		lastVoteOn
-        forCount
-        forDirectCount
-        forMostRepresentingVoters {
+        createdBy {
+            name
             handle
             avatar
-            name
-            representeeCount
         }
-        againstCount
-        againstMostRepresentingVoters {
-            handle
-            avatar
-            name
-            representeeCount
-        }
-        againstDirectCount
-        directVotes
-        indirectVotes
     }
+}
 
-    fragment vote on Vote {
-        # _id
+fragment stats on QuestionStats {
+    lastVoteOn
+    forCount
+    forDirectCount
+    forMostRepresentingVoters {
+        handle
+        avatar
+        name
+        representeeCount
+        stats{
+            directVotesMade
+        }
+        yourStats {
+            directVotesInCommon
+            directVotesInAgreement
+            directVotesInDisagreement
+            indirectVotesMadeByYou
+            indirectVotesMadeForYou
+        }
+    }
+    againstCount
+    againstMostRepresentingVoters {
+        handle
+        avatar
+        name
+        representeeCount
+        stats{
+            directVotesMade
+        }
+        yourStats {
+            directVotesInCommon
+            directVotesInAgreement
+            directVotesInDisagreement
+            indirectVotesMadeByYou
+            indirectVotesMadeForYou
+        }
+    }
+    againstDirectCount
+    directVotes
+    indirectVotes
+}
+
+fragment vote on Vote {
+    # _id
+    questionText
+    choiceText
+    groupChannel {
+        group
+    }
+    position
+    isDirect
+    forWeight
+    againstWeight
+    representatives{
+        representativeHandle
+        representativeAvatar
+        representativeName
+        position
+        forWeight
+        againstWeight
+        createdOn
+        lastEditOn
+        stats{
+            directVotesMade
+        }
+        yourStats {
+            directVotesInCommon
+            directVotesInAgreement
+            directVotesInDisagreement
+            indirectVotesMadeByYou
+            indirectVotesMadeForYou
+        }
+
+    }
+    createdOn
+    lastEditOn
+    representeeVotes {
         questionText
         choiceText
         groupChannel {
             group
         }
-        position
         isDirect
-        forWeight
-        againstWeight
-        representatives{
-            representativeHandle
-            representativeAvatar
-            representativeName
-            position
-            forWeight
-            againstWeight
-            createdOn
-            lastEditOn
-        }
-        createdOn
-        lastEditOn
-        representeeVotes {
-            questionText
-            choiceText
-            groupChannel {
-                group
-            }
-            isDirect
-            position
-            user {
-                handle
-                name
-                avatar
-            }
-        }
+        position
         user {
             handle
             name
             avatar
         }
     }
+    user {
+        handle
+        name
+        avatar
+    }
+}
 `;
 
 export const EDIT_USER = gql`

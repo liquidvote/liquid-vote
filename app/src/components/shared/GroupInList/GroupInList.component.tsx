@@ -3,9 +3,9 @@ import { Link } from "react-router-dom";
 import { useQuery, useMutation } from "@apollo/client";
 import useAuthUser from '@state/AuthUser/authUser.effect';
 
-import LockSVG from "@shared/Icons/Lock.svg";
-import WorldSVG from "@shared/Icons/World.svg";
-import LinkSVG from "@shared/Icons/Link.svg";
+import LockSVG from "@shared/Icons/Lock-tiny.svg";
+import WorldSVG from "@shared/Icons/World-tiny.svg";
+import LinkSVG from "@shared/Icons/Link-tiny.svg";
 import useSearchParams from "@state/Global/useSearchParams.effect";
 import { EDIT_GROUP_MEMBER_CHANNEL_RELATION } from "@state/User/typeDefs";
 import Avatar from '@components/shared/Avatar';
@@ -49,12 +49,12 @@ export const GroupInList: FunctionComponent<{
                         <div className="d-flex align-items-center mb-1 ">
                             <Link to={`/group/${group.handle}`}><b>{group.name}</b></Link>
                             {/* <small className="mt-n1">@DanPriceSeattle</small> */}
-                            <div className="ml-2">
+                            <div className="ml-2 d-flex align-items-center">
                                 {group?.privacy === "private" ? (
-                                    <LockSVG />
+                                    <LockSVG data-tip="private" />
                                 ) : group?.privacy === "public" ? (
-                                    <WorldSVG />
-                                ) : <LinkSVG />}
+                                    <WorldSVG data-tip="public"  />
+                                ) : <LinkSVG data-tip="link only"  />}
                             </div>
                         </div>
                         <div className="d-flex mb-1 ml-n1">
@@ -96,7 +96,7 @@ export const GroupInList: FunctionComponent<{
                     <small className="d-flex mb-0">
                         {group.bio}
                     </small>
-                    <div className="d-flex ml-2 mt-2">
+                    <div className="d-flex ml-n5 mt-3">
                         {[
                             ...group.yourStats?.membersYouFollow || [],
                             ...group?.stats?.mostRepresentingMembers.filter(

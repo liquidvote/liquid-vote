@@ -352,9 +352,9 @@ export const UserResolvers = {
                         as: 'representativeUser'
                     }
                 },
-                ...(!! AuthUser._id) ? [
+                ...(!!AuthUser._id) ? [
                     ...userRepresentedByComparissons({ groupHandle, AuthUserId: AuthUser._id })
-                ]: []
+                ] : []
             ];
 
             const representativesAndGroups = (
@@ -735,11 +735,26 @@ export const UserResolvers = {
                             }))(RepresentativeGroupMemberRelations && RepresentativeGroupMemberRelations.find(
                                 r => r.groupId.toString() === g._id.toString()
                             )),
+                            youToHimRepresentativeRelation: await (async r => ({
+                                isGroupMember: !!r && r?.isMember,
+                                ...(!!r) && {
+                                    ... await mongoDB.collection("UserRepresentations")
+                                        .findOne({
+                                            representativeId: new ObjectId(AuthUser?._id),
+                                            representeeId: new ObjectId(Representative?._id),
+                                            groupId: new ObjectId(g?._id),
+                                        })
+                                }
+                            }))(RepresentativeGroupMemberRelations && RepresentativeGroupMemberRelations.find(
+                                r => r.groupId.toString() === g._id.toString()
+                            )),
                             yourUserStats: g.yourUserStats,
                             userStats: g.userStats,
                             yourStats: g.yourStats      //TODO: are these really needed here?
                         }
                     }))));
+
+            console.log({ GroupsR: Groups.map(r => r.representativeRelation) });
 
             return Groups;
         },
@@ -1078,7 +1093,7 @@ export const UserResolvers = {
 };
 
 export const getUserStats = async ({ userId, mongoDB }) => {
-
+    // TODO: combine with single aggregation that gets user, make it a materialised view too
     return ({
         lastDirectVoteOn: 0, // TODO
         representing: (
@@ -1137,6 +1152,21 @@ export const getUserStats = async ({ userId, mongoDB }) => {
                 "isDirect": false,
                 'position': { $ne: null },
                 "user": new ObjectId(userId)
+            }).count(),
+        pollsCreated: await mongoDB.collection("Questions")
+            .find({
+                "createdBy": new ObjectId(userId),
+                "status": { "$ne": "deleted" }
+            }).count(),
+        following: await mongoDB.collection("UserFollows")
+            .find({
+                "followingId": new ObjectId(userId),
+                "isFollowing": { "$eq": true }
+            }).count(),
+        followedBy: await mongoDB.collection("UserFollows")
+            .find({
+                "followedId": new ObjectId(userId),
+                "isFollowing": { "$eq": true }
             }).count(),
     });
 }

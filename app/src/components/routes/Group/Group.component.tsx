@@ -22,6 +22,7 @@ import { timeAgo } from '@state/TimeAgo';
 import { EDIT_GROUP_MEMBER_CHANNEL_RELATION } from "@state/User/typeDefs";
 import TopPageInvite from '@components/shared/TopPageInvite';
 import env from '@env';
+import InviteTinySvg from "@shared/Icons/Invite-tiny.svg";
 
 import GroupPolls from './GroupPolls';
 import GroupVotes from './GroupVotes';
@@ -133,19 +134,6 @@ export const Group: FunctionComponent<{}> = ({ }) => {
                         <>
                             <div
                                 className="button_ small mb-2 ml-2"
-                                onClick={() => updateParams({
-                                    paramsToAdd: {
-                                        modal: "ChooseRepresentatives",
-                                        modalData: JSON.stringify({
-                                            groupHandle: group.handle
-                                        })
-                                    }
-                                })}
-                            >
-                                Choose Representatives
-                            </div>
-                            <div
-                                className="button_ small mb-2 ml-2"
                                 onClick={async () => {
                                     const inviteLink = `${env.website}/invite/by/${liquidUser?.handle}/to/group/${group.handle}`;
 
@@ -171,7 +159,20 @@ export const Group: FunctionComponent<{}> = ({ }) => {
                                     }
                                 }}
                             >
-                                Invite Members
+                                <InviteTinySvg />
+                            </div>
+                            <div
+                                className="button_ small mb-2 ml-2"
+                                onClick={() => updateParams({
+                                    paramsToAdd: {
+                                        modal: "ChooseRepresentatives",
+                                        modalData: JSON.stringify({
+                                            groupHandle: group.handle
+                                        })
+                                    }
+                                })}
+                            >
+                                Choose Representatives
                             </div>
                         </>
                     )}

@@ -46,6 +46,7 @@ export default function App() {
                             <Route path="/invite/by/:userHandle/to/group/:handle" element={<Loader component={<Group />} />} />
                             <Route path="/invite/by/:userHandle/to/group/:handle/:acceptOnLogin" element={<Loader component={<Group />} />} />
                             <Route path="/invite/by/:handle/to/causeOnProfile/:groupHandle" element={<Loader component={<Profile />} />} />
+                            <Route path="/invite/by/:inviterHandle/toCompareWith/:handle" element={<Loader component={<Profile />} />} />
                             <Route path="/invite/by/:userHandle/to/voteOn/:voteName/:groupHandle" element={<Loader component={<Question />} />} />
 
                             <Route path="/poll/:voteName/:groupHandle/:section/:subsection/:subsubsection" element={<Loader component={<Question />} />} />

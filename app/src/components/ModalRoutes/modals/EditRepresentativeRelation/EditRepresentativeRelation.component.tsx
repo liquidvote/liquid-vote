@@ -46,9 +46,10 @@ export const EditRepresentativeRelation: FunctionComponent<{}> = ({ }) => {
     useEffect(() => {
         console.log({
             representative_data,
+            yourGroups,
             modalData
         })
-    }, [representative_data]);
+    }, [representative_data, yourGroups]);
 
     return (
         <form>
@@ -65,7 +66,7 @@ export const EditRepresentativeRelation: FunctionComponent<{}> = ({ }) => {
                     {!!yourGroups && [
                         ...yourGroups
                     ].
-                        filter((g: any) => g.representativeRelation.isGroupMember)?.
+                        filter((g: any) => g?.representativeRelation?.isGroupMember)?.
                         sort((a: any, b: any) => (
                             b.stats.members - a.stats.members ||
                             // +!!b.representativeRelation.isGroupMember - +!!a.representativeRelation.isGroupMember ||

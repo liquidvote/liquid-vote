@@ -135,7 +135,7 @@ export const GroupInProfileListVotes: FunctionComponent<{}> = ({ }) => {
                     {
                         (() => {
                             if (type === 'directVotesMade') {
-                                return 'hasn\'t answered directly to any direct polls';
+                                return 'hasn\'t answered directly to any polls';
                             } else if (type === 'directVotesInAgreement') {
                                 return 'hasn\'t agreed with you on any polls';
                             } else if (type === 'directVotesInDisagreement') {

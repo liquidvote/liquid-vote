@@ -467,7 +467,7 @@ export const getGroupStats = async ({ groupId, groupHandle, mongoDB, AuthUser })
         .toArray()
     )?.slice(0, 12);
 
-    console.log({ groupHandle, mostRepresentingMembers });
+    // console.log({ groupHandle, mostRepresentingMembers });
 
     return ({
         lastDirectVoteOn: 0,
