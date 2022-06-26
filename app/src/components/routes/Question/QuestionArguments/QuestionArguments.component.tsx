@@ -52,7 +52,7 @@ export const QuestionArguments: FunctionComponent<{}> = ({ }) => {
 
             {arguments_data?.Arguments?.filter(a => a.user.handle !== liquidUser?.handle)?.
                 map(a =>
-                    <ArgumentInList key={a.user.handle} a={a} />
+                    <ArgumentInList key={a.user.handle} a={a} groupHandle={groupHandle} />
                 )
             }
         </>

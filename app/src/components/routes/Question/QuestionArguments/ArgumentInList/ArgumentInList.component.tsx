@@ -9,10 +9,11 @@ import LikedSVG from '@components/shared/Icons/Liked.svg';
 import { EDIT_ARGUMENT_UP_VOTE } from "@state/ArgumentUpVotes/typeDefs";
 import useAuthUser from '@state/AuthUser/authUser.effect';
 import useSearchParams from "@state/Global/useSearchParams.effect";
+import Avatar from "@components/shared/Avatar";
 
 import './style.sass';
 
-export const ArgumentInList: FunctionComponent<{ a: any }> = ({ a }) => {
+export const ArgumentInList: FunctionComponent<{ a: any, groupHandle: string }> = ({ a, groupHandle }) => {
 
     const { liquidUser } = useAuthUser();
     const { allSearchParams, updateParams } = useSearchParams();
@@ -29,13 +30,12 @@ export const ArgumentInList: FunctionComponent<{ a: any }> = ({ a }) => {
     return (
         <>
             <div className="d-flex">
-                <Link to={`/profile/${a.user?.handle}`}>
-                    <div
-                        className={`small-avatar bg`}
-                        style={{
-                            background: a.user?.avatar && `url(${a.user?.avatar}) 50% 50% / cover no-repeat`
-                        }}
-                    ></div>
+                <Link to={`/profile/${a.user?.handle}/cause/${groupHandle}`}>
+                    <Avatar
+                        person={a.user}
+                        type="small"
+                        groupHandle={groupHandle}
+                    />
                 </Link>
                 <div className="flex-fill">
                     <div className="mb-n1 flex-fill d-flex align-items-center justify-content-between">

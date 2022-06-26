@@ -174,7 +174,7 @@ export const UserResolvers = {
             // );
 
             return !!User ? {
-                id: User?._id,
+                id: User?.LiquidUser?.handle+groupHandle,
                 ...User?.LiquidUser,
                 isThisUser: !!AuthUser && AuthUser?.Auth0User?.sub === User?.Auth0User?.sub,
                 isRepresentingYou: User?.isRepresentingYou?.length || 0,
@@ -182,7 +182,7 @@ export const UserResolvers = {
                 ...!!AuthUser && (AuthUser._id.toString() !== User._id.toString()) && {
                     yourStats: User?.yourStats,
                 },
-                ...!!groupHandle && {
+                ...!!groupHandle && (AuthUser._id.toString() !== User._id.toString()) && {
                     groupStats: {
                         stats: User?.groupStats?.stats,
                         yourStats: User?.groupStats?.yourStats,

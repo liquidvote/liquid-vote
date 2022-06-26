@@ -1,6 +1,8 @@
 import React, { FunctionComponent } from 'react';
 import { Link } from "react-router-dom";
 
+import Avatar from "@components/shared/Avatar";
+
 import './style.sass';
 
 export const VotedExplanation: FunctionComponent<{
@@ -8,24 +10,25 @@ export const VotedExplanation: FunctionComponent<{
     representeeVotes?: any,
     representatives?: any,
     user?: any,
+    groupHandle?: string,
 }> = ({
     position,
     representeeVotes,
     representatives,
-    user
+    user,
+    groupHandle
 }) => {
         return position !== "delegated" ? (
             <div className="d-flex align-items-center">
                 {!!user && (
                     <span className="d-flex ml-1">
-                        <Link
-                            to={`/profile/${user.handle}`}
-                            className={`vote-avatar none tiny ml-n2`}
-                            style={{
-                                background: `url(${user.avatar}) 50% 50% / cover no-repeat`
-                            }}
-                            title={user.name}
-                        ></Link>
+                        <Link to={`/profile/${user.handle}/cause/${groupHandle}`}>
+                            <Avatar
+                                person={user}
+                                groupHandle={groupHandle}
+                                type="tiny"
+                            />
+                        </Link>
                     </span>
                 )}
                 <small className="d-inline-block mr-1">
@@ -42,13 +45,14 @@ export const VotedExplanation: FunctionComponent<{
                             {representeeVotes?.map((r: any) => (
                                 <Link
                                     key={`representeeVotes-${r.user.handle}`}
-                                    to={`/profile/${r.user.handle}`}
-                                    className={`vote-avatar none tiny ml-n2`}
-                                    style={{
-                                        background: `url(${r.user.avatar}) 50% 50% / cover no-repeat`
-                                    }}
-                                    title={r.user.name}
-                                ></Link>
+                                    to={`/profile/${r.user.handle}/cause/${groupHandle}`}
+                                >
+                                    <Avatar
+                                        person={r.user}
+                                        groupHandle={groupHandle}
+                                        type="tiny"
+                                    />
+                                </Link>
                             ))}
                         </div>
                     </small>
@@ -61,13 +65,14 @@ export const VotedExplanation: FunctionComponent<{
                             {representatives?.map((r: any, i: number) => (
                                 <Link
                                     key={`representatives-${r?.representativeHandle || i}`}
-                                    to={`/profile/${r?.representativeHandle}`}
-                                    className={`vote-avatar tiny ${position} ml-n2`}
-                                    style={{
-                                        background: `url(${r?.representativeAvatar}) 50% 50% / cover no-repeat`
-                                    }}
-                                    title={r?.representativeName}
-                                ></Link>
+                                    to={`/profile/${r?.representativeHandle}/cause/${groupHandle}`}
+                                >
+                                    <Avatar
+                                        person={r.user}
+                                        groupHandle={groupHandle}
+                                        type="tiny"
+                                    />
+                                </Link>
                             ))}
                         </span>
                     </small>

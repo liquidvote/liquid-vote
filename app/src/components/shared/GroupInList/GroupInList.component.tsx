@@ -53,8 +53,8 @@ export const GroupInList: FunctionComponent<{
                                 {group?.privacy === "private" ? (
                                     <LockSVG data-tip="private" />
                                 ) : group?.privacy === "public" ? (
-                                    <WorldSVG data-tip="public"  />
-                                ) : <LinkSVG data-tip="link only"  />}
+                                    <WorldSVG data-tip="public" />
+                                ) : <LinkSVG data-tip="link only" />}
                             </div>
                         </div>
                         <div className="d-flex mb-1 ml-n1">
@@ -103,20 +103,21 @@ export const GroupInList: FunctionComponent<{
                                 (m: any) => !group.yourStats?.membersYouFollow.find((mm: any) => mm.handle === m.handle)
                             )
                         ].slice(0, 12).map((m: any) => (
-                        <Link
-                            key={m.handle}
-                            to={`/profile/${m.handle}/cause/${group.handle}`}
-                            title={`${m.name}`}
-                        >
-                            <Avatar
-                                person={{
-                                    ...m,
-                                    yourStats: m.yourStats,
-                                    stats: m.stats
-                                }}
-                                type="vote"
-                            />
-                        </Link>
+                            <Link
+                                key={m.handle+group.handle}
+                                to={`/profile/${m.handle}/cause/${group.handle}`}
+                                title={`${m.name}`}
+                            >
+                                <Avatar
+                                    person={{
+                                        ...m,
+                                        yourStats: m.yourStats,
+                                        stats: m.stats
+                                    }}
+                                    groupHandle={group.handle}
+                                    type="vote"
+                                />
+                            </Link>
                         ))}
                         <Link
                             to={`/group-people/${group.handle}/members`}

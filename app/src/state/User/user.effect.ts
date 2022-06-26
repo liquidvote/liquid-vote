@@ -3,9 +3,11 @@ import { useQuery, useMutation } from "@apollo/client";
 import { USER } from "@state/User/typeDefs";
 
 export default function useUser({
-    userHandle
+    userHandle,
+    groupHandle
 }: {
-    userHandle?: string
+    userHandle?: string,
+    groupHandle?: string
 }) {
     const {
         loading: user_loading,
@@ -13,7 +15,7 @@ export default function useUser({
         data: user_data,
         refetch: user_refetch
     } = useQuery(USER, {
-        variables: { handle: userHandle },
+        variables: { handle: userHandle, groupHandle },
         skip: userHandle === "new" || !userHandle
     });
 

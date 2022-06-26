@@ -240,6 +240,7 @@ export const Choice: FunctionComponent<{
                                                         yourStats: forRepresentatives[0].yourStats,
                                                         stats: forRepresentatives[0].stats
                                                     }}
+                                                    groupHandle={groupHandle}
                                                     type={inList ? 'tiny' : 'vote'}
                                                 />
                                             </Link>
@@ -275,6 +276,7 @@ export const Choice: FunctionComponent<{
                                             person={{
                                                 ...liquidUser
                                             }}
+                                            groupHandle={groupHandle}
                                             type={inList ? 'tiny' : 'vote'}
                                         />
                                     </div>
@@ -307,6 +309,7 @@ export const Choice: FunctionComponent<{
                                     <div key={`forDisplayedVoters-${p?.handle}`} className="ml-n1">
                                         <Avatar
                                             person={p}
+                                            groupHandle={groupHandle}
                                             type={inList ? 'tiny' : 'vote'}
                                         />
                                     </div>
@@ -345,6 +348,7 @@ export const Choice: FunctionComponent<{
                                         <div key={`againstDisplayedVoters-${p?.handle}`} className="ml-n1">
                                             <Avatar
                                                 person={p}
+                                                groupHandle={groupHandle}
                                                 type={inList ? 'tiny' : 'vote'}
                                             />
                                         </div>
@@ -406,6 +410,7 @@ export const Choice: FunctionComponent<{
                                                         yourStats: againstRepresentatives[0].yourStats,
                                                         stats: againstRepresentatives[0].stats
                                                     }}
+                                                    groupHandle={groupHandle}
                                                     type={inList ? 'tiny' : 'vote'}
                                                 />
                                             </Link>
@@ -440,6 +445,7 @@ export const Choice: FunctionComponent<{
                                             person={{
                                                 ...liquidUser
                                             }}
+                                            groupHandle={groupHandle}
                                             type={inList ? 'tiny' : 'vote'}
                                         />
                                     </div>

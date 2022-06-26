@@ -34,6 +34,7 @@ export const UserTypeDefs = gql`
     }
 
     type User {
+        id: ID
         handle: String
         name: String
         bio: String

@@ -82,6 +82,7 @@ export const GroupInProfileList: FunctionComponent<{
                                         yourStats: group.yourUserStats,
                                         stats: group.userStats
                                     }}
+                                    groupHandle={group?.handle}
                                     type="small"
                                 />
                             </Link>

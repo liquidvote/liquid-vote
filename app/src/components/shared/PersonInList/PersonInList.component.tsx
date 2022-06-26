@@ -4,12 +4,11 @@ import Avatar from '@components/shared/Avatar';
 
 import './style.sass';
 
-export const PersonInList: FunctionComponent<{ person: any }> = ({ person }) => {
-
+export const PersonInList: FunctionComponent<{ person: any, groupHandle?: string }> = ({ person, groupHandle }) => {
     return (
         <div className="d-flex relative border-bottom py-2">
             <Link to={`/profile/${person.handle}`}>
-                <Avatar person={person} type="small" />
+                <Avatar person={person} type="small" groupHandle={groupHandle} />
             </Link>
             <div className="flex-fill">
                 <div className="d-flex justify-content-between align-items-center flex-wrap">

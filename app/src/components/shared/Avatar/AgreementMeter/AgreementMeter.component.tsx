@@ -1,11 +1,17 @@
-import React, { FunctionComponent } from 'react';
+import React, { FunctionComponent, useEffect } from 'react';
 
 import './style.sass';
 
 export const AgreementMeter: FunctionComponent<{
-    type?: 'profile' | 'small' | 'vote', person?: any
+    inner?: boolean,
+    type?: 'profile' | 'small' | 'vote' | 'tiny',
+    yourStats?: any,
+    personStats?: any
 }> = ({
-    type = 'small', person
+    inner,
+    type = 'small',
+    yourStats,
+    personStats
 }) => {
 
         const circlePath = (cx: number, cy: number, r: number) => {
@@ -14,15 +20,15 @@ export const AgreementMeter: FunctionComponent<{
                 // "M "+cx+" "+cy+" m -"+r+", 0 a "+r+","+r+" 0 1,0 "+r * 2+",0 a "+r+","+r+" 0 1,0 -"+r * 2+",0"
             );
         };
-        const s = !person?.yourStats?.directVotesInCommon ? 0 : ((
-            person?.yourStats?.directVotesInAgreement + 0.1
+        const s = !yourStats?.directVotesInCommon ? 0 : ((
+            yourStats?.directVotesInAgreement + 0.1
         ) / (
-                person?.yourStats?.directVotesInCommon + 0.1
+                yourStats?.directVotesInCommon + 0.1
             )) * 100; //70;
-        const nn = person?.stats?.directVotesMade > person?.yourStats?.directVotesInCommon
+        const nn = personStats?.directVotesMade > yourStats?.directVotesInCommon
             ? ((
-                person?.stats?.directVotesMade - person?.yourStats?.directVotesInCommon
-            ) / person?.stats?.directVotesMade) * 60
+                personStats?.directVotesMade - yourStats?.directVotesInCommon
+            ) / personStats?.directVotesMade) * 60
             : 0  //0;
         const circle = 280;
         const path = circlePath(75, 75, 45);
@@ -30,7 +36,7 @@ export const AgreementMeter: FunctionComponent<{
         const disagreement = circle - agreement - 13 - nn * 3;
 
         return (
-            <div className={`circles ${type}`}>
+            <div className={`circles ${type} ${inner && 'inner'}`}>
                 {/* {s} - {nn} */}
                 <svg viewBox="0 0 150 150">
                     {/* <path className="bg" d={path} fill="none" /> */}
@@ -43,7 +49,7 @@ export const AgreementMeter: FunctionComponent<{
                                 strokeDashoffset: `${(s - nn) > 90 ? 0 : circle - agreement}`,
                                 transform: `rotate(${45 + agreement / 1.58}deg)`
                             }}
-                        />
+                        ><title>{`${yourStats?.directVotesInDisagreement} Votes in Disagreement`}</title></path>
 
                     )}
                     {s > 1 && s < 100 && (
@@ -55,7 +61,7 @@ export const AgreementMeter: FunctionComponent<{
                                 strokeDashoffset: `${(s + nn) < 10 ? 0 : circle - disagreement}`,
                                 transform: `rotate(${225 + disagreement / 1.58}deg)`
                             }}
-                        />
+                        ><title>{`${yourStats?.directVotesInDisagreement} Votes in Disagreement`}</title></path>
                     )}
                 </svg>
             </div>

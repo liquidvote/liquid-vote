@@ -105,13 +105,13 @@ export const QuestionsAgg = ({
 
         ...getYourStatsForRepresentatives_On_QuestionsAgg({ AuthUserId }),
 
-        ...getYourStatsForAgainstMostRepresentingVoters_On_QuestionsAgg({ AuthUserId }),
+        // ...getYourStatsForAgainstMostRepresentingVoters_On_QuestionsAgg({ AuthUserId }),
 
-        ...getYourStatsForAgainstMostRepresentingVoters_On_QuestionsChoicesAgg({ AuthUserId }),
+        // ...getYourStatsForAgainstMostRepresentingVoters_On_QuestionsChoicesAgg({ AuthUserId }),
 
-        ...getYourStatsForFortMostRepresentingVoters_On_QuestionsAgg({ AuthUserId }),
+        // ...getYourStatsForFortMostRepresentingVoters_On_QuestionsAgg({ AuthUserId }),
         
-        ...getYourStatsForForMostRepresentingVoters_On_QuestionsChoicesAgg({ AuthUserId }),
+        // ...getYourStatsForForMostRepresentingVoters_On_QuestionsChoicesAgg({ AuthUserId }),
 
         ...votersYouFollow({ AuthUserId }),
 

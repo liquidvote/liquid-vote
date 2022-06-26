@@ -9,6 +9,7 @@ import Choice from "@shared/Choice";
 import './style.sass';
 import { timeAgo } from '@state/TimeAgo';
 import VotedExplanation from '@shared/VotedExplanation';
+import Avatar from "@components/shared/Avatar";
 
 export const Notification: FunctionComponent<{
     v: any,
@@ -39,12 +40,17 @@ export const Notification: FunctionComponent<{
                 <div className="d-flex relative align-items-center">
                     {!!showUser && (
                         <Link to={`/profile/${v.user?.handle}`}>
-                            <div
+                            <Avatar
+                                person={v.user}
+                                groupHandle={v?.groupChannel?.group}
+                                type="small"
+                            />
+                            {/* <div
                                 className={`small-avatar bg`}
                                 style={{
                                     background: v.user?.avatar && `url(${v.user?.avatar}) 50% 50% / cover no-repeat`
                                 }}
-                            ></div>
+                            ></div> */}
                         </Link>
                     )}
                     <div className="flex-fill">
@@ -64,8 +70,9 @@ export const Notification: FunctionComponent<{
                                             representeeVotes={userVote.representeeVotes}
                                             representatives={userVote.representatives}
                                             user={v.user}
+                                            groupHandle={v?.groupChannel?.group}
                                         />
-                                    ): ''} 
+                                    ) : ''}
                                 </div>
                             </div>
                             {(

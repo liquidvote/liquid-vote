@@ -1,8 +1,9 @@
 import { gql, useMutation } from '@apollo/client';
 
 export const USER = gql`
-  query($handle: String!) {
-    User(handle: $handle) {
+  query($handle: String!, $groupHandle: String) {
+    User(handle: $handle, groupHandle: $groupHandle) {
+        id
         handle,
         name,
         bio,
@@ -36,6 +37,25 @@ export const USER = gql`
             directVotesInDisagreement
             indirectVotesMadeByYou
             indirectVotesMadeForYou
+        }
+        groupStats {
+          stats {
+            lastDirectVoteOn
+            representing
+            representedBy
+            directVotesMade
+            indirectVotesMadeByUser
+            indirectVotesMadeForUser
+            pollsCreated
+          }
+          yourStats {
+              votesInCommon
+              directVotesInCommon
+              directVotesInAgreement
+              directVotesInDisagreement
+              indirectVotesMadeByYou
+              indirectVotesMadeForYou
+          }
         }
     }
   }
