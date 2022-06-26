@@ -270,7 +270,7 @@ export const Choice: FunctionComponent<{
                                 }
 
                                 {yourVote_ === 'for' && (
-                                    <div className="d-flex ml-2 my-n2 mr-n1">
+                                    <div className={`d-flex ml-2 my-n2 ${inList ? 'mr-n1' : 'mr-n2'}`}>
                                         <Avatar
                                             person={{
                                                 ...liquidUser

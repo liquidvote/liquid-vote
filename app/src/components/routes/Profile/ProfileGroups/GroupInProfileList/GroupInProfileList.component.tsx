@@ -108,7 +108,7 @@ export const GroupInProfileList: FunctionComponent<{
                                                 ) : <LinkSVG />}
                                             </div>
                                         </div>
-                                        <small>
+                                        <small className='primary-color'>
                                             {group.representativeRelation?.isRepresentingYou && !group.youToHimRepresentativeRelation?.isRepresentingYou ? "represents you" : ""}
                                             {!group.representativeRelation?.isRepresentingYou && group.youToHimRepresentativeRelation?.isRepresentingYou ? "represented by you" : ""}
                                             {group.representativeRelation?.isRepresentingYou && group.youToHimRepresentativeRelation?.isRepresentingYou ? "you represent each other" : ""}
@@ -249,20 +249,25 @@ export const GroupInProfileList: FunctionComponent<{
 
                     <Link
                         style={{ marginLeft: 58 }}
-                        className="d-flex text-decoration-none pb-1"
+                        className="d-flex flex-column text-decoration-none"
                         to={isSelected ? `/profile/${user.handle}` : `/profile/${user.handle}/cause/${group.handle}`}
                     >
-                        <small className="d-flex mb-0">
-                            <b className='white mr-1'>{' '}{group?.userStats?.directVotesMade}</b> votes
+                        <div className="d-flex">
+                            <small className="d-flex mb-0">
+                                <b className='white mr-1'>{' '}{group?.userStats?.directVotesMade}</b> votes
+                            </small>
+                            {!!group?.yourUserStats?.directVotesInCommon && (
+                                <>
+                                    ・
+                                    <small className="d-flex mb-0">
+                                        <b className='white mr-1'>{' '}{group?.yourUserStats?.directVotesInCommon}</b> in common
+                                    </small>
+                                </>
+                            )}
+                        </div>
+                        <small className='white'>
+                            {isSelected ? 'hide' : 'show'} votes
                         </small>
-                        {!!group?.yourUserStats?.directVotesInCommon && (
-                            <>
-                                ・
-                                <small className="d-flex mb-0">
-                                    <b className='white mr-1'>{' '}{group?.yourUserStats?.directVotesInCommon}</b> in common
-                                </small>
-                            </>
-                        )}
                         {/* <div style={{ marginRight: 2, marginTop: -5 }}>⬇</div> */}
                     </Link>
 

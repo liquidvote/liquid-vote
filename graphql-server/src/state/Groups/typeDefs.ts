@@ -42,7 +42,7 @@ export const GroupTypeDefs = gql`
         thisUserIsAdmin: Boolean
         userMemberRelation: GroupMemberRelation
         yourMemberRelation: GroupMemberRelation
-        representativeRelation: UserRepresentativeGroupRelation
+        representativeRelation: UserRepresentativeGroupRelation # him to you
         youToHimRepresentativeRelation: UserRepresentativeGroupRelation
         stats: GroupStats
         yourStats: YourGroupStats

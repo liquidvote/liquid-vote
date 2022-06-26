@@ -248,10 +248,10 @@ export const Profile: FunctionComponent<{}> = ({ }) => {
                 <div className="d-flex flex-column">
                     <div className="d-flex flex-wrap align-items-center">
                         <Link to={`/profile-people/${profile.handle}/representedBy`} className="mr-2">
-                            Following {' '}<b className="white">{profile?.stats?.following}</b>
+                            Following {' '}<b className="white">{profile?.stats?.following || 0}</b>
                         </Link>
                         <Link to={`/profile-people/${profile.handle}/representing`} className="mr-2">
-                            Followed by{' '}<b className="white">{profile?.stats?.followedBy}</b>
+                            Followed by{' '}<b className="white">{profile?.stats?.followedBy || 0}</b>
                         </Link>
                     </div>
                     {(profile?.stats?.representedBy || profile?.stats?.representing) ? (

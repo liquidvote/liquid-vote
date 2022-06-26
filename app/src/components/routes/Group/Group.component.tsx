@@ -262,6 +262,12 @@ export const Group: FunctionComponent<{}> = ({ }) => {
                         group?.yourStats && (
                             <>
                                 <Link className="mr-2" to={`/group-people/${group?.handle}/representingYou`}>
+                                    <b className="white">{0}</b> Following you
+                                </Link>
+                                <Link className="mr-2" to={`/group-people/${group?.handle}/representingYou`}>
+                                    <b className="white">{0}</b> Followed by you
+                                </Link>
+                                <Link className="mr-2" to={`/group-people/${group?.handle}/representingYou`}>
                                     <b className="white">{group?.yourStats.representing || 0}</b> Representing you
                                 </Link>
                                 <Link to={`/group-people/${group?.handle}/representedByYou`}>
@@ -272,7 +278,7 @@ export const Group: FunctionComponent<{}> = ({ }) => {
                     }
                 </div>
             </div>
-            <div className="profile-stats-container flex-nowrap mb-4 mt-2">
+            {/* <div className="profile-stats-container flex-nowrap mb-4 mt-2">
                 <div className="mr-1"><DropSVG /></div>
                 <div className="d-flex flex-wrap">
                     <div
@@ -344,11 +350,11 @@ export const Group: FunctionComponent<{}> = ({ }) => {
                         )
                     }
                 </div>
-            </div>
+            </div> */}
 
             {
                 isMember && (
-                    <div className="d-flex justify-content-center">
+                    <div className="d-flex justify-content-center mt-3 mb-3">
                         <div
                             onClick={() => updateParams({
                                 paramsToAdd: {

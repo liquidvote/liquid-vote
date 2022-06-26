@@ -15,6 +15,11 @@ export const UserTypeDefs = gql`
         followedBy: Int
     }
 
+    type UserGroupStats {
+        directVotesMade: Int
+        yourStats: YourUserStats
+    }
+
     type YourUserStats {
         # groupsInCommon: Int
         votesInCommon: Int
@@ -45,6 +50,7 @@ export const UserTypeDefs = gql`
         isYouFollowing: Boolean
         stats: UserStats
         yourStats: YourUserStats
+        groupStats: UserGroupStats
         vote: Vote                          # for when used on 
 
         representationGroups: [Group]
@@ -72,7 +78,7 @@ export const UserTypeDefs = gql`
     }
 
     extend type Query {
-        User(handle: String): User
+        User(handle: String, groupHandle: String): User
         SearchUsers(
             text: String,
             notInGroup: String,
