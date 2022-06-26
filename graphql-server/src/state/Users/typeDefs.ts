@@ -16,7 +16,7 @@ export const UserTypeDefs = gql`
     }
 
     type UserGroupStats {
-        directVotesMade: Int
+        stats: UserStats
         yourStats: YourUserStats
     }
 
@@ -51,7 +51,7 @@ export const UserTypeDefs = gql`
         stats: UserStats
         yourStats: YourUserStats
         groupStats: UserGroupStats
-        vote: Vote                          # for when used on 
+        vote: Vote
 
         representationGroups: [Group]
     }

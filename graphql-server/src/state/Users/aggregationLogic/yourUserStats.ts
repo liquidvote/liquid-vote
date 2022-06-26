@@ -1,9 +1,9 @@
 import { ObjectId } from 'mongodb';
 import { votesInCommonPipelineForVotes } from './votesInCommonPipelineForVotes';
 
-export const yourUserStatsAgg = ({ AuthUser }) =>  [{
+export const yourUserStatsAgg = ({ AuthUser, groupHandle }) => [{
     '$lookup': {
-        'as': 'yourStats',
+        'as': 'yourStats_',
         'from': 'Votes',
         'let': {
             'userId': '$_id',
@@ -19,14 +19,30 @@ export const yourUserStatsAgg = ({ AuthUser }) =>  [{
                                 ]
                             }
                         },
+                        ...(!!groupHandle) ? [
+                            {
+                                '$expr': {
+                                    '$eq': ['$groupChannel.group', groupHandle]
+                                }
+                            }
+                        ] : [],
                     ],
                 }
             },
-            ...votesInCommonPipelineForVotes()
+
+            ...votesInCommonPipelineForVotes(),
         ]
+    },
+},
+...(!groupHandle) ? [
+    {
+        '$addFields': {
+            'yourStats': { '$first': '$yourStats_' }
+        }
     }
-}, {
+] : [{
     '$addFields': {
-        'yourStats': { '$first': '$yourStats' }
+        'groupStats.yourStats': { '$first': '$yourStats_' }
     }
-}]
+}],
+]

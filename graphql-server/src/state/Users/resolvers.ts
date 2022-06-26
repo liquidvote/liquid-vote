@@ -15,6 +15,9 @@ export const UserResolvers = {
     Query: {
         User: async (_source, { handle, groupHandle }, { mongoDB, AuthUser }) => {
 
+            const group = !!groupHandle && await mongoDB.collection("Groups")
+                .findOne({ 'handle': groupHandle });
+
             const UserAgg = [
                 {
                     '$match': {
@@ -107,10 +110,56 @@ export const UserResolvers = {
                         ]
                     },
                 }] : [],
-                ...userStatsAgg(),
-                ...(!!AuthUser?._id) ? [...yourUserStatsAgg({ AuthUser })] : [],
-                // groupStats & groupStats.yourStats
+                ...userStatsAgg({ groupHandle: null, groupId: null  }),
+                ...(!!AuthUser?._id) ? [...yourUserStatsAgg({ AuthUser, groupHandle: null })] : [],
+                ...(!!groupHandle) ? [
+                    // groupStats.stats & groupStats.yourStats
+                    ...userStatsAgg({ groupHandle, groupId: group._id  }),
+                    ...yourUserStatsAgg({ AuthUser, groupHandle })
+                ] : [],
                 // isRepresentingYou
+                ...(!!AuthUser?._id) ? [{
+                    '$lookup': {
+                        'as': 'isRepresentingYou',
+                        'from': 'UserRepresentations',
+                        'let': {
+                            'userId': '$_id',
+                        },
+                        'pipeline': [
+                            {
+                                '$match': {
+                                    '$and': [
+                                        {
+                                            '$expr': {
+                                                '$eq': [
+                                                    '$representativeId', {
+                                                        '$toObjectId': '$$userId'
+                                                    }
+                                                ]
+                                            }
+                                        },
+                                        {
+                                            '$expr': {
+                                                '$eq': [
+                                                    '$representeeId', {
+                                                        '$toObjectId': ObjectId(AuthUser._id)
+                                                    }
+                                                ]
+                                            }
+                                        },
+                                        {
+                                            '$expr': {
+                                                '$eq': [
+                                                    '$isRepresentingYou', true
+                                                ]
+                                            }
+                                        },
+                                    ],
+                                }
+                            },
+                        ]
+                    },
+                }] : [],
             ]
 
             const User = (await mongoDB.collection("Users")
@@ -118,27 +167,27 @@ export const UserResolvers = {
             )?.[0];
 
 
-            const writeToDebugFile = fs.writeFile(
-                process.cwd() + '/debug' + '/User.json',
-                JSON.stringify({ UserAgg }, null, 2),
-                { encoding: 'utf8' }
-            );
+            // const writeToDebugFile = fs.writeFile(
+            //     process.cwd() + '/debug' + '/User.json',
+            //     JSON.stringify({ UserAgg }, null, 2),
+            //     { encoding: 'utf8' }
+            // );
 
             return !!User ? {
                 id: User?._id,
                 ...User?.LiquidUser,
                 isThisUser: !!AuthUser && AuthUser?.Auth0User?.sub === User?.Auth0User?.sub,
-                isRepresentingYou: (await mongoDB.collection("UserRepresentations")
-                    .find({
-                        "representativeId": new ObjectId(User._id),
-                        "representeeId": new ObjectId(AuthUser?._id),
-                        "isRepresentingYou": true
-                    }).count()) || 0,
+                isRepresentingYou: User?.isRepresentingYou?.length || 0,
                 stats: User?.stats,
                 ...!!AuthUser && (AuthUser._id.toString() !== User._id.toString()) && {
                     yourStats: User?.yourStats,
                 },
-                // groupStats. 
+                ...!!groupHandle && {
+                    groupStats: {
+                        stats: User?.groupStats?.stats,
+                        yourStats: User?.groupStats?.yourStats,
+                    },
+                },
                 isFollowingYou: User.isFollowingYou?.length === 1,
                 isYouFollowing: User.isYouFollowing?.length === 1,
             } : {};

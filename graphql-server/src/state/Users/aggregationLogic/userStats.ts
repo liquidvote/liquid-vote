@@ -1,4 +1,6 @@
-export const userStatsAgg = () => [
+import { ObjectId } from 'mongodb';
+
+export const userStatsAgg = ({ groupHandle, groupId }) => [
     {
         '$lookup': {
             'as': 'stats_representing',
@@ -24,7 +26,14 @@ export const userStatsAgg = () => [
                                         '$isRepresentingYou', true
                                     ]
                                 }
-                            }
+                            },
+                            ...(!!groupId) ? [
+                                {
+                                    '$expr': {
+                                        '$eq': ['$groupId', new ObjectId(groupId)]
+                                    }
+                                }
+                            ] : [],
                         ]
                     }
                 }, {
@@ -63,7 +72,14 @@ export const userStatsAgg = () => [
                                         '$isRepresentingYou', true
                                     ]
                                 }
-                            }
+                            },
+                            ...(!!groupId) ? [
+                                {
+                                    '$expr': {
+                                        '$eq': ['$groupId', new ObjectId(groupId)]
+                                    }
+                                }
+                            ] : [],
                         ]
                     }
                 }, {
@@ -77,7 +93,8 @@ export const userStatsAgg = () => [
                 }
             ]
         }
-    }, {
+    },
+    ...(!groupId) ? [{
         '$lookup': {
             'as': 'stats_groupsJoined',
             'from': 'GroupMembers',
@@ -102,7 +119,7 @@ export const userStatsAgg = () => [
                                         '$isMember', true
                                     ]
                                 }
-                            }
+                            },
                         ]
                     }
                 }, {
@@ -110,7 +127,8 @@ export const userStatsAgg = () => [
                 }
             ]
         }
-    }, {
+    }] : [],
+    {
         '$lookup': {
             'as': 'stats_directVotesMade',
             'from': 'Votes',
@@ -141,7 +159,14 @@ export const userStatsAgg = () => [
                                         '$position', null
                                     ]
                                 }
-                            }
+                            },
+                            ...(!!groupHandle) ? [
+                                {
+                                    '$expr': {
+                                        '$eq': ['$groupChannel.group', groupHandle]
+                                    }
+                                }
+                            ] : [],
                         ]
                     }
                 }, {
@@ -202,7 +227,14 @@ export const userStatsAgg = () => [
                                         '$position', null
                                     ]
                                 }
-                            }
+                            },
+                            ...(!!groupHandle) ? [
+                                {
+                                    '$expr': {
+                                        '$eq': ['$groupChannel.group', groupHandle]
+                                    }
+                                }
+                            ] : [],
                         ]
                     }
                 }, {
@@ -241,7 +273,14 @@ export const userStatsAgg = () => [
                                         '$position', null
                                     ]
                                 }
-                            }
+                            },
+                            ...(!!groupHandle) ? [
+                                {
+                                    '$expr': {
+                                        '$eq': ['$groupChannel.group', groupHandle]
+                                    }
+                                }
+                            ] : [],
                         ]
                     }
                 }, {
@@ -274,7 +313,14 @@ export const userStatsAgg = () => [
                                         '$status', 'deleted'
                                     ]
                                 }
-                            }
+                            },
+                            ...(!!groupHandle) ? [
+                                {
+                                    '$expr': {
+                                        '$eq': ['$groupChannel.group', groupHandle]
+                                    }
+                                }
+                            ] : [],
                         ]
                     }
                 }, {
@@ -282,7 +328,8 @@ export const userStatsAgg = () => [
                 }
             ]
         }
-    }, {
+    },
+    ...(!groupId) ? [{
         '$lookup': {
             'as': 'stats_following',
             'from': 'UserFollows',
@@ -348,38 +395,65 @@ export const userStatsAgg = () => [
                 }
             ]
         }
-    }, {
-        '$addFields': {
-            'stats.lastDirectVoteOn': {
-                '$first': '$stats_directVotesMade.lastEditOn'
-            },
-            'stats.representing': {
-                '$first': '$stats_representing.count'
-            },
-            'stats.representedBy': {
-                '$first': '$stats_representedBy.count'
-            },
-            'stats.groupsJoined': {
-                '$first': '$stats_groupsJoined.count'
-            },
-            'stats.directVotesMade': {
-                '$first': '$stats_directVotesMade.count'
-            },
-            'stats.indirectVotesMadeByUser': {
-                '$first': '$stats_indirectVotesMadeByUser.count'
-            },
-            'stats.indirectVotesMadeForUser': {
-                '$first': '$stats_indirectVotesMadeForUser.count'
-            },
-            'stats.pollsCreated': {
-                '$first': '$stats_pollsCreated.count'
-            },
-            'stats.following': {
-                '$first': '$stats_following.count'
-            },
-            'stats.followedBy': {
-                '$first': '$stats_followedBy.count'
+    }] : [],
+    ...(!groupId) ? [
+        {
+            '$addFields': {
+                'stats.lastDirectVoteOn': {
+                    '$first': '$stats_directVotesMade.lastEditOn'
+                },
+                'stats.representing': {
+                    '$first': '$stats_representing.count'
+                },
+                'stats.representedBy': {
+                    '$first': '$stats_representedBy.count'
+                },
+                'stats.groupsJoined': {
+                    '$first': '$stats_groupsJoined.count'
+                },
+                'stats.directVotesMade': {
+                    '$first': '$stats_directVotesMade.count'
+                },
+                'stats.indirectVotesMadeByUser': {
+                    '$first': '$stats_indirectVotesMadeByUser.count'
+                },
+                'stats.indirectVotesMadeForUser': {
+                    '$first': '$stats_indirectVotesMadeForUser.count'
+                },
+                'stats.pollsCreated': {
+                    '$first': '$stats_pollsCreated.count'
+                },
+                'stats.following': {
+                    '$first': '$stats_following.count'
+                },
+                'stats.followedBy': {
+                    '$first': '$stats_followedBy.count'
+                }
             }
         }
-    }
+    ] : [{
+        '$addFields': {
+            'groupStats.stats.lastDirectVoteOn': {
+                '$first': '$stats_directVotesMade.lastEditOn'
+            },
+            'groupStats.stats.representing': {
+                '$first': '$stats_representing.count'
+            },
+            'groupStats.stats.representedBy': {
+                '$first': '$stats_representedBy.count'
+            },
+            'groupStats.stats.directVotesMade': {
+                '$first': '$stats_directVotesMade.count'
+            },
+            'groupStats.stats.indirectVotesMadeByUser': {
+                '$first': '$stats_indirectVotesMadeByUser.count'
+            },
+            'groupStats.stats.indirectVotesMadeForUser': {
+                '$first': '$stats_indirectVotesMadeForUser.count'
+            },
+            'groupStats.stats.pollsCreated': {
+                '$first': '$stats_pollsCreated.count'
+            }
+        }
+    }],
 ];
