@@ -19,6 +19,7 @@ export const USER = gql`
         isFollowingYou
         isYouFollowing
         stats {
+            id
             lastDirectVoteOn
             representing
             representedBy
@@ -31,6 +32,7 @@ export const USER = gql`
             followedBy
         }
         yourStats {
+            id
             votesInCommon
             directVotesInCommon
             directVotesInAgreement

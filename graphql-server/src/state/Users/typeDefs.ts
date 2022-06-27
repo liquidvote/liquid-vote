@@ -3,6 +3,7 @@ import { gql } from "apollo-server-lambda";
 export const UserTypeDefs = gql`
 
     type UserStats {
+        id: ID
         lastDirectVoteOn: String
         representing: Int                       # inUse
         representedBy: Int                      # inUse
@@ -21,6 +22,7 @@ export const UserTypeDefs = gql`
     }
 
     type YourUserStats {
+        id: ID
         # groupsInCommon: Int
         votesInCommon: Int
         directVotesInCommon: Int                # inUse

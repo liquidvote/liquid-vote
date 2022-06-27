@@ -178,9 +178,15 @@ export const UserResolvers = {
                 ...User?.LiquidUser,
                 isThisUser: !!AuthUser && AuthUser?.Auth0User?.sub === User?.Auth0User?.sub,
                 isRepresentingYou: User?.isRepresentingYou?.length || 0,
-                stats: User?.stats,
+                stats: {
+                    id: User?.LiquidUser?.handle,
+                    ...User?.stats
+                },
                 ...!!AuthUser && (AuthUser._id.toString() !== User._id.toString()) && {
-                    yourStats: User?.yourStats,
+                    yourStats: {
+                        id: User?.LiquidUser?.handle,
+                        ...User?.yourStats
+                    }
                 },
                 ...!!groupHandle && (AuthUser._id.toString() !== User._id.toString()) && {
                     groupStats: {
