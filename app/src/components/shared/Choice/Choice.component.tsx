@@ -4,6 +4,7 @@ import numeral from 'numeral';
 import { useQuery, useMutation } from "@apollo/client";
 
 import { EDIT_VOTE } from '@state/Vote/typeDefs';
+import { USER } from "@state/User/typeDefs";
 import Chart from "@shared/VoteGraph1/chart.svg";
 import { voteStatsMap } from '@state/Question/map';
 import useAuthUser from '@state/AuthUser/authUser.effect';
@@ -50,7 +51,17 @@ export const Choice: FunctionComponent<{
             loading: editVote_loading,
             error: editVote_error,
             data: editVote_data,
-        }] = useMutation(EDIT_VOTE);
+        }] = useMutation(EDIT_VOTE, {
+            ...!!user && {
+                refetchQueries: () => [{
+                    query: USER,
+                    variables: {
+                        handle: user.handle,
+                        groupHandle
+                    },
+                }],
+            }
+        });
 
         const yourVote_ = editVote_data ? editVote_data?.editVote?.position : yourVote?.position;
 
