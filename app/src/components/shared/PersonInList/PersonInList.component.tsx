@@ -1,12 +1,17 @@
-import React, { FunctionComponent, useMemo } from 'react';
+import React, { FunctionComponent, useState } from 'react';
 import { Link } from "react-router-dom";
+
 import Avatar from '@components/shared/Avatar';
+import GroupInProfileListVotes from "@shared/GroupInProfileListVotes";
 
 import './style.sass';
 
 export const PersonInList: FunctionComponent<{ person: any, groupHandle?: string }> = ({ person, groupHandle }) => {
+
+    const [showVotes, setShowVotes] = useState(false);
+
     return (
-        <div className="d-flex relative border-bottom py-2">
+        <div className="d-flex relative border-bottom py-2 mb-2">
             <Link to={`/profile/${person.handle}`}>
                 <Avatar person={person} type="small" groupHandle={groupHandle} />
             </Link>
@@ -31,14 +36,46 @@ export const PersonInList: FunctionComponent<{ person: any, groupHandle?: string
                         </div>
                     </div> */}
                 </div>
-                {!!person?.yourStats?.directVotesInCommon && (
-                    <small className="d-flex mb-0">
-                        <b className='white mr-1'>{' '}{person?.yourStats?.directVotesInCommon}</b> votes in common on [GROUP]
-                    </small>
-                )}
                 <small className="d-flex mb-0">
                     {person.bio}
                 </small>
+                <div className="d-flex mb-n1">
+                    <small className="d-flex mb-0">
+                        <b className='white mr-1'>{' '}{person?.stats?.directVotesMade}</b> votes
+                    </small>
+                    {!!person?.yourStats?.directVotesInCommon && (
+                        <>
+                            {/* ・
+                                    <small className="d-flex mb-0">
+                                        <b className='white mr-1'>{' '}{group?.yourUserStats?.directVotesInCommon}</b> in common
+                                    </small> */}
+                            ・
+                            <small className="d-flex mb-0">
+                                <b className='white mr-1'>{' '}{person?.yourStats?.directVotesInAgreement} </b> in agreement
+                            </small>
+                            ・
+                            <small className="d-flex mb-0">
+                                <b className='white mr-1'>{' '}{person?.yourStats?.directVotesInDisagreement}</b> in disagreement
+                            </small>
+                        </>
+
+                    )}
+                </div>
+
+                {!!person?.stats?.directVotesMade && (
+                    <small className='white'>
+                        <a className='link white pointer' onClick={() => setShowVotes(!showVotes)}>{showVotes ? 'hide' : 'show'} votes</a>
+                    </small>
+                )}
+
+                {showVotes && (
+                    <GroupInProfileListVotes
+                        userHandle={person.handle}
+                        groupHandle={groupHandle}
+                        // subsection={null}
+                        // subsubsection={null}
+                    />
+                )}
 
                 {/* <pre>{JSON.stringify(person, null, 2)}</pre> */}
                 {/* {!!person.representationGroups && (
@@ -69,8 +106,9 @@ export const PersonInList: FunctionComponent<{ person: any, groupHandle?: string
                     yourStats: person.yourStats,
                     'stats.directVotesMade': person.stats?.directVotesMade,
                 }, null, 2)}</pre> */}
+
             </div>
-        </div>
+        </div >
     );
 }
 

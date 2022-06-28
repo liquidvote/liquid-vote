@@ -1,5 +1,5 @@
 import React, { FunctionComponent, useEffect } from 'react';
-import { Link } from "react-router-dom";
+import { Link, useParams } from "react-router-dom";
 import { useQuery, useMutation } from "@apollo/client";
 
 import env from '@env';
@@ -12,7 +12,7 @@ import { EDIT_GROUP_MEMBER_CHANNEL_RELATION, EDIT_USER_REPRESENTATIVE_GROUP_RELA
 import Avatar from '@components/shared/Avatar';
 import ThreeDotsSmallSVG from '@shared/Icons/ThreeDots-small-horizontal.svg';
 import Popper from "@shared/Popper";
-import GroupInProfileListVotes from "./GroupInProfileListVotes";
+import GroupInProfileListVotes from "@shared/GroupInProfileListVotes";
 
 import './style.sass';
 
@@ -27,6 +27,8 @@ export const GroupInProfileList: FunctionComponent<{
     user,
     isSelected
 }) => {
+
+        let { section, subsection, subsubsection, handle, groupHandle } = useParams<any>();
 
         const { liquidUser } = useAuthUser();
 
@@ -259,9 +261,17 @@ export const GroupInProfileList: FunctionComponent<{
                             </small>
                             {!!group?.yourUserStats?.directVotesInCommon && (
                                 <>
-                                    ・
+                                    {/* ・
                                     <small className="d-flex mb-0">
                                         <b className='white mr-1'>{' '}{group?.yourUserStats?.directVotesInCommon}</b> in common
+                                    </small> */}
+                                    ・
+                                    <small className="d-flex mb-0">
+                                        <b className='white mr-1'>{' '}{group?.yourUserStats?.directVotesInAgreement} </b> in agreement
+                                    </small>
+                                    ・
+                                    <small className="d-flex mb-0">
+                                        <b className='white mr-1'>{' '}{group?.yourUserStats?.directVotesInDisagreement}</b> in disagreement
                                     </small>
                                 </>
                             )}
@@ -278,7 +288,12 @@ export const GroupInProfileList: FunctionComponent<{
                 </div>
 
                 {isSelected && (
-                    <GroupInProfileListVotes />
+                    <GroupInProfileListVotes
+                        userHandle={ handle }
+                        groupHandle={ groupHandle}
+                        subsection={ subsection }
+                        subsubsection={ subsubsection }
+                    />
                 )}
             </div>
         );

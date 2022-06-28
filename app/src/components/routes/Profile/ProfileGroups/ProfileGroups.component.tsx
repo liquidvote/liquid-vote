@@ -39,8 +39,6 @@ export const ProfileGroups: FunctionComponent<{}> = () => {
         variables: { handle }
     });
 
-    console.log({ userGroups });
-
     useEffect(() => {
         if (allSearchParams.refetch === 'group') {
             userGroups_refetch();

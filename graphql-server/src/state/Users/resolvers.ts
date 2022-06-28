@@ -110,11 +110,11 @@ export const UserResolvers = {
                         ]
                     },
                 }] : [],
-                ...userStatsAgg({ groupHandle: null, groupId: null  }),
+                ...userStatsAgg({ groupHandle: null, groupId: null }),
                 ...(!!AuthUser?._id) ? [...yourUserStatsAgg({ AuthUser, groupHandle: null })] : [],
                 ...(!!groupHandle) ? [
                     // groupStats.stats & groupStats.yourStats
-                    ...userStatsAgg({ groupHandle, groupId: group._id  }),
+                    ...userStatsAgg({ groupHandle, groupId: group._id }),
                     ...yourUserStatsAgg({ AuthUser, groupHandle })
                 ] : [],
                 // isRepresentingYou
@@ -174,7 +174,7 @@ export const UserResolvers = {
             // );
 
             return !!User ? {
-                id: User?.LiquidUser?.handle+groupHandle,
+                id: User?.LiquidUser?.handle + groupHandle,
                 ...User?.LiquidUser,
                 isThisUser: !!AuthUser && AuthUser?.Auth0User?.sub === User?.Auth0User?.sub,
                 isRepresentingYou: User?.isRepresentingYou?.length || 0,
@@ -288,11 +288,6 @@ export const UserResolvers = {
 
             const group = !!groupHandle && await mongoDB.collection("Groups")
                 .findOne({ 'handle': groupHandle });
-
-            console.log({
-                User,
-                group
-            })
 
             const representeesAndGroups = (
                 await mongoDB.collection("UserRepresentations").aggregate(
@@ -917,7 +912,139 @@ export const UserResolvers = {
                 ),
                 i
             })));
-        }
+        },
+        UserFollowing: async (_source, { handle }, { mongoDB, AuthUser }) => {
+            const User = await mongoDB.collection("Users")
+                .findOne({ 'LiquidUser.handle': handle });
+
+            const Agg = [
+                {
+                    '$match': {
+                        '$and': [
+                            {
+                                '$expr': {
+                                    '$eq': [
+                                        '$followingId', {
+                                            '$toObjectId': ObjectId(User._id)
+                                        }
+                                    ]
+                                }
+                            },
+                            {
+                                '$expr': {
+                                    '$eq': [
+                                        '$isFollowing', true
+                                    ]
+                                }
+                            },
+                        ],
+                    }
+                },
+                {
+                    "$lookup": {
+                        "as": "user",
+                        "from": "Users",
+                        let: {
+                            'followedId': '$followedId',
+                        },
+                        "pipeline": [
+                            {
+                                "$match": {
+                                    '$and': [
+                                        { "$expr": { "$eq": ["$_id", "$$followedId"] } }
+                                    ]
+                                }
+                            }
+                        ],
+                    }
+                }, {
+                    "$replaceRoot": { newRoot: { "$first": "$user" } }
+                },
+                {
+                    '$replaceRoot': {
+                        newRoot: {
+                            $mergeObjects: [
+                                { _id: "$_id" },
+                                "$LiquidUser"
+                            ]
+                        }
+                    }
+                }
+            ];
+
+            const Users = (await mongoDB.collection("UserFollows")
+                .aggregate(Agg).toArray()
+            );
+
+            console.log({ Users });
+
+            return Users;
+        },
+        UserFollowedBy: async (_source, { handle }, { mongoDB, AuthUser }) => {
+            const User = await mongoDB.collection("Users")
+                .findOne({ 'LiquidUser.handle': handle });
+
+            const Agg = [
+                {
+                    '$match': {
+                        '$and': [
+                            {
+                                '$expr': {
+                                    '$eq': [
+                                        '$followedId', {
+                                            '$toObjectId': ObjectId(User._id)
+                                        }
+                                    ]
+                                }
+                            },
+                            {
+                                '$expr': {
+                                    '$eq': [
+                                        '$isFollowing', true
+                                    ]
+                                }
+                            },
+                        ],
+                    }
+                },
+                {
+                    "$lookup": {
+                        "as": "user",
+                        "from": "Users",
+                        let: {
+                            'followingId': '$followingId',
+                        },
+                        "pipeline": [
+                            {
+                                "$match": {
+                                    '$and': [
+                                        { "$expr": { "$eq": ["$_id", "$$followingId"] } }
+                                    ]
+                                }
+                            }
+                        ],
+                    }
+                }, {
+                    "$replaceRoot": { newRoot: { "$first": "$user" } }
+                },
+                {
+                    '$replaceRoot': {
+                        newRoot: {
+                            $mergeObjects: [
+                                { _id: "$_id" },
+                                "$LiquidUser"
+                            ]
+                        }
+                    }
+                }
+            ];
+
+            const Users = (await mongoDB.collection("UserFollows")
+                .aggregate(Agg).toArray()
+            );
+
+            return Users;
+        },
     },
     Mutation: {
         editUser: async (_source, { User }, { mongoDB, AuthUser }) => {

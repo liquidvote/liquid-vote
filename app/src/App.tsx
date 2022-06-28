@@ -27,7 +27,8 @@ export default function App() {
     const Group = lazy(() => import('./components/routes/Group'));
     const Question = lazy(() => import('./components/routes/Question'));
     const Profile = lazy(() => import('./components/routes/Profile'));
-    const ProfilePeople = lazy(() => import('./components/routes/ProfilePeople'));
+    const ProfilePeople = lazy(() => import('./components/routes/Profile/ProfilePeople'));
+    const ProfileFollowings = lazy(() => import('./components/routes/Profile/ProfileFollowings'));
     // const Trending = lazy(() => import('./components/routes/Trending'));
     const Feed = lazy(() => import('./components/routes/Feed'));
     const Notifications = lazy(() => import('./components/routes/Notifications'));
@@ -64,6 +65,7 @@ export default function App() {
                             <Route path="/profile/:handle" element={<Loader component={<Profile />} />} />
                             <Route path="/profile" element={<Loader component={<Profile />} />} />
                             <Route path="/profile-people/:handle/:which" element={<Loader component={<ProfilePeople />} />} />
+                            <Route path="/profile-follows/:handle/:which" element={<Loader component={<ProfileFollowings />} />} />
                             {/* <Route path="/trending" element={<>{loadable(() => import('./components/routes/Trending'))}</>} /> */}
                             <Route path="/home/:section" element={<Loader component={<Feed />} />} />
                             <Route path="/home" element={<Loader component={<Feed />} />} />

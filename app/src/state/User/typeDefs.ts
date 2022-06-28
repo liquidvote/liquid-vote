@@ -73,6 +73,63 @@ export const SEARCH_USERS = gql`
   }
 `;
 
+export const USER_FOLLOWING = gql`
+  query($handle: String!) {
+    UserFollowing(handle: $handle) {
+        handle,
+        name,
+        bio,
+        email,
+        avatar,
+        cover,
+        location,
+        externalLink,
+        joinedOn,
+        lastEditOn,
+        isThisUser
+        isRepresentingYou
+        stats {
+            lastDirectVoteOn
+            representing
+            representedBy
+            groupsJoined
+            directVotesMade
+            indirectVotesMadeByUser
+            indirectVotesMadeForUser
+        }
+    }
+  }
+`;
+
+
+export const USER_FOLLOWED_BY = gql`
+  query($handle: String!) {
+    UserFollowedBy(handle: $handle) {
+        handle,
+        name,
+        bio,
+        email,
+        avatar,
+        cover,
+        location,
+        externalLink,
+        joinedOn,
+        lastEditOn,
+        isThisUser
+        isRepresentingYou
+        stats {
+            lastDirectVoteOn
+            representing
+            representedBy
+            groupsJoined
+            directVotesMade
+            indirectVotesMadeByUser
+            indirectVotesMadeForUser
+        }
+    }
+  }
+`;
+
 export const USER_REPRESENTING = gql`
   query($handle: String!, $groupHandle: String) {
     UserRepresenting(handle: $handle, groupHandle: $groupHandle) {

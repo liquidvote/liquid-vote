@@ -90,8 +90,8 @@ export const UserTypeDefs = gql`
         ): [User]
         UserRepresenting(handle: String, groupHandle: String): [User] # Users that this user is representing
         UserRepresentedBy(handle: String, groupHandle: String, representativeHandle: String): [User] # Users that this user is represented by
-        UserFollowing(handle: String, groupHandle: String): [User]
-        UserFollowedBy(handle: String, groupHandle: String, representativeHandle: String): [User]
+        UserFollowing(handle: String): [User]
+        UserFollowedBy(handle: String): [User]
         UserGroups(
             handle: String,
             representative: String,

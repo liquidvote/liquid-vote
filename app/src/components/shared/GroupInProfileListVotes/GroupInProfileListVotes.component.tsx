@@ -12,9 +12,9 @@ import DropAnimation from '@components/shared/DropAnimation';
 
 import './style.sass';
 
-export const GroupInProfileListVotes: FunctionComponent<{}> = ({ }) => {
+export const GroupInProfileListVotes: FunctionComponent<{ userHandle?: string, groupHandle?: string, subsection?: string, subsubsection?: string }> = ({ userHandle, groupHandle, subsection, subsubsection }) => {
 
-    let { section, subsection, subsubsection, handle, groupHandle } = useParams<any>();
+    // let { section, subsection, subsubsection, handle, groupHandle } = useParams<any>();
 
     const [sortBy, setSortBy] = useState('time');
 
@@ -26,7 +26,7 @@ export const GroupInProfileListVotes: FunctionComponent<{}> = ({ }) => {
         data: user_data,
         refetch: user_refetch
     } = useQuery(USER, {
-        variables: { handle }
+        variables: { userHandle }
     });
 
     const profile = user_data?.User;
@@ -55,7 +55,7 @@ export const GroupInProfileListVotes: FunctionComponent<{}> = ({ }) => {
         refetch: user_votes_refetch
     } = useQuery(VOTES, {
         variables: {
-            userHandle: handle,
+            userHandle,
             ...groupHandle && { groupHandle },
             type,
             sortBy
