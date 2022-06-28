@@ -26,7 +26,7 @@ export const GroupInProfileListVotes: FunctionComponent<{ userHandle?: string, g
         data: user_data,
         refetch: user_refetch
     } = useQuery(USER, {
-        variables: { userHandle }
+        variables: { handle: userHandle }
     });
 
     const profile = user_data?.User;
