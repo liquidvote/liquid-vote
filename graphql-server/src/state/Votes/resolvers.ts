@@ -55,6 +55,7 @@ export const VoteResolvers = {
                     ...!!filterAfterYourVoteAndBooleans ? [
                         ...filterAfterYourVoteAndBooleans
                     ] : [],
+                    ...AggregateLogic.representativeUsersForYourVote,
                     ...AggregateLogic.representativeUsers,
                     ...AggregateLogic.representeeVotes,
                     ...AggregateLogic.mergedChoices,
@@ -70,7 +71,7 @@ export const VoteResolvers = {
                 ];
 
                 const writeToDebugFile = fs.writeFile(
-                    process.cwd() + '/debug' + '/votes.json',
+                    process.cwd() + '/debug' + '/votes_.json',
                     JSON.stringify({ QueryJSON }, null, 2),
                     { encoding: 'utf8' }
                 );
@@ -79,7 +80,7 @@ export const VoteResolvers = {
                     .aggregate(QueryJSON)
                     .toArray();
 
-                console.log({ VotesR: Votes.map(v => v.question?.yourVote?.representatives) });
+                console.log({ VotesR: Votes.map(v => v?.yourVote?.representatives) });
 
                 return Votes;
             };

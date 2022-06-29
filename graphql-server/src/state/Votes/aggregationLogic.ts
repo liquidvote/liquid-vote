@@ -32,6 +32,29 @@ export const VotersAgg = ({
             }
         ]
     ),
+    removeRepresentativesIfNotDelegated: (
+        [{
+            '$addFields': {
+                representatives: {
+                    $cond: [
+                        { $eq: ["$position", "delegated"] },
+                        {
+                            '$filter': {
+                                'input': '$representatives',
+                                'as': 'r',
+                                'cond': {
+                                    '$ne': [
+                                        '$$r.position', null
+                                    ]
+                                }
+                            }
+                        },
+                        []
+                    ]
+                }
+            }
+        }]
+    ),
     yourVoteAndBooleans: (
         [
             {
@@ -93,8 +116,8 @@ export const VotersAgg = ({
                     },
                     'userVote': '$$ROOT',
                 }
-            }, 
-            
+            },
+
             // {
             //     '$unwind': {
             //         'path': '$yourVote.representatives',
@@ -154,8 +177,8 @@ export const VotersAgg = ({
             //         'yourVote.representatives': '$representatives'
             //     }
             // },
-            
-            
+
+
             {
                 '$addFields': {
                     'youAndUserDetails': {
@@ -270,7 +293,6 @@ export const VotersAgg = ({
             },
         ]
     ),
-    // ⚠️ WIP
     representativeUsersForYourVote: (
         [
             {
@@ -281,21 +303,21 @@ export const VotersAgg = ({
             }, {
                 '$lookup': {
                     'from': 'Users',
-                    'localField': 'representatives.representativeId',
+                    'localField': 'yourVote.representatives.representativeId',
                     'foreignField': '_id',
                     'as': 'representativeUser'
                 }
             }, {
                 '$addFields': {
-                    'representativeUser': {
+                    'your_representativeUser': {
                         '$first': '$representativeUser.LiquidUser'
                     }
                 }
             }, {
                 '$addFields': {
-                    'representatives.representativeHandle': '$representativeUser.handle',
-                    'representatives.representativeName': '$representativeUser.name',
-                    'representatives.representativeAvatar': '$representativeUser.avatar'
+                    'yourVote.representatives.representativeHandle': '$your_representativeUser.handle',
+                    'yourVote.representatives.representativeName': '$your_representativeUser.name',
+                    'yourVote.representatives.representativeAvatar': '$your_representativeUser.avatar'
                 }
             }, {
                 '$group': {
@@ -312,14 +334,14 @@ export const VotersAgg = ({
                     'userVote': { '$first': '$userVote' },
                     'yourVote': { '$first': '$yourVote' },
                     'youAndUserDetails': { '$first': '$youAndUserDetails' },
-                    'representatives': { '$push': '$representatives' },
+                    'yourVote_representatives': { '$push': '$yourVote.representatives' },
                     'user': { '$first': '$user' },
                 }
             }, {
                 '$addFields': {
-                    'representatives': {
+                    'yourVote_representatives': {
                         '$filter': {
-                            'input': '$representatives',
+                            'input': '$yourVote_representatives',
                             'as': 'r',
                             'cond': {
                                 "$gt": ["$$r", {}]
@@ -329,33 +351,10 @@ export const VotersAgg = ({
                 }
             }, {
                 '$addFields': {
-                    'userVote.representatives': '$representatives'
+                    'yourVote.representatives': '$yourVote_representatives'
                 }
             }
         ]
-    ),
-    removeRepresentativesIfNotDelegated: (
-        [{
-            '$addFields': {
-                representatives: {
-                    $cond: [
-                        { $eq: ["$position", "delegated"] },
-                        {
-                            '$filter': {
-                                'input': '$representatives',
-                                'as': 'r',
-                                'cond': {
-                                    '$ne': [
-                                        '$$r.position', null
-                                    ]
-                                }
-                            }
-                        },
-                        []
-                    ]
-                }
-            }
-        }]
     ),
     representativeUsers: (
         [
