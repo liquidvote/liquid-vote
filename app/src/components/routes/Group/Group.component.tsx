@@ -14,7 +14,6 @@ import LockSVG from "@shared/Icons/Lock.svg";
 import WorldSVG from "@shared/Icons/World.svg";
 import ProfileSmallSVG from "@shared/Icons/Profile-small.svg";
 import HandshakeSVG from "@shared/Icons/Handshake.svg";
-import DropSVG from "@shared/Icons/Drop.svg";
 import useAuthUser from '@state/AuthUser/authUser.effect';
 import useSearchParams from "@state/Global/useSearchParams.effect";
 import useGroup from '@state/Group/group.effect';
@@ -26,7 +25,6 @@ import env from '@env';
 import InviteTinySvg from "@shared/Icons/Invite-tiny.svg";
 
 import GroupPolls from './GroupPolls';
-import GroupVotes from './GroupVotes';
 import './style.sass';
 
 export const Group: FunctionComponent<{}> = ({ }) => {
@@ -384,12 +382,6 @@ export const Group: FunctionComponent<{}> = ({ }) => {
                         <b>{group?.stats?.questions}</b>{' '}Polls
                     </Link>
                 </li>
-                {/* <li className="nav-item">
-                    <Link className={`nav-link ${section === 'votes' && 'active'}`} to={`/group/${group?.handle}/votes`}>
-                        <b>{group?.stats?.directVotesMade}</b>{' '}
-                        Votes
-                    </Link>
-                </li> */}
                 <li className="px-4 mt-1">
                     <VoteSortPicker updateSortInParent={setSortBy} />
                 </li>
@@ -404,11 +396,6 @@ export const Group: FunctionComponent<{}> = ({ }) => {
                     <div>
                         <GroupPolls sortBy={sortBy} />
                     </div>
-                )
-            }
-            {
-                (section === 'votes') && (
-                    <GroupVotes sortBy={sortBy} />
                 )
             }
 

@@ -3,14 +3,7 @@ import { Link, useParams } from "react-router-dom";
 import { useQuery, useMutation } from "@apollo/client";
 
 import useAuthUser from '@state/AuthUser/authUser.effect';
-import { USER } from "@state/User/typeDefs";
-import { VOTES } from "@state/Vote/typeDefs";
-import Notification from '@shared/Notification';
-import SortSmallSvg from "@shared/Icons/Sort-small.svg";
 import { ARGUMENTS } from "@state/Argument/typeDefs";
-import Popper from "@shared/Popper";
-import VoteSortPicker from '@components/shared/VoteSortPicker';
-import DropAnimation from '@components/shared/DropAnimation';
 import ArgumentForm from '@components/shared/Forms/ArgumentForm';
 import ArgumentInList from './ArgumentInList';
 

@@ -1,16 +1,10 @@
-import React, { FunctionComponent, useState } from 'react';
+import React, { FunctionComponent } from 'react';
 import { Link, useParams } from "react-router-dom";
-import { useQuery, useMutation } from "@apollo/client";
+import { useQuery } from "@apollo/client";
 
-import useAuthUser from '@state/AuthUser/authUser.effect';
-import { VOTES } from "@state/Vote/typeDefs";
-import Notification from '@shared/Notification';
-import SortSmallSvg from "@shared/Icons/Sort-small.svg";
 import SingleVoteInList from "@shared/SingleVoteInList";
 import MultiVoteInList from "@shared/MultiVoteInList";
 import { QUESTIONS_VOTERS_ALSO_VOTED_ON } from '@state/Question/typeDefs';
-import Popper from "@shared/Popper";
-import VoteSortPicker from '@components/shared/VoteSortPicker';
 import DropAnimation from '@components/shared/DropAnimation';
 
 import './style.sass';
