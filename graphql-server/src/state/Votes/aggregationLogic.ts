@@ -36,6 +36,7 @@ export const VotersAgg = ({
         [
             {
                 '$lookup': {
+                    'as': 'yourVote',
                     'from': 'Votes',
                     'let': {
                         'userId': new ObjectId(AuthUser?._id),
@@ -78,12 +79,11 @@ export const VotersAgg = ({
                                                 ]
                                             }
                                         }
-                                    ] : []
+                                    ] : [],
                                 ]
                             }
                         }
-                    ],
-                    'as': 'yourVote'
+                    ]
                 }
             },
             {
@@ -93,7 +93,70 @@ export const VotersAgg = ({
                     },
                     'userVote': '$$ROOT',
                 }
-            }, {
+            }, 
+            
+            // {
+            //     '$unwind': {
+            //         'path': '$yourVote.representatives',
+            //         'preserveNullAndEmptyArrays': true
+            //     }
+            // }, {
+            //     '$lookup': {
+            //         'as': 'representativeUser',
+            //         'from': 'Users',
+            //         'localField': 'yourVote.representatives.representativeId',
+            //         'foreignField': '_id',
+            //     }
+            // }, {
+            //     '$addFields': {
+            //         'representativeUser': {
+            //             '$first': '$representativeUser.LiquidUser'
+            //         }
+            //     }
+            // }, {
+            //     '$addFields': {
+            //         'yourVote.representatives.representativeHandle': '$representativeUser.handle',
+            //         'yourVote.representatives.representativeName': '$representativeUser.name',
+            //         'yourVote.representatives.representativeAvatar': '$representativeUser.avatar'
+            //     }
+            // }, {
+            //     '$group': {
+            //         '_id': {
+            //             'user': '$user',
+            //             'questionText': '$questionText',
+            //             'choiceText': '$choiceText',
+            //             'groupChannel': '$groupChannel'
+            //         },
+            //         'questionText': { '$first': '$questionText' },
+            //         'choiceText': { '$first': '$choiceText' },
+            //         'groupChannel': { '$first': '$groupChannel' },
+            //         'lastEditOn': { '$first': '$lastEditOn' },
+            //         'userVote': { '$first': '$userVote' },
+            //         'yourVote': { '$first': '$yourVote' },
+            //         'youAndUserDetails': { '$first': '$youAndUserDetails' },
+            //         'yourVote_representatives': { '$push': '$yourVote.representatives' },
+            //         'user': { '$first': '$user' },
+            //     }
+            // }, {
+            //     '$addFields': {
+            //         'yourVote.representatives': {
+            //             '$filter': {
+            //                 'input': '$yourVote_representatives',
+            //                 'as': 'r',
+            //                 'cond': {
+            //                     "$gt": ["$$r", {}]
+            //                 }
+            //             }
+            //         }
+            //     }
+            // }, {
+            //     '$addFields': {
+            //         'yourVote.representatives': '$representatives'
+            //     }
+            // },
+            
+            
+            {
                 '$addFields': {
                     'youAndUserDetails': {
                         'bothDirect': {
@@ -205,6 +268,70 @@ export const VotersAgg = ({
                     }
                 }
             },
+        ]
+    ),
+    // ⚠️ WIP
+    representativeUsersForYourVote: (
+        [
+            {
+                '$unwind': {
+                    'path': '$yourVote.representatives',
+                    'preserveNullAndEmptyArrays': true
+                }
+            }, {
+                '$lookup': {
+                    'from': 'Users',
+                    'localField': 'representatives.representativeId',
+                    'foreignField': '_id',
+                    'as': 'representativeUser'
+                }
+            }, {
+                '$addFields': {
+                    'representativeUser': {
+                        '$first': '$representativeUser.LiquidUser'
+                    }
+                }
+            }, {
+                '$addFields': {
+                    'representatives.representativeHandle': '$representativeUser.handle',
+                    'representatives.representativeName': '$representativeUser.name',
+                    'representatives.representativeAvatar': '$representativeUser.avatar'
+                }
+            }, {
+                '$group': {
+                    '_id': {
+                        'user': '$user',
+                        'questionText': '$questionText',
+                        'choiceText': '$choiceText',
+                        'groupChannel': '$groupChannel'
+                    },
+                    'questionText': { '$first': '$questionText' },
+                    'choiceText': { '$first': '$choiceText' },
+                    'groupChannel': { '$first': '$groupChannel' },
+                    'lastEditOn': { '$first': '$lastEditOn' },
+                    'userVote': { '$first': '$userVote' },
+                    'yourVote': { '$first': '$yourVote' },
+                    'youAndUserDetails': { '$first': '$youAndUserDetails' },
+                    'representatives': { '$push': '$representatives' },
+                    'user': { '$first': '$user' },
+                }
+            }, {
+                '$addFields': {
+                    'representatives': {
+                        '$filter': {
+                            'input': '$representatives',
+                            'as': 'r',
+                            'cond': {
+                                "$gt": ["$$r", {}]
+                            }
+                        }
+                    }
+                }
+            }, {
+                '$addFields': {
+                    'userVote.representatives': '$representatives'
+                }
+            }
         ]
     ),
     removeRepresentativesIfNotDelegated: (

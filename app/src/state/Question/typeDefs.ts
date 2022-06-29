@@ -396,6 +396,9 @@ export const QUESTIONS_CREATED_BY_USER = gql`
             yourVote {
                 ...vote
             }
+            userVote {
+                ...vote
+            }
             yourStats {
                 votersYouFollow {
                 handle
@@ -417,7 +420,7 @@ export const QUESTIONS_CREATED_BY_USER = gql`
                 }
             }
         }
-        allowNewChoices
+        # allowNewChoices
         groupChannel {
             group
             channel
@@ -428,6 +431,9 @@ export const QUESTIONS_CREATED_BY_USER = gql`
             ...stats
         }
         yourVote {
+            ...vote
+        }
+        userVote {
             ...vote
         }
         yourStats {

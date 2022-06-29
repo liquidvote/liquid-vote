@@ -836,7 +836,8 @@ export const UserResolvers = {
                                 (!!UserGroups && notUsers) ?
                                     { '$nin': UserGroups.map(g => g.handle) } :
                                     null,
-                            AuthUserId: AuthUser?._id
+                            AuthUserId: AuthUser?._id,
+                            userId: null
                         }),
                         // {
                         //     $lookup: {

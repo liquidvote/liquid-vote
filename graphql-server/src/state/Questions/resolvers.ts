@@ -12,7 +12,8 @@ export const QuestionResolvers = {
                 .aggregate(QuestionsAgg({
                     questionText,
                     group,
-                    AuthUserId: AuthUser?._id
+                    AuthUserId: AuthUser?._id,
+                    userId: null
                 }))?.toArray())?.[0];
 
             // const writeToDebugFile = fs.writeFile(
@@ -74,7 +75,8 @@ export const QuestionResolvers = {
                         ...QuestionsAgg({
                             questionText: null,
                             group,
-                            AuthUserId: AuthUser?._id
+                            AuthUserId: AuthUser?._id,
+                            userId: null
                         }),
                         {
                             '$addFields': {
@@ -153,7 +155,8 @@ export const QuestionResolvers = {
                         ...QuestionsAgg({
                             questionText: null,
                             group: null,
-                            AuthUserId: AuthUser?._id
+                            AuthUserId: AuthUser?._id,
+                            userId: null
                         }),
                         {
                             $match: {
@@ -213,6 +216,8 @@ export const QuestionResolvers = {
             sortBy
         }, { mongoDB, AuthUser }) => {
 
+            console.log({ handle });
+
             const User = !!handle && await mongoDB.collection("Users")
                 .findOne({ 'LiquidUser.handle': handle });
 
@@ -238,7 +243,8 @@ export const QuestionResolvers = {
                         ...QuestionsAgg({
                             questionText: null,
                             group: null,
-                            AuthUserId: AuthUser?._id
+                            AuthUserId: AuthUser?._id,
+                            userId: User?._id
                         }),
                         {
                             '$addFields': {
@@ -275,18 +281,24 @@ export const QuestionResolvers = {
                 )
                 .toArray();
 
+            console.log({
+                Questions
+            });
+
             // TODO: move this logic to the aggregation, it'll run much faster
             return await Promise.all(Questions.map(async (q, i) => ({
                 ...q,
                 _id: q?.id,
                 ...(q.questionType === 'single' && !!AuthUser) && {
-                    yourVote: q?.choices[0]?.yourVote
+                    yourVote: q?.choices[0]?.yourVote,
+                    userVote: q?.choices[0]?.userVote,
                 },
                 ...(q.questionType === 'multi') && {
                     choices: await Promise.all(q?.choices?.map(async (c) => ({
                         ...c?.choice,
                         ...(!!AuthUser) && {
-                            yourVote: c?.yourVote
+                            yourVote: c?.yourVote,
+                            userVote: c?.userVote
                         }
                     })))
                 },

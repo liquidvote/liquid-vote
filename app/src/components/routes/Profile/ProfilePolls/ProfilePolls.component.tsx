@@ -1,6 +1,7 @@
 import React, { FunctionComponent, useState } from 'react';
 import { useQuery } from "@apollo/client";
 import { Link, useParams } from "react-router-dom";
+import { timeAgo } from '@state/TimeAgo';
 
 import { QUESTIONS_CREATED_BY_USER } from "@state/Question/typeDefs";
 import SingleVoteInList from "@shared/SingleVoteInList";
@@ -10,7 +11,7 @@ import useAuthUser from '@state/AuthUser/authUser.effect';
 
 import './style.sass';
 
-export const ProfilePolls: FunctionComponent<{}> = ({ }) => {
+export const ProfilePolls: FunctionComponent<{ userHandle: string, user: any }> = ({ userHandle, user }) => {
 
     const { liquidUser } = useAuthUser();
 
@@ -23,10 +24,10 @@ export const ProfilePolls: FunctionComponent<{}> = ({ }) => {
         refetch: questions_refetch
     } = useQuery(QUESTIONS_CREATED_BY_USER, {
         variables: {
-            handle: liquidUser?.handle || null,
+            handle: userHandle,
             sortBy,
-        }
-        // skip: !liquidUser
+        },
+        skip: !userHandle
     });
 
     console.log({ questions_data });
@@ -36,7 +37,7 @@ export const ProfilePolls: FunctionComponent<{}> = ({ }) => {
             {questions_data?.QuestionsCreatedByUser?.map((v: any, i: any) => (
                 <div key={'polls-' + i}>
 
-                    <div className="poll-cover-container">
+                    {/* <div className="poll-cover-container">
                         <div
                             className="poll-cover"
                             style={{
@@ -52,13 +53,14 @@ export const ProfilePolls: FunctionComponent<{}> = ({ }) => {
                                 </h5>
                             </Link>
                         </div>
-                    </div>
+                    </div> */}
 
                     {v.questionType === 'multi' && (
                         <MultiVoteInList
                             key={`multi-${v.questionText}`}
                             v={v}
                             showGroupAndTime={true}
+                            user={user}
                         />
                     )}
                     {v.questionType === 'single' && (
@@ -67,8 +69,31 @@ export const ProfilePolls: FunctionComponent<{}> = ({ }) => {
                             l={v}
                             showGroupAndTime={true}
                             showIntroMessage={true}
+                            user={user}
                         />
                     )}
+
+
+                    <div className="mt-4 d-flex align-items-center flex-nowrap justify-content-between">
+                        <small
+                            className="d-flex justify-content-center align-items-center align-self-end"
+                        >
+                            {/* <small className="time-ago" data-tip="Last vote was"> */}
+                            {!!v?.createdBy && (
+                                <Link to={`/profile/${v?.createdBy.handle}`}>
+                                    <div
+                                        className="vote-avatar none mr-1"
+                                        style={{
+                                            background: v?.createdBy.avatar && `url(${v?.createdBy.avatar}) 50% 50% / cover no-repeat`
+                                        }}
+                                    ></div>
+                                </Link>
+                            )}
+                            {' '}launched{' '}
+                            {timeAgo.format(new Date(Number(v?.createdOn)))}
+                        </small>
+                    </div>
+
                     <hr />
                 </div>
             ))}

@@ -69,15 +69,19 @@ export const VoteResolvers = {
                     ...AggregateLogic.userObject
                 ];
 
-                // const writeToDebugFile = fs.writeFile(
-                //     process.cwd() + '/debug' + '/votes.json',
-                //     JSON.stringify({ QueryJSON }, null, 2),
-                //     { encoding: 'utf8' }
-                // );
+                const writeToDebugFile = fs.writeFile(
+                    process.cwd() + '/debug' + '/votes.json',
+                    JSON.stringify({ QueryJSON }, null, 2),
+                    { encoding: 'utf8' }
+                );
 
-                return await mongoDB.collection("Votes")
+                const Votes = await mongoDB.collection("Votes")
                     .aggregate(QueryJSON)
-                    .toArray()
+                    .toArray();
+
+                console.log({ VotesR: Votes.map(v => v.question?.yourVote?.representatives) });
+
+                return Votes;
             };
 
             const Votes = await (async (type) => {
@@ -252,6 +256,7 @@ export const VoteResolvers = {
             console.log({
                 type,
                 VotesL: Votes?.length,
+                // VotesRespresentatives: Votes.map(v => JSON.stringify({ id: v?._id, r: v?.representatives }, null, 2))
                 // Vote: Votes?.[0]?.choiceVotes
                 // Votes: JSON.stringify(Votes.map(v => ({
                 //     c: v.youAndUserDetailsCount
@@ -455,6 +460,8 @@ export const VoteResolvers = {
             // Update User Stats
             // Update Group Stats
             // Update Tags Stats
+
+            console.log({ savedVote });
 
             return {
                 ...savedVote,

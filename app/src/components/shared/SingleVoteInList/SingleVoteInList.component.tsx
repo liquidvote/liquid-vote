@@ -39,6 +39,8 @@ export const SingleVoteInList: FunctionComponent<{
     showChart
 }) => {
 
+        console.log({ user });
+
         const { allSearchParams, updateParams } = useSearchParams();
 
         return (
@@ -105,7 +107,7 @@ export const SingleVoteInList: FunctionComponent<{
                                 >
                                     <div className={`${showGroupAndTime && 'limit-right'}`} title={l.questionText}>
                                         {l.questionText}
-                                        {showIntroMessage && '?'}
+                                        {/* {showIntroMessage && '?'} */}
                                     </div>
                                 </a>
                                 {/* {l.userVote && (
@@ -144,6 +146,7 @@ export const SingleVoteInList: FunctionComponent<{
                             user={user}
                             inList={true}
                             showChart={showChart}
+                            yourStats={l.yourStats}
                         />
                     </div>
                 </div>

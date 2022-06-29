@@ -22,7 +22,6 @@ import InviteTinySvg from "@shared/Icons/Invite-tiny.svg";
 import env from '@env';
 import TopPageInvite from '@components/shared/TopPageInvite';
 
-import ProfileVotes from "./ProfileVotes";
 import './style.sass';
 import ProfileGroups from "./ProfileGroups";
 import ProfilePolls from "./ProfilePolls";
@@ -420,10 +419,8 @@ export const Profile: FunctionComponent<{}> = ({ }) => {
             <hr className="mt-n4" />
 
             {(!section || section === 'groups' || !!groupHandle) && <ProfileGroups />}
-            {(section === 'polls') && <ProfilePolls />}
+            {(section === 'polls') && <ProfilePolls userHandle={profile.handle} user={profile} />}
             {(section === 'followings') && <ProfileFollowings />}
-
-            {/* {(section === 'votes') && <ProfileVotes />} */}
         </>
     );
 }

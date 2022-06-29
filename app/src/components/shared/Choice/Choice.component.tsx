@@ -63,10 +63,12 @@ export const Choice: FunctionComponent<{
             }
         });
 
-        const yourVote_ = editVote_data ? editVote_data?.editVote?.position : yourVote?.position;
+        const yourVote_ = editVote_data ? editVote_data?.editVote : yourVote;
 
         // console.log({
-        //     yourVote
+        //     yourVote,
+        //     yourVote_,
+        //     edited: editVote_data?.editVote
         // });
 
         const handleUserVote = (vote: string) => {
@@ -78,7 +80,7 @@ export const Choice: FunctionComponent<{
                         choiceText,
                         group: groupHandle,
                         Vote: {
-                            position: (vote === yourVote_) ? null : vote
+                            position: (vote === yourVote_?.position) ? null : vote
                         },
                     }
                 });
@@ -109,8 +111,8 @@ export const Choice: FunctionComponent<{
             }
         });
 
-        const forRepresentatives = yourVote?.representatives?.filter((r: any) => r.position === 'for');
-        const againstRepresentatives = yourVote?.representatives?.filter((r: any) => r.position === 'against');
+        const forRepresentatives = yourVote_?.representatives?.filter((r: any) => r.position === 'for');
+        const againstRepresentatives = yourVote_?.representatives?.filter((r: any) => r.position === 'against');
 
         const forFollowees = yourStats?.votersYouFollow?.filter((r: any) => r?.vote?.position === 'for');
         const againstFollowees = yourStats?.votersYouFollow?.filter((r: any) => r?.vote?.position === 'against');
@@ -226,7 +228,7 @@ export const Choice: FunctionComponent<{
                     <div className="d-flex d-flex justify-content-between mt-1">
                         <div className="d-flex align-items-center c-on-tiny">
                             <div
-                                className={`button_ forDirectBorder justify-content-between min-w mr-1 ${yourVote_ === 'for' && 'forDirectBg'} ${inList && 'small'}`}
+                                className={`button_ forDirectBorder justify-content-between min-w mr-1 ${yourVote_?.position === 'for' && 'forDirectBg'} ${inList && 'small'}`}
                                 onClick={() => handleUserVote('for')}
                             >
                                 <span className="mr-1">
@@ -281,7 +283,7 @@ export const Choice: FunctionComponent<{
                                     )
                                 }
 
-                                {yourVote_ === 'for' && (
+                                {yourVote_?.position === 'for' && (
                                     <div className={`d-flex ml-2 my-n2 ${inList ? 'mr-n1' : 'mr-n2'}`}>
                                         <Avatar
                                             person={{
@@ -399,7 +401,7 @@ export const Choice: FunctionComponent<{
                                 </div>
                             </div>
                             <div
-                                className={`button_ againstDirectBorder min-w justify-content-between text-right ml-1 ${yourVote_ === 'against' && 'againstDirectBg'} ${inList && 'small'}`}
+                                className={`button_ againstDirectBorder min-w justify-content-between text-right ml-1 ${yourVote_?.position === 'against' && 'againstDirectBg'} ${inList && 'small'}`}
                                 onClick={() => handleUserVote('against')}
                             >
                                 {
@@ -450,7 +452,7 @@ export const Choice: FunctionComponent<{
                                     )
                                 }
 
-                                {yourVote_ === 'against' && (
+                                {yourVote_?.position === 'against' && (
                                     <div className={`d-flex mr-1 my-n2 ${inList ? 'ml-n1' : 'ml-n2'}`}>
                                         <Avatar
                                             person={{
