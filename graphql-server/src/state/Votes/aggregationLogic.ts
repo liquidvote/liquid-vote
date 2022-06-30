@@ -598,6 +598,19 @@ export const VotersAgg = ({
                             }
                         }
                     },
+                    "Count_representing": {
+                        "$sum": {
+                            "$switch": {
+                                "branches": [{
+                                    "case": {
+                                        "$gt": [{ '$size': "$userVote.representeeVotes" }, 0]
+                                    },
+                                    "then": 1
+                                }],
+                                "default": 0
+                            }
+                        }
+                    },
                     'Count_directAgainst': {
                         '$sum': {
                             "$switch": {
@@ -626,6 +639,7 @@ export const VotersAgg = ({
                         direct: '$Count_direct',
                         delegated: '$Count_delegated',
                         directAgainst: '$Count_directAgainst',
+                        representing: "$Count_representing"
                     }
                 }
             }
@@ -845,6 +859,54 @@ export const VotersAgg = ({
         ]
     )
 });
+
+export const VotesGeneralAggregateLogic = async ({
+    filterAfterYourVoteAndBooleans = false,
+    filterAfterMerge = false,
+    choiceFilters = false,
+    questionText,
+    choiceText,
+    groupHandle,
+    userHandle,
+    User,
+    AuthUser,
+    sortBy
+}: any) => {
+
+    // TODO check if viewer has access to group
+
+    const AggregateLogic = VotersAgg({
+        questionText,
+        choiceText,
+        groupHandle,
+        userHandle,
+        User,
+        AuthUser,
+        sortBy
+    })
+
+    return [
+        ...AggregateLogic.matchVoteToParams,
+        ...AggregateLogic.removeRepresentativesIfNotDelegated,
+        ...AggregateLogic.yourVoteAndBooleans,
+        ...!!filterAfterYourVoteAndBooleans ? [
+            ...filterAfterYourVoteAndBooleans
+        ] : [],
+        ...AggregateLogic.representativeUsersForYourVote,
+        ...AggregateLogic.representativeUsers,
+        ...AggregateLogic.representeeVotes,
+        ...AggregateLogic.mergedChoices,
+        ...AggregateLogic.mergedChoicesUniqueRepresentatives,
+        ...AggregateLogic.mergedChoicesUniqueRepresentees,
+        ...!!filterAfterMerge ? [
+            ...filterAfterMerge
+        ] : [],
+        ...AggregateLogic.matchChoiceParam(choiceFilters),
+        ...AggregateLogic.sortLogic,
+        ...AggregateLogic.question,
+        ...AggregateLogic.userObject
+    ];
+};
 
 export const representeesAndVoteAgg = ({
     efficientOrThorough,

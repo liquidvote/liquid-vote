@@ -11,6 +11,7 @@ export const Avatar: FunctionComponent<{
     person, type = 'small', groupHandle
 }) => {
 
+
         const { user } = useUser({ userHandle: person.handle, groupHandle });
 
         return (

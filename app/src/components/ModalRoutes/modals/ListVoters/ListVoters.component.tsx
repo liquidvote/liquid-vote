@@ -1,6 +1,7 @@
 import React, { FunctionComponent, useState } from 'react';
 import { Link, useParams } from "react-router-dom";
 import { useQuery, useMutation } from "@apollo/client";
+import numeral from 'numeral';
 
 import useAuthUser from '@state/AuthUser/authUser.effect';
 import useSearchParams from "@state/Global/useSearchParams.effect";
@@ -10,6 +11,7 @@ import VoteSortPicker from '@components/shared/VoteSortPicker';
 import Notification from '@shared/Notification';
 import DropAnimation from '@components/shared/DropAnimation';
 import useGroup from '@state/Group/group.effect';
+import ListVotersMenu from "./ListVotersMenu";
 
 import ModalHeader from "../../shared/ModalHeader";
 import './style.sass';
@@ -74,15 +76,6 @@ export const ListVoters: FunctionComponent<{}> = ({ }) => {
         return null
     })();
 
-    console.log({
-        stats,
-        modalData,
-        question_data,
-        type,
-        subsection,
-        subsubsection
-    });
-
     const {
         loading: votes_loading,
         error: votes_error,
@@ -101,6 +94,12 @@ export const ListVoters: FunctionComponent<{}> = ({ }) => {
     });
 
     console.log({
+        stats,
+        modalData,
+        question_data,
+        type,
+        subsection,
+        subsubsection,
         votes_data
     });
 
@@ -115,344 +114,16 @@ export const ListVoters: FunctionComponent<{}> = ({ }) => {
                 hideSubmitButton={true}
             />
             <div className="">
-                <ul className="mt-1 nav d-flex justify-content-around">
-                    {/* <li className="nav-item">
-                        <div
-                            className={`pointer nav-link ${(!subsection || subsection === 'total') && 'active'}`}
-                            // to={`/poll/${questionText}/${groupHandle}/timeline`}
-                            onClick={
-                                e => {
-                                    e.stopPropagation();
-                                    updateParams({
-                                        paramsToAdd: {
-                                            modal: "ListVoters",
-                                            modalData: JSON.stringify({
-                                                questionText,
-                                                choiceText,
-                                                groupHandle,
-                                                subsection: 'total',
-                                                // subsubsection: 'foryou'
-                                            })
-                                        }
-                                    })
-                                }
-                            }
-                        >
-                            <b>{
-                                (stats?.directVotes + stats?.indirectVotes) || 0
-                            }</b> Total
-                        </div>
-                    </li> */}
-                    <li className="nav-item">
-                        <div
-                            className={`pointer nav-link ${(!subsection || subsection === 'direct') && 'active'}`}
-                            // to={`/poll/${questionText}/${groupHandle}/timeline`}
-                            onClick={
-                                e => {
-                                    e.stopPropagation();
-                                    updateParams({
-                                        paramsToAdd: {
-                                            modal: "ListVoters",
-                                            modalData: JSON.stringify({
-                                                questionText,
-                                                choiceText,
-                                                groupHandle,
-                                                subsection: 'direct',
-                                                // subsubsection: 'foryou'
-                                            })
-                                        }
-                                    })
-                                }
-                            }
-                        >
-                            <b>{stats?.directVotes || stats?.directVotesMade}</b> Direct
-                        </div>
-                    </li>
-                    <li className="nav-item">
-                        <div
-                            className={`pointer nav-link ${(subsection === 'represented') && 'active'}`}
-                            // to={`/poll/${questionText}/${groupHandle}/timeline/represented`}
-                            onClick={
-                                e => {
-                                    e.stopPropagation();
-                                    updateParams({
-                                        paramsToAdd: {
-                                            modal: "ListVoters",
-                                            modalData: JSON.stringify({
-                                                questionText,
-                                                choiceText,
-                                                groupHandle,
-                                                subsection: 'represented',
-                                                // subsubsection: 'foryou'
-                                            })
-                                        }
-                                    })
-                                }
-                            }
-                        >
-                            <b>{stats?.indirectVotes || stats?.indirectVotesMade}</b> Represented
-                        </div>
-                    </li>
-                    <li className="px-4 mt-1">
-                        <VoteSortPicker updateSortInParent={setSortBy} />
-                    </li>
-                </ul>
-                <hr className="mt-n4 mx-0 mb-0" />
-
-                {(!!questionText && (!subsection || subsection === 'total')) && (
-                    <>
-                        <ul className="nav d-flex justify-content-around">
-                            <li className="nav-item">
-                                <div
-                                    className={`pointer nav-link ${(!subsubsection) && 'active'}`}
-                                    // to={`/poll/${questionText}/${groupHandle}/timeline/direct/for`}
-                                    onClick={
-                                        e => {
-                                            e.stopPropagation();
-                                            updateParams({
-                                                paramsToAdd: {
-                                                    modal: "ListVoters",
-                                                    modalData: JSON.stringify({
-                                                        questionText,
-                                                        choiceText,
-                                                        groupHandle,
-                                                        subsection: 'all'
-                                                    })
-                                                }
-                                            })
-                                        }
-                                    }
-                                >
-                                    <b className="px-1 rounded">{
-                                        (stats?.directVotes + stats?.indirectVotes) || 0
-                                    }</b> All
-                                </div>
-                            </li>
-                            <li className="nav-item">
-                                <div
-                                    className={`pointer nav-link ${(subsubsection === 'for') && 'active'}`}
-                                    // to={`/poll/${questionText}/${groupHandle}/timeline/direct/for`}
-                                    onClick={
-                                        e => {
-                                            e.stopPropagation();
-                                            updateParams({
-                                                paramsToAdd: {
-                                                    modal: "ListVoters",
-                                                    modalData: JSON.stringify({
-                                                        questionText,
-                                                        choiceText,
-                                                        groupHandle,
-                                                        subsection: 'total',
-                                                        subsubsection: 'for'
-                                                    })
-                                                }
-                                            })
-                                        }
-                                    }
-                                >
-                                    <b className="forDirect white px-1 rounded">{
-                                        (stats?.forCount) || 0
-                                    }</b> For
-                                </div>
-                            </li>
-                            <li className="nav-item">
-                                <div
-                                    className={`pointer nav-link ${(subsubsection === 'against') && 'active'}`}
-                                    // to={`/poll/${questionText}/${groupHandle}/timeline/direct/against`}
-                                    onClick={
-                                        e => {
-                                            e.stopPropagation();
-                                            updateParams({
-                                                paramsToAdd: {
-                                                    modal: "ListVoters",
-                                                    modalData: JSON.stringify({
-                                                        questionText,
-                                                        choiceText,
-                                                        groupHandle,
-                                                        subsection: 'total',
-                                                        subsubsection: 'against'
-                                                    })
-                                                }
-                                            })
-                                        }
-                                    }
-                                >
-                                    <b className="againstDirect white px-1 rounded">{
-                                        (stats?.againstCount) || 0
-                                    }</b> Against
-                                </div>
-                            </li>
-                        </ul>
-                        <hr className="mt-n4 mb-0 mx-0" />
-                    </>
-                )}
-
-                {(!!questionText && (!subsection || subsection === 'direct')) && (
-                    <>
-                        <ul className="nav d-flex justify-content-around">
-                            <li className="nav-item">
-                                <div
-                                    className={`pointer nav-link ${(!subsubsection) && 'active'}`}
-                                    // to={`/poll/${questionText}/${groupHandle}/timeline/direct/for`}
-                                    onClick={
-                                        e => {
-                                            e.stopPropagation();
-                                            updateParams({
-                                                paramsToAdd: {
-                                                    modal: "ListVoters",
-                                                    modalData: JSON.stringify({
-                                                        questionText,
-                                                        choiceText,
-                                                        groupHandle,
-                                                        subsection: 'direct'
-                                                    })
-                                                }
-                                            })
-                                        }
-                                    }
-                                >
-                                    <b className="px-1 rounded">{stats?.directVotes || stats?.directVotesMade}</b> All
-                                </div>
-                            </li>
-                            <li className="nav-item">
-                                <div
-                                    className={`pointer nav-link ${(subsubsection === 'for') && 'active'}`}
-                                    // to={`/poll/${questionText}/${groupHandle}/timeline/direct/for`}
-                                    onClick={
-                                        e => {
-                                            e.stopPropagation();
-                                            updateParams({
-                                                paramsToAdd: {
-                                                    modal: "ListVoters",
-                                                    modalData: JSON.stringify({
-                                                        questionText,
-                                                        choiceText,
-                                                        groupHandle,
-                                                        subsection: 'direct',
-                                                        subsubsection: 'for'
-                                                    })
-                                                }
-                                            })
-                                        }
-                                    }
-                                >
-                                    <b className="forDirect white px-1 rounded">{stats?.forDirectCount}</b> For
-                                </div>
-                            </li>
-                            <li className="nav-item">
-                                <div
-                                    className={`pointer nav-link ${(subsubsection === 'against') && 'active'}`}
-                                    // to={`/poll/${questionText}/${groupHandle}/timeline/direct/against`}
-                                    onClick={
-                                        e => {
-                                            e.stopPropagation();
-                                            updateParams({
-                                                paramsToAdd: {
-                                                    modal: "ListVoters",
-                                                    modalData: JSON.stringify({
-                                                        questionText,
-                                                        choiceText,
-                                                        groupHandle,
-                                                        subsection: 'direct',
-                                                        subsubsection: 'against'
-                                                    })
-                                                }
-                                            })
-                                        }
-                                    }
-                                >
-                                    <b className="againstDirect white px-1 rounded">{stats?.againstDirectCount}</b> Against
-                                </div>
-                            </li>
-                        </ul>
-                        <hr className="mt-n4 mb-0 mx-0" />
-                    </>
-                )}
-
-                {!!liquidUser && subsection === 'represented' && (
-                    <>
-                        <ul className="nav d-flex justify-content-around">
-                            <li className="nav-item">
-                                <div
-                                    className={`pointer nav-link ${!subsubsection && 'active'}`}
-                                    // to={`/poll/${questionText}/${groupHandle}/timeline/represented`}
-                                    onClick={
-                                        e => {
-                                            e.stopPropagation();
-                                            updateParams({
-                                                paramsToAdd: {
-                                                    modal: "ListVoters",
-                                                    modalData: JSON.stringify({
-                                                        questionText,
-                                                        choiceText,
-                                                        groupHandle,
-                                                        subsection: 'represented',
-                                                        // subsubsection: 'foryou'
-                                                    })
-                                                }
-                                            })
-                                        }
-                                    }
-                                >
-                                    <b>{stats?.indirectVotes}</b> By anyone
-                                </div>
-                            </li>
-                            <li className="nav-item">
-                                <div
-                                    className={`pointer nav-link ${subsubsection === 'byyou' && 'active'}`}
-                                    // to={`/poll/${questionText}/${groupHandle}/timeline/represented/byyou`}
-                                    onClick={
-                                        e => {
-                                            e.stopPropagation();
-                                            updateParams({
-                                                paramsToAdd: {
-                                                    modal: "ListVoters",
-                                                    modalData: JSON.stringify({
-                                                        questionText,
-                                                        choiceText,
-                                                        groupHandle,
-                                                        subsection: 'represented',
-                                                        subsubsection: 'byyou'
-                                                    })
-                                                }
-                                            })
-                                        }
-                                    }
-                                >
-                                    {/* <b>{profile?.yourStats?.indirectVotesMadeByYou}</b> */}
-                                    By you
-                                </div>
-                            </li>
-                            <li className="nav-item">
-                                <div
-                                    className={`pointer nav-link ${subsubsection === 'foryou' && 'active'}`}
-                                    // to={`/poll/${questionText}/${groupHandle}/timeline/represented/foryou`}
-                                    onClick={
-                                        e => {
-                                            e.stopPropagation();
-                                            updateParams({
-                                                paramsToAdd: {
-                                                    modal: "ListVoters",
-                                                    modalData: JSON.stringify({
-                                                        questionText,
-                                                        choiceText,
-                                                        groupHandle,
-                                                        subsection: 'represented',
-                                                        subsubsection: 'foryou'
-                                                    })
-                                                }
-                                            })
-                                        }
-                                    }
-                                >
-                                    {/* <b>{profile?.yourStats?.indirectVotesMadeForYou}</b> */}
-                                    For you
-                                </div>
-                            </li>
-                        </ul>
-                        <hr className="mt-n4 mb-0 mx-0" />
-                    </>
-                )}
+                <ListVotersMenu
+                    subsection={subsection}
+                    subsubsection={subsubsection}
+                    questionText={questionText}
+                    choiceText={choiceText}
+                    groupHandle={groupHandle}
+                    stats={stats}
+                    setSortBy={setSortBy}
+                    liquidUser={liquidUser}
+                />
             </div>
             <div className="Modal-Content">
 
@@ -487,15 +158,10 @@ export const ListVoters: FunctionComponent<{}> = ({ }) => {
                             key={type + i}
                             v={{
                                 ...n,
-                                user: {
-                                    ...n.user,
-                                }
                             }}
+                            showUser={false}
                             showChart={false}
                             hideChoicesBesides={choiceText}
-                            showTitle={!questionText}
-                        // hideGroup={true}
-                        // hideQuestionText={true}
                         />
                     ))}
                 </div>

@@ -158,7 +158,6 @@ export const MultiVoteInList: FunctionComponent<{
                     {/* <pre style={{ 'color': 'white' }}>{JSON.stringify(v.choices, null, 2)}</pre> */}
                 </div>
 
-
                 {v.choices?.length > 4 && (
                     <div className="d-flex justify-content-start mt-3">
                         <div
@@ -167,9 +166,6 @@ export const MultiVoteInList: FunctionComponent<{
                         >{showAllChoices ? 'Show less' : `Show ${v.choices?.length - 4} more`}</div>
                     </div>
                 )}
-
-
-                {/* <pre>{JSON.stringify(v.choices, null, 2)}</pre> */}
             </div>
         );
     }

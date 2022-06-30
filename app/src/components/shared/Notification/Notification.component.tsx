@@ -1,11 +1,8 @@
 import React, { FunctionComponent, useState } from 'react';
 import { Link } from "react-router-dom";
 
-import GroupSvg from "@shared/Icons/Group.svg";
-import VoteWrapper from "@shared/VoteWrapper";
 import SingleVoteInList from "@shared/SingleVoteInList";
 import MultiVoteInList from "@shared/MultiVoteInList";
-import Choice from "@shared/Choice";
 import './style.sass';
 import { timeAgo } from '@state/TimeAgo';
 import VotedExplanation from '@shared/VotedExplanation';
@@ -16,14 +13,14 @@ export const Notification: FunctionComponent<{
     showUser?: boolean,
     showChart?: boolean,
     hideChoicesBesides?: string,
-    showTitle?: boolean
 }> = ({
     v,
     showUser = true,
     showChart = false,
-    hideChoicesBesides,
-    showTitle = false,
+    hideChoicesBesides
 }) => {
+
+        console.log({ v });
 
         const [showAllChoices, setShowAllChoices] = useState(!hideChoicesBesides);
 

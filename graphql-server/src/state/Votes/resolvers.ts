@@ -4,7 +4,7 @@ const { promises: fs } = require("fs");
 
 import { updateQuestionVotingStats } from '../Questions/resolvers';
 import { getUserStats } from '../Users/resolvers';
-import { VotersAgg, representeesAndVoteAgg, representativeVotesAgg } from './aggregationLogic';
+import { VotersAgg, representeesAndVoteAgg, representativeVotesAgg, VotesGeneralAggregateLogic } from './aggregationLogic';
 
 export const VoteResolvers = {
     Query: {
@@ -30,65 +30,10 @@ export const VoteResolvers = {
             const User = !!userHandle && await mongoDB.collection("Users")
                 .findOne({ 'LiquidUser.handle': userHandle });
 
-            const defaultAggregation = async ({
-                filterAfterYourVoteAndBooleans = false,
-                filterAfterMerge = false,
-                choiceFilters = false
-            }: any) => {
-
-                // TODO check if viewer has access to group
-
-                const AggregateLogic = VotersAgg({
-                    questionText,
-                    choiceText,
-                    groupHandle,
-                    userHandle,
-                    User,
-                    AuthUser,
-                    sortBy
-                })
-
-                const QueryJSON = [
-                    ...AggregateLogic.matchVoteToParams,
-                    ...AggregateLogic.removeRepresentativesIfNotDelegated,
-                    ...AggregateLogic.yourVoteAndBooleans,
-                    ...!!filterAfterYourVoteAndBooleans ? [
-                        ...filterAfterYourVoteAndBooleans
-                    ] : [],
-                    ...AggregateLogic.representativeUsersForYourVote,
-                    ...AggregateLogic.representativeUsers,
-                    ...AggregateLogic.representeeVotes,
-                    ...AggregateLogic.mergedChoices,
-                    ...AggregateLogic.mergedChoicesUniqueRepresentatives,
-                    ...AggregateLogic.mergedChoicesUniqueRepresentees,
-                    ...!!filterAfterMerge ? [
-                        ...filterAfterMerge
-                    ] : [],
-                    ...AggregateLogic.matchChoiceParam(choiceFilters),
-                    ...AggregateLogic.sortLogic,
-                    ...AggregateLogic.question,
-                    ...AggregateLogic.userObject
-                ];
-
-                const writeToDebugFile = fs.writeFile(
-                    process.cwd() + '/debug' + '/votes_.json',
-                    JSON.stringify({ QueryJSON }, null, 2),
-                    { encoding: 'utf8' }
-                );
-
-                const Votes = await mongoDB.collection("Votes")
-                    .aggregate(QueryJSON)
-                    .toArray();
-
-                console.log({ VotesR: Votes.map(v => v?.yourVote?.representatives) });
-
-                return Votes;
-            };
-
-            const Votes = await (async (type) => {
+            const VotesSpecificAggregateLogic = await (async (type, routeParams) => {
                 return {
-                    'all': async () => await defaultAggregation({}),
-                    'directFor': async () => await defaultAggregation({
+                    'all': await VotesGeneralAggregateLogic({}),
+                    'directFor': VotesGeneralAggregateLogic({
                         filterAfterYourVoteAndBooleans: [{
                             '$match': {
                                 // 'position': 'for',
@@ -108,9 +53,10 @@ export const VoteResolvers = {
                             '$eq': [
                                 '$$v.userVote.position', 'for'
                             ]
-                        }]
+                        }],
+                        ...routeParams
                     }),
-                    'directAgainst': async () => await defaultAggregation({
+                    'directAgainst': VotesGeneralAggregateLogic({
                         filterAfterYourVoteAndBooleans: [{
                             '$match': {
                                 // 'position': 'against',
@@ -130,9 +76,10 @@ export const VoteResolvers = {
                             '$eq': [
                                 '$$v.userVote.position', 'against'
                             ]
-                        }]
+                        }],
+                        ...routeParams
                     }),
-                    'directVotesMade': async () => await defaultAggregation({
+                    'directVotesMade': VotesGeneralAggregateLogic({
                         filterAfterYourVoteAndBooleans: [{
                             '$match': {
                                 // 'isDirect': true
@@ -147,9 +94,10 @@ export const VoteResolvers = {
                             '$eq': [
                                 '$$v.userVote.isDirect', true
                             ]
-                        }]
+                        }],
+                        ...routeParams
                     }),
-                    'directVotesInAgreement': async () => await defaultAggregation({
+                    'directVotesInAgreement': VotesGeneralAggregateLogic({
                         filterAfterYourVoteAndBooleans: [{
                             '$match': {
                                 // 'youAndUserDetails.InAgreement': true,
@@ -165,9 +113,10 @@ export const VoteResolvers = {
                             '$eq': [
                                 '$$v.userVote.isDirect', true
                             ]
-                        }]
+                        }],
+                        ...routeParams
                     }),
-                    'directVotesInDisagreement': async () => await defaultAggregation({
+                    'directVotesInDisagreement': VotesGeneralAggregateLogic({
                         filterAfterYourVoteAndBooleans: [{
                             '$match': {
                                 // TODO: Get disagreement count
@@ -184,10 +133,24 @@ export const VoteResolvers = {
                             '$eq': [
                                 '$$v.userVote.isDirect', true
                             ]
-                        }]
+                        }],
+                        ...routeParams
                     }),
-
-                    'indirectVotesMade': async () => await defaultAggregation({
+                    'indirectVotesMade': VotesGeneralAggregateLogic({
+                        filterAfterYourVoteAndBooleans: [{
+                            '$match': {
+                                // position: "delegated",
+                                // isDirect: false
+                            }
+                        }],
+                        filterAfterMerge: [{
+                            '$match': {
+                                'Count.representing': { $gt: 0 }
+                            }
+                        }],
+                        ...routeParams
+                    }),
+                    'indirectVotesMadeForUser': VotesGeneralAggregateLogic({
                         filterAfterYourVoteAndBooleans: [{
                             '$match': {
                                 // position: "delegated",
@@ -198,22 +161,10 @@ export const VoteResolvers = {
                             '$match': {
                                 'Count.delegated': { $gt: 0 }
                             }
-                        }]
-                    }),
-                    'indirectVotesMadeForUser': async () => await defaultAggregation({
-                        filterAfterYourVoteAndBooleans: [{
-                            '$match': {
-                                // position: "delegated",
-                                // isDirect: false
-                            }
                         }],
-                        filterAfterMerge: [{
-                            '$match': {
-                                'Count.delegated': { $gt: 0 }
-                            }
-                        }]
+                        ...routeParams
                     }),
-                    'indirectVotesMadeByYou': async () => await defaultAggregation({
+                    'indirectVotesMadeByYou': VotesGeneralAggregateLogic({
                         filterAfterYourVoteAndBooleans: [{
                             '$match': {
                                 // 'youAndUserDetails.yourVoteMadeForUser': true
@@ -223,9 +174,10 @@ export const VoteResolvers = {
                             '$match': {
                                 'youAndUserDetailsCount.yourVoteMadeForUser': { $gt: 0 }
                             }
-                        }]
+                        }],
+                        ...routeParams
                     }),
-                    'indirectVotesMadeForYou': async () => await defaultAggregation({
+                    'indirectVotesMadeForYou': VotesGeneralAggregateLogic({
                         filterAfterYourVoteAndBooleans: [{
                             '$match': {
                                 //     'youAndUserDetails.yourVoteMadeByUser': true
@@ -235,9 +187,10 @@ export const VoteResolvers = {
                             '$match': {
                                 'youAndUserDetailsCount.yourVoteMadeByUser': { $gt: 0 }
                             }
-                        }]
+                        }],
+                        ...routeParams
                     }),
-                    'directVotesMadeByYou': async () => await defaultAggregation({
+                    'directVotesMadeByYou': VotesGeneralAggregateLogic({
                         filterAfterYourVoteAndBooleans: [{
                             '$match': {
                                 'user': new ObjectId(AuthUser?._id), // stays
@@ -249,60 +202,70 @@ export const VoteResolvers = {
                             '$match': {
                                 'Count.direct': { $gt: 0 }
                             }
-                        }]
+                        }],
+                        ...routeParams
                     }),
-                }[type]();
-            })(type);
+                }[type];
+            })(type, {
+                questionText,
+                choiceText,
+                groupHandle,
+                userHandle,
+                User,
+                AuthUser,
+                sortBy
+            });
+
+
+            const writeToDebugFile = fs.writeFile(
+                process.cwd() + '/debug' + '/votes_.json',
+                JSON.stringify({ QueryJSON: VotesSpecificAggregateLogic }, null, 2),
+                { encoding: 'utf8' }
+            );
+
+            const Votes = (await mongoDB.collection("Votes").aggregate(VotesSpecificAggregateLogic).toArray())
+                .map(v => ({
+                    // _id: Math.random()*1000000,
+                    ...v,
+
+                    // get `yourVote`s into `question` and `question.choices`
+                    question: {
+                        ...v.question,
+                        _id: `choiceaggregate_${type}_${questionText}_${choiceText}_${groupHandle}_${userHandle}_${v.user?.handle}_${v.questionText}`,
+                        choices: v.question?.choices?.map(c => ({
+                            ...c,
+                            userVote: !!v.choiceVotes?.find(cv => cv.userVote?.choiceText === c.text)?.userVote ? ({
+                                ...v.choiceVotes?.find(cv => cv.userVote.choiceText === c.text)?.userVote,
+                                user: v.user,
+                                groupChannel: v.groupChannel,
+                                // _id: `userChoiceVote_${type}_${questionText}_${choiceText}_${groupHandle}_${userHandle}_${v.user?.handle}_${v.questionText}_${c.text}`,
+                            }) : null,
+                            yourVote: !!v.choiceVotes?.find(cv => cv.userVote?.choiceText === c.text)?.yourVote ? ({
+                                ...v.choiceVotes?.find(cv => cv.userVote.choiceText === c.text)?.yourVote,
+                                user: AuthUser.LiquidUser,
+                                groupChannel: v.groupChannel,
+                                // _id: `yourVote_${type}_${questionText}_${choiceText}_${groupHandle}_${userHandle}_${v.user?.handle}_${v.questionText}_${c.text}`,
+                            }) : null
+                        })),
+                        yourVote: {
+                            ...v.yourVote,
+                            // _id: `yourVote_${type}_${questionText}_${groupHandle}_${userHandle}_${v.user?.handle}_${v.questionText}`,
+                        },
+                        userVote: {
+                            ...v.userVote,
+                            // _id: `userVote_${type}_${questionText}_${groupHandle}_${userHandle}_${v.user?.handle}_${v.questionText}`,
+                        }
+                    },
+                    // _id: `choiceaggregate_${type}_${questionText}_${choiceText}_${groupHandle}_${userHandle}_${v.user?.handle}_${v.questionText}`,
+                }));;
 
             console.log({
                 type,
                 VotesL: Votes?.length,
-                // VotesRespresentatives: Votes.map(v => JSON.stringify({ id: v?._id, r: v?.representatives }, null, 2))
-                // Vote: Votes?.[0]?.choiceVotes
-                // Votes: JSON.stringify(Votes.map(v => ({
-                //     c: v.youAndUserDetailsCount
-                // }))),
-                // v: JSON.stringify(Votes.map(v => ({
-                //     r: v.representatives
-                //     // g: v.question?.groupChannel?.group
-                // })), null, 2)
-                // singleQuestions: Votes.filter(v => v.question.questionType === 'single')
+                VotesR: Votes.map(v => v?.yourVote?.representatives)
             });
 
-            return Votes.map(v => ({
-                // _id: Math.random()*1000000,
-                ...v,
-
-                // get `yourVote`s into `question` and `question.choices`
-                question: {
-                    ...v.question,
-                    _id: `choiceaggregate_${type}_${questionText}_${choiceText}_${groupHandle}_${userHandle}_${v.user?.handle}_${v.questionText}`,
-                    choices: v.question?.choices?.map(c => ({
-                        ...c,
-                        userVote: !!v.choiceVotes?.find(cv => cv.userVote?.choiceText === c.text)?.userVote ? ({
-                            ...v.choiceVotes?.find(cv => cv.userVote.choiceText === c.text)?.userVote,
-                            user: v.user,
-                            groupChannel: v.groupChannel,
-                            // _id: `userChoiceVote_${type}_${questionText}_${choiceText}_${groupHandle}_${userHandle}_${v.user?.handle}_${v.questionText}_${c.text}`,
-                        }) : null,
-                        yourVote: !!v.choiceVotes?.find(cv => cv.userVote?.choiceText === c.text)?.yourVote ? ({
-                            ...v.choiceVotes?.find(cv => cv.userVote.choiceText === c.text)?.yourVote,
-                            user: AuthUser.LiquidUser,
-                            groupChannel: v.groupChannel,
-                            // _id: `yourVote_${type}_${questionText}_${choiceText}_${groupHandle}_${userHandle}_${v.user?.handle}_${v.questionText}_${c.text}`,
-                        }) : null
-                    })),
-                    yourVote: {
-                        ...v.yourVote,
-                        // _id: `yourVote_${type}_${questionText}_${groupHandle}_${userHandle}_${v.user?.handle}_${v.questionText}`,
-                    },
-                    userVote: {
-                        ...v.userVote,
-                        // _id: `userVote_${type}_${questionText}_${groupHandle}_${userHandle}_${v.user?.handle}_${v.questionText}`,
-                    }
-                },
-                // _id: `choiceaggregate_${type}_${questionText}_${choiceText}_${groupHandle}_${userHandle}_${v.user?.handle}_${v.questionText}`,
-            }));
+            return Votes;
         },
         VotesTest: async (_source, { args }, { mongoDB, AuthUser }) => {
 
