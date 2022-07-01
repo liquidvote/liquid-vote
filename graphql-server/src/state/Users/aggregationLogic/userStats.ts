@@ -30,7 +30,11 @@ export const userStatsAgg = ({ groupHandle, groupId }) => [
                             ...(!!groupId) ? [
                                 {
                                     '$expr': {
-                                        '$eq': ['$groupId', new ObjectId(groupId)]
+                                        '$eq': [
+                                            '$groupId', {
+                                                "$toObjectId": new ObjectId(groupId)
+                                            }
+                                        ]
                                     }
                                 }
                             ] : [],
@@ -76,7 +80,11 @@ export const userStatsAgg = ({ groupHandle, groupId }) => [
                             ...(!!groupId) ? [
                                 {
                                     '$expr': {
-                                        '$eq': ['$groupId', new ObjectId(groupId)]
+                                        '$eq': [
+                                            '$groupId', {
+                                                "$toObjectId": new ObjectId(groupId)
+                                            }
+                                        ]
                                     }
                                 }
                             ] : [],

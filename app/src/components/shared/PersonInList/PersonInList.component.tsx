@@ -6,7 +6,15 @@ import GroupInProfileListVotes from "@shared/GroupInProfileListVotes";
 
 import './style.sass';
 
-export const PersonInList: FunctionComponent<{ person: any, groupHandle?: string }> = ({ person, groupHandle }) => {
+export const PersonInList: FunctionComponent<{
+    person: any,
+    groupHandle?: string,
+    isShowingRepresentativeRelation?: boolean
+}> = ({
+    person,
+    groupHandle,
+    isShowingRepresentativeRelation
+}) => {
 
     const [showVotes, setShowVotes] = useState(false);
 
@@ -39,28 +47,14 @@ export const PersonInList: FunctionComponent<{ person: any, groupHandle?: string
                 <small className="d-flex mb-0">
                     {person.bio}
                 </small>
-                <div className="d-flex mb-n1">
-                    <small className="d-flex mb-0">
-                        <b className='white mr-1'>{' '}{person?.stats?.directVotesMade}</b> votes
-                    </small>
-                    {!!person?.yourStats?.directVotesInCommon && (
-                        <>
-                            {/* ・
-                                    <small className="d-flex mb-0">
-                                        <b className='white mr-1'>{' '}{group?.yourUserStats?.directVotesInCommon}</b> in common
-                                    </small> */}
-                            ・
-                            <small className="d-flex mb-0">
-                                <b className='white mr-1'>{' '}{person?.yourStats?.directVotesInAgreement} </b> in agreement
-                            </small>
-                            ・
-                            <small className="d-flex mb-0">
-                                <b className='white mr-1'>{' '}{person?.yourStats?.directVotesInDisagreement}</b> in disagreement
-                            </small>
-                        </>
 
-                    )}
-                </div>
+                {!isShowingRepresentativeRelation ? (
+                    <div className="d-flex mb-n1">
+                        <small className="d-flex mb-0">
+                            <b className='white mr-1'>{' '}{person?.stats?.directVotesMade || 0}</b> votes
+                        </small>
+                    </div>
+                ) : null}
 
                 {!!person?.stats?.directVotesMade && (
                     <small className='white'>
@@ -78,7 +72,7 @@ export const PersonInList: FunctionComponent<{ person: any, groupHandle?: string
                 )}
 
                 {/* <pre>{JSON.stringify(person, null, 2)}</pre> */}
-                {/* {!!person.representationGroups && (
+                {(isShowingRepresentativeRelation && !!person.representationGroups) ? (
                     <div
                         className="d-flex flex-wrap justify-content-start"
                     >
@@ -94,7 +88,8 @@ export const PersonInList: FunctionComponent<{ person: any, groupHandle?: string
                         ))}
                     </div>
 
-                )}
+                ) : null}
+                {/*
                 <small>
                     Voted the same as you in
                     {' '}<b className="white forDirect px-1 rounded">{useMemo(() => Math.floor(Math.random() * 100), [])}</b>

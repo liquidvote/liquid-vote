@@ -13,6 +13,8 @@ import Avatar from '@components/shared/Avatar';
 import ThreeDotsSmallSVG from '@shared/Icons/ThreeDots-small-horizontal.svg';
 import Popper from "@shared/Popper";
 import GroupInProfileListVotes from "@shared/GroupInProfileListVotes";
+import useUser from '@state/User/user.effect';
+import HandshakeSVG from "@shared/Icons/Handshake.svg";
 
 import './style.sass';
 
@@ -31,6 +33,10 @@ export const GroupInProfileList: FunctionComponent<{
         let { section, subsection, subsubsection, handle, groupHandle } = useParams<any>();
 
         const { liquidUser } = useAuthUser();
+
+        const { user: userWithMoreData } = useUser({ userHandle: user.handle, groupHandle: group.handle });
+
+        console.log({ user, userWithMoreData });
 
         const [editGroupMemberChannelRelation, {
             loading: editGroupMemberChannelRelation_loading,
@@ -111,10 +117,33 @@ export const GroupInProfileList: FunctionComponent<{
                                                 ) : <LinkSVG />}
                                             </div>
                                         </div>
-                                        <small className='primary-color'>
-                                            {group.representativeRelation?.isRepresentingYou && !group.youToHimRepresentativeRelation?.isRepresentingYou ? "represents you" : ""}
+                                        <small className='primary-color d-flex'>
+                                            {
+                                                (userWithMoreData?.groupStats?.stats?.representedBy || userWithMoreData?.groupStats?.stats?.representing) ?
+                                                    <>
+                                                        {/* <div className="mr-1"><HandshakeSVG /></div> */}
+                                                        <div className="d-flex flex-column">
+                                                            <div className="d-flex flex-wrap">
+                                                                {userWithMoreData?.groupStats?.stats?.representedBy ? (
+                                                                    <Link to={`/profile-people/${user.handle}/representedBy`} className="mr-2">
+                                                                        Representing{' '}<b className="white">{userWithMoreData?.groupStats?.stats?.representedBy}</b>
+                                                                        {group.representativeRelation?.isRepresentingYou ? " (including you)" : ""}
+                                                                    </Link>
+                                                                ) : null}
+                                                                {userWithMoreData?.groupStats?.stats?.representing ? (
+                                                                    <Link to={`/profile-people/${user.handle}/representing`} className="mr-2">
+                                                                        Represented by{' '}<b className="white">{userWithMoreData?.groupStats?.stats?.representing}</b>
+                                                                        {group.youToHimRepresentativeRelation?.isRepresentingYou ? " (including you)" : ""}
+                                                                    </Link>
+                                                                ) : null}
+                                                            </div>
+                                                        </div>
+                                                    </> :
+                                                    <></>
+                                            }
+                                            {/* {group.representativeRelation?.isRepresentingYou && !group.youToHimRepresentativeRelation?.isRepresentingYou ? "represents you" : ""}
                                             {!group.representativeRelation?.isRepresentingYou && group.youToHimRepresentativeRelation?.isRepresentingYou ? "represented by you" : ""}
-                                            {group.representativeRelation?.isRepresentingYou && group.youToHimRepresentativeRelation?.isRepresentingYou ? "you represent each other" : ""}
+                                            {group.representativeRelation?.isRepresentingYou && group.youToHimRepresentativeRelation?.isRepresentingYou ? "you represent each other" : ""} */}
                                         </small>
                                     </div>
                                     <div className="d-flex ml-n1 justify-content-center">
@@ -289,10 +318,10 @@ export const GroupInProfileList: FunctionComponent<{
 
                 {isSelected && (
                     <GroupInProfileListVotes
-                        userHandle={ handle }
-                        groupHandle={ groupHandle}
-                        subsection={ subsection }
-                        subsubsection={ subsubsection }
+                        userHandle={handle}
+                        groupHandle={groupHandle}
+                        subsection={subsection}
+                        subsubsection={subsubsection}
                     />
                 )}
             </div>

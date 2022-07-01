@@ -468,6 +468,7 @@ export const UserResolvers = {
                             }
                         },
                     },
+                    // ...userStatsAgg({ groupHandle, groupId: group._id }),
                     {
                         '$lookup': {
                             'as': 'directVotesMadeByUser',

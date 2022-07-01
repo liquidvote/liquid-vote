@@ -68,7 +68,7 @@ export const ProfilePeople: FunctionComponent<{}> = ({ }) => {
             {which === 'representedBy' && (
                 <div className="mt-n2">
                     {user_representing_data?.UserRepresenting?.map((el, i) => (
-                        <PersonInList person={el} />
+                        <PersonInList person={el} isShowingRepresentativeRelation={true} />
                     ))}
                     {(!user_representing_data?.UserRepresenting?.length && !user_representing_loading) && (
                         <div className="p-4 text-center">{`${profile?.name} isn't represented by anyone yet.`}</div>
@@ -79,7 +79,7 @@ export const ProfilePeople: FunctionComponent<{}> = ({ }) => {
             {which === 'representing' && (
                 <div className="mt-n2">
                     {user_represented_by_data?.UserRepresentedBy?.map((el, i) => (
-                        <PersonInList person={el} />
+                        <PersonInList person={el} isShowingRepresentativeRelation={true} />
                     ))}
                     {(!user_represented_by_data?.UserRepresentedBy?.length && !user_represented_by_loading) && (
                         <div className="p-4 text-center">{`${profile?.name} isn't representing anyone yet.`}</div>
