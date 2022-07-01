@@ -57,7 +57,6 @@ export const GroupPolls: FunctionComponent<{
                             key={`single-${q.questionText}`}
                             l={q}
                             showGroupAndTime={true}
-                            showIntroMessage={true}
                         />
                     )}
                     <hr />

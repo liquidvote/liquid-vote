@@ -21,35 +21,22 @@ export const Home: FunctionComponent<{}> = ({ }) => {
 
             <h2>Welcome to <b className="white">Liquid Vote</b></h2>
 
-            <p>Where opinions are found</p>
+            <p>Where opinions are followed and delegated</p>
 
             <br />
 
-            <h4>Who is it for?</h4>
+            {/* <h4>Who is it for?</h4>
             <p>
                 From choosing the theme for a birthday party, to managing large condominiums. <br />
                 Liquid Vote helps tiny and large organizations quickly gather a group's opinions.
+            </p> */}
+
+            <h4>Are my votes anonymous?</h4>
+            <p>
+                No.
+                <br />
+                But anonymity features will come.
             </p>
-
-            {/* <br />
-
-            <h4>What is liquid voting?</h4>
-            <div className="d-flex align-items-center">
-                <p className="mr-2">
-                    A form of voting where you express your views by voting directly,
-                    or by delegating to people you trust to represent you.
-                </p>
-                <iframe
-                    // width="560"
-                    // height="315"
-                    style={{ maxHeight: '100%', maxWidth: '48%' }}
-                    src="https://www.youtube.com/embed/fg0_Vhldz-8"
-                    title="YouTube video player"
-                    frameBorder="0"
-                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                    allowFullScreen
-                ></iframe>
-            </div> */}
 
             <br />
 
@@ -58,17 +45,16 @@ export const Home: FunctionComponent<{}> = ({ }) => {
                 If you vote on an poll, your vote's weight is 100% on your choice,
                 even when you have representatives.
                 <br />
-                But when not voting, your vote's weight gets delegated to your representatives.
-                Or to their representatives, if they themselves do not vote either.
+                But when not voting, your vote's weight gets equally split among your representatives. Or, has no weight on the poll if you have no voting representatives.
             </p>
 
-            <br />
+            {/* <br />
 
             <h4>Ok ok, but why is this any better than voting on social media?</h4>
             <p>
-                This is quicker to gather everyone's input on <b>no matter how many questions</b> you need answered.<br/>
+                This is quicker to gather everyone's input on <b>no matter how many questions</b> you need answered.<br />
                 By delegating votes, people instantly add weight to whatever their chosen representatives voted on already.
-            </p>
+            </p> */}
 
             <br />
 
@@ -76,40 +62,14 @@ export const Home: FunctionComponent<{}> = ({ }) => {
             <p>
                 Hey man, you do you, but: <br />
                 1. This is still in early development <br />
-                2. Such tools are great for gathering opinions, perhaps not for changing your nation state's laws in real time as people's minds change. 
+                2. Such tools are great for gathering opinions, perhaps not for changing your nation state's laws in real time as people's minds change.
             </p>
-
-            {/* <br />
-            
-
-            <div className="bar-container-horizontal">
-                <VoteWrapper
-                    l={{
-                        questionText: 'Liquid Voting is Cool',
-                        // showNameInside,
-                        forDirectCount: 12000,
-                        forCount: 35700,
-                        againstDirectCount: 1430,
-                        againstCount: 4500,
-                        // forPercentageOnOther = null,
-                        // userVote = null,
-                        // userDelegatedVotes = null,
-                        // group = null,
-                        // showQuestionMarkInName = false
-                        showQuestionMarkInName: true
-                    }}
-                    // i={0}
-                    showIntroMessage={true}
-                    introMessage="Do you Believe"
-                    showColorLegend={true}
-                />
-            </div> */}
 
             <br />
 
             <h4>Pricing</h4>
             <p>
-               Free forever for any active group created before we start charging profitable businesses. 
+                Free forever for 10 years for any active <b>Cause</b> created before we start charging profitable businesses.
             </p>
 
             <br />
@@ -133,11 +93,11 @@ export const Home: FunctionComponent<{}> = ({ }) => {
                             }
                         })
                     )}
-                >Create a Group</div>
+                >Launch a Cause</div>
                 <Link
                     className="button_ mr-3"
                     to={`/groups`}
-                >Explore Groups</Link>
+                >Explore Causes</Link>
                 <a
                     className="button_ mr-3"
                     // Edit with this tool: https://mailto.vercel.app

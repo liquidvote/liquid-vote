@@ -22,18 +22,12 @@ import './style.sass';
 export const SingleVoteInList: FunctionComponent<{
     l: any,
     user?: any,
-    introMessage?: string,
-    showIntroMessage?: boolean,
-    showColorLegend?: boolean,
     showGroupAndTime?: boolean,
     hideTitle?: boolean,
     showChart?: boolean,
 }> = ({
     l,
     user,
-    introMessage,
-    showIntroMessage,
-    showColorLegend,
     showGroupAndTime,
     hideTitle,
     showChart
@@ -95,9 +89,6 @@ export const SingleVoteInList: FunctionComponent<{
                     </small>
                 )} */}
                 <div>
-                    {/* {(showIntroMessage && !hideTitle) && (
-                        <small className="do-you d-flex mb-n1">{introMessage || `Do you ${l?.startText || 'approve'}`}</small>
-                    )} */}
                     <div className="bar-wrapper">
                         {(!!l.questionText && !hideTitle) && (
                             <div className="d-flex align-items-center flex-wrap">
@@ -107,7 +98,6 @@ export const SingleVoteInList: FunctionComponent<{
                                 >
                                     <div className={`${showGroupAndTime && 'limit-right'}`} title={l.questionText}>
                                         {l.questionText}
-                                        {/* {showIntroMessage && '?'} */}
                                     </div>
                                 </a>
                                 {/* {l.userVote && (

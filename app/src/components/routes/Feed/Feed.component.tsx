@@ -97,7 +97,6 @@ export const Feed: FunctionComponent<{}> = ({ }) => {
                                 key={`single-${v.questionText}`}
                                 l={v}
                                 showGroupAndTime={true}
-                                showIntroMessage={true}
                             />
                         )}
                         <hr />

@@ -20,7 +20,7 @@ export const Notification: FunctionComponent<{
     hideChoicesBesides
 }) => {
 
-        console.log({ v });
+        // console.log({ v });
 
         const [showAllChoices, setShowAllChoices] = useState(!hideChoicesBesides);
 
