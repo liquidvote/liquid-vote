@@ -28,7 +28,7 @@ export const Header: FunctionComponent<{
             if (backLink) {
                 navigate(backLink);
             } else {
-                navigate(-1)
+                navigate(-1, { replace: false })
             }
         }
 
