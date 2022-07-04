@@ -1,5 +1,4 @@
 import { ObjectId } from 'mongodb';
-import { votesInCommonPipelineForVotes } from '../../Users/aggregationLogic/votesInCommonPipelineForVotes';
 
 export const QuestionsAgg = ({
     userId,
@@ -42,6 +41,7 @@ export const QuestionsAgg = ({
         }, {
             $addFields: { 'group': { $first: '$group' } }
         },
+        // TODO: confirm public group or user belongs to Link Only Group
         {
             '$unwind': {
                 'path': '$choices',
@@ -154,18 +154,13 @@ export const QuestionsAgg = ({
             },
         ] : [],
 
-        ...getYourStatsForRepresentatives_On_QuestionsAgg({ AuthUserId }),
+        ...(!!AuthUserId) ? [
+            ...getYourVoteRepresentativesUsers_On_QuestionsAgg({ AuthUserId }),
 
-        // ...getYourStatsForAgainstMostRepresentingVoters_On_QuestionsAgg({ AuthUserId }),
+            ...yourStats({ AuthUserId }),
+        ] : [],
 
-        // ...getYourStatsForAgainstMostRepresentingVoters_On_QuestionsChoicesAgg({ AuthUserId }),
-
-        // ...getYourStatsForFortMostRepresentingVoters_On_QuestionsAgg({ AuthUserId }),
-
-        // ...getYourStatsForForMostRepresentingVoters_On_QuestionsChoicesAgg({ AuthUserId }),
-
-        ...votersYouFollow({ AuthUserId }),
-
+        // Merge Choices into Question
         {
             '$group': {
                 '_id': {
@@ -212,23 +207,35 @@ export const QuestionsAgg = ({
                 'stats': {
                     '$first': '$stats'
                 },
-                'yourStats': {
-                    '$first': '$yourStats'
-                },
+                'yourVote_representatives': { '$push': '$yourVote.representatives' },
+                'yourStats_votersYouFollow': { '$push': '$yourStats.votersYouFollow' },
                 'createdBy': {
                     '$first': '$createdBy'
-                },
-                'votersInCommonStats': {
-                    '$first': '$votersInCommonStats'
                 },
                 'group': {
                     '$first': '$group'
                 }
             }
         },
+
+        ...(!!AuthUserId) ? [
+            ...mergedYourVoteUniqueRepresentatives,
+            ...mergedYourStatsVotersYouFollow,
+
+
+            {
+                '$addFields': {
+                    'yourStats': {
+                        'votersYouFollow': '$yourStats_votersYouFollow',
+                        'votersRepresentingYou': '$yourVote_representatives'
+                    }
+                }
+            },
+
+        ] : []
     ];
 
-const getYourStatsForRepresentatives_On_QuestionsAgg = ({ AuthUserId }) => [
+const getYourVoteRepresentativesUsers_On_QuestionsAgg = ({ AuthUserId }) => [
     {
         '$unwind': {
             'path': '$yourVote.representatives',
@@ -249,105 +256,15 @@ const getYourStatsForRepresentatives_On_QuestionsAgg = ({ AuthUserId }) => [
         }
     }, {
         '$addFields': {
-            'yourVote.representatives.representativeHandle': '$representativeUser.handle',
-            'yourVote.representatives.representativeName': '$representativeUser.name',
-            'yourVote.representatives.representativeAvatar': '$representativeUser.avatar'
+            'yourVote.representatives.representativeHandle': '$representativeUser.handle',  // should be obsoleted
+            'yourVote.representatives.representativeName': '$representativeUser.name',      // should be obsoleted
+            'yourVote.representatives.representativeAvatar': '$representativeUser.avatar',  // should be obsoleted
+            'yourVote.representatives.handle': '$representativeUser.handle',
+            'yourVote.representatives.name': '$representativeUser.name',
+            'yourVote.representatives.avatar': '$representativeUser.avatar',
+            'yourVote.representatives.vote.position': '$yourVote.representatives.position',
         }
     },
-    // ...(!!AuthUserId) ? [
-    //     {
-    //         '$lookup': {
-    //             'as': 'directVotesMade_byRepresentative',
-    //             'from': 'Votes',
-    //             'let': {
-    //                 'userId': '$yourVote.representatives.representativeId',
-    //                 'group': '$groupChannel.group'
-    //             },
-    //             'pipeline': [
-    //                 {
-    //                     '$match': {
-    //                         '$and': [
-    //                             {
-    //                                 '$expr': {
-    //                                     '$eq': [
-    //                                         '$user', '$$userId'
-    //                                     ]
-    //                                 }
-    //                             },
-    //                             {
-    //                                 '$expr': {
-    //                                     '$eq': [
-    //                                         '$isDirect', true
-    //                                     ]
-    //                                 }
-    //                             },
-    //                             {
-    //                                 '$expr': {
-    //                                     '$ne': [
-    //                                         '$position', null
-    //                                     ]
-    //                                 }
-    //                             },
-    //                             {
-    //                                 '$expr': {
-    //                                     '$eq': [
-    //                                         '$groupChannel.group', '$$group'
-    //                                     ]
-    //                                 }
-    //                             },
-    //                         ],
-    //                     }
-    //                 },
-    //             ]
-    //         }
-    //     },
-    //     {
-    //         '$addFields': {
-    //             'yourVote.representatives.stats': {
-    //                 'directVotesMade': {
-    //                     $size: '$directVotesMade_byRepresentative'
-    //                 }
-    //             }
-    //         }
-    //     },
-    //     {
-    //         '$lookup': {
-    //             'as': 'yourStats_forRepresentative',
-    //             'from': 'Votes',
-    //             'let': {
-    //                 'userId': '$yourVote.representatives.representativeId',
-    //                 'group': "$groupChannel.group"
-    //             },
-    //             'pipeline': [
-    //                 {
-    //                     '$match': {
-    //                         '$and': [
-    //                             {
-    //                                 '$expr': {
-    //                                     '$eq': [
-    //                                         '$user', new ObjectId(AuthUserId)
-    //                                     ]
-    //                                 }
-    //                             },
-    //                             {
-    //                                 '$expr': {
-    //                                     '$eq': [
-    //                                         '$groupChannel.group', '$$group'
-    //                                     ]
-    //                                 }
-    //                             },
-    //                         ],
-    //                     }
-    //                 },
-    //                 ...votesInCommonPipelineForVotes()
-    //             ]
-    //         }
-    //     }, {
-    //         '$addFields': {
-    //             'yourVote.representatives.yourStats': { '$first': '$yourStats_forRepresentative' }
-    //         }
-    //     }
-    // ] : [],
     {
         '$addFields': {
             'yourVote_Representatives': '$yourVote.representatives'
@@ -372,7 +289,7 @@ const getYourStatsForRepresentatives_On_QuestionsAgg = ({ AuthUserId }) => [
                 '$first': '$yourVote'
             },
             'userVote': {
-                '$first' : '$userVote',
+                '$first': '$userVote',
             },
             'id': {
                 '$first': '$id'
@@ -410,9 +327,6 @@ const getYourStatsForRepresentatives_On_QuestionsAgg = ({ AuthUserId }) => [
             'i': {
                 '$first': '$i'
             },
-            'votersInCommonStats': {
-                '$first': '$votersInCommonStats'
-            },
             'group': {
                 '$first': '$group'
             },
@@ -429,7 +343,167 @@ const getYourStatsForRepresentatives_On_QuestionsAgg = ({ AuthUserId }) => [
     },
 ];
 
-const votersYouFollow = ({ AuthUserId }) => [
+const mergedYourVoteUniqueRepresentatives = [
+    {
+        '$unwind': {
+            'path': '$yourVote_representatives',
+            'preserveNullAndEmptyArrays': true,
+            "includeArrayIndex": "i1"
+        }
+    }, {
+        '$unwind': {
+            'path': '$yourVote_representatives',
+            'preserveNullAndEmptyArrays': true,
+            "includeArrayIndex": "i2"
+        }
+    }, {
+        '$group': {
+            '_id': {
+                // no `choiceText`
+                // 'user': '$_id.user',
+                'questionText': '$questionText',
+                'groupId': '$group._id',
+                'representativeId': '$yourVote_representatives.representativeId'
+            },
+            'root': {
+                '$first': '$$ROOT'
+            }
+        }
+    },
+    {
+        '$group': {
+            '_id': {
+                'questionText': '$root.questionText'
+            },
+            'choices': {
+                '$first': '$root.choices'
+            },
+            'allowNewChoices': {
+                '$first': '$root.allowNewChoices'
+            },
+            'id': {
+                '$first': '$root.id'
+            },
+            'questionType': {
+                '$first': '$root.questionType'
+            },
+            'questionText': {
+                '$first': '$root.questionText'
+            },
+            'description': {
+                '$first': '$root.description'
+            },
+            'startText': {
+                '$first': '$root.startText'
+            },
+            'groupChannel': {
+                '$first': '$root.groupChannel'
+            },
+            'resultsOn': {
+                '$first': '$root.resultsOn'
+            },
+            'lastEditOn': {
+                '$first': '$root.lastEditOn'
+            },
+            'createdOn': {
+                '$first': '$root.createdOn'
+            },
+            'stats': {
+                '$first': '$root.stats'
+            },
+            'yourVote_representatives': { '$push': '$root.yourVote_representatives' },
+            'yourStats_votersYouFollow': { '$first': '$root.yourStats_votersYouFollow' },
+            'createdBy': {
+                '$first': '$root.createdBy'
+            },
+            'group': {
+                '$first': '$root.group'
+            }
+        }
+    }
+];
+
+const mergedYourStatsVotersYouFollow = [
+    {
+        '$unwind': {
+            'path': '$yourStats_votersYouFollow',
+            'preserveNullAndEmptyArrays': true,
+            "includeArrayIndex": "i1"
+        }
+    }, {
+        '$unwind': {
+            'path': '$yourStats_votersYouFollow',
+            'preserveNullAndEmptyArrays': true,
+            "includeArrayIndex": "i2"
+        }
+    }, {
+        '$group': {
+            '_id': {
+                // no `choiceText`
+                // 'user': '$_id.user',
+                'questionText': '$questionText',
+                'groupId': '$group._id',
+                'yourStats_votersYouFollow_handle': '$yourStats_votersYouFollow.handle'
+            },
+            'root': {
+                '$first': '$$ROOT'
+            }
+        }
+    },
+    {
+        '$group': {
+            '_id': {
+                'questionText': '$root.questionText'
+            },
+            'choices': {
+                '$first': '$root.choices'
+            },
+            'allowNewChoices': {
+                '$first': '$root.allowNewChoices'
+            },
+            'id': {
+                '$first': '$root.id'
+            },
+            'questionType': {
+                '$first': '$root.questionType'
+            },
+            'questionText': {
+                '$first': '$root.questionText'
+            },
+            'description': {
+                '$first': '$root.description'
+            },
+            'startText': {
+                '$first': '$root.startText'
+            },
+            'groupChannel': {
+                '$first': '$root.groupChannel'
+            },
+            'resultsOn': {
+                '$first': '$root.resultsOn'
+            },
+            'lastEditOn': {
+                '$first': '$root.lastEditOn'
+            },
+            'createdOn': {
+                '$first': '$root.createdOn'
+            },
+            'stats': {
+                '$first': '$root.stats'
+            },
+            'yourVote_representatives': { '$first': '$root.yourVote_representatives' },
+            'yourStats_votersYouFollow': { '$push': '$root.yourStats_votersYouFollow' },
+            'createdBy': {
+                '$first': '$root.createdBy'
+            },
+            'group': {
+                '$first': '$root.group'
+            }
+        }
+    }
+];
+
+const yourStats = ({ AuthUserId }) => [
     ...(!!AuthUserId) ? [
         {
             '$lookup': {
@@ -538,105 +612,16 @@ const votersYouFollow = ({ AuthUserId }) => [
                         '$addFields': {
                             'vote': { '$first': '$vote' }
                         }
-                    },
-                    // {
-                    //     '$lookup': {
-                    //         'as': 'directVotesMade',
-                    //         'from': 'Votes',
-                    //         'let': {
-                    //             'userId': '$_id',
-                    //             'group': '$$group'
-                    //         },
-                    //         'pipeline': [
-                    //             {
-                    //                 '$match': {
-                    //                     '$and': [
-                    //                         {
-                    //                             '$expr': {
-                    //                                 '$eq': [
-                    //                                     '$user', '$$userId'
-                    //                                 ]
-                    //                             }
-                    //                         },
-                    //                         {
-                    //                             '$expr': {
-                    //                                 '$eq': [
-                    //                                     '$isDirect', true
-                    //                                 ]
-                    //                             }
-                    //                         },
-                    //                         {
-                    //                             '$expr': {
-                    //                                 '$ne': [
-                    //                                     '$position', null
-                    //                                 ]
-                    //                             }
-                    //                         },
-                    //                         {
-                    //                             '$expr': {
-                    //                                 '$eq': [
-                    //                                     '$groupChannel.group', '$$group'
-                    //                                 ]
-                    //                             }
-                    //                         },
-                    //                     ],
-                    //                 }
-                    //             },
-                    //         ]
-                    //     }
-                    // },
-                    // {
-                    //     '$addFields': {
-                    //         'stats': {
-                    //             'directVotesMade': {
-                    //                 $size: '$directVotesMade'
-                    //             }
-                    //         }
-                    //     }
-                    // },
-                    // {
-                    //     '$lookup': {
-                    //         'as': 'yourStats',
-                    //         'from': 'Votes',
-                    //         'let': {
-                    //             'userId': '$_id',
-                    //             'group': "$$group"
-                    //         },
-                    //         'pipeline': [
-                    //             {
-                    //                 '$match': {
-                    //                     '$and': [
-                    //                         {
-                    //                             '$expr': {
-                    //                                 '$eq': [
-                    //                                     '$user', new ObjectId(AuthUserId)
-                    //                                 ]
-                    //                             }
-                    //                         },
-                    //                         {
-                    //                             '$expr': {
-                    //                                 '$eq': [
-                    //                                     '$groupChannel.group', '$$group'
-                    //                                 ]
-                    //                             }
-                    //                         },
-                    //                     ],
-                    //                 }
-                    //             },
-                    //             ...votesInCommonPipelineForVotes()
-                    //         ]
-                    //     }
-                    // }, {
-                    //     '$addFields': {
-                    //         'yourStats': { '$first': '$yourStats' }
-                    //     }
-                    // }
+                    }
                 ]
             }
         },
         {
             '$addFields': {
-                'yourStats': { 'votersYouFollow': '$votersYouFollow' }
+                'yourStats': {
+                    'votersYouFollow': '$votersYouFollow',
+                    'votersRepresentingYou': '$yourVote.representatives'
+                }
             }
         },
     ] : []

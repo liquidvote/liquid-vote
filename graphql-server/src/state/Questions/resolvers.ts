@@ -17,12 +17,13 @@ export const QuestionResolvers = {
                 }))?.toArray())?.[0];
 
             // const writeToDebugFile = fs.writeFile(
-            //     process.cwd() + '/debug' + '/Questions.json',
+            //     process.cwd() + '/debug' + '/Question.json',
             //     JSON.stringify({
             //         QueryJSON: QuestionsAgg({
             //             questionText,
             //             group,
-            //             AuthUserId: AuthUser?._id
+            //             AuthUserId: AuthUser?._id,
+            //             userId: null
             //         })
             //     }, null, 2),
             //     { encoding: 'utf8' }
@@ -57,17 +58,18 @@ export const QuestionResolvers = {
 
             // console.log("questions");
 
-            // const writeToDebugFile = fs.writeFile(
-            //     process.cwd() + '/debug' + '/Questions.json',
-            //     JSON.stringify({
-            //         QueryJSON: QuestionsAgg({
-            //             questionText: null,
-            //             group,
-            //             AuthUserId: AuthUser?._id
-            //         }),
-            //     }, null, 2),
-            //     { encoding: 'utf8' }
-            // );
+            const writeToDebugFile = fs.writeFile(
+                process.cwd() + '/debug' + '/Questions_.json',
+                JSON.stringify({
+                    QueryJSON: QuestionsAgg({
+                        questionText: null,
+                        group,
+                        AuthUserId: AuthUser?._id,
+                        userId: null
+                    }),
+                }, null, 2),
+                { encoding: 'utf8' }
+            );
 
             const Questions = await mongoDB.collection("Questions")
                 .aggregate(

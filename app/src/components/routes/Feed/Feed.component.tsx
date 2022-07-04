@@ -6,7 +6,7 @@ import Header from "@shared/Header";
 import { USER_QUESTIONS } from "@state/User/typeDefs";
 import SingleVoteInList from "@shared/SingleVoteInList";
 import MultiVoteInList from "@shared/MultiVoteInList";
-import DropAnimation from "@components/shared/DropAnimation";
+import DropAnimation from "@shared/DropAnimation";
 import useAuthUser from '@state/AuthUser/authUser.effect';
 import VoteSortPicker from '@components/shared/VoteSortPicker';
 

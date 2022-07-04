@@ -817,80 +817,88 @@ export const UserResolvers = {
             })
                 .toArray();
 
-            const Questions = await mongoDB.collection("Questions")
-                .aggregate(
-                    [
-                        // ...(!!UserGroups && !notUsers) ? [{
-                        //     '$match': {
-                        //         'groupChannel.group': { '$in': UserGroups.map(g => g.handle) }
-                        //     }
-                        // }] : [],
-                        // ...(!!UserGroups && notUsers) ? [{
-                        //     '$match': {
-                        //         'groupChannel.group': { '$nin': UserGroups.map(g => g.handle) }
-                        //     }
-                        // }] : [],
-                        ...QuestionsAgg({
-                            questionText: null,
-                            group: (!!UserGroups && !notUsers) ?
-                                { '$in': UserGroups.map(g => g.handle) } :
-                                (!!UserGroups && notUsers) ?
-                                    { '$nin': UserGroups.map(g => g.handle) } :
-                                    null,
-                            AuthUserId: AuthUser?._id,
-                            userId: null
-                        }),
-                        // {
-                        //     $lookup: {
-                        //         from: 'Groups',
-                        //         localField: 'groupChannel.group',
-                        //         foreignField: 'handle',
-                        //         as: 'group'
-                        //     }
-                        // },
-                        // {
-                        //     $addFields: {
-                        //         group: { $first: "$group" }
-                        //     }
-                        // },
-                        ...(!!notUsers || !handle) ? [{
-                            $match: {
-                                'group.privacy': 'public'
-                            }
-                        }] : [],
-                        {
-                            '$addFields': {
-                                'stats.lastEditOrVote': {
-                                    '$cond': [
-                                        {
-                                            '$gt': [
-                                                '$lastEditOn', '$stats.lastVoteOn'
-                                            ]
-                                        }, '$lastEditOn', '$stats.lastVoteOn'
+            const Agg = [
+                // ...(!!UserGroups && !notUsers) ? [{
+                //     '$match': {
+                //         'groupChannel.group': { '$in': UserGroups.map(g => g.handle) }
+                //     }
+                // }] : [],
+                // ...(!!UserGroups && notUsers) ? [{
+                //     '$match': {
+                //         'groupChannel.group': { '$nin': UserGroups.map(g => g.handle) }
+                //     }
+                // }] : [],
+                ...QuestionsAgg({
+                    questionText: null,
+                    group: (!!UserGroups && !notUsers) ?
+                        { '$in': UserGroups.map(g => g.handle) } :
+                        (!!UserGroups && notUsers) ?
+                            { '$nin': UserGroups.map(g => g.handle) } :
+                            null,
+                    AuthUserId: AuthUser?._id,
+                    userId: null
+                }),
+                // {
+                //     $lookup: {
+                //         from: 'Groups',
+                //         localField: 'groupChannel.group',
+                //         foreignField: 'handle',
+                //         as: 'group'
+                //     }
+                // },
+                // {
+                //     $addFields: {
+                //         group: { $first: "$group" }
+                //     }
+                // },
+                ...(!!notUsers || !handle) ? [{
+                    $match: {
+                        'group.privacy': 'public'
+                    }
+                }] : [],
+                {
+                    '$addFields': {
+                        'stats.lastEditOrVote': {
+                            '$cond': [
+                                {
+                                    '$gt': [
+                                        '$lastEditOn', '$stats.lastVoteOn'
                                     ]
-                                },
-                                'stats.totalVotes': {
-                                    '$sum': [
-                                        '$stats.directVotes', '$stats.indirectVotes'
-                                    ]
-                                },
-                                // 'thisUserIsAdmin': {
-                                //     '$eq': ['$createdBy', AuthUser?.LiquidUser?.handle]
-                                // }
-                            }
+                                }, '$lastEditOn', '$stats.lastVoteOn'
+                            ]
                         },
-                        ...(sortBy === 'weight') ? [
-                            {
-                                '$sort': { 'stats.totalVotes': -1 }
-                            }
-                        ] : [],
-                        ...(sortBy === 'time') ? [
-                            {
-                                '$sort': { 'stats.lastEditOrVote': -1 }
-                            }
-                        ] : []
-                    ]
-                )
+                        'stats.totalVotes': {
+                            '$sum': [
+                                '$stats.directVotes', '$stats.indirectVotes'
+                            ]
+                        },
+                        // 'thisUserIsAdmin': {
+                        //     '$eq': ['$createdBy', AuthUser?.LiquidUser?.handle]
+                        // }
+                    }
+                },
+                ...(sortBy === 'weight') ? [
+                    {
+                        '$sort': { 'stats.totalVotes': -1 }
+                    }
+                ] : [],
+                ...(sortBy === 'time') ? [
+                    {
+                        '$sort': { 'stats.lastEditOrVote': -1 }
+                    }
+                ] : []
+            ];
+
+            const writeToDebugFile = fs.writeFile(
+                process.cwd() + '/debug' + '/UserQuestions.json',
+                JSON.stringify({
+                    QueryJSON: Agg,
+                }, null, 2),
+                { encoding: 'utf8' }
+            );
+
+            const Questions = await mongoDB.collection("Questions")
+                .aggregate(Agg)
                 .toArray();
 
             // TODO: move this logic to the aggregation, it'll run much faster

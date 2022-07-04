@@ -3,19 +3,38 @@ import { gql } from "apollo-server-lambda";
 export const QuestionTypeDefs = gql`
 
     type QuestionStats {
-        lastVoteOn: String                      #
-        forCount: Float                         #
-        forDirectCount: Float                   #
-        forMostRepresentingVoters: [Voter]      # TODO: Comparison Circles
-        againstCount: Float                     #
-        againstMostRepresentingVoters: [Voter]  # TODO: Comparison Circles
-        againstDirectCount: Float
+        lastVoteOn: String
+
+        forMostRepresentingVoters: [Voter]
+        againstMostRepresentingVoters: [Voter]
+
+        # Count
+        forCount: Float
+        forDirectCount: Float
         directVotes: Float
+        againstCount: Float
         indirectVotes: Float
+        againstDirectCount: Float
+
+        # Time Weight
+        votersTimeWeight: Float
     }
 
     type YourQuestionStats {
+        lastVoteByVoterYouFollowOn: String
+        lastVoteByRepresentativeOn: String
+        lastVoteByYouOn: String
+
         votersYouFollow: [Voter]
+        votersRepresentingYou: [Voter]
+
+        # Count
+        votersYouFollowCount: Float
+        votersRepresentingYouCount: Float
+
+        # Time Weight
+        votersYouFollowTimeWeight: Float
+        votersRepresentingYouTimeWeight: Float
     }
 
     type Choice {
@@ -45,6 +64,7 @@ export const QuestionTypeDefs = gql`
 
         stats: QuestionStats
         yourStats: YourQuestionStats
+        yourStatsUnseen: YourQuestionStats
         userVote: Vote
         yourVote: Vote
         group: Group
