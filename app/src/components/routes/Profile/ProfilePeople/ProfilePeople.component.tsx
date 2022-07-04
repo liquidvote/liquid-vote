@@ -52,13 +52,13 @@ export const ProfilePeople: FunctionComponent<{}> = ({ }) => {
 
             <ul className="nav d-flex justify-content-around mt-1 mb-n4 mx-n3">
                 <li className="nav-item">
-                    <Link className={`nav-link ${which === 'representing' && 'active'}`} to={`/profile-people/${profile.handle}/representing`}>
-                        <b>{profile?.stats?.representing}</b> Representing {profile.name}
+                    <Link className={`nav-link ${which === 'representedBy' && 'active'}`} to={`/profile-people/${profile.handle}/representedBy`}>
+                        <b>{profile?.stats?.representedBy}</b> Represented by {profile.name}
                     </Link>
                 </li>
                 <li className="nav-item">
-                    <Link className={`nav-link ${which === 'representedBy' && 'active'}`} to={`/profile-people/${profile.handle}/representedBy`}>
-                        <b>{profile?.stats?.representedBy}</b> Represented by {profile.name}
+                    <Link className={`nav-link ${which === 'representing' && 'active'}`} to={`/profile-people/${profile.handle}/representing`}>
+                        <b>{profile?.stats?.representing}</b> Representing {profile.name}
                     </Link>
                 </li>
             </ul>
