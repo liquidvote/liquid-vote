@@ -227,7 +227,9 @@ export const QuestionsAgg = ({
                 '$addFields': {
                     'yourStats': {
                         'votersYouFollow': '$yourStats_votersYouFollow',
-                        'votersRepresentingYou': '$yourVote_representatives'
+                        'votersYouFollowCount': { '$size': '$yourStats_votersYouFollow' },
+                        'votersRepresentingYou': '$yourVote_representatives',
+                        'votersRepresentingYouCount': { '$size': '$yourVote_representatives' },
                     }
                 }
             },
@@ -263,6 +265,33 @@ const getYourVoteRepresentativesUsers_On_QuestionsAgg = ({ AuthUserId }) => [
             'yourVote.representatives.name': '$representativeUser.name',
             'yourVote.representatives.avatar': '$representativeUser.avatar',
             'yourVote.representatives.vote.position': '$yourVote.representatives.position',
+            "yourVote.representatives.vote.daysAgo": {
+                "$divide": [
+                    {
+                        "$subtract": [
+                            Date.now(),
+                            "$yourVote.representatives.lastEditOn"
+                        ]
+                    },
+                    86400000
+                ]
+            },
+            "yourVote.representatives.vote.inverseDaysAgo": {
+                "$divide": [
+                    1,
+                    {
+                        "$divide": [
+                            {
+                                "$subtract": [
+                                    Date.now(),
+                                    "$yourVote.representatives.lastEditOn"
+                                ]
+                            },
+                            86400000
+                        ]
+                    }
+                ]
+            }
         }
     },
     {
@@ -612,6 +641,37 @@ const yourStats = ({ AuthUserId }) => [
                         '$addFields': {
                             'vote': { '$first': '$vote' }
                         }
+                    },
+                    {
+                        '$addFields': {
+                            "vote.daysAgo": {
+                                "$divide": [
+                                    {
+                                        "$subtract": [
+                                            Date.now(),
+                                            "$vote.lastEditOn"
+                                        ]
+                                    },
+                                    86400000
+                                ]
+                            },
+                            "vote.inverseDaysAgo": {
+                                "$divide": [
+                                    1,
+                                    {
+                                        "$divide": [
+                                            {
+                                                "$subtract": [
+                                                    Date.now(),
+                                                    "$vote.lastEditOn"
+                                                ]
+                                            },
+                                            86400000
+                                        ]
+                                    }
+                                ]
+                            }
+                        }
                     }
                 ]
             }
@@ -620,7 +680,9 @@ const yourStats = ({ AuthUserId }) => [
             '$addFields': {
                 'yourStats': {
                     'votersYouFollow': '$votersYouFollow',
-                    'votersRepresentingYou': '$yourVote.representatives'
+                    'votersYouFollowCount': { '$size': '$votersYouFollow' },
+                    'votersRepresentingYou': '$yourVote.representatives',
+                    'votersRepresentingYouCount': { '$size': '$yourVote.representatives' },
                 }
             }
         },

@@ -13,7 +13,8 @@
     "deploy:live": "npx sls deploy --stage live",
     "remove:dev": "npx sls remove --stage dev",
     "remove:live": "npx sls remove --stage live",
-    "logs": "npx sls logs -f graphql -t -s live"
+    "logs": "npx sls logs -f graphql -t -s live",
+    "db:dumpLiveToLocal": "node migrations/dumpLiveToLocal.js"
   },
   "keywords": [],
   "author": "",
