@@ -26,7 +26,7 @@ export const GroupPolls: FunctionComponent<{
         refetch: questions_refetch
     } = useQuery(QUESTIONS, {
         variables: {
-            group: handle,
+            groupHandle: handle,
             sortBy
         }
     });

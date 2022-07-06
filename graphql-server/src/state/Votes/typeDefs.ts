@@ -37,8 +37,8 @@ export const VoteTypeDefs = gql`
         # createdBy
         user: User
         createdOn: String
-        daysAgo: String
-        inverseDaysAgo: String
+        daysAgo: Float
+        inverseDaysAgo: Float
         lastEditOn: String
         thisUserIsAdmin: Boolean
         QuestionStats: QuestionStats

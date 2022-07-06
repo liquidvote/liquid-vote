@@ -52,76 +52,106 @@ export const QuestionResolvers = {
             };
         },
         Questions: async (_source, {
-            group,
-            sortBy
+            groupHandle,
+            sortBy,
+            createdByHandle,
+            notUsers
         }, { mongoDB, AuthUser }) => {
 
-            // console.log("questions");
+            // console.log({
+            //     groupHandle,
+            //     sortBy,
+            //     createdByHandle,
+            //     notUsers
+            // });
 
-            const writeToDebugFile = fs.writeFile(
-                process.cwd() + '/debug' + '/Questions_.json',
-                JSON.stringify({
-                    QueryJSON: QuestionsAgg({
-                        questionText: null,
-                        group,
-                        AuthUserId: AuthUser?._id,
-                        userId: null
-                    }),
-                }, null, 2),
-                { encoding: 'utf8' }
-            );
-
-            const Questions = await mongoDB.collection("Questions")
-                .aggregate(
-                    [
-                        ...QuestionsAgg({
-                            questionText: null,
-                            group,
-                            AuthUserId: AuthUser?._id,
-                            userId: null
-                        }),
-                        {
-                            '$addFields': {
-                                'stats.lastEditOrVote': {
-                                    '$cond': [
-                                        {
-                                            '$gt': [
-                                                '$lastEditOn', '$stats.lastVoteOn'
-                                            ]
-                                        }, '$lastEditOn', '$stats.lastVoteOn'
-                                    ]
-                                },
-                                'stats.totalVotes': {
-                                    '$sum': [
-                                        '$stats.directVotes', '$stats.indirectVotes'
-                                    ]
-                                },
-                            }
-                        },
-                        ...(sortBy === 'weight') ? [
-                            {
-                                '$sort': { 'stats.totalVotes': -1 }
-                            }
-                        ] : [],
-                        ...(sortBy === 'time') ? [
-                            {
-                                '$sort': { 'stats.lastEditOrVote': -1 }
-                            }
-                        ] : []
-                    ]
-                )
+            const AuthUserGroupMemberRelations = !!AuthUser && await mongoDB.collection("GroupMembers")
+                .find({ 'userId': new ObjectId(AuthUser?._id) })
                 .toArray();
 
-            // console.log({
-            //     Questions: Questions.map(q => ({
-            //         b: q.questionType,
-            //         a: q.stats,
-            //     }))
-            // });
+            const AuthUserGroups = !!AuthUserGroupMemberRelations && await mongoDB.collection("Groups").find({
+                "_id": {
+                    "$in": AuthUserGroupMemberRelations.map(r => new ObjectId(r.groupId))
+                }
+            })
+                .toArray();
+
+            const Agg = [
+                ...createdByHandle ? [{
+                    '$match': {
+                        "createdBy": new ObjectId(
+                            (await mongoDB.collection("Users")
+                                .findOne({ 'LiquidUser.handle': createdByHandle }))._id
+                        ),
+                    }
+                }] : [],
+                ...QuestionsAgg({
+                    questionText: null,
+                    // group: groupHandle,
+                    group: groupHandle ?
+                        groupHandle :
+                        (!!AuthUser && !notUsers) ?
+                            { '$in': AuthUserGroups.map(g => g.handle) } :
+                            (!!AuthUserGroups && notUsers) ?
+                                { '$nin': AuthUserGroups.map(g => g.handle) } :
+                                null,
+                    AuthUserId: AuthUser?._id,
+                    userId: null
+                }),
+                ...(!!notUsers || !AuthUser) ? [{
+                    $match: {
+                        'group.privacy': 'public'
+                    }
+                }] : [],
+                {
+                    '$addFields': {
+                        'stats.lastEditOrVote': {
+                            '$cond': [
+                                {
+                                    '$gt': [
+                                        '$lastEditOn', '$stats.lastVoteOn'
+                                    ]
+                                }, '$lastEditOn', '$stats.lastVoteOn'
+                            ]
+                        },
+                        'stats.totalVotes': {
+                            '$sum': [
+                                '$stats.directVotes', '$stats.indirectVotes'
+                            ]
+                        },
+                    }
+                },
+                ...(sortBy === 'weight') ? [
+                    {
+                        '$sort': { 'stats.totalVotes': -1 }
+                    }
+                ] : [],
+                ...(sortBy === 'time') ? [
+                    {
+                        '$sort': { 'stats.lastEditOrVote': -1 }
+                    }
+                ] : [],
+                ...(sortBy === 'votersYouFollowOrRepresentingYouTimeWeight' || sortBy === '') ? [
+                    {
+                        '$sort': { 'yourStats.votersYouFollowOrRepresentingYouTimeWeight': -1 }
+                    }
+                ] : []
+            ]
+
+            // const writeToDebugFile = fs.writeFile(
+            //     process.cwd() + '/debug' + '/Questions.json',
+            //     JSON.stringify(Agg, null, 2),
+            //     { encoding: 'utf8' }
+            // );
+
+            const Questions = await mongoDB.collection("Questions")
+                .aggregate(Agg)
+                .toArray();
 
             return (await Promise.all(Questions.map(async (q, i) => ({
                 ...q,
                 _id: q?.id,
+                allowNewChoices: q.allowNewChoices || false, // TODO: this should be obsoleted
                 ...(q.questionType === 'single' && !!AuthUser) && {
                     yourVote: q?.choices[0]?.yourVote
                 },
@@ -139,7 +169,7 @@ export const QuestionResolvers = {
                     q?.group?.admins?.map(a => a?.handle)?.includes(AuthUser?.LiquidUser?.handle)
                 ),
                 i
-            }))))?.sort((a: any, b: any) => a.i - b.i);
+            }))));
         },
         VotersAlsoVotedOn: async (_source, {
             questionText,
@@ -212,104 +242,6 @@ export const QuestionResolvers = {
             }))?.
                 sort((a: any, b: any) => a.i - b.i)?.
                 filter(q => q.questionText !== questionText);
-        },
-        QuestionsCreatedByUser: async (_source, {
-            handle,
-            sortBy
-        }, { mongoDB, AuthUser }) => {
-
-            console.log({ handle });
-
-            const User = !!handle && await mongoDB.collection("Users")
-                .findOne({ 'LiquidUser.handle': handle });
-
-            const Questions = await mongoDB.collection("Questions")
-                .aggregate(
-                    [
-                        // ...(!!UserGroups && !notUsers) ? [{
-                        //     '$match': {
-                        //         'groupChannel.group': { '$in': UserGroups.map(g => g.handle) }
-                        //     }
-                        // }] : [],
-                        // ...(!!UserGroups && notUsers) ? [{
-                        //     '$match': {
-                        //         'groupChannel.group': { '$nin': UserGroups.map(g => g.handle) }
-                        //     }
-                        // }] : [],
-                        {
-                            '$match': {
-                                "createdBy": new ObjectId(User._id),
-                                "status": { "$ne": "deleted" }
-                            }
-                        },
-                        ...QuestionsAgg({
-                            questionText: null,
-                            group: null,
-                            AuthUserId: AuthUser?._id,
-                            userId: User?._id
-                        }),
-                        {
-                            '$addFields': {
-                                'stats.lastEditOrVote': {
-                                    '$cond': [
-                                        {
-                                            '$gt': [
-                                                '$lastEditOn', '$stats.lastVoteOn'
-                                            ]
-                                        }, '$lastEditOn', '$stats.lastVoteOn'
-                                    ]
-                                },
-                                'stats.totalVotes': {
-                                    '$sum': [
-                                        '$stats.directVotes', '$stats.indirectVotes'
-                                    ]
-                                },
-                                // 'thisUserIsAdmin': {
-                                //     '$eq': ['$createdBy', AuthUser?.LiquidUser?.handle]
-                                // }
-                            }
-                        },
-                        ...(sortBy === 'weight') ? [
-                            {
-                                '$sort': { 'stats.totalVotes': -1 }
-                            }
-                        ] : [],
-                        ...(sortBy === 'time') ? [
-                            {
-                                '$sort': { 'stats.lastEditOrVote': -1 }
-                            }
-                        ] : []
-                    ]
-                )
-                .toArray();
-
-            console.log({
-                Questions
-            });
-
-            // TODO: move this logic to the aggregation, it'll run much faster
-            return await Promise.all(Questions.map(async (q, i) => ({
-                ...q,
-                _id: q?.id,
-                ...(q.questionType === 'single' && !!AuthUser) && {
-                    yourVote: q?.choices[0]?.yourVote,
-                    userVote: q?.choices[0]?.userVote,
-                },
-                ...(q.questionType === 'multi') && {
-                    choices: await Promise.all(q?.choices?.map(async (c) => ({
-                        ...c?.choice,
-                        ...(!!AuthUser) && {
-                            yourVote: c?.yourVote,
-                            userVote: c?.userVote
-                        }
-                    })))
-                },
-                thisUserIsAdmin: !!AuthUser && (
-                    q?.createdBy?.handle === AuthUser?.LiquidUser?.handle ||
-                    q?.group?.admins?.map(a => a?.handle)?.includes(AuthUser?.LiquidUser?.handle)
-                ),
-                i
-            })));
         }
     },
     Mutation: {

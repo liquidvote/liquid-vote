@@ -230,6 +230,9 @@ export const QuestionsAgg = ({
                         'votersYouFollowCount': { '$size': '$yourStats_votersYouFollow' },
                         'votersRepresentingYou': '$yourVote_representatives',
                         'votersRepresentingYouCount': { '$size': '$yourVote_representatives' },
+                        'votersYouFollowTimeWeight': '$yourStats_votersYouFollowTimeWeight',
+                        'votersRepresentingYouTimeWeight': '$yourStats_votersRepresentingYouTimeWeight',
+                        'votersYouFollowOrRepresentingYouTimeWeight': { '$add' : [ '$yourStats_votersYouFollowTimeWeight', '$yourStats_votersRepresentingYouTimeWeight' ] }
                     }
                 }
             },
@@ -442,6 +445,8 @@ const mergedYourVoteUniqueRepresentatives = [
             },
             'yourVote_representatives': { '$push': '$root.yourVote_representatives' },
             'yourStats_votersYouFollow': { '$first': '$root.yourStats_votersYouFollow' },
+            'yourStats_votersRepresentingYouTimeWeight': { '$sum': '$root.yourVote_representatives.vote.inverseDaysAgo' },
+            'yourStats_votersYouFollowTimeWeight': { '$first': '$root.yourStats_votersYouFollowTimeWeight' },
             'createdBy': {
                 '$first': '$root.createdBy'
             },
@@ -522,6 +527,8 @@ const mergedYourStatsVotersYouFollow = [
             },
             'yourVote_representatives': { '$first': '$root.yourVote_representatives' },
             'yourStats_votersYouFollow': { '$push': '$root.yourStats_votersYouFollow' },
+            'yourStats_votersYouFollowTimeWeight': { '$sum': '$root.yourStats_votersYouFollow.vote.inverseDaysAgo' },
+            'yourStats_votersRepresentingYouTimeWeight': { '$first': '$root.yourStats_votersRepresentingYouTimeWeight' },
             'createdBy': {
                 '$first': '$root.createdBy'
             },

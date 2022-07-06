@@ -35,6 +35,7 @@ export const QuestionTypeDefs = gql`
         # Time Weight
         votersYouFollowTimeWeight: Float
         votersRepresentingYouTimeWeight: Float
+        votersYouFollowOrRepresentingYouTimeWeight: Float
     }
 
     type Choice {
@@ -91,18 +92,16 @@ export const QuestionTypeDefs = gql`
             group: String
         ): Question
         Questions(
-            group: String,
-            sortBy: String
+            groupHandle: String,
+            sortBy: String,
+            createdByHandle: String,
+            notUsers: Boolean
         ): [Question]
         VotersAlsoVotedOn(
             questionText: String,
             group: String,
             sortBy: String
         ): [Question]
-        QuestionsCreatedByUser(
-            handle: String,
-            sortBy: String
-        ):  [Question]
     }
 
     extend type Mutation {

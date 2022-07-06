@@ -3,7 +3,7 @@ import { useQuery } from "@apollo/client";
 import { Link, useParams } from "react-router-dom";
 
 import Header from "@shared/Header";
-import { USER_QUESTIONS } from "@state/User/typeDefs";
+import { QUESTIONS } from "@state/Question/typeDefs";
 import SingleVoteInList from "@shared/SingleVoteInList";
 import MultiVoteInList from "@shared/MultiVoteInList";
 import DropAnimation from "@shared/DropAnimation";
@@ -25,10 +25,9 @@ export const Feed: FunctionComponent<{}> = ({ }) => {
         error: questions_error,
         data: questions_data,
         refetch: questions_refetch
-    } = useQuery(USER_QUESTIONS, {
+    } = useQuery(QUESTIONS, {
         variables: {
-            handle: liquidUser?.handle || null,
-            sortBy,
+            sortBy: liquidUser ? 'votersYouFollowOrRepresentingYouTimeWeight' : 'weight',
             notUsers: section === 'other' || !liquidUser,
         }
         // skip: !liquidUser
@@ -64,26 +63,28 @@ export const Feed: FunctionComponent<{}> = ({ }) => {
             } */}
 
             <div className="mt-3">
-                {questions_data?.UserQuestions?.map((v: any, i: any) => (
+                {questions_data?.Questions?.map((v: any, i: any) => (
                     <div key={'polls-' + i}>
 
-                        <div className="poll-cover-container">
-                            <div
-                                className="poll-cover"
-                                style={{
-                                    background: v?.group?.cover && `url(${v?.group?.cover}) 50% 50% / cover no-repeat`
-                                }}
-                            />
-                            <div className="poll-cover-overlay">
+                        {v?.group?.handle !== questions_data?.Questions[i-1]?.group?.handle ? (
+                            <div className="poll-cover-container">
+                                <div
+                                    className="poll-cover"
+                                    style={{
+                                        background: v?.group?.cover && `url(${v?.group?.cover}) 50% 50% / cover no-repeat`
+                                    }}
+                                />
+                                <div className="poll-cover-overlay">
+                                </div>
+                                <div className="poll-cover-info">
+                                    <Link to={`/group/${v?.group?.handle}`}>
+                                        <h5 className="white p-0 m-0">
+                                            {v?.group?.name}
+                                        </h5>
+                                    </Link>
+                                </div>
                             </div>
-                            <div className="poll-cover-info">
-                                <Link to={`/group/${v?.group?.handle}`}>
-                                    <h5 className="white p-0 m-0">
-                                        {v?.group?.name}
-                                    </h5>
-                                </Link>
-                            </div>
-                        </div>
+                        ) : null}
 
                         {v.questionType === 'multi' && (
                             <MultiVoteInList
@@ -103,7 +104,7 @@ export const Feed: FunctionComponent<{}> = ({ }) => {
                     </div>
                 ))}
 
-                {questions_data?.UserQuestions?.length === 0 && (
+                {questions_data?.Questions?.length === 0 && (
                     <div className="p-4 text-center">
                         There are no polls in {section === 'other' ? 'other' : 'your'} groups yet
                     </div>

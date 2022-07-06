@@ -202,8 +202,18 @@ export const QUESTION = gql`
 `;
 
 export const QUESTIONS = gql`
-    query($group: String!, $sortBy: String) {
-        Questions(group: $group, sortBy: $sortBy) {
+    query(
+        $groupHandle: String,
+        $sortBy: String,
+        $createdByHandle: String,
+        $notUsers: Boolean
+    ) {
+        Questions(
+            groupHandle: $groupHandle,
+            sortBy: $sortBy,
+            createdByHandle: $createdByHandle,
+            notUsers: $notUsers
+        ) {
             _id
             questionText
             description
@@ -252,28 +262,25 @@ export const QUESTIONS = gql`
                 ...vote
             }
             yourStats {
+                votersYouFollowCount
+                votersRepresentingYouCount
+                votersYouFollowTimeWeight
+                votersRepresentingYouTimeWeight
                 votersYouFollow {
-                    handle
-                    avatar
-                    name
-                    stats {
-                        directVotesMade
-                    }
-                    yourStats {
-                        directVotesInCommon
-                        directVotesInAgreement
-                        directVotesInDisagreement
-                        indirectVotesMadeByYou
-                        indirectVotesMadeForYou
-                    }
-                    vote {
-                        position
-                    }
+                    ...voter
+                }
+                votersRepresentingYou{
+                    ...voter
                 }
             }
             createdOn
             lastEditOn
             thisUserIsAdmin
+            group {
+                handle
+                cover
+                name
+            }
             createdBy {
                 name
                 handle
@@ -378,110 +385,11 @@ export const QUESTIONS = gql`
             avatar
         }
     }
-`;
-
-export const QUESTIONS_CREATED_BY_USER = gql`
-  query($handle: String, $sortBy: String) {
-    QuestionsCreatedByUser(handle: $handle, sortBy: $sortBy) {
-        _id
-        questionText
-        description
-        questionType
-        startText
-        choices {
-            text
-            stats {
-                ...stats
-            }
-            yourVote {
-                ...vote
-            }
-            userVote {
-                ...vote
-            }
-            yourStats {
-                votersYouFollow {
-                handle
-                avatar
-                name
-                stats {
-                    directVotesMade
-                }
-                yourStats {
-                    directVotesInCommon
-                    directVotesInAgreement
-                    directVotesInDisagreement
-                    indirectVotesMadeByYou
-                    indirectVotesMadeForYou
-                }
-                vote {
-                    position
-                }
-                }
-            }
-        }
-        # allowNewChoices
-        groupChannel {
-            group
-            channel
-        }
-        resultsOn
-
+    fragment voter on Voter {
+        handle
+        avatar
+        name
         stats {
-            ...stats
-        }
-        yourVote {
-            ...vote
-        }
-        userVote {
-            ...vote
-        }
-        yourStats {
-            votersYouFollow {
-                handle
-                avatar
-                name
-                stats {
-                    directVotesMade
-                }
-                yourStats {
-                    directVotesInCommon
-                    directVotesInAgreement
-                    directVotesInDisagreement
-                    indirectVotesMadeByYou
-                    indirectVotesMadeForYou
-                }
-                vote {
-                    position
-                }
-            }
-        }
-        createdOn
-        lastEditOn
-        thisUserIsAdmin
-        group {
-            handle
-            cover
-            name
-        }
-        createdBy {
-            name
-            handle
-            avatar
-        }
-    }
-}
-
-fragment stats on QuestionStats {
-    lastVoteOn
-    forCount
-    forDirectCount
-    forMostRepresentingVoters {
-        handle
-        avatar
-        name
-        representeeCount
-        stats{
             directVotesMade
         }
         yourStats {
@@ -491,83 +399,12 @@ fragment stats on QuestionStats {
             indirectVotesMadeByYou
             indirectVotesMadeForYou
         }
-    }
-    againstCount
-    againstMostRepresentingVoters {
-        handle
-        avatar
-        name
-        representeeCount
-        stats{
-            directVotesMade
-        }
-        yourStats {
-            directVotesInCommon
-            directVotesInAgreement
-            directVotesInDisagreement
-            indirectVotesMadeByYou
-            indirectVotesMadeForYou
+        vote {
+            position
+            daysAgo
+            inverseDaysAgo
         }
     }
-    againstDirectCount
-    directVotes
-    indirectVotes
-}
-
-fragment vote on Vote {
-    # _id
-    questionText
-    choiceText
-    groupChannel {
-        group
-    }
-    position
-    isDirect
-    forWeight
-    againstWeight
-    representatives{
-        representativeHandle
-        representativeAvatar
-        representativeName
-        position
-        forWeight
-        againstWeight
-        createdOn
-        lastEditOn
-        stats{
-            directVotesMade
-        }
-        yourStats {
-            directVotesInCommon
-            directVotesInAgreement
-            directVotesInDisagreement
-            indirectVotesMadeByYou
-            indirectVotesMadeForYou
-        }
-
-    }
-    createdOn
-    lastEditOn
-    representeeVotes {
-        questionText
-        choiceText
-        groupChannel {
-            group
-        }
-        isDirect
-        position
-        user {
-            handle
-            name
-            avatar
-        }
-    }
-    user {
-        handle
-        name
-        avatar
-    }
-}
 `;
 
 export const QUESTIONS_VOTERS_ALSO_VOTED_ON = gql`

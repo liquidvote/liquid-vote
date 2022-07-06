@@ -524,6 +524,9 @@ export const UserResolvers = {
                             }
                         }
                     },
+                    {
+                        $sort: { 'userStats.directVotesMade': -1 }
+                    },
                     //  On Your Groups - membersYouFollow
                     ...(!!AuthUser?._id && handle === AuthUser?.LiquidUser.handle) ? [
                         {
@@ -739,9 +742,10 @@ export const UserResolvers = {
                             '$addFields': {
                                 'yourUserStats': { '$first': '$yourUserStats' }
                             }
-                        }, {
-                            $sort: { 'yourUserStats.directVotesInCommon': -1 }
-                        }
+                        }, 
+                        // {
+                        //     $sort: { 'yourUserStats.directVotesInCommon': -1 }
+                        // }
                     ] : [],
                 ])
                     .toArray())
@@ -793,135 +797,9 @@ export const UserResolvers = {
                         }
                     }))));
 
-            console.log({ GroupsR: Groups.map(r => r.representativeRelation) });
+            // console.log({ GroupsR: Groups.map(r => r.representativeRelation) });
 
             return Groups;
-        },
-        UserQuestions: async (_source, {
-            handle,
-            sortBy,
-            notUsers
-        }, { mongoDB, AuthUser }) => {
-
-            const User = !!handle && await mongoDB.collection("Users")
-                .findOne({ 'LiquidUser.handle': handle });
-
-            const UserGroupMemberRelations = !!User && await mongoDB.collection("GroupMembers")
-                .find({ 'userId': new ObjectId(User?._id) })
-                .toArray();
-
-            const UserGroups = !!UserGroupMemberRelations && await mongoDB.collection("Groups").find({
-                "_id": {
-                    "$in": UserGroupMemberRelations.map(r => new ObjectId(r.groupId))
-                }
-            })
-                .toArray();
-
-            const Agg = [
-                // ...(!!UserGroups && !notUsers) ? [{
-                //     '$match': {
-                //         'groupChannel.group': { '$in': UserGroups.map(g => g.handle) }
-                //     }
-                // }] : [],
-                // ...(!!UserGroups && notUsers) ? [{
-                //     '$match': {
-                //         'groupChannel.group': { '$nin': UserGroups.map(g => g.handle) }
-                //     }
-                // }] : [],
-                ...QuestionsAgg({
-                    questionText: null,
-                    group: (!!UserGroups && !notUsers) ?
-                        { '$in': UserGroups.map(g => g.handle) } :
-                        (!!UserGroups && notUsers) ?
-                            { '$nin': UserGroups.map(g => g.handle) } :
-                            null,
-                    AuthUserId: AuthUser?._id,
-                    userId: null
-                }),
-                // {
-                //     $lookup: {
-                //         from: 'Groups',
-                //         localField: 'groupChannel.group',
-                //         foreignField: 'handle',
-                //         as: 'group'
-                //     }
-                // },
-                // {
-                //     $addFields: {
-                //         group: { $first: "$group" }
-                //     }
-                // },
-                ...(!!notUsers || !handle) ? [{
-                    $match: {
-                        'group.privacy': 'public'
-                    }
-                }] : [],
-                {
-                    '$addFields': {
-                        'stats.lastEditOrVote': {
-                            '$cond': [
-                                {
-                                    '$gt': [
-                                        '$lastEditOn', '$stats.lastVoteOn'
-                                    ]
-                                }, '$lastEditOn', '$stats.lastVoteOn'
-                            ]
-                        },
-                        'stats.totalVotes': {
-                            '$sum': [
-                                '$stats.directVotes', '$stats.indirectVotes'
-                            ]
-                        },
-                        // 'thisUserIsAdmin': {
-                        //     '$eq': ['$createdBy', AuthUser?.LiquidUser?.handle]
-                        // }
-                    }
-                },
-                ...(sortBy === 'weight') ? [
-                    {
-                        '$sort': { 'stats.totalVotes': -1 }
-                    }
-                ] : [],
-                ...(sortBy === 'time') ? [
-                    {
-                        '$sort': { 'stats.lastEditOrVote': -1 }
-                    }
-                ] : []
-            ];
-
-            const writeToDebugFile = fs.writeFile(
-                process.cwd() + '/debug' + '/UserQuestions.json',
-                JSON.stringify({
-                    QueryJSON: Agg,
-                }, null, 2),
-                { encoding: 'utf8' }
-            );
-
-            const Questions = await mongoDB.collection("Questions")
-                .aggregate(Agg)
-                .toArray();
-
-            // TODO: move this logic to the aggregation, it'll run much faster
-            return await Promise.all(Questions.map(async (q, i) => ({
-                ...q,
-                _id: q?.id,
-                ...(q.questionType === 'single' && !!AuthUser) && {
-                    yourVote: q?.choices[0]?.yourVote
-                },
-                ...(q.questionType === 'multi') && {
-                    choices: await Promise.all(q?.choices?.map(async (c) => ({
-                        ...c?.choice,
-                        ...(!!AuthUser) && {
-                            yourVote: c?.yourVote
-                        }
-                    })))
-                },
-                thisUserIsAdmin: !!AuthUser && (
-                    q?.createdBy?.handle === AuthUser?.LiquidUser?.handle ||
-                    q?.group?.admins?.map(a => a?.handle)?.includes(AuthUser?.LiquidUser?.handle)
-                ),
-                i
-            })));
         },
         UserFollowing: async (_source, { handle }, { mongoDB, AuthUser }) => {
             const User = await mongoDB.collection("Users")
