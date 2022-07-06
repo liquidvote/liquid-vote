@@ -3,7 +3,6 @@ import { ObjectId } from 'mongodb';
 const { promises: fs } = require("fs");
 
 import { updateQuestionVotingStats } from '../Questions/resolvers';
-import { getUserStats } from '../Users/resolvers';
 import { VotersAgg, representeesAndVoteAgg, representativeVotesAgg, VotesGeneralAggregateLogic } from './aggregationLogic';
 
 export const VoteResolvers = {
@@ -275,7 +274,8 @@ export const VoteResolvers = {
             const users = await mongoDB.collection("Users").find().toArray();
             const usersWithStats = await Promise.all(users.map(async (u) => ({
                 ...u,
-                stats: await getUserStats({ userId: u._id, mongoDB })
+                // TODO: replace getUserStats
+                // stats: await getUserStats({ userId: u._id, mongoDB })
             })));
             const usersVoteQueryStats = await Promise.all(usersWithStats.map(async (u: any) => ({
                 ...u,

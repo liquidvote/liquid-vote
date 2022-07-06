@@ -97,7 +97,12 @@ export const GroupPeople: FunctionComponent<{}> = ({ }) => {
                 // <pre>{JSON.stringify(user_representing_data?.UserRepresenting, null, 2)}</pre>
                 <div className="mt-n2">
                     {group_members_data?.GroupMembers?.map((el, i) => (
-                        <PersonInList key={el.handle} person={el} groupHandle={handle} />
+                        <PersonInList
+                            key={'gp_members'+el.handle}
+                            person={el}
+                            groupHandle={handle}
+                            includeVotes={true}
+                        />
                     ))}
                     {(!group_members_data?.GroupMembers?.length && !group_members_loading) && (
                         <div className="p-4 text-center">{`This group doesn't have any members, yet!`}</div>
@@ -108,7 +113,12 @@ export const GroupPeople: FunctionComponent<{}> = ({ }) => {
                 // <pre>{JSON.stringify(user_representing_data?.UserRepresenting, null, 2)}</pre>
                 <div className="mt-n2">
                     {user_represented_by_data?.UserRepresentedBy?.map((el, i) => (
-                        <PersonInList key={el.handle} person={el} groupHandle={handle} />
+                        <PersonInList
+                            key={'gp_representingYou'+el.handle}
+                            person={el}
+                            groupHandle={handle}
+                            includeVotes={true}
+                        />
                     ))}
                     {(!user_represented_by_data?.UserRepresentedBy?.length && !user_represented_by_loading) && (
                         <div className="p-4 text-center">{`No one is representing you in this group.`}</div>
@@ -119,7 +129,12 @@ export const GroupPeople: FunctionComponent<{}> = ({ }) => {
                 // <pre>{JSON.stringify(user_representing_data?.UserRepresenting, null, 2)}</pre>
                 <div className="mt-n2">
                     {user_representing_data?.UserRepresenting?.map((el, i) => (
-                        <PersonInList key={el.handle} person={el} groupHandle={handle} />
+                        <PersonInList
+                            key={'gp_representedByYou'+el.handle}
+                            person={el}
+                            groupHandle={handle}
+                            includeVotes={true}
+                        />
                     ))}
                     {(!user_representing_data?.UserRepresenting?.length && !user_representing_loading) && (
                         <div className="p-4 text-center">{`No one is being represented by you in this group.`}</div>

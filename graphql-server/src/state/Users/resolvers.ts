@@ -205,7 +205,6 @@ export const UserResolvers = {
                 isYouFollowing: User.isYouFollowing?.length === 1,
             } : {};
         },
-
         SearchUsers: async (_source, {
             text,
             notInGroup,
@@ -287,7 +286,6 @@ export const UserResolvers = {
 
             return Users?.map(u => u.LiquidUser) || [];
         },
-
         UserRepresenting: async (_source, { handle, groupHandle }, { mongoDB, AuthUser }) => {
 
             const User = await mongoDB.collection("Users")
@@ -346,7 +344,6 @@ export const UserResolvers = {
 
             return representeesAndGroups;
         },
-
         UserRepresentedBy: async (
             _source,
             { handle, groupHandle, representativeHandle },
@@ -425,7 +422,6 @@ export const UserResolvers = {
 
             return representativesAndGroups;
         },
-
         UserGroups: async (_source, { handle, representative, notUsers }, { mongoDB, AuthUser }) => {
 
             const User = !!handle && await mongoDB.collection("Users")
@@ -868,7 +864,93 @@ export const UserResolvers = {
                             ]
                         }
                     }
-                }
+                },
+                // isFollowingYou & isYouFollowing
+                ...(!!AuthUser?._id) ? [{
+                    '$lookup': {
+                        'as': 'isFollowingYou',
+                        'from': 'UserFollows',
+                        'let': {
+                            'followedId': new ObjectId(AuthUser._id),
+                            'followingId': '$_id',
+                        },
+                        'pipeline': [
+                            {
+                                '$match': {
+                                    '$and': [
+                                        {
+                                            '$expr': {
+                                                '$eq': [
+                                                    '$followedId', {
+                                                        '$toObjectId': '$$followedId'
+                                                    }
+                                                ]
+                                            }
+                                        },
+                                        {
+                                            '$expr': {
+                                                '$eq': [
+                                                    '$followingId', {
+                                                        '$toObjectId': '$$followingId'
+                                                    }
+                                                ]
+                                            }
+                                        },
+                                        {
+                                            '$expr': {
+                                                '$eq': [
+                                                    '$isFollowing', true
+                                                ]
+                                            }
+                                        },
+                                    ],
+                                }
+                            },
+                        ]
+                    },
+                }, {
+                    '$lookup': {
+                        'as': 'isYouFollowing',
+                        'from': 'UserFollows',
+                        'let': {
+                            'followedId': '$_id',
+                            'followingId': new ObjectId(AuthUser._id),
+                        },
+                        'pipeline': [
+                            {
+                                '$match': {
+                                    '$and': [
+                                        {
+                                            '$expr': {
+                                                '$eq': [
+                                                    '$followedId', {
+                                                        '$toObjectId': '$$followedId'
+                                                    }
+                                                ]
+                                            }
+                                        },
+                                        {
+                                            '$expr': {
+                                                '$eq': [
+                                                    '$followingId', {
+                                                        '$toObjectId': '$$followingId'
+                                                    }
+                                                ]
+                                            }
+                                        },
+                                        {
+                                            '$expr': {
+                                                '$eq': [
+                                                    '$isFollowing', true
+                                                ]
+                                            }
+                                        },
+                                    ],
+                                }
+                            },
+                        ]
+                    },
+                }] : [],
             ];
 
             const Users = (await mongoDB.collection("UserFollows")
@@ -935,7 +1017,93 @@ export const UserResolvers = {
                             ]
                         }
                     }
-                }
+                },
+                // isFollowingYou & isYouFollowing
+                ...(!!AuthUser?._id) ? [{
+                    '$lookup': {
+                        'as': 'isFollowingYou',
+                        'from': 'UserFollows',
+                        'let': {
+                            'followedId': new ObjectId(AuthUser._id),
+                            'followingId': '$_id',
+                        },
+                        'pipeline': [
+                            {
+                                '$match': {
+                                    '$and': [
+                                        {
+                                            '$expr': {
+                                                '$eq': [
+                                                    '$followedId', {
+                                                        '$toObjectId': '$$followedId'
+                                                    }
+                                                ]
+                                            }
+                                        },
+                                        {
+                                            '$expr': {
+                                                '$eq': [
+                                                    '$followingId', {
+                                                        '$toObjectId': '$$followingId'
+                                                    }
+                                                ]
+                                            }
+                                        },
+                                        {
+                                            '$expr': {
+                                                '$eq': [
+                                                    '$isFollowing', true
+                                                ]
+                                            }
+                                        },
+                                    ],
+                                }
+                            },
+                        ]
+                    },
+                }, {
+                    '$lookup': {
+                        'as': 'isYouFollowing',
+                        'from': 'UserFollows',
+                        'let': {
+                            'followedId': '$_id',
+                            'followingId': new ObjectId(AuthUser._id),
+                        },
+                        'pipeline': [
+                            {
+                                '$match': {
+                                    '$and': [
+                                        {
+                                            '$expr': {
+                                                '$eq': [
+                                                    '$followedId', {
+                                                        '$toObjectId': '$$followedId'
+                                                    }
+                                                ]
+                                            }
+                                        },
+                                        {
+                                            '$expr': {
+                                                '$eq': [
+                                                    '$followingId', {
+                                                        '$toObjectId': '$$followingId'
+                                                    }
+                                                ]
+                                            }
+                                        },
+                                        {
+                                            '$expr': {
+                                                '$eq': [
+                                                    '$isFollowing', true
+                                                ]
+                                            }
+                                        },
+                                    ],
+                                }
+                            },
+                        ]
+                    },
+                }] : [],
             ];
 
             const Users = (await mongoDB.collection("UserFollows")
@@ -1159,132 +1327,3 @@ export const UserResolvers = {
         },
     },
 };
-
-export const getUserStats = async ({ userId, mongoDB }) => {
-    // TODO: combine with single aggregation that gets user, make it a materialised view too
-    return ({
-        lastDirectVoteOn: 0, // TODO
-        representing: (
-            await mongoDB.collection("UserRepresentations").aggregate(
-                [{
-                    $match: {
-                        "representeeId": new ObjectId(userId),
-                        "isRepresentingYou": true
-                    }
-                }, {
-                    $group: {
-                        _id: {
-                            "representativeId": "$representativeId"
-                        }
-                    }
-                }, {
-                    $count: 'count'
-                }]
-            ).toArray())?.[0]?.count || 0,
-        representedBy: (
-            await mongoDB.collection("UserRepresentations").aggregate(
-                [{
-                    $match: {
-                        "representativeId": new ObjectId(userId),
-                        "isRepresentingYou": true
-                    }
-                }, {
-                    $group: {
-                        _id: {
-                            "representeeId": "$representeeId"
-                        }
-                    }
-                }, {
-                    $count: 'count'
-                }]
-            ).toArray())?.[0]?.count || 0,
-        groupsJoined: await mongoDB.collection("GroupMembers")
-            .find({
-                "userId": new ObjectId(userId),
-                "isMember": true
-            }).count(),
-        directVotesMade: await mongoDB.collection("Votes")
-            .find({
-                "isDirect": true,
-                'position': { $ne: null },
-                "user": new ObjectId(userId)
-            }).count(),
-        indirectVotesMadeByUser: await mongoDB.collection("Votes")
-            .find({
-                "isDirect": false,
-                'position': { $ne: null },
-                "representatives.representativeId": new ObjectId(userId)
-            }).count(),
-        indirectVotesMadeForUser: await mongoDB.collection("Votes")
-            .find({
-                "isDirect": false,
-                'position': { $ne: null },
-                "user": new ObjectId(userId)
-            }).count(),
-        pollsCreated: await mongoDB.collection("Questions")
-            .find({
-                "createdBy": new ObjectId(userId),
-                "status": { "$ne": "deleted" }
-            }).count(),
-        following: await mongoDB.collection("UserFollows")
-            .find({
-                "followingId": new ObjectId(userId),
-                "isFollowing": { "$eq": true }
-            }).count(),
-        followedBy: await mongoDB.collection("UserFollows")
-            .find({
-                "followedId": new ObjectId(userId),
-                "isFollowing": { "$eq": true }
-            }).count(),
-    });
-}
-
-// delete?
-const getYourUserStats = async ({ userId, AuthUser, mongoDB }) => {
-
-    console.log({ userId });
-
-    const votesInCommon = (
-        await mongoDB.collection("Votes")
-            .aggregate([
-                {
-                    '$lookup': {
-                        'as': 'yourStats',
-                        'from': 'Votes',
-                        'let': {
-                            'userId': new ObjectId(userId),
-                        },
-                        'pipeline': [
-                            {
-                                '$match': {
-                                    '$and': [
-                                        {
-                                            '$expr': {
-                                                '$eq': [
-                                                    '$user', new ObjectId(AuthUser._id)
-                                                ]
-                                            }
-                                        },
-                                    ],
-                                }
-                            },
-                            ...votesInCommonPipelineForVotes()
-                        ]
-                    }
-                }, {
-                    '$addFields': {
-                        'yourStats': { '$first': '$yourStats' }
-                    }
-                }
-            ])
-            .toArray()
-    )?.[0];
-
-    console.log({
-        votesInCommon
-    })
-
-    return {
-        ...votesInCommon?.yourStats
-    }
-}

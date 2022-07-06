@@ -10,10 +10,12 @@ export const PersonInList: FunctionComponent<{
     person: any,
     groupHandle?: string,
     isShowingRepresentativeRelation?: boolean
+    includeVotes?: boolean
 }> = ({
     person,
     groupHandle,
-    isShowingRepresentativeRelation
+    isShowingRepresentativeRelation,
+    includeVotes
 }) => {
 
     const [showVotes, setShowVotes] = useState(false);
@@ -48,19 +50,24 @@ export const PersonInList: FunctionComponent<{
                     {person.bio}
                 </small>
 
-                {!isShowingRepresentativeRelation ? (
-                    <div className="d-flex mb-n1">
-                        <small className="d-flex mb-0">
-                            <b className='white mr-1'>{' '}{person?.stats?.directVotesMade || 0}</b> votes
-                        </small>
-                    </div>
+                {includeVotes ? (
+                    <>                    
+                        {!isShowingRepresentativeRelation ? (
+                            <div className="d-flex mb-n1">
+                                <small className="d-flex mb-0">
+                                    <b className='white mr-1'>{' '}{person?.stats?.directVotesMade || 0}</b> votes
+                                </small>
+                            </div>
+                        ) : null}
+        
+                        {!!person?.stats?.directVotesMade && (
+                            <small className='white'>
+                                <a className='link white pointer' onClick={() => setShowVotes(!showVotes)}>{showVotes ? 'hide' : 'show'} votes</a>
+                            </small>
+                        )}
+                    </>
                 ) : null}
 
-                {!!person?.stats?.directVotesMade && (
-                    <small className='white'>
-                        <a className='link white pointer' onClick={() => setShowVotes(!showVotes)}>{showVotes ? 'hide' : 'show'} votes</a>
-                    </small>
-                )}
 
                 {showVotes && (
                     <GroupInProfileListVotes

@@ -72,7 +72,10 @@ export const ProfileFollowings: FunctionComponent<{}> = ({ }) => {
             {which === 'followedby' && (
                 <div className="mt-n2">
                     {user_following_data?.UserFollowing?.map((el, i) => (
-                        <PersonInList person={el} />
+                        <PersonInList
+                            key={'pf_followedby'+el.handle}
+                            person={el}
+                        />
                     ))}
                     {(!user_following_data?.UserFollowing?.length && !user_following_loading) && (
                         <div className="p-4 text-center">{`${profile?.name} isn't following anyone yet.`}</div>
@@ -83,7 +86,10 @@ export const ProfileFollowings: FunctionComponent<{}> = ({ }) => {
             {which === 'following' && (
                 <div className="mt-n2">
                     {user_followed_by_data?.UserFollowedBy?.map((el, i) => (
-                        <PersonInList person={el} />
+                        <PersonInList
+                            key={'pf_following'+el.handle}
+                            person={el}
+                        />
                     ))}
                     {(!user_followed_by_data?.UserFollowedBy?.length && !user_followed_by_loading) && (
                         <div className="p-4 text-center">{`${profile?.name} isn't followed by anyone yet.`}</div>
