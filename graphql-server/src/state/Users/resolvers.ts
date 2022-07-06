@@ -173,22 +173,29 @@ export const UserResolvers = {
             //     { encoding: 'utf8' }
             // );
 
+            const isUser = AuthUser?._id.toString() === User?._id.toString();
+
             return !!User ? {
                 id: User?.LiquidUser?.handle + groupHandle,
                 ...User?.LiquidUser,
+                ...isUser ? {
+                    email: User.email
+                } : {
+                    email: null
+                },
                 isThisUser: !!AuthUser && AuthUser?.Auth0User?.sub === User?.Auth0User?.sub,
                 isRepresentingYou: User?.isRepresentingYou?.length || 0,
                 stats: {
                     id: User?.LiquidUser?.handle,
                     ...User?.stats
                 },
-                ...!!AuthUser && (AuthUser._id.toString() !== User._id.toString()) && {
+                ...!!AuthUser && (!isUser) && {
                     yourStats: {
                         id: User?.LiquidUser?.handle,
                         ...User?.yourStats
                     }
                 },
-                ...!!groupHandle && (AuthUser._id.toString() !== User._id.toString()) && {
+                ...!!groupHandle && (!isUser) && {
                     groupStats: {
                         stats: User?.groupStats?.stats,
                         yourStats: User?.groupStats?.yourStats,
@@ -329,10 +336,13 @@ export const UserResolvers = {
                         }
                     ]
                 ).toArray())
-                .map(r => ({
-                    ...r?.representeeUser[0]?.LiquidUser,
-                    representationGroups: r?.groups
-                }));
+                .map(r => {
+                    return {
+                        ...r?.representeeUser[0]?.LiquidUser,
+                        representationGroups: r?.groups,
+                        email: null
+                    }
+                });
 
             return representeesAndGroups;
         },
@@ -401,7 +411,8 @@ export const UserResolvers = {
                     ...r?.representativeUser[0]?.LiquidUser,
                     representationGroups: r?.groups,
                     stats: r?.stats,
-                    yourStats: r?.yourStats
+                    yourStats: r?.yourStats,
+                    email: null
                 }));
 
             // const writeToDebugFile = fs.writeFile(
@@ -742,7 +753,7 @@ export const UserResolvers = {
                             '$addFields': {
                                 'yourUserStats': { '$first': '$yourUserStats' }
                             }
-                        }, 
+                        },
                         // {
                         //     $sort: { 'yourUserStats.directVotesInCommon': -1 }
                         // }
@@ -866,7 +877,7 @@ export const UserResolvers = {
 
             console.log({ Users });
 
-            return Users;
+            return Users.map(u => ({ ...u, email: null }));
         },
         UserFollowedBy: async (_source, { handle }, { mongoDB, AuthUser }) => {
             const User = await mongoDB.collection("Users")
@@ -930,8 +941,7 @@ export const UserResolvers = {
             const Users = (await mongoDB.collection("UserFollows")
                 .aggregate(Agg).toArray()
             );
-
-            return Users;
+            return Users.map(u => ({ ...u, email: null }));
         },
     },
     Mutation: {

@@ -159,14 +159,14 @@ export const GroupResolvers = {
                             'yourStats': { '$first': '$yourStats' }
                         }
                     }, {
-                        $sort: { 'yourStats.directVotesInCommon': -1 }
+                        $sort: { 'stats.directVotesMade': -1 }
                     }] : [],
                 ])?.toArray();
 
-            // TODO: sort by Agreeability
-            // TODO: sort by % votes in common
-
-            return Members;
+            return Members.map(m => ({
+                ...m,
+                email: null
+            }));
         },
         GroupQuestions: async (_source, { handle, channels }, { mongoDB, AuthUser }) => {
 
@@ -462,7 +462,7 @@ export const getGroupStats = async ({ groupId, groupHandle, mongoDB, AuthUser })
                 }, {
                     $sort: { 'yourStats.directVotesInCommon': -1 }
                 }
-            ]: [])
+            ] : [])
         ])
         .toArray()
     )?.slice(0, 12);
