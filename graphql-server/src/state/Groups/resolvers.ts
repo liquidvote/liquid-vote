@@ -5,16 +5,105 @@ export const GroupResolvers = {
     Query: {
         Group: async (_source, { handle }, { mongoDB, AuthUser }) => {
 
-            const Group = await mongoDB.collection("Groups")
-                .findOne({ 'handle': handle });
+            const Group = (await mongoDB.collection("Groups").aggregate([
+                { '$match': { 'handle': handle } },
+
+                {
+                    '$lookup': {
+                        as: "membersYouFollow",
+                        from: "UserFollows",
+                        let: {
+                            'loggedInUser': new ObjectId(AuthUser._id),
+                            'groupId': '$_id',
+                            'groupHandle': '$handle'
+                        },
+                        'pipeline': [{
+                            '$match': {
+                                '$expr': {
+                                    '$eq': [
+                                        '$followingId', '$$loggedInUser'
+                                    ]
+                                }
+                            }
+                        }, {
+                            "$lookup": {
+                                "as": "isGroupMember",
+                                "from": "GroupMembers",
+                                let: {
+                                    'followedId': '$followedId',
+                                    'groupId': '$$groupId'
+                                },
+                                "pipeline": [
+                                    {
+                                        "$match": {
+                                            '$and': [
+                                                { "$expr": { "$eq": ["$userId", "$$followedId"] } },
+                                                { "$expr": { "$eq": ["$groupId", "$$groupId"] } },
+                                                { "$expr": { "$eq": ["$isMember", true] } }
+                                            ]
+                                        }
+                                    }
+                                ],
+                            }
+                        },
+                        {
+                            '$match': {
+                                '$expr': {
+                                    '$eq': [
+                                        { "$size": "$isGroupMember" }, 1
+                                    ]
+                                }
+                            }
+                        },
+                        {
+                            "$lookup": {
+                                "as": "user",
+                                "from": "Users",
+                                let: {
+                                    'followedId': '$followedId',
+                                },
+                                "pipeline": [
+                                    {
+                                        "$match": {
+                                            '$and': [
+                                                { "$expr": { "$eq": ["$_id", "$$followedId"] } }
+                                            ]
+                                        }
+                                    }
+                                ],
+                            }
+                        }, {
+                            "$replaceRoot": { newRoot: { "$first": "$user" } }
+                        }, {
+                            '$replaceRoot': {
+                                newRoot: {
+                                    $mergeObjects: [
+                                        { _id: "$_id" },
+                                        "$LiquidUser"
+                                    ]
+                                }
+                            }
+                        }]
+                    },
+                },
+                {
+                    '$addFields': {
+                        'yourStats': { 'membersYouFollow': '$membersYouFollow' }
+                    }
+                },
+
+            ]).toArray())?.[0];
+
+
 
             if (!Group) return;
 
-            const GroupMemberRelation = AuthUser ? (await mongoDB.collection("GroupMembers")
-                .findOne({
-                    'userId': new ObjectId(AuthUser._id),
-                    'groupId': new ObjectId(Group._id)
-                })) : {};
+            const GroupMemberRelation = AuthUser ? (
+                await mongoDB.collection("GroupMembers")
+                    .findOne({
+                        'userId': new ObjectId(AuthUser._id),
+                        'groupId': new ObjectId(Group._id)
+                    })) : {};
 
             return {
                 ...Group,
@@ -28,13 +117,52 @@ export const GroupResolvers = {
                     AuthUser
                 }),
                 //TODO: replace with Aggregation
-                yourStats: !!AuthUser && await getYourGroupStats({
-                    groupHandle: Group.handle,
-                    groupId: Group._id,
-                    AuthUser,
-                    mongoDB,
-                }),
+                yourStats: !!AuthUser && {
+                    ...Group.yourStats,
+                    ...await getYourGroupStats({
+                        groupHandle: Group.handle,
+                        groupId: Group._id,
+                        AuthUser,
+                        mongoDB,
+                    })
+                },
             };
+        },
+        Groups: async (_source, { userHandle }, { mongoDB, AuthUser }) => {
+
+            const User = await mongoDB.collection("Users")
+                .findOne({ 'LiquidUser.handle': userHandle });
+
+            const GroupsMemberRelations = await mongoDB.collection("GroupMembers")
+                .find({ 'userId': new ObjectId(User?._id) })
+                .toArray();
+
+            const Groups = await Promise.all((
+                await mongoDB.collection("Groups").find({
+                    "_id": {
+                        "$in": GroupsMemberRelations.map(r => new ObjectId(r.groupId))
+                    }
+                }).toArray()
+            )
+                .map(async (g) => ({
+                    ...g,
+                    thisUserIsAdmin: !!g.admins.find(u => u.handle === AuthUser?.LiquidUser?.handle),
+                    stats: await getGroupStats({
+                        groupHandle: g.handle,
+                        groupId: g._id,
+                        mongoDB,
+                        AuthUser
+                    }),
+                    //TODO: replace with Aggregation
+                    yourStats: !!AuthUser && await getYourGroupStats({
+                        groupHandle: g.handle,
+                        groupId: g._id,
+                        AuthUser,
+                        mongoDB,
+                    }),
+                })));
+
+            return Groups;
         },
         GroupMembers: async (_source, { handle }, { mongoDB, AuthUser }) => {
 
@@ -178,35 +306,6 @@ export const GroupResolvers = {
                 ...q,
                 thisUserIsAdmin: q.createdBy === AuthUser?._id,
             }));
-        },
-        Groups: async (_source, { userHandle }, { mongoDB, AuthUser }) => {
-
-            const User = await mongoDB.collection("Users")
-                .findOne({ 'LiquidUser.handle': userHandle });
-
-            const GroupsMemberRelations = await mongoDB.collection("GroupMembers")
-                .find({ 'userId': new ObjectId(User?._id) })
-                .toArray();
-
-            const Groups = await Promise.all((
-                await mongoDB.collection("Groups").find({
-                    "_id": {
-                        "$in": GroupsMemberRelations.map(r => new ObjectId(r.groupId))
-                    }
-                }).toArray()
-            )
-                .map(async (g) => ({
-                    ...g,
-                    thisUserIsAdmin: !!g.admins.find(u => u.handle === AuthUser?.LiquidUser?.handle),
-                    stats: await getGroupStats({
-                        groupHandle: g.handle,
-                        groupId: g._id,
-                        mongoDB,
-                        AuthUser
-                    }),
-                })));
-
-            return Groups;
         },
     },
     Mutation: {
@@ -790,5 +889,8 @@ const getYourGroupStats = async ({ groupId, groupHandle, AuthUser, mongoDB }) =>
 
         indirectVotesMadeByYou: votesInCommon?.indirectVotesMadeByYou || 0, // count if user made indirect vote and you represented him
         indirectVotesMadeForYou: votesInCommon?.indirectVotesMadeForYou || 0, // count if you made an indirect vote and he represented you
+
+
+
     });
 }

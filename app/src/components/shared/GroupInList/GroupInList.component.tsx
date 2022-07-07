@@ -99,6 +99,7 @@ export const GroupInList: FunctionComponent<{
                     <div className="d-flex ml-n5 mt-3">
                         {[
                             ...group.yourStats?.membersYouFollow || [],
+                            // TODO: representatives
                             ...group?.stats?.mostRepresentingMembers.filter(
                                 (m: any) => !group.yourStats?.membersYouFollow.find((mm: any) => mm.handle === m.handle)
                             )
@@ -121,8 +122,9 @@ export const GroupInList: FunctionComponent<{
                         ))}
                         <Link
                             to={`/group-people/${group.handle}/members`}
+                            className="vote-avatar count"
                         >
-                            <div className="vote-avatar count ml-n2">{group?.stats?.members}</div>
+                            <div>{group?.stats?.members}</div>
                         </Link>
                     </div>
                 </div>

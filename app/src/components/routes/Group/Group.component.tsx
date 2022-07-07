@@ -23,6 +23,7 @@ import { EDIT_GROUP_MEMBER_CHANNEL_RELATION } from "@state/User/typeDefs";
 import TopPageInvite from '@components/shared/TopPageInvite';
 import env from '@env';
 import InviteTinySvg from "@shared/Icons/Invite-tiny.svg";
+import Avatar from '@components/shared/Avatar';
 
 import GroupPolls from './GroupPolls';
 import './style.sass';
@@ -256,10 +257,33 @@ export const Group: FunctionComponent<{}> = ({ }) => {
                     <>
                         <div className="profile-stats-container flex-nowrap mt-2">
                             <div className="mr-1"><ProfileSmallSVG /></div>
-                            <div className="d-flex flex-wrap">
+                            <div className="d-flex flex-wrap align-items-center">
                                 <Link className="mr-2" to={`/group-people/${group?.handle}/members`}>
                                     <b className="white">{group?.stats?.members || 0}</b> Member{group?.stats?.members !== 1 && 's'}
                                 </Link>
+
+                                <div className='d-flex ml-2'>
+                                    {[
+                                        ...group.yourStats?.membersYouFollow || []
+                                        // TODO: representatives
+                                    ].slice(0, ).map((m: any) => (
+                                        <Link
+                                            key={m.handle + group.handle}
+                                            to={`/profile/${m.handle}/cause/${group.handle}`}
+                                            title={`${m.name}`}
+                                        >
+                                            <Avatar
+                                                person={{
+                                                    ...m,
+                                                    yourStats: m.yourStats,
+                                                    stats: m.stats
+                                                }}
+                                                groupHandle={group.handle}
+                                                type="tiny"
+                                            />
+                                        </Link>
+                                    ))}
+                                </div>
                             </div>
                         </div>
                         {(group?.yourStats.representing || group?.yourStats.representedBy) ? (

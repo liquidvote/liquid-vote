@@ -44,6 +44,7 @@ export const GROUP = gql`
             representations
             directVotesMade
             indirectVotesMade
+            
         }
         yourStats {
             lastDirectVoteOn
@@ -54,6 +55,23 @@ export const GROUP = gql`
             indirectVotesMadeForYou
             directVotesInAgreement
             directVotesInDisagreement
+
+            membersYouFollow {
+                name
+                avatar
+                handle
+                yourStats {
+                  directVotesInCommon
+                  directVotesInAgreement
+                  directVotesInDisagreement
+                  indirectVotesMadeByYou
+                  indirectVotesMadeForYou
+                }
+                stats {
+                    directVotesMade
+                }
+            }
+
         }
     }
   }

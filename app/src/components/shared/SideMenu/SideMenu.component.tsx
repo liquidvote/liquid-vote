@@ -63,7 +63,7 @@ export const SideMenu: FunctionComponent<{}> = ({ }) => {
                     </Link>
                 </>
             )} */}
-            <Link to="/groups" data-tip={isAuthenticated ? "Your Groups" : " Groups"}>
+            <Link to="/groups" data-tip={isAuthenticated ? "Your Causes" : " Causes"}>
                 <GroupSvg />
             </Link>
             {/* <Link to="/tags" data-tip="Tags">

@@ -8,6 +8,7 @@ import { updateQuestionVotingStats } from '../Questions/resolvers';
 import { QuestionsAgg } from '../Questions/aggregationLogic/QuestionsAgg';
 import { votesInCommonPipelineForVotes } from './aggregationLogic/votesInCommonPipelineForVotes';
 import { userRepresentedByComparissons } from './aggregationLogic/userRepresentedByComparissons';
+import { userRepresentingComparissons } from './aggregationLogic/UserRepresentingComparissons';
 import { userStatsAgg } from './aggregationLogic/userStats';
 import { yourUserStatsAgg } from './aggregationLogic/yourUserStats';
 
@@ -331,13 +332,18 @@ export const UserResolvers = {
                                 foreignField: '_id',
                                 as: 'representeeUser'
                             }
-                        }
+                        },
+                        ...(!!AuthUser._id) ? [
+                            ...userRepresentingComparissons({ groupHandle, AuthUserId: AuthUser._id })
+                        ] : []
                     ]
                 ).toArray())
                 .map(r => {
                     return {
                         ...r?.representeeUser[0]?.LiquidUser,
                         representationGroups: r?.groups,
+                        stats: r?.stats,
+                        yourStats: r?.yourStats,
                         email: null
                     }
                 });
@@ -463,17 +469,37 @@ export const UserResolvers = {
 
             const Groups = await Promise.all((
                 (await mongoDB.collection("Groups").aggregate([
+                    // {
+                    //     '$match': {
+                    //         ...!!UserGroupMemberRelations && {
+                    //             "_id": {
+                    //                 [`${notUsers ? '$nin' : '$in'}`]: UserGroupMemberRelations.map(r => new ObjectId(r.groupId))
+                    //             },
+                    //         },
+                    //         ...(notUsers || !(!!handle)) && {
+                    //             privacy: 'public'
+                    //         }
+                    //     },
+                    // },
+                    // filter out Non Public UserGroups you don't belong to
                     {
                         '$match': {
-                            ...!!UserGroupMemberRelations && {
-                                "_id": {
-                                    [`${notUsers ? '$nin' : '$in'}`]: UserGroupMemberRelations.map(r => new ObjectId(r.groupId))
-                                },
-                            },
-                            ...(notUsers || !(!!handle)) && {
-                                privacy: 'public'
-                            }
-                        },
+                            $and: [
+                                ...!!UserGroupMemberRelations ? [{
+                                    "_id": {
+                                        [`${notUsers ? '$nin' : '$in'}`]: UserGroupMemberRelations.map(r => new ObjectId(r.groupId))
+                                    },
+                                }] : [],
+                                {
+                                    $or: [
+                                        { privacy: 'public' },
+                                        ...!!YourGroupMemberRelations ? [
+                                            { '_id': { '$in': YourGroupMemberRelations.map(r => new ObjectId(r.groupId)) } }
+                                        ] : []
+                                    ]
+                                }
+                            ]
+                        }
                     },
                     // ...userStatsAgg({ groupHandle, groupId: group._id }),
                     {
