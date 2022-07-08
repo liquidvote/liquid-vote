@@ -391,62 +391,81 @@ export const updateQuestionVotingStats = async ({
             // 'groupChannel.channel': channel
         });
 
-    const VoteCounts = async ({ choiceText }) => (await mongoDB.collection("Votes")
-        .aggregate([
-            {
-                $match: {
-                    "groupChannel.group": group,
-                    // "groupChannel.channel": channel,
-                    "questionText": questionText,
-                    ...choiceText && { "choiceText": choiceText }
+    const VoteCountsAgg = ({ choiceText }) => [
+        {
+            $match: {
+                "groupChannel.group": group,
+                // "groupChannel.channel": channel,
+                "questionText": questionText,
+                ...choiceText && { "choiceText": choiceText }
+            },
+        },
+        {
+            $sort: {
+                'lastEditOn': 1
+            }
+        },
+        {
+            $group: {
+                _id: {
+                    "groupChannel": "$groupChannel",
+                    "questionText": "$questionText",
                 },
-            },
-            {
-                $group: {
-                    _id: {
-                        "groupChannel": "$groupChannel",
-                        "questionText": "$questionText",
-                    },
-                    forVotes: {
-                        $sum: "$forWeight"
-                    },
-                    forDirectVotes: {
-                        $sum: {
-                            $cond: [
-                                {
-                                    $and: [
-                                        { "$eq": ["$isDirect", true] },
-                                        { "$eq": ["$position", 'for'] }
-                                    ]
-                                },
-                                1,
-                                0
-                            ]
-                        }
-                    },
-                    againstVotes: {
-                        $sum: "$againstWeight"
-                    },
-                    againstDirectVotes: {
-                        $sum: {
-                            $cond: [
-                                {
-                                    $and: [
-                                        { "$eq": ["$isDirect", true] },
-                                        { "$eq": ["$position", 'against'] }
-                                    ]
-                                },
-                                1,
-                                0
-                            ]
-                        }
-                    },
-                    lastVoteOn: {
-                        $last: "$lastEditOn"
+                forVotes: {
+                    $sum: "$forWeight"
+                },
+                forDirectVotes: {
+                    $sum: {
+                        $cond: [
+                            {
+                                $and: [
+                                    { "$eq": ["$isDirect", true] },
+                                    { "$eq": ["$position", 'for'] }
+                                ]
+                            },
+                            1,
+                            0
+                        ]
                     }
+                },
+                againstVotes: {
+                    $sum: "$againstWeight"
+                },
+                againstDirectVotes: {
+                    $sum: {
+                        $cond: [
+                            {
+                                $and: [
+                                    { "$eq": ["$isDirect", true] },
+                                    { "$eq": ["$position", 'against'] }
+                                ]
+                            },
+                            1,
+                            0
+                        ]
+                    }
+                },
+                lastVoteOn: {
+                    $last: "$lastEditOn"
                 }
-            },
-        ])
+            }
+        },
+    ];
+
+    const writeToDebugFile = fs.writeFile(
+        process.cwd() + '/debug' + '/VoteCountsAgg' + undefined + '.json',
+        JSON.stringify(VoteCountsAgg({ choiceText: undefined }), null, 2),
+        { encoding: 'utf8' }
+    );
+
+    const writeToDebugFile_2 = fs.writeFile(
+        process.cwd() + '/debug' + '/VoteCountsAgg' + choiceText + '.json',
+        JSON.stringify(VoteCountsAgg({ choiceText }), null, 2),
+        { encoding: 'utf8' }
+    );
+
+    const VoteCounts = async ({ choiceText }) => (await mongoDB.collection("Votes")
+        .aggregate(VoteCountsAgg({ choiceText }))
         .toArray())?.[0];
 
     const DirectVotersByPosition = async ({ choiceText }) => (await mongoDB.collection("Votes")
@@ -577,7 +596,7 @@ export const updateQuestionVotingStats = async ({
                                 'forDirectCount': choiceVoteCounts?.forDirectVotes || 0,
                                 'againstCount': choiceVoteCounts?.againstVotes || 0,
                                 'againstDirectCount': choiceVoteCounts?.againstDirectVotes || 0,
-                                'lastVoteOn': choiceVoteCounts?.lastVoteOn,
+                                'lastVoteOn': choiceVoteCounts?.lastVoteOn, // TODO: f**ed on multi
                                 'forMostRepresentingVoters': choiceDirectVotersByPosition?.for?.voters,
                                 'againstMostRepresentingVoters': choiceDirectVotersByPosition?.against?.voters,
                                 'directVotes': choiceVoteCounts?.forDirectVotes + choiceVoteCounts?.againstDirectVotes || 0,

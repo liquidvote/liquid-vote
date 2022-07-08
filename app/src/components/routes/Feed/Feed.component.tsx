@@ -18,7 +18,7 @@ export const Feed: FunctionComponent<{}> = ({ }) => {
     let { section } = useParams<any>();
     const { liquidUser } = useAuthUser();
 
-    const [sortBy, setSortBy] = useState('time');
+    // const [sortBy, setSortBy] = useState('time');
 
     const {
         loading: questions_loading,
@@ -31,6 +31,12 @@ export const Feed: FunctionComponent<{}> = ({ }) => {
             notUsers: section === 'other' || !liquidUser,
         }
         // skip: !liquidUser
+    });
+
+    console.log({
+        liquidUser,
+        section,
+        questions_data
     });
 
     return (
@@ -85,6 +91,8 @@ export const Feed: FunctionComponent<{}> = ({ }) => {
                                 </div>
                             </div>
                         ) : null}
+
+                        {/* <pre className='small'>{JSON.stringify(v?.stats, null, 2)}</pre> */}
 
                         {v.questionType === 'multi' && (
                             <MultiVoteInList

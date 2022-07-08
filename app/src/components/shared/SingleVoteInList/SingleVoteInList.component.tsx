@@ -33,7 +33,7 @@ export const SingleVoteInList: FunctionComponent<{
     showChart
 }) => {
 
-        console.log({ user });
+        // console.log({ user });
 
         const { allSearchParams, updateParams } = useSearchParams();
 

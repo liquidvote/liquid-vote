@@ -121,14 +121,20 @@ export const Choice: FunctionComponent<{
             ...yourStats?.votersYouFollow?.filter((r: any) => r?.vote?.position === 'for') || [],
             ...(
                 !!editVote_data ? editVote_data?.editVote?.QuestionStats?.forMostRepresentingVoters : stats?.forMostRepresentingVoters
-            )?.filter((u: any) => u?.handle !== liquidUser?.handle) || []
+            )
+                ?.filter((u: any) => u?.handle !== liquidUser?.handle)
+                ?.filter((u: any) => !yourStats?.votersYouFollow?.filter((r: any) => r?.vote?.position === 'for').find((u: any) => u.handle === u.handle))
+                || []
         ];
 
         const againstDisplayed = [
             ...yourStats?.votersYouFollow?.filter((r: any) => r?.vote?.position === 'against') || [],
             ...(
                 !!editVote_data ? editVote_data?.editVote?.QuestionStats?.againstMostRepresentingVoters : stats?.againstMostRepresentingVoters
-            )?.filter((u: any) => u?.handle !== liquidUser?.handle) || []
+            )
+                ?.filter((u: any) => u?.handle !== liquidUser?.handle)
+                ?.filter((u: any) => !yourStats?.votersYouFollow?.filter((r: any) => r?.vote?.position === 'against').find((u: any) => u.handle === u.handle))
+                || []
         ];
 
         // console.log({
@@ -319,7 +325,7 @@ export const Choice: FunctionComponent<{
                                 {(
                                     !!user ? [] : forDisplayed
                                 )?.slice(0, 3).map((p: any) => (
-                                    <div key={`forDisplayedVoters-${p?.handle}`} className="ml-n1">
+                                    <div key={`forDisplayedVoter-${voteName}-${p?.handle}`} className="ml-n1">
                                         <Avatar
                                             person={p}
                                             groupHandle={groupHandle}
@@ -358,7 +364,7 @@ export const Choice: FunctionComponent<{
                                     (
                                         !!user ? [] : againstDisplayed
                                     )?.slice(0, 3).map((p: any) => (
-                                        <div key={`againstDisplayedVoters-${p?.handle}`} className="ml-n1">
+                                        <div key={`againstDisplayedVoter-${voteName}-${p?.handle}`} className="ml-n1">
                                             <Avatar
                                                 person={p}
                                                 groupHandle={groupHandle}
