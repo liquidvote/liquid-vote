@@ -4,6 +4,7 @@ import { Link, useParams } from "react-router-dom";
 import VoteWrapper from "@shared/VoteWrapper";
 import useSearchParams from "@state/Global/useSearchParams.effect";
 import useAuthUser from '@state/AuthUser/authUser.effect';
+import Drop from "@shared/Icons/Drop.svg";
 
 import './style.sass';
 
@@ -21,7 +22,7 @@ export const Home: FunctionComponent<{}> = ({ }) => {
 
             <h2>Welcome to <b className="white">Liquid Vote</b></h2>
 
-            <p>Where opinions are followed and delegated</p>
+            <p>The place for opinions</p>
 
             <br />
 
@@ -31,11 +32,20 @@ export const Home: FunctionComponent<{}> = ({ }) => {
                 Liquid Vote helps tiny and large organizations quickly gather a group's opinions.
             </p> */}
 
+            <h3>What can I do here?</h3>
+
+            <p> <Drop /> Learn where you and your friends <b className="forDirect white px-1 rounded">agree</b> and <b className="againstDirect white px-1 rounded">disagree</b>.</p>
+            <p> <Drop /> Vote on important Causes.</p>
+            <p> <Drop /> Delegate your voting power on specific causes.</p>
+
+            <br />
+            <br />
+
             <h4>Are my votes anonymous?</h4>
             <p>
                 No.
                 <br />
-                But anonymity features will come.
+                But anonymity features are in development.
             </p>
 
             <br />
@@ -96,14 +106,18 @@ export const Home: FunctionComponent<{}> = ({ }) => {
                 >Launch a Cause</div>
                 <Link
                     className="button_ mr-3"
-                    to={`/groups`}
+                    to={`/groups${!!liquidUser ? '/other' : ''}`}
                 >Explore Causes</Link>
-                <a
+                <Link
+                    className="button_ mr-3"
+                    to={`/group/lvcritics`}
+                >Give us feedback</Link>
+                {/* <a
                     className="button_ mr-3"
                     // Edit with this tool: https://mailto.vercel.app
                     href={`mailto:hello@liquid-vote.com?subject=I'd%20like%20to%20book%20a%20demo&body=Hi%20Pedro%2C%0AI'm%20free%20for%2030%20minutes%2C%20tomorrow%2C%2016pm%20London%20time%2C%20does%20that%20work%20for%20you%3F%0A%0ABest%20regards%2C%0AA%20curious%20person`}
                     target="_blank"
-                >Request a Demo</a>
+                >Request a Demo</a> */}
             </div>
 
             <br />

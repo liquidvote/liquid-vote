@@ -255,7 +255,7 @@ export const Group: FunctionComponent<{}> = ({ }) => {
             {
                 group?.yourStats && (
                     <>
-                        <div className="profile-stats-container flex-nowrap mt-2">
+                        <div className="profile-stats-container flex-nowrap mt-3">
                             <div className="mr-1"><ProfileSmallSVG /></div>
                             <div className="d-flex flex-wrap align-items-center">
                                 <Link className="mr-2" to={`/group-people/${group?.handle}/members`}>
@@ -263,26 +263,57 @@ export const Group: FunctionComponent<{}> = ({ }) => {
                                 </Link>
 
                                 <div className='d-flex ml-2'>
-                                    {[
-                                        ...group.yourStats?.membersYouFollow || []
-                                        // TODO: representatives
-                                    ].slice(0, ).map((m: any) => (
-                                        <Link
-                                            key={m.handle + group.handle}
-                                            to={`/profile/${m.handle}/cause/${group.handle}`}
-                                            title={`${m.name}`}
-                                        >
-                                            <Avatar
-                                                person={{
-                                                    ...m,
-                                                    yourStats: m.yourStats,
-                                                    stats: m.stats
-                                                }}
-                                                groupHandle={group.handle}
-                                                type="tiny"
-                                            />
-                                        </Link>
-                                    ))}
+                                    {group.yourStats?.membersYouFollow?.length ? (
+                                        <>
+                                            {[
+                                                ...group.yourStats?.membersYouFollow || []
+                                                // TODO: representatives
+                                            ].slice(0, 3).map((m: any) => (
+                                                <Link
+                                                    key={m.handle + group.handle}
+                                                    to={`/profile/${m.handle}/cause/${group.handle}`}
+                                                    title={`${m.name}`}
+                                                >
+                                                    <Avatar
+                                                        person={{
+                                                            ...m,
+                                                            yourStats: m.yourStats,
+                                                            stats: m.stats
+                                                        }}
+                                                        groupHandle={group.handle}
+                                                        type="tiny"
+                                                    />
+                                                </Link>
+                                            ))}
+
+
+                                            <small className='ml-2'>
+                                                {[
+                                                    ...group.yourStats?.membersYouFollow || []
+                                                    // TODO: representatives
+                                                ].slice(0, 3).map((m: any, i) => (
+                                                    <>
+                                                        {' '}
+                                                        <Link
+                                                            key={m.handle + group.handle}
+                                                            to={`/profile/${m.handle}/cause/${group.handle}`}
+                                                            title={`${m.name}`}
+                                                        >
+                                                            {m.name}
+                                                        </Link>
+                                                        {' '}
+                                                        {(i + 2) < group?.yourStats?.membersYouFollow.length ? ", " : ""}
+                                                        {(i + 2) === group?.yourStats?.membersYouFollow.length ? " and " : ""}
+                                                    </>
+                                                ))}
+                                                are members
+                                            </small>
+                                        </>
+                                    ) : null}
+
+                                    {!group.yourStats?.membersYouFollow.length ? (
+                                        <small>No members you follow</small>
+                                    ) : null}
                                 </div>
                             </div>
                         </div>
@@ -298,7 +329,6 @@ export const Group: FunctionComponent<{}> = ({ }) => {
                                     </Link>
                                 </div>
                             </div>
-
                         ) : null}
                     </>
                 )
@@ -407,7 +437,10 @@ export const Group: FunctionComponent<{}> = ({ }) => {
                     </Link>
                 </li>
                 <li className="px-4 mt-1">
-                    <VoteSortPicker updateSortInParent={setSortBy} />
+                    <VoteSortPicker
+                        updateSortInParent={setSortBy}
+                        initialSort="votersYouFollowOrRepresentingYouTimeWeight"
+                    />
                 </li>
             </ul>
 

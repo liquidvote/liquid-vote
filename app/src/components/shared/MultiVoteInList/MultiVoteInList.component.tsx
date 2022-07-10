@@ -1,15 +1,9 @@
 import React, { FunctionComponent, useState } from 'react';
-import { Link } from "react-router-dom";
-import numeral from 'numeral';
-import { format } from 'timeago.js';
 import ReactTooltip from 'react-tooltip';
 import { timeAgo } from '@state/TimeAgo';
 
-import VoteGraph1 from "@shared/VoteGraph1";
 import './style.sass';
-import { valores } from "@state/Mock/Votes";
 import Choice from "@shared/Choice";
-import GroupSvg from "@shared/Icons/Group.svg";
 import ThreeDotsSmallSVG from '@shared/Icons/ThreeDots-small-horizontal.svg';
 import Popper from "@shared/Popper";
 import useSearchParams from "@state/Global/useSearchParams.effect";
@@ -126,7 +120,7 @@ export const MultiVoteInList: FunctionComponent<{
                     <div className="d-flex flex-column justify-content-end mb-n1">
                         <small className="tiny-text" data-tip="Last vote was">
                             {!!v?.stats.lastVoteOn ?
-                                'last voted ' + timeAgo.format(new Date(Number(v?.stats?.lastVoteOn))) :
+                                'last vote was ' + timeAgo.format(new Date(Number(v?.stats?.lastVoteOn))) :
                                 'no votes yet'
                             }
                         </small>

@@ -92,6 +92,8 @@ export const GROUP_MEMBERS = gql`
         lastEditOn,
         isThisUser
         isRepresentingYou
+        isFollowingYou
+        isYouFollowing
         stats {
             lastDirectVoteOn
             representing

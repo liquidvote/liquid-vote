@@ -240,44 +240,52 @@ export const Profile: FunctionComponent<{}> = ({ }) => {
                     <div>Joined {timeAgo.format(new Date(Number(profile.joinedOn)))}</div>
                 </div>
             </div>
-            <div className="profile-stats-container mt-1 flex-nowrap">
-                <div className="mr-1"><ProfileSmallSVG /></div>
-                <div className="d-flex flex-column">
-                    <div className="d-flex flex-wrap align-items-center">
-                        <Link to={`/profile-follows/${profile.handle}/followedby`} className="mr-2">
-                            Following {' '}<b className="white">{profile?.stats?.following || 0}</b>
-                        </Link>
-                        <Link to={`/profile-follows/${profile.handle}/following`} className="mr-2">
-                            Followed by{' '}<b className="white">{profile?.stats?.followedBy || 0}</b>
-                        </Link>
-                    </div>
-                    {/* {(profile?.stats?.representedBy || profile?.stats?.representing) ? (
-                        <div className="d-flex flex-wrap">
-                            <Link to={`/profile-people/${profile.handle}/representedBy`} className="mr-2">
-                                Representing{' '}<b className="white">{profile?.stats?.representedBy}</b>
-                            </Link>
-                            <Link to={`/profile-people/${profile.handle}/representing`} className="mr-2">
-                                Represented by{' '}<b className="white">{profile?.stats?.representing}</b>
-                            </Link>
-                        </div>
-                    ) : null} */}
-                </div>
-            </div>
-            {(profile?.stats?.representedBy || profile?.stats?.representing) ? (
-                <div className="profile-stats-container mt-1 flex-nowrap">
-                    <div className="mr-1"><HandshakeSVG /></div>
+
+            <div>
+                <div className="profile-stats-container mt-3 flex-nowrap">
+                    <div className="mr-1"><ProfileSmallSVG /></div>
                     <div className="d-flex flex-column">
-                        <div className="d-flex flex-wrap">
-                            <Link to={`/profile-people/${profile.handle}/representedBy`} className="mr-2">
-                                Representing{' '}<b className="white">{profile?.stats?.representedBy || 0}</b>
+                        <div className="d-flex flex-wrap align-items-center">
+                            <Link to={`/profile-follows/${profile.handle}/followedby`} className="mr-2">
+                                Following {' '}<b className="white">{profile?.stats?.following || 0}</b>
                             </Link>
-                            <Link to={`/profile-people/${profile.handle}/representing`} className="mr-2">
-                                Represented by{' '}<b className="white">{profile?.stats?.representing || 0}</b>
+                            <Link to={`/profile-follows/${profile.handle}/following`} className="mr-2">
+                                Followed by{' '}<b className="white">{profile?.stats?.followedBy || 0}</b>
                             </Link>
                         </div>
+                        {/* {(profile?.stats?.representedBy || profile?.stats?.representing) ? (
+                            <div className="d-flex flex-wrap">
+                                <Link to={`/profile-people/${profile.handle}/representedBy`} className="mr-2">
+                                    Representing{' '}<b className="white">{profile?.stats?.representedBy}</b>
+                                </Link>
+                                <Link to={`/profile-people/${profile.handle}/representing`} className="mr-2">
+                                    Represented by{' '}<b className="white">{profile?.stats?.representing}</b>
+                                </Link>
+                            </div>
+                        ) : null} */}
                     </div>
                 </div>
-            ) : null}
+                <small className="">Not followed by anyone you follow</small>
+            </div>
+
+            <div>
+                {(profile?.stats?.representedBy || profile?.stats?.representing) ? (
+                    <div className="profile-stats-container mt-3 flex-nowrap">
+                        <div className="mr-1"><HandshakeSVG /></div>
+                        <div className="d-flex flex-column">
+                            <div className="d-flex flex-wrap">
+                                <Link to={`/profile-people/${profile.handle}/representedBy`} className="mr-2">
+                                    Representing{' '}<b className="white">{profile?.stats?.representedBy || 0}</b>
+                                </Link>
+                                <Link to={`/profile-people/${profile.handle}/representing`} className="mr-2">
+                                    Represented by{' '}<b className="white">{profile?.stats?.representing || 0}</b>
+                                </Link>
+                            </div>
+                        </div>
+                    </div>
+                ) : null}
+                <small className="">Not represented by anyone you follow</small>
+            </div>
             {/* {profile?.yourStats?.groupsInCommon && (
                     <Link to={`/profile-people/${profile.handle}/groups`} className="mr-2">
                         <b>{profile?.yourStats?.groupsInCommon}</b> Groups in common

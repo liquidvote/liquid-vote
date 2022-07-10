@@ -1,7 +1,7 @@
 import React, { FunctionComponent } from 'react';
-import { Link, useParams } from "react-router-dom";
+import { Link } from "react-router-dom";
 import numeral from 'numeral';
-import { useQuery, useMutation } from "@apollo/client";
+import { useMutation } from "@apollo/client";
 
 import { EDIT_VOTE } from '@state/Vote/typeDefs';
 import { USER } from "@state/User/typeDefs";
@@ -9,8 +9,6 @@ import Chart from "@shared/VoteGraph1/chart.svg";
 import { voteStatsMap } from '@state/Question/map';
 import useAuthUser from '@state/AuthUser/authUser.effect';
 import useSearchParams from "@state/Global/useSearchParams.effect";
-import { timeAgo } from '@state/TimeAgo';
-import VotedExplanation from '@shared/VotedExplanation';
 import Avatar from '@components/shared/Avatar';
 
 import './style.sass';
@@ -124,7 +122,7 @@ export const Choice: FunctionComponent<{
             )
                 ?.filter((u: any) => u?.handle !== liquidUser?.handle)
                 ?.filter((u: any) => !yourStats?.votersYouFollow?.filter((r: any) => r?.vote?.position === 'for').find((u: any) => u.handle === u.handle))
-                || []
+            || []
         ];
 
         const againstDisplayed = [
@@ -134,7 +132,7 @@ export const Choice: FunctionComponent<{
             )
                 ?.filter((u: any) => u?.handle !== liquidUser?.handle)
                 ?.filter((u: any) => !yourStats?.votersYouFollow?.filter((r: any) => r?.vote?.position === 'against').find((u: any) => u.handle === u.handle))
-                || []
+            || []
         ];
 
         // console.log({
@@ -298,6 +296,30 @@ export const Choice: FunctionComponent<{
                                             groupHandle={groupHandle}
                                             type={inList ? 'tiny' : 'vote'}
                                         />
+
+                                        {/* <div
+                                            onClick={
+                                                e => {
+                                                    e.stopPropagation();
+                                                    updateParams({
+                                                        paramsToAdd: {
+                                                            modal: "ListVoters",
+                                                            modalData: JSON.stringify({
+                                                                questionText: voteName,
+                                                                choiceText,
+                                                                groupHandle,
+                                                                subsection: 'represented',
+                                                                subsubsection: 'byyou'
+                                                            })
+                                                        }
+                                                    })
+                                                }
+                                            }
+                                            // to={`/${choiceText ? 'multipoll' : 'poll'}/${voteName}/${groupHandle}/timeline/representingYou`}
+                                            // onClick={e => e.stopPropagation()}
+                                            className={`text-decoration-none count for ml-n2 ${inList ? 'tiny-avatar' : 'vote-avatar'}`}
+                                        >{yourVote_.representee.length}</div> */}
+
                                     </div>
                                 )}
                             </div>

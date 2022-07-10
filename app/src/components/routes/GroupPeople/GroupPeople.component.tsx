@@ -68,6 +68,11 @@ export const GroupPeople: FunctionComponent<{}> = ({ }) => {
                         <b>{group?.stats?.members}</b> Members
                     </Link>
                 </li>
+                <li className="nav-item">
+                    <Link className={`nav-link ${which === 'youFollow' && 'active'}`} to={`/group-people/${group?.handle}/youFollow`}>
+                        <b>{group?.yourStats?.membersYouFollow?.length || 0}</b> You Follow
+                    </Link>
+                </li>
                 {
                     group?.yourStats && (
                         <>
@@ -98,7 +103,7 @@ export const GroupPeople: FunctionComponent<{}> = ({ }) => {
                 <div className="mt-n2">
                     {group_members_data?.GroupMembers?.map((el, i) => (
                         <PersonInList
-                            key={'gp_members'+el.handle}
+                            key={'gp_members' + el.handle}
                             person={el}
                             groupHandle={handle}
                             includeVotes={true}
@@ -109,12 +114,29 @@ export const GroupPeople: FunctionComponent<{}> = ({ }) => {
                     )}
                 </div>
             )}
+
+            {which === 'youFollow' && (
+                // <pre>{JSON.stringify(user_representing_data?.UserRepresenting, null, 2)}</pre>
+                <div className="mt-n2">
+                    {group?.yourStats?.membersYouFollow?.map((el, i) => (
+                        <PersonInList
+                            key={'gp_members' + el.handle}
+                            person={el}
+                            groupHandle={handle}
+                            includeVotes={true}
+                        />
+                    ))}
+                    {(!group?.yourStats?.membersYouFollow?.length) && (
+                        <div className="p-4 text-center">{`No members you follow, yet!`}</div>
+                    )}
+                </div>
+            )}
             {which === 'representingYou' && (
                 // <pre>{JSON.stringify(user_representing_data?.UserRepresenting, null, 2)}</pre>
                 <div className="mt-n2">
                     {user_represented_by_data?.UserRepresentedBy?.map((el, i) => (
                         <PersonInList
-                            key={'gp_representingYou'+el.handle}
+                            key={'gp_representingYou' + el.handle}
                             person={el}
                             groupHandle={handle}
                             includeVotes={true}
@@ -130,7 +152,7 @@ export const GroupPeople: FunctionComponent<{}> = ({ }) => {
                 <div className="mt-n2">
                     {user_representing_data?.UserRepresenting?.map((el, i) => (
                         <PersonInList
-                            key={'gp_representedByYou'+el.handle}
+                            key={'gp_representedByYou' + el.handle}
                             person={el}
                             groupHandle={handle}
                             includeVotes={true}

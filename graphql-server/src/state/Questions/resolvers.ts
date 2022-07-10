@@ -138,11 +138,11 @@ export const QuestionResolvers = {
                 ] : []
             ]
 
-            // const writeToDebugFile = fs.writeFile(
-            //     process.cwd() + '/debug' + '/Questions.json',
-            //     JSON.stringify(Agg, null, 2),
-            //     { encoding: 'utf8' }
-            // );
+            const writeToDebugFile = fs.writeFile(
+                process.cwd() + '/debug' + '/Questions.json',
+                JSON.stringify(Agg, null, 2),
+                { encoding: 'utf8' }
+            );
 
             const Questions = await mongoDB.collection("Questions")
                 .aggregate(Agg)
@@ -445,6 +445,19 @@ export const updateQuestionVotingStats = async ({
                         ]
                     }
                 },
+                inDirectVotes: {
+                    $sum: {
+                        $cond: [
+                            {
+                                $and: [
+                                    { "$eq": ["$isDirect", false] },
+                                ]
+                            },
+                            1,
+                            0
+                        ]
+                    }
+                },
                 lastVoteOn: {
                     $last: "$lastEditOn"
                 }
@@ -571,6 +584,11 @@ export const updateQuestionVotingStats = async ({
     const choiceVoteCounts = !!choiceText && await VoteCounts({ choiceText });
     const choiceDirectVotersByPosition = !!choiceText && await DirectVotersByPosition({ choiceText });
 
+    console.log({
+        questionVoteCounts,
+        choiceVoteCounts
+    });
+
     const updatedQuestion = (await mongoDB.collection("Questions").findOneAndUpdate(
         { _id: Question_._id },
         {
@@ -584,9 +602,9 @@ export const updateQuestionVotingStats = async ({
                 'stats.forMostRepresentingVoters': questionDirectVotersByPosition?.for?.voters,
                 'stats.againstMostRepresentingVoters': questionDirectVotersByPosition?.against?.voters,
                 'stats.directVotes': questionVoteCounts?.forDirectVotes + questionVoteCounts?.againstDirectVotes || 0,
-                'stats.indirectVotes':
-                    (questionVoteCounts?.forVotes - questionVoteCounts?.forDirectVotes) +
-                    (questionVoteCounts?.againstVotes - questionVoteCounts?.againstDirectVotes) || 0,
+                'stats.indirectVotes': questionVoteCounts.inDirectVotes,
+                // (questionVoteCounts?.forVotes - questionVoteCounts?.forDirectVotes) +
+                // (questionVoteCounts?.againstVotes - questionVoteCounts?.againstDirectVotes) || 0,
                 ...(!!choiceText) && {
                     'choices': Question_.choices.map(c => ({
                         ...c,
@@ -600,9 +618,9 @@ export const updateQuestionVotingStats = async ({
                                 'forMostRepresentingVoters': choiceDirectVotersByPosition?.for?.voters,
                                 'againstMostRepresentingVoters': choiceDirectVotersByPosition?.against?.voters,
                                 'directVotes': choiceVoteCounts?.forDirectVotes + choiceVoteCounts?.againstDirectVotes || 0,
-                                'indirectVotes':
-                                    (choiceVoteCounts?.forVotes - choiceVoteCounts?.forDirectVotes) +
-                                    (choiceVoteCounts?.againstVotes - choiceVoteCounts?.againstDirectVotes) || 0,
+                                'indirectVotes': choiceVoteCounts.inDirectVotes,
+                                    // (choiceVoteCounts?.forVotes - choiceVoteCounts?.forDirectVotes) +
+                                    // (choiceVoteCounts?.againstVotes - choiceVoteCounts?.againstDirectVotes) || 0,
                             }
                         }
                     }))

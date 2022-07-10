@@ -35,7 +35,7 @@ export const Groups: FunctionComponent<{}> = ({ }) => {
 
     return (
         <>
-            <Header title="Groups" />
+            <Header title="Causes" />
 
             {!!liquidUser && (
                 <ul className="nav d-flex flex-nowrap justify-content-around align-items-center mt-1 mx-n3">

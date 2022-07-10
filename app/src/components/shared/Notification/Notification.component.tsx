@@ -55,15 +55,21 @@ export const Notification: FunctionComponent<{
                                         </Link>
                                     </div>
                                 )}
+
+                                {/* {userVote.position} */}
+
                                 <div className="d-flex flex-wrap align-items-center mt-0 mb-0">
                                     {!showChart ? (
-                                        <VotedExplanation
-                                            position={userVote.position}
-                                            representeeVotes={userVote.representeeVotes}
-                                            representatives={userVote.representatives}
-                                            user={v.user}
-                                            groupHandle={v?.groupChannel?.group}
-                                        />
+                                        <>
+                                            🗣
+                                            <VotedExplanation
+                                                position={userVote.position}
+                                                representeeVotes={userVote.representeeVotes}
+                                                representatives={userVote.representatives}
+                                                user={v.user}
+                                                groupHandle={v?.groupChannel?.group}
+                                            />
+                                        </>
                                     ) : ''}
                                 </div>
                             </div>
@@ -108,7 +114,6 @@ export const Notification: FunctionComponent<{
                             l={v.question}
                             user={v.user}
                             showGroupAndTime={false}
-                            showIntroMessage={true}
                             showChart={showChart}
                         />
                     </div>

@@ -8,6 +8,7 @@ import DropPlusSVG from "@shared/Icons/Drop+.svg";
 import useSearchParams from "@state/Global/useSearchParams.effect";
 import { QUESTIONS } from "@state/Question/typeDefs";
 import DropAnimation from "@components/shared/DropAnimation";
+import PollExplanation from '@shared/PollExplanation';
 
 import './style.sass';
 
@@ -16,66 +17,70 @@ export const GroupPolls: FunctionComponent<{
 }> = ({
     sortBy
 }) => {
-    let { handle } = useParams<any>();
-    const { allSearchParams, updateParams } = useSearchParams();
+        let { handle } = useParams<any>();
+        const { allSearchParams, updateParams } = useSearchParams();
 
-    const {
-        loading: questions_loading,
-        error: questions_error,
-        data: questions_data,
-        refetch: questions_refetch
-    } = useQuery(QUESTIONS, {
-        variables: {
-            groupHandle: handle,
-            sortBy
-        }
-    });
+        const {
+            loading: questions_loading,
+            error: questions_error,
+            data: questions_data,
+            refetch: questions_refetch
+        } = useQuery(QUESTIONS, {
+            variables: {
+                groupHandle: handle,
+                sortBy
+            }
+        });
 
-    useEffect(() => {
-        if (allSearchParams.refetch === 'questions') {
-            questions_refetch();
-            updateParams({ keysToRemove: ['refetch'] })
-        }
-    }, [allSearchParams.refetch]);
+        useEffect(() => {
+            if (allSearchParams.refetch === 'questions') {
+                questions_refetch();
+                updateParams({ keysToRemove: ['refetch'] })
+            }
+        }, [allSearchParams.refetch]);
 
-    console.log({ questions_data });
+        console.log({ questions_data });
 
-    return (
-        <>
-            {questions_data?.Questions?.map((q: any, i: any) => (
-                <div key={'polls-' + i}>
-                    {q.questionType === 'multi' && (
-                        <MultiVoteInList
-                            key={`multi-${q.questionText}`}
-                            v={q}
-                            // i={i}
-                            showGroupAndTime={true}
+        return (
+            <>
+                {questions_data?.Questions?.map((q: any, i: any) => (
+                    <div key={'polls-' + i}>
+                        <PollExplanation
+                            p={q}
                         />
-                    )}
-                    {q.questionType === 'single' && (
-                        <SingleVoteInList
-                            key={`single-${q.questionText}`}
-                            l={q}
-                            showGroupAndTime={true}
-                        />
-                    )}
-                    <hr />
-                </div>
-            ))}
 
-            {questions_data?.Questions?.length === 0 && (
-                <div className="p-4 text-center">
-                    There are no polls in this group yet
-                </div>
-            )}
+                        {q.questionType === 'multi' && (
+                            <MultiVoteInList
+                                key={`multi-${q.questionText}`}
+                                v={q}
+                                // i={i}
+                                showGroupAndTime={true}
+                            />
+                        )}
+                        {q.questionType === 'single' && (
+                            <SingleVoteInList
+                                key={`single-${q.questionText}`}
+                                l={q}
+                                showGroupAndTime={true}
+                            />
+                        )}
+                        <hr />
+                    </div>
+                ))}
 
-            {questions_loading && (
-                <div className="d-flex justify-content-center mt-5">
-                    <DropAnimation />
-                </div>
-            )}
+                {questions_data?.Questions?.length === 0 && (
+                    <div className="p-4 text-center">
+                        There are no polls in this group yet
+                    </div>
+                )}
 
-        </>
-    );
-}
+                {questions_loading && (
+                    <div className="d-flex justify-content-center mt-5">
+                        <DropAnimation />
+                    </div>
+                )}
+
+            </>
+        );
+    }
 

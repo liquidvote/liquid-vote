@@ -58,7 +58,7 @@ export const ListVotersMenu: FunctionComponent<{
                     </li>
                     <li className="nav-item">
                         <div
-                            className={`pointer nav-link ${(subsection === 'represented') && 'active'}`}
+                            className={`small pointer nav-link ${(subsection === 'represented') && 'active'}`}
                             // to={`/poll/${questionText}/${groupHandle}/timeline/represented`}
                             onClick={
                                 e => {
@@ -200,7 +200,7 @@ export const ListVotersMenu: FunctionComponent<{
                                         }
                                     }
                                 >
-                                    <b className="px-1 rounded">{numeral(stats?.directVotes || stats?.directVotesMade).format('0a[.]0')}</b> All
+                                    <b className="px-1 rounded">{numeral(stats?.directVotes || stats?.directVotesMade).format('0a[.]0')}</b> By Following
                                 </div>
                             </li>
                             <li className="nav-item">
@@ -263,7 +263,7 @@ export const ListVotersMenu: FunctionComponent<{
                         <ul className="nav d-flex justify-content-around">
                             <li className="nav-item">
                                 <div
-                                    className={`pointer nav-link ${!subsubsection && 'active'}`}
+                                    className={`small pointer nav-link ${!subsubsection && 'active'}`}
                                     // to={`/poll/${questionText}/${groupHandle}/timeline/represented`}
                                     onClick={
                                         e => {
@@ -288,7 +288,7 @@ export const ListVotersMenu: FunctionComponent<{
                             </li>
                             <li className="nav-item">
                                 <div
-                                    className={`pointer nav-link ${subsubsection === 'byyou' && 'active'}`}
+                                    className={`small pointer nav-link ${subsubsection === 'byyou' && 'active'}`}
                                     // to={`/poll/${questionText}/${groupHandle}/timeline/represented/byyou`}
                                     onClick={
                                         e => {
@@ -314,7 +314,7 @@ export const ListVotersMenu: FunctionComponent<{
                             </li>
                             <li className="nav-item">
                                 <div
-                                    className={`pointer nav-link ${subsubsection === 'foryou' && 'active'}`}
+                                    className={`small pointer nav-link ${subsubsection === 'foryou' && 'active'}`}
                                     // to={`/poll/${questionText}/${groupHandle}/timeline/represented/foryou`}
                                     onClick={
                                         e => {
@@ -336,6 +336,32 @@ export const ListVotersMenu: FunctionComponent<{
                                 >
                                     {/* <b>{profile?.yourStats?.indirectVotesMadeForYou}</b> */}
                                     For you
+                                </div>
+                            </li>
+                            <li className="nav-item">
+                                <div
+                                    className={`small pointer nav-link ${subsubsection === 'foryou' && 'active'}`}
+                                    // to={`/poll/${questionText}/${groupHandle}/timeline/represented/foryou`}
+                                    onClick={
+                                        e => {
+                                            e.stopPropagation();
+                                            updateParams({
+                                                paramsToAdd: {
+                                                    modal: "ListVoters",
+                                                    modalData: JSON.stringify({
+                                                        questionText,
+                                                        choiceText,
+                                                        groupHandle,
+                                                        subsection: 'represented',
+                                                        subsubsection: 'foryou'
+                                                    })
+                                                }
+                                            })
+                                        }
+                                    }
+                                >
+                                    {/* <b>{profile?.yourStats?.indirectVotesMadeForYou}</b> */}
+                                    By Following
                                 </div>
                             </li>
                         </ul>

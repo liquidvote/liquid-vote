@@ -30,7 +30,8 @@ export default function useSearchParams_() {
     const updateParams = ({ keysToRemove, paramsToAdd }: {
         keysToRemove?: Array<string>,
         paramsToAdd?: Object
-    }) =>
+    }) => {
+
         // history.replace({
         //     pathname: location.pathname,
         //     search: getNewSearchParamsString({
@@ -39,10 +40,16 @@ export default function useSearchParams_() {
         //     }),
 
         // })
-        setSearchParams(getNewSearchParamsString({
+
+        const newParams = getNewSearchParamsString({
             keysToRemove,
             paramsToAdd
-        }));
+        })
+
+        console.log({ newParams });
+
+        setSearchParams(newParams);
+    }
 
     return {
         allSearchParams,

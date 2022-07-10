@@ -1,14 +1,12 @@
 import React, { FunctionComponent, useState } from 'react';
-import { Link, useParams } from "react-router-dom";
-import { useQuery, useMutation } from "@apollo/client";
+import { useQuery } from "@apollo/client";
 
 import useAuthUser from '@state/AuthUser/authUser.effect';
 import { USER } from "@state/User/typeDefs";
 import { VOTES } from "@state/Vote/typeDefs";
-import Notification from '@shared/Notification';
-import Popper from "@shared/Popper";
-import VoteSortPicker from '@components/shared/VoteSortPicker';
 import DropAnimation from '@components/shared/DropAnimation';
+import SingleVoteInList from "@shared/SingleVoteInList";
+import MultiVoteInList from "@shared/MultiVoteInList";
 
 import './style.sass';
 
@@ -155,15 +153,38 @@ export const GroupInProfileListVotes: FunctionComponent<{ userHandle?: string, g
             )}
 
             {user_votes_data?.Votes.map((n, i) => (
-                <Notification
-                    key={'notification-uservote' + n.questionText + type + n.choiceText + n.user.handle}
-                    v={{
-                        ...n,
-                        user: profile
-                    }}
-                    showUser={false}
-                    showChart={true}
-                />
+                <div className='mt-3' key={'uservote' + n.questionText + type + n.choiceText + profile.handle}>
+                    {
+                        n.question.questionType === 'multi' && (
+                            <MultiVoteInList
+                                key={`multi-${n.questionText}`}
+                                v={{
+                                    ...n.question
+                                }}
+                                user={profile}
+                                showGroupAndTime={true}
+                            />
+                        )
+                    }
+                    {
+                        n.question.questionType === 'single' && (
+                            <SingleVoteInList
+                                key={`single-${n.questionText}`}
+                                l={{
+                                    ...n.question
+                                }}
+                                user={profile}
+                                showGroupAndTime={true}
+                            />
+                        )
+                    }
+
+                    {user_votes_data?.Votes.length - 1 !== i ? (
+                        <hr />
+                    ) : null}
+                </div>
+
+
             ))}
 
             {user_votes_loading && (

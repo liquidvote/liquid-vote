@@ -9,6 +9,7 @@ import MultiVoteInList from "@shared/MultiVoteInList";
 import DropAnimation from "@shared/DropAnimation";
 import useAuthUser from '@state/AuthUser/authUser.effect';
 import VoteSortPicker from '@components/shared/VoteSortPicker';
+import PollExplanation from '@shared/PollExplanation';
 
 import './style.sass';
 
@@ -91,6 +92,10 @@ export const Feed: FunctionComponent<{}> = ({ }) => {
                                 </div>
                             </div>
                         ) : null}
+
+                        <PollExplanation
+                            p={v}
+                        />
 
                         {/* <pre className='small'>{JSON.stringify(v?.stats, null, 2)}</pre> */}
 

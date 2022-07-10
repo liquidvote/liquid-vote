@@ -135,6 +135,29 @@ export const VoteResolvers = {
                         }],
                         ...routeParams
                     }),
+                    'indirectVotes': VotesGeneralAggregateLogic({
+                        filterAfterYourVoteAndBooleans: [{
+                            '$match': {
+                                // position: "delegated",
+                                // isDirect: false
+                            }
+                        }],
+                        // filterAfterMerge: [{
+                        //     '$match': {
+                        //         'Count.representing': { $gt: 0 }
+                        //     }
+                        // }],
+                        choiceFilters: [{
+                            '$eq': [
+                                '$$v.userVote.isDirect', false
+                            ]
+                        }, {
+                            '$eq': [
+                                '$$v.userVote.position', 'delegated'
+                            ]
+                        }],
+                        ...routeParams
+                    }),
                     'indirectVotesMade': VotesGeneralAggregateLogic({
                         filterAfterYourVoteAndBooleans: [{
                             '$match': {
@@ -217,8 +240,8 @@ export const VoteResolvers = {
 
 
             const writeToDebugFile = fs.writeFile(
-                process.cwd() + '/debug' + '/votes_.json',
-                JSON.stringify({ QueryJSON: VotesSpecificAggregateLogic }, null, 2),
+                process.cwd() + '/debug' + '/votes_'+type+'.json',
+                JSON.stringify(VotesSpecificAggregateLogic, null, 2),
                 { encoding: 'utf8' }
             );
 
@@ -261,7 +284,7 @@ export const VoteResolvers = {
             console.log({
                 type,
                 VotesL: Votes?.length,
-                VotesR: Votes.map(v => v?.yourVote?.representatives)
+                // VotesR: Votes.map(v => v?.yourVote?.representatives)
             });
 
             return Votes;

@@ -12,6 +12,7 @@ import Notification from '@shared/Notification';
 import DropAnimation from '@components/shared/DropAnimation';
 import useGroup from '@state/Group/group.effect';
 import ListVotersMenu from "./ListVotersMenu";
+import Choice from "@shared/Choice";
 
 import ModalHeader from "../../shared/ModalHeader";
 import './style.sass';
@@ -65,7 +66,7 @@ export const ListVoters: FunctionComponent<{}> = ({ }) => {
         } else if (subsection === 'direct' && subsubsection === 'against') {
             return 'directAgainst';
         } else if (subsection === 'represented' && !subsubsection) {
-            return 'indirectVotesMade'
+            return 'indirectVotes'
         } else if (subsection === 'direct' && subsubsection === 'byYou') {
             return 'directVotesMadeByYou';
         } else if (subsection === 'represented' && subsubsection === 'byyou') {
@@ -94,14 +95,18 @@ export const ListVoters: FunctionComponent<{}> = ({ }) => {
     });
 
     console.log({
-        stats,
-        modalData,
-        question_data,
-        type,
-        subsection,
-        subsubsection,
+        // stats,
+        // modalData,
+        // question_data,
+        // type,
+        // subsection,
+        // subsubsection,
         votes_data
     });
+
+    const choice = question_data?.Question?.questionType === 'single' ?
+        question_data?.Question :
+        question_data?.Question?.choices?.find(c => c.text === choiceText);
 
     return (
         <>
@@ -113,6 +118,20 @@ export const ListVoters: FunctionComponent<{}> = ({ }) => {
                 }
                 hideSubmitButton={true}
             />
+            <div className='pt-3 pb-1 px-2'>
+                <Choice
+                    choiceText={choice?.text}
+                    voteName={question_data?.Question.questionText}
+                    groupHandle={question_data?.Question.groupChannel.group}
+                    stats={choice?.stats}
+                    yourVote={choice?.yourVote}
+                    userVote={choice?.userVote}
+                    // user={user}
+                    inList={true}
+                    showChart={true}
+                    yourStats={choice?.yourStats}
+                />
+            </div>
             <div className="">
                 <ListVotersMenu
                     subsection={subsection}
@@ -124,6 +143,13 @@ export const ListVoters: FunctionComponent<{}> = ({ }) => {
                     setSortBy={setSortBy}
                     liquidUser={liquidUser}
                 />
+            </div>
+            <div className='p-3 d-flex align-items-center justify-content-center'>
+                <div>
+                    {type} -
+                    {subsection} -
+                    {subsubsection}
+                </div>
             </div>
             <div className="Modal-Content">
 
@@ -159,7 +185,7 @@ export const ListVoters: FunctionComponent<{}> = ({ }) => {
                             v={{
                                 ...n,
                             }}
-                            showUser={false}
+                            showUser={true}
                             showChart={false}
                             hideChoicesBesides={choiceText}
                         />

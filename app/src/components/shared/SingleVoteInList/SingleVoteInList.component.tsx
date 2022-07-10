@@ -120,7 +120,7 @@ export const SingleVoteInList: FunctionComponent<{
                             <div className="d-flex flex-column justify-content-end mb-1 mt-n1">
                                 <small className="tiny-text" data-tip="Last vote was">
                                     {!!l?.stats.lastVoteOn ?
-                                        'last voted ' + timeAgo.format(new Date(Number(l?.stats?.lastVoteOn))) :
+                                        'last vote was ' + timeAgo.format(new Date(Number(l?.stats?.lastVoteOn))) :
                                         'no votes yet'
                                     }
                                 </small>

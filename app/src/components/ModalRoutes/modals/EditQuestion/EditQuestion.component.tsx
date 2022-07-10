@@ -179,7 +179,7 @@ export const EditQuestion: FunctionComponent<{}> = ({ }) => {
                         />
                     ))('questionType')}
                 </div>
-{/* 
+                {/* 
                 {watch('questionType') === 'single' ? (
                     <>
                         <div className="d-flex input-override position-relative on-top">
@@ -261,7 +261,7 @@ export const EditQuestion: FunctionComponent<{}> = ({ }) => {
                             {((name: any) => (
                                 <ToggleInput
                                     name={name}
-                                    labelName="Allow new choices"
+                                    labelName="Allow creating new choices"
                                     register={register(name, {
                                         // validate: {
                                         //     minimum2: (v) =>
@@ -281,6 +281,31 @@ export const EditQuestion: FunctionComponent<{}> = ({ }) => {
                                 // disabled={modalData.questionText !== "new"}
                                 />
                             ))('allowNewChoices')}
+                        </div>
+                        <div className="my-3 mt-4">
+                            {((name: any) => (
+                                <ToggleInput
+                                    name={name}
+                                    labelName="Only allow voting for one choice"
+                                    register={register(name, {
+                                        // validate: {
+                                        //     minimum2: (v) =>
+                                        //         v.reduce((acc: any, curr: any) => acc + !!curr.text, 0) >= 2 ||
+                                        //         'please present at least 2 choices',
+                                        // }
+                                    })}
+                                    value={watch(name)}
+                                    error={errors[name]}
+                                    setValue={setValue}
+                                    info={
+                                        watch('allowMultipleVotes') ? `
+                                            Voters can only vote on one choice - (🏗 soon)
+                                        ` : `
+                                            Voters can vote on all choices
+                                        `}
+                                // disabled={modalData.questionText !== "new"}
+                                />
+                            ))('allowMultipleVotes')}
                         </div>
 
                     </>

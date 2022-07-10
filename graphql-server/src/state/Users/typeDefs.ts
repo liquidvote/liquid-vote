@@ -53,10 +53,12 @@ export const UserTypeDefs = gql`
         isYouFollowing: Boolean
         stats: UserStats
         yourStats: YourUserStats
-        groupStats: UserGroupStats
+        groupStats: UserGroupStats  # this could go in "thisGroup"
         vote: Vote
 
         representationGroups: [Group]
+
+        thisGroup: Group
     }
 
     type UserRepresentativeGroupRelation {
