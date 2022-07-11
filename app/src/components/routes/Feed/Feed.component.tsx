@@ -10,6 +10,8 @@ import DropAnimation from "@shared/DropAnimation";
 import useAuthUser from '@state/AuthUser/authUser.effect';
 import VoteSortPicker from '@components/shared/VoteSortPicker';
 import PollExplanation from '@shared/PollExplanation';
+import useUser from '@state/User/user.effect';
+import { useAuth0 } from "@auth0/auth0-react";
 
 import './style.sass';
 
@@ -18,6 +20,10 @@ export const Feed: FunctionComponent<{}> = ({ }) => {
 
     let { section } = useParams<any>();
     const { liquidUser } = useAuthUser();
+    const { user: yourUser } = useUser({ userHandle: liquidUser?.handle });
+    const { loginWithPopup } = useAuth0();
+
+    console.log({ yourUser });
 
     // const [sortBy, setSortBy] = useState('time');
 
@@ -30,8 +36,8 @@ export const Feed: FunctionComponent<{}> = ({ }) => {
         variables: {
             sortBy: liquidUser ? 'votersYouFollowOrRepresentingYouTimeWeight' : 'weight',
             notUsers: section === 'other' || !liquidUser,
-        }
-        // skip: !liquidUser
+        },
+        skip: !liquidUser || !yourUser?.stats?.following
     });
 
     console.log({
@@ -44,9 +50,9 @@ export const Feed: FunctionComponent<{}> = ({ }) => {
         <>
             <Header
                 title="Home"
-                // rightElement={
-                //     () => <VoteSortPicker updateSortInParent={setSortBy} initialSort={sortBy} />
-                // }
+            // rightElement={
+            //     () => <VoteSortPicker updateSortInParent={setSortBy} initialSort={sortBy} />
+            // }
             />
 
             {/* {
@@ -73,7 +79,7 @@ export const Feed: FunctionComponent<{}> = ({ }) => {
                 {questions_data?.Questions?.map((v: any, i: any) => (
                     <div key={'polls-' + i}>
 
-                        {v?.group?.handle !== questions_data?.Questions[i-1]?.group?.handle ? (
+                        {v?.group?.handle !== questions_data?.Questions[i - 1]?.group?.handle ? (
                             <div className="poll-cover-container">
                                 <div
                                     className="poll-cover"
@@ -93,9 +99,12 @@ export const Feed: FunctionComponent<{}> = ({ }) => {
                             </div>
                         ) : null}
 
-                        <PollExplanation
-                            p={v}
-                        />
+
+                        {liquidUser ? (
+                            <PollExplanation
+                                p={v}
+                            />
+                        ) : null}
 
                         {/* <pre className='small'>{JSON.stringify(v?.stats, null, 2)}</pre> */}
 
@@ -117,9 +126,39 @@ export const Feed: FunctionComponent<{}> = ({ }) => {
                     </div>
                 ))}
 
+                {!liquidUser && (
+                    <div className="p-4 text-center">
+                        <h3>Login to see what your friends are voting on</h3>
+
+                        <div className="d-flex align-items-center justify-content-center">
+                            <div
+                                className="button_ mx-5 my-4"
+                                onClick={loginWithPopup}
+                            >
+                                Log In
+                            </div>
+                            or
+                            <div
+                                className="button_ mx-5 my-4"
+                                onClick={loginWithPopup}
+                            >
+                                Sign Up
+                            </div>
+                        </div>
+                    </div>
+                )}
+
+                {liquidUser && !yourUser?.stats?.following && (
+                    <div className="p-4 text-center">
+                        <h3>Liquid Vote is more fun with friends.</h3>
+
+                        <p>Follow people to see here what they are voting on.</p>
+                    </div>
+                )}
+
                 {questions_data?.Questions?.length === 0 && (
                     <div className="p-4 text-center">
-                        There are no polls in {section === 'other' ? 'other' : 'your'} groups yet
+                        The people you follow haven't voted yet, at least not in any public groups, or groups you have joined yet
                     </div>
                 )}
 

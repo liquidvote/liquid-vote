@@ -141,7 +141,7 @@ export const ListVotersMenu: FunctionComponent<{
                                 >
                                     <b className="forDirect white px-1 rounded">{
                                         numeral((stats?.forCount) || 0).format('0a[.]0')
-                                    }</b> For
+                                    }</b> Yay
                                 </div>
                             </li>
                             <li className="nav-item">
@@ -168,7 +168,7 @@ export const ListVotersMenu: FunctionComponent<{
                                 >
                                     <b className="againstDirect white px-1 rounded">{
                                         numeral((stats?.againstCount) || 0).format('0a[.]0')
-                                    }</b> Against
+                                    }</b> Nay
                                 </div>
                             </li>
                         </ul>
@@ -225,7 +225,7 @@ export const ListVotersMenu: FunctionComponent<{
                                         }
                                     }
                                 >
-                                    <b className="forDirect white px-1 rounded">{numeral(stats?.forDirectCount).format('0a[.]0')}</b> For
+                                    <b className="forDirect white px-1 rounded">{numeral(stats?.forDirectCount).format('0a[.]0')}</b> Yay
                                 </div>
                             </li>
                             <li className="nav-item">
@@ -250,7 +250,7 @@ export const ListVotersMenu: FunctionComponent<{
                                         }
                                     }
                                 >
-                                    <b className="againstDirect white px-1 rounded">{numeral(stats?.againstDirectCount).format('0a[.]0')}</b> Against
+                                    <b className="againstDirect white px-1 rounded">{numeral(stats?.againstDirectCount).format('0a[.]0')}</b> Nay
                                 </div>
                             </li>
                         </ul>

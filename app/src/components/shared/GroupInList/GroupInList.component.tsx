@@ -96,16 +96,16 @@ export const GroupInList: FunctionComponent<{
                     <small className="d-flex mb-0">
                         {group.bio}
                     </small>
-                    <div className="d-flex ml-n5 mt-3">
+                    <div className="d-flex align-items-center ml-n5 mt-3">
                         {[
                             ...group.yourStats?.membersYouFollow || [],
                             // TODO: representatives
                             ...group?.stats?.mostRepresentingMembers.filter(
                                 (m: any) => !group.yourStats?.membersYouFollow.find((mm: any) => mm.handle === m.handle)
                             )
-                        ].slice(0, 12).map((m: any) => (
+                        ].slice(0, 7).map((m: any) => (
                             <Link
-                                key={m.handle+group.handle}
+                                key={m.handle + group.handle}
                                 to={`/profile/${m.handle}/cause/${group.handle}`}
                                 title={`${m.name}`}
                             >
@@ -126,6 +126,28 @@ export const GroupInList: FunctionComponent<{
                         >
                             <div>{group?.stats?.members}</div>
                         </Link>
+
+                        {group.yourStats?.membersYouFollow?.length ? (
+                            <small className='ml-2'>
+                                {group.yourStats?.membersYouFollow.slice(0, 3).map((m: any, i) => (
+                                    <>
+                                        {' '}
+                                        <Link
+                                            key={`groupFollower_name-${group?.handle}-${m.handle}`}
+                                            to={`/profile/${m.handle}/cause/${group.handle}`}
+                                            title={`${m.name}`}
+                                        >{m.name}</Link>
+                                        {(i + 2) < group.yourStats?.membersYouFollow?.length ? ", " : ""}
+                                        {(i + 2) === group.yourStats?.membersYouFollow?.length ? " and " : ""}
+                                        {i === 2 && group.yourStats?.membersYouFollow?.length > 3 ? ` and ${group.yourStats?.membersYouFollow?.length - 3} other you follow ` : ""}
+                                    </>
+                                ))}
+                                {' '}
+                                {group.yourStats?.membersYouFollow?.length > 1 ? 'are members' : 'is a member'}
+                            </small>
+                        ) : null}
+
+
                     </div>
                 </div>
             </div>

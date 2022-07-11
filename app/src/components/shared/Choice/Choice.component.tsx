@@ -117,22 +117,22 @@ export const Choice: FunctionComponent<{
 
         const forDisplayed = [
             ...yourStats?.votersYouFollow?.filter((r: any) => r?.vote?.position === 'for') || [],
-            ...(
-                !!editVote_data ? editVote_data?.editVote?.QuestionStats?.forMostRepresentingVoters : stats?.forMostRepresentingVoters
-            )
-                ?.filter((u: any) => u?.handle !== liquidUser?.handle)
-                ?.filter((u: any) => !yourStats?.votersYouFollow?.filter((r: any) => r?.vote?.position === 'for').find((u: any) => u.handle === u.handle))
-            || []
+            // ...(
+            //     !!editVote_data ? editVote_data?.editVote?.QuestionStats?.forMostRepresentingVoters : stats?.forMostRepresentingVoters
+            // )
+            //     ?.filter((u: any) => u?.handle !== liquidUser?.handle)
+            //     ?.filter((u: any) => !yourStats?.votersYouFollow?.filter((r: any) => r?.vote?.position === 'for').find((u: any) => u.handle === u.handle))
+            // || []
         ];
 
         const againstDisplayed = [
             ...yourStats?.votersYouFollow?.filter((r: any) => r?.vote?.position === 'against') || [],
-            ...(
-                !!editVote_data ? editVote_data?.editVote?.QuestionStats?.againstMostRepresentingVoters : stats?.againstMostRepresentingVoters
-            )
-                ?.filter((u: any) => u?.handle !== liquidUser?.handle)
-                ?.filter((u: any) => !yourStats?.votersYouFollow?.filter((r: any) => r?.vote?.position === 'against').find((u: any) => u.handle === u.handle))
-            || []
+            // ...(
+            //     !!editVote_data ? editVote_data?.editVote?.QuestionStats?.againstMostRepresentingVoters : stats?.againstMostRepresentingVoters
+            // )
+            //     ?.filter((u: any) => u?.handle !== liquidUser?.handle)
+            //     ?.filter((u: any) => !yourStats?.votersYouFollow?.filter((r: any) => r?.vote?.position === 'against').find((u: any) => u.handle === u.handle))
+            // || []
         ];
 
         // console.log({

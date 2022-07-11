@@ -229,7 +229,7 @@ export const Group: FunctionComponent<{}> = ({ }) => {
             <div className="profile-description pre-wrap">
                 {group?.bio}
             </div>
-            <div className="profile-icons-container d-flex mt-2">
+            <div className="profile-icons-container d-flex mt-2 mb-2">
                 {/* <div>
                     <LocationSVG />
                     <div>{group?.bio}</div>
@@ -255,14 +255,17 @@ export const Group: FunctionComponent<{}> = ({ }) => {
             {
                 group?.yourStats && (
                     <>
-                        <div className="profile-stats-container flex-nowrap mt-3">
-                            <div className="mr-1"><ProfileSmallSVG /></div>
-                            <div className="d-flex flex-wrap align-items-center">
-                                <Link className="mr-2" to={`/group-people/${group?.handle}/members`}>
-                                    <b className="white">{group?.stats?.members || 0}</b> Member{group?.stats?.members !== 1 && 's'}
-                                </Link>
-
-                                <div className='d-flex ml-2'>
+                        <div className="profile-stats-container flex-nowrap align-items-center">
+                            <div className='d-flex'>
+                                <div className="mr-1"><ProfileSmallSVG /></div>
+                                <div className="d-flex">
+                                    <Link className="d-flex mr-2" to={`/group-people/${group?.handle}/members`}>
+                                        <b className="white mr-1">{group?.stats?.members || 0}</b> Member{group?.stats?.members !== 1 && 's'}
+                                    </Link>
+                                </div>
+                            </div>
+                            {liquidUser ? (
+                                <div className='d-flex ml-n2 mt-2'>
                                     {group.yourStats?.membersYouFollow?.length ? (
                                         <>
                                             {[
@@ -286,36 +289,33 @@ export const Group: FunctionComponent<{}> = ({ }) => {
                                                 </Link>
                                             ))}
 
-
-                                            <small className='ml-2'>
-                                                {[
-                                                    ...group.yourStats?.membersYouFollow || []
-                                                    // TODO: representatives
-                                                ].slice(0, 3).map((m: any, i) => (
-                                                    <>
-                                                        {' '}
-                                                        <Link
-                                                            key={m.handle + group.handle}
-                                                            to={`/profile/${m.handle}/cause/${group.handle}`}
-                                                            title={`${m.name}`}
-                                                        >
-                                                            {m.name}
-                                                        </Link>
-                                                        {' '}
-                                                        {(i + 2) < group?.yourStats?.membersYouFollow.length ? ", " : ""}
-                                                        {(i + 2) === group?.yourStats?.membersYouFollow.length ? " and " : ""}
-                                                    </>
-                                                ))}
-                                                are members
-                                            </small>
+                                            {group.yourStats?.membersYouFollow?.length ? (
+                                                <small className='ml-2'>
+                                                    {group.yourStats?.membersYouFollow.slice(0, 3).map((m: any, i) => (
+                                                        <>
+                                                            {' '}
+                                                            <Link
+                                                                key={`groupFollower_name-${group?.handle}-${m.handle}`}
+                                                                to={`/profile/${m.handle}/cause/${group.handle}`}
+                                                                title={`${m.name}`}
+                                                            >{m.name}</Link>
+                                                            {(i + 2) < group.yourStats?.membersYouFollow?.length ? ", " : ""}
+                                                            {(i + 2) === group.yourStats?.membersYouFollow?.length ? " and " : ""}
+                                                            {i === 2 && group.yourStats?.membersYouFollow?.length > 3 ? ` and ${group.yourStats?.membersYouFollow?.length - 3} other you follow ` : ""}
+                                                        </>
+                                                    ))}
+                                                    {' '}
+                                                    {group.yourStats?.membersYouFollow?.length > 1 ? 'are members' : 'is a member'}
+                                                </small>
+                                            ) : null}
                                         </>
                                     ) : null}
 
-                                    {!group.yourStats?.membersYouFollow.length ? (
+                                    {!group.yourStats?.membersYouFollow?.length ? (
                                         <small>No members you follow</small>
                                     ) : null}
                                 </div>
-                            </div>
+                            ) : null}
                         </div>
                         {(group?.yourStats.representing || group?.yourStats.representedBy) ? (
                             <div className="profile-stats-container flex-nowrap mt-2">
@@ -408,7 +408,7 @@ export const Group: FunctionComponent<{}> = ({ }) => {
             </div> */}
 
             {
-                isMember && (
+                isMember ? (
                     <div className="d-flex justify-content-center mt-3 mb-3">
                         <div
                             onClick={() => updateParams({
@@ -426,6 +426,8 @@ export const Group: FunctionComponent<{}> = ({ }) => {
                             <div className="ml-2">Create a new Poll</div>
                         </div>
                     </div>
+                ) : (
+                    <br />
                 )
             }
 

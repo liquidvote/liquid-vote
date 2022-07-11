@@ -3,7 +3,6 @@
 export const AuthUserResolvers = {
     Query: {
         authUser: async (_source, { }, { mongoDB, AuthUser }) => {
-
             return AuthUser;
         },
     },

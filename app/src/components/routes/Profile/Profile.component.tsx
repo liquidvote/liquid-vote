@@ -284,7 +284,7 @@ export const Profile: FunctionComponent<{}> = ({ }) => {
                         </div>
                     </div>
                 ) : null}
-                <small className="">Not represented by anyone you follow</small>
+                {/* <small className="">Not represented by anyone you follow</small> */}
             </div>
             {/* {profile?.yourStats?.groupsInCommon && (
                     <Link to={`/profile-people/${profile.handle}/groups`} className="mr-2">
