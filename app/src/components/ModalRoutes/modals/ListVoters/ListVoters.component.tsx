@@ -8,7 +8,7 @@ import useSearchParams from "@state/Global/useSearchParams.effect";
 import { QUESTION } from '@state/Question/typeDefs';
 import { VOTES } from "@state/Vote/typeDefs";
 import VoteSortPicker from '@components/shared/VoteSortPicker';
-import Notification from '@shared/Notification';
+import Vote from './Vote';
 import DropAnimation from '@components/shared/DropAnimation';
 import useGroup from '@state/Group/group.effect';
 import ListVotersMenu from "./ListVotersMenu";
@@ -21,7 +21,7 @@ export const ListVoters: FunctionComponent<{}> = ({ }) => {
 
     const { allSearchParams, updateParams } = useSearchParams();
     const modalData = JSON.parse(allSearchParams.modalData);
-    const { questionText, choiceText, groupHandle, subsection, subsubsection } = modalData;
+    const { questionText, choiceText, groupHandle, subsection, subsubsection, followsOnly } = modalData;
 
     const [sortBy, setSortBy] = useState('time');
 
@@ -42,16 +42,6 @@ export const ListVoters: FunctionComponent<{}> = ({ }) => {
         // fetchPolicy: "no-cache"
     });
 
-    const stats = !!choiceText ?
-        question_data?.Question?.choices.find(c => c.text === choiceText)?.stats :
-        !!questionText ?
-            question_data?.Question?.stats :
-            group?.stats;
-
-    console.log({
-        stats
-    });
-
     const type = (() => {
         if (subsection === 'total' && !subsubsection) {
             return 'all';
@@ -59,13 +49,13 @@ export const ListVoters: FunctionComponent<{}> = ({ }) => {
             return 'for';
         } else if (subsection === 'total' && subsubsection === 'against') {
             return 'against';
-        } else if (subsection === 'direct' && !subsubsection) {
+        } else if (subsection === 'direct' && (!subsubsection || subsubsection === 'all')) {
             return 'directVotesMade';
         } else if (subsection === 'direct' && subsubsection === 'for') {
             return 'directFor';
         } else if (subsection === 'direct' && subsubsection === 'against') {
             return 'directAgainst';
-        } else if (subsection === 'represented' && !subsubsection) {
+        } else if (subsection === 'represented' && (!subsubsection || subsubsection === 'byFollows')) {
             return 'indirectVotes'
         } else if (subsection === 'direct' && subsubsection === 'byYou') {
             return 'directVotesMadeByYou';
@@ -89,24 +79,27 @@ export const ListVoters: FunctionComponent<{}> = ({ }) => {
             groupHandle,
             handleType: 'user',
             type,
-            sortBy
+            sortBy,
+            followsOnly
         },
         skip: !type
     });
 
-    console.log({
-        // stats,
-        // modalData,
-        // question_data,
-        // type,
-        // subsection,
-        // subsubsection,
-        votes_data
-    });
+    // console.log({
+    //     // stats,
+    //     // modalData,
+    //     // question_data,
+    //     // type,
+    //     // subsection,
+    //     // subsubsection,
+    //     followsOnly,
+    //     // votes_data
+    // });
 
     const choice = question_data?.Question?.questionType === 'single' ?
         question_data?.Question :
         question_data?.Question?.choices?.find(c => c.text === choiceText);
+
 
     return (
         <>
@@ -139,31 +132,36 @@ export const ListVoters: FunctionComponent<{}> = ({ }) => {
                     questionText={questionText}
                     choiceText={choiceText}
                     groupHandle={groupHandle}
-                    stats={stats}
+                    stats={choice?.stats}
+                    yourStats={choice?.yourStats}
                     setSortBy={setSortBy}
                     liquidUser={liquidUser}
+                    followsOnly={followsOnly}
                 />
             </div>
-            <div className='p-3 d-flex align-items-center justify-content-center'>
+            {/* <div className='p-3 d-flex align-items-center justify-content-center'>
                 <div>
                     {type} -
                     {subsection} -
                     {subsubsection}
                 </div>
-            </div>
+            </div> */}
             <div className="Modal-Content">
 
                 <br />
+
 
                 {votes_data?.Votes.length === 0 && (
                     <div className="p-4 text-center">
                         {
                             (() => {
-                                if (type === 'directFor') {
+                                if (type === 'all' && followsOnly) {
+                                    return 'No one you follow has voted on this poll yet'
+                                } else if (type === 'directFor') {
                                     return 'This poll hasn\'t received any votes in favor yet';
                                 } else if (type === 'directAgainst') {
                                     return 'This poll hasn\'t received any votes against yet';
-                                } else if (type === 'indirectVotesMade') {
+                                } else if (type === 'indirectVotes') {
                                     return 'No one has been represented for this poll yet';
                                 } else if (type === 'directVotesMadeByYou') {
                                     return 'You  haven\'t voted for this poll yet';
@@ -180,13 +178,11 @@ export const ListVoters: FunctionComponent<{}> = ({ }) => {
 
                 <div>
                     {votes_data?.Votes?.map((n, i) => (
-                        <Notification
-                            key={type + i}
+                        <Vote
+                            key={'vote_' + type + '_' + n.user?.handle}
                             v={{
                                 ...n,
                             }}
-                            showUser={true}
-                            showChart={false}
                             hideChoicesBesides={choiceText}
                         />
                     ))}

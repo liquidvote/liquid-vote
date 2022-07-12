@@ -29,6 +29,8 @@ export const QuestionResolvers = {
             //     { encoding: 'utf8' }
             // );
 
+            console.log({ c: Question?.choices })
+
             return {
                 ...Question,
                 _id: Question?.id,
@@ -40,7 +42,8 @@ export const QuestionResolvers = {
                     choices: (await Promise.all([...Question?.choices]?.map(async (c, i) => ({
                         ...c?.choice,
                         ...(!!AuthUser) && {
-                            yourVote: c?.yourVote
+                            yourVote: c?.yourVote,
+                            yourStats: c?.yourStats
                         },
                         i
                     }))))?.sort((a: any, b: any) => a.i - b.i),
@@ -619,8 +622,8 @@ export const updateQuestionVotingStats = async ({
                                 'againstMostRepresentingVoters': choiceDirectVotersByPosition?.against?.voters,
                                 'directVotes': choiceVoteCounts?.forDirectVotes + choiceVoteCounts?.againstDirectVotes || 0,
                                 'indirectVotes': choiceVoteCounts.inDirectVotes,
-                                    // (choiceVoteCounts?.forVotes - choiceVoteCounts?.forDirectVotes) +
-                                    // (choiceVoteCounts?.againstVotes - choiceVoteCounts?.againstDirectVotes) || 0,
+                                // (choiceVoteCounts?.forVotes - choiceVoteCounts?.forDirectVotes) +
+                                // (choiceVoteCounts?.againstVotes - choiceVoteCounts?.againstDirectVotes) || 0,
                             }
                         }
                     }))

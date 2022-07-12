@@ -4,6 +4,9 @@ export const VoteTypeDefs = gql`
 
     type RepresentativeVote {
         # representativeId
+        handle: String
+        avatar: String
+        name: String
         representativeHandle: String
         representativeAvatar: String
         representativeName: String
@@ -57,6 +60,7 @@ export const VoteTypeDefs = gql`
             choiceText: String,
             groupHandle: String,
             userHandle: String,
+            followsOnly: Boolean
             type: String,
             sortBy: String
         ):  [Vote]

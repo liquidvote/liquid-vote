@@ -41,24 +41,16 @@ export const QUESTION = gql`
                     ...vote
                 }
                 yourStats {
-                  votersYouFollow {
-                    handle
-                    avatar
-                    name
-                    stats {
-                      directVotesMade
+                    votersYouFollowCount
+                    votersRepresentingYouCount
+                    votersYouFollowTimeWeight
+                    votersRepresentingYouTimeWeight
+                    votersYouFollow {
+                        ...voter
                     }
-                    yourStats {
-                      directVotesInCommon
-                      directVotesInAgreement
-                      directVotesInDisagreement
-                      indirectVotesMadeByYou
-                      indirectVotesMadeForYou
+                    votersRepresentingYou{
+                        ...voter
                     }
-                    vote {
-                      position
-                    }
-                  }
                 }
             }
             allowNewChoices
@@ -119,23 +111,15 @@ export const QUESTION = gql`
                 ...vote
             }
             yourStats {
+                votersYouFollowCount
+                votersRepresentingYouCount
+                votersYouFollowTimeWeight
+                votersRepresentingYouTimeWeight
                 votersYouFollow {
-                handle
-                avatar
-                name
-                stats {
-                    directVotesMade
+                    ...voter
                 }
-                yourStats {
-                    directVotesInCommon
-                    directVotesInAgreement
-                    directVotesInDisagreement
-                    indirectVotesMadeByYou
-                    indirectVotesMadeForYou
-                }
-                vote {
-                    position
-                }
+                votersRepresentingYou{
+                    ...voter
                 }
             }
             createdBy {
@@ -199,6 +183,28 @@ export const QUESTION = gql`
             avatar
         }
     }
+
+    fragment voter on Voter {
+        handle
+        avatar
+        name
+        stats {
+            directVotesMade
+        }
+        yourStats {
+            directVotesInCommon
+            directVotesInAgreement
+            directVotesInDisagreement
+            indirectVotesMadeByYou
+            indirectVotesMadeForYou
+        }
+        vote {
+            position
+            daysAgo
+            inverseDaysAgo
+        }
+    }
+
 `;
 
 export const QUESTIONS = gql`

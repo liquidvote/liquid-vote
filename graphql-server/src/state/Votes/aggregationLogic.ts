@@ -360,13 +360,13 @@ export const VotersAgg = ({
         [
             {
                 '$unwind': {
-                    'path': '$representatives',
+                    'path': '$userVote.representatives',
                     'preserveNullAndEmptyArrays': true
                 }
             }, {
                 '$lookup': {
                     'from': 'Users',
-                    'localField': 'representatives.representativeId',
+                    'localField': 'userVote.representatives.representativeId',
                     'foreignField': '_id',
                     'as': 'representativeUser'
                 }
@@ -378,9 +378,12 @@ export const VotersAgg = ({
                 }
             }, {
                 '$addFields': {
-                    'representatives.representativeHandle': '$representativeUser.handle',
-                    'representatives.representativeName': '$representativeUser.name',
-                    'representatives.representativeAvatar': '$representativeUser.avatar'
+                    'userVote.representatives.representativeHandle': '$representativeUser.handle',
+                    'userVote.representatives.representativeName': '$representativeUser.name',
+                    'userVote.representatives.representativeAvatar': '$representativeUser.avatar',
+                    'userVote.representatives.handle': '$representativeUser.handle',
+                    'userVote.representatives.name': '$representativeUser.name',
+                    'userVote.representatives.avatar': '$representativeUser.avatar'
                 }
             }, {
                 '$group': {
@@ -397,7 +400,7 @@ export const VotersAgg = ({
                     'userVote': { '$first': '$userVote' },
                     'yourVote': { '$first': '$yourVote' },
                     'youAndUserDetails': { '$first': '$youAndUserDetails' },
-                    'representatives': { '$push': '$representatives' },
+                    'representatives': { '$push': '$userVote.representatives' },
                     'user': { '$first': '$user' },
                 }
             }, {
@@ -795,7 +798,10 @@ export const VotersAgg = ({
             }, {
                 '$addFields': {
                     'user': {
-                        '$first': '$user.LiquidUser'
+                        $mergeObjects: [
+                            { _id: { '$first': '$user._id' } },
+                            { '$first': '$user.LiquidUser' }
+                        ]
                     }
                 }
             }
@@ -857,7 +863,61 @@ export const VotersAgg = ({
                 }
             ] : []
         ]
-    )
+    ),
+    filterFollows: ([
+        {
+            '$lookup': {
+                'as': 'isYouFollowing',
+                'from': 'UserFollows',
+                'let': {
+                    'followedId': '$user._id',
+                    'followingId': new ObjectId(AuthUser?._id),
+                },
+                'pipeline': [
+                    {
+                        '$match': {
+                            '$and': [
+                                {
+                                    '$expr': {
+                                        '$eq': [
+                                            '$followedId', {
+                                                '$toObjectId': '$$followedId'
+                                            }
+                                        ]
+                                    }
+                                },
+                                {
+                                    '$expr': {
+                                        '$eq': [
+                                            '$followingId', {
+                                                '$toObjectId': '$$followingId'
+                                            }
+                                        ]
+                                    }
+                                },
+                                {
+                                    '$expr': {
+                                        '$eq': [
+                                            '$isFollowing', true
+                                        ]
+                                    }
+                                },
+                            ],
+                        }
+                    },
+                ]
+            }
+        },
+        {
+            '$match': {
+                '$expr': {
+                    '$gt': [
+                        { "$size": "$isYouFollowing" }, 0
+                    ]
+                }
+            }
+        },
+    ])
 });
 
 export const VotesGeneralAggregateLogic = async ({
@@ -870,7 +930,8 @@ export const VotesGeneralAggregateLogic = async ({
     userHandle,
     User,
     AuthUser,
-    sortBy
+    sortBy,
+    followsOnly
 }: any) => {
 
     // TODO check if viewer has access to group
@@ -883,7 +944,12 @@ export const VotesGeneralAggregateLogic = async ({
         User,
         AuthUser,
         sortBy
-    })
+    });
+
+    console.log({
+        followsOnly,
+        AuthUser
+    });
 
     return [
         ...AggregateLogic.matchVoteToParams,
@@ -904,7 +970,8 @@ export const VotesGeneralAggregateLogic = async ({
         ...AggregateLogic.matchChoiceParam(choiceFilters),
         ...AggregateLogic.sortLogic,
         ...AggregateLogic.question,
-        ...AggregateLogic.userObject
+        ...AggregateLogic.userObject,
+        ...(followsOnly && AuthUser) ? AggregateLogic.filterFollows : []
     ];
 };
 

@@ -2,7 +2,6 @@ import React, { FunctionComponent } from 'react';
 import numeral from 'numeral';
 
 import useSearchParams from "@state/Global/useSearchParams.effect";
-import VoteSortPicker from '@components/shared/VoteSortPicker';
 
 import './style.sass';
 
@@ -13,8 +12,10 @@ export const ListVotersMenu: FunctionComponent<{
     choiceText?: any
     groupHandle?: any
     stats?: any
+    yourStats?: any
     setSortBy?: any
     liquidUser?: any
+    followsOnly?: any
 }> = ({
     subsection,
     subsubsection,
@@ -22,8 +23,10 @@ export const ListVotersMenu: FunctionComponent<{
     choiceText,
     groupHandle,
     stats,
+    yourStats,
     setSortBy,
-    liquidUser
+    liquidUser,
+    followsOnly
 }) => {
 
         const { allSearchParams, updateParams } = useSearchParams();
@@ -78,11 +81,8 @@ export const ListVotersMenu: FunctionComponent<{
                                 }
                             }
                         >
-                            <b>{numeral(stats?.indirectVotes || stats?.indirectVotesMade).format('0a[.]0')}</b> Represented
+                            <b>{numeral(stats?.indirectVotes || stats?.indirectVotesMade).format('0a[.]0')}</b> Represented (🧪)
                         </div>
-                    </li>
-                    <li className="px-4 mt-1">
-                        <VoteSortPicker updateSortInParent={setSortBy} />
                     </li>
                 </ul>
 
@@ -181,7 +181,7 @@ export const ListVotersMenu: FunctionComponent<{
                         <ul className="nav d-flex justify-content-around">
                             <li className="nav-item">
                                 <div
-                                    className={`pointer nav-link ${(!subsubsection) && 'active'}`}
+                                    className={`pointer nav-link ${((!subsubsection || subsubsection === 'all') && followsOnly) && 'active'}`}
                                     // to={`/poll/${questionText}/${groupHandle}/timeline/direct/for`}
                                     onClick={
                                         e => {
@@ -193,14 +193,16 @@ export const ListVotersMenu: FunctionComponent<{
                                                         questionText,
                                                         choiceText,
                                                         groupHandle,
-                                                        subsection: 'direct'
+                                                        subsection: 'direct',
+                                                        subsubsection: 'all',
+                                                        followsOnly: true
                                                     })
                                                 }
                                             })
                                         }
                                     }
                                 >
-                                    <b className="px-1 rounded">{numeral(stats?.directVotes || stats?.directVotesMade).format('0a[.]0')}</b> By Following
+                                    <b className="px-1 rounded">{numeral(yourStats?.votersYouFollowCount).format('0a[.]0')}</b> By Follows
                                 </div>
                             </li>
                             <li className="nav-item">
@@ -308,6 +310,7 @@ export const ListVotersMenu: FunctionComponent<{
                                         }
                                     }
                                 >
+                                    🧪
                                     {/* <b>{profile?.yourStats?.indirectVotesMadeByYou}</b> */}
                                     By you
                                 </div>
@@ -334,13 +337,13 @@ export const ListVotersMenu: FunctionComponent<{
                                         }
                                     }
                                 >
-                                    {/* <b>{profile?.yourStats?.indirectVotesMadeForYou}</b> */}
+                                    <b>{yourStats?.votersRepresentingYouCount}</b>
                                     For you
                                 </div>
                             </li>
-                            <li className="nav-item">
+                            {/* <li className="nav-item">
                                 <div
-                                    className={`small pointer nav-link ${subsubsection === 'foryou' && 'active'}`}
+                                    className={`small pointer nav-link ${subsubsection === 'represented' && subsubsection === 'byFollows' && 'active'}`}
                                     // to={`/poll/${questionText}/${groupHandle}/timeline/represented/foryou`}
                                     onClick={
                                         e => {
@@ -353,17 +356,19 @@ export const ListVotersMenu: FunctionComponent<{
                                                         choiceText,
                                                         groupHandle,
                                                         subsection: 'represented',
-                                                        subsubsection: 'foryou'
+                                                        subsubsection: 'byFollows',
+                                                        followsOnly: true
                                                     })
                                                 }
                                             })
                                         }
                                     }
                                 >
-                                    {/* <b>{profile?.yourStats?.indirectVotesMadeForYou}</b> */}
-                                    By Following
+                                    
+                                    🧪
+                                    By Follows
                                 </div>
-                            </li>
+                            </li> */}
                         </ul>
                         <hr className="mt-n4 mb-0 mx-0" />
                     </>

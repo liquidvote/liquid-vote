@@ -5,7 +5,7 @@ import { Link, useParams } from "react-router-dom";
 import Header from "@shared/Header";
 import { VOTES } from "@state/Vote/typeDefs";
 import useAuthUser from '@state/AuthUser/authUser.effect';
-import Notification from '@shared/Notification';
+
 import DropAnimation from '@components/shared/DropAnimation';
 import CogSVG from "@shared/Icons/Cog.svg";
 import useSearchParams from "@state/Global/useSearchParams.effect";
@@ -91,14 +91,14 @@ export const Notifications: FunctionComponent<{}> = ({ }) => {
             {section === 'representatives' && (
                 user_votes_data?.Votes.map((n, i) => (
                     <>
-                        <Notification
+                        {/* <Notification
                             key={'notification-uservote' + n.user?.handle + n.questionText + n.choiceText}
                             v={{
                                 ...n,
                                 // user: profile
                             }}
                             showChart={true}
-                        />
+                        /> */}
                     </>
                 ))
             )}

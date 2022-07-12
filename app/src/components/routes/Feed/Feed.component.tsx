@@ -25,8 +25,6 @@ export const Feed: FunctionComponent<{}> = ({ }) => {
 
     console.log({ yourUser });
 
-    // const [sortBy, setSortBy] = useState('time');
-
     const {
         loading: questions_loading,
         error: questions_error,

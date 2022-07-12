@@ -7,19 +7,23 @@ import './style.sass';
 
 export const VotedExplanation: FunctionComponent<{
     position?: string,
+    forWeight?: boolean,
+    againstWeight?: boolean,
     representeeVotes?: any,
     representatives?: any,
     user?: any,
     groupHandle?: string,
 }> = ({
     position,
+    forWeight,
+    againstWeight,
     representeeVotes,
     representatives,
     user,
     groupHandle
 }) => {
         return <div className="d-flex align-items-center">
-            {!!user && (
+            {/* {!!user && (
                 <span className="d-flex ml-1">
                     <Link to={`/profile/${user.handle}/cause/${groupHandle}`}>
                         <Avatar
@@ -29,24 +33,22 @@ export const VotedExplanation: FunctionComponent<{
                         />
                     </Link>
                 </span>
-            )}
+            )} */}
             <small className="d-inline-block mr-1">
 
-                {position !== "delegated" ? (
+                {position && position !== "delegated" ? (
                     <>
                         Voted
                         <b className={`white ml-1 ${position?.toLowerCase()}Direct px-1 rounded`}>
                             {position}
                         </b>
                     </>
-                ) : (
-                    <>
-                        Was
-                    </>
-                )}
+                ) : null}
+                {position && position === "delegated" ? <>Was</> : null}
+                {!position ? <>Did not vote</> : null}
             </small>
 
-            {!!representeeVotes.length && (
+            {position !== "delegated" && !!representeeVotes?.length && (
                 <small className="d-flex align-items-center mr-1">
                     Representing
                     <div className="d-flex ml-2 pl-1 mr-1">
@@ -66,23 +68,29 @@ export const VotedExplanation: FunctionComponent<{
                 </small>
             )}
 
-            {!!representatives.length && (
+            {!!representatives?.length && (
                 <small className="d-flex align-items-center d-inline-block mr-1">
                     Represented by
                     <span className="d-flex ml-2 pl-1">
                         {representatives?.map((r: any, i: number) => (
                             <Link
-                                key={`representatives-${r?.representativeHandle || i}`}
-                                to={`/profile/${r?.representativeHandle}/cause/${groupHandle}`}
+                                key={`representatives-${r?.handle || i}`}
+                                to={`/profile/${r?.handle}/cause/${groupHandle}`}
                             >
                                 <Avatar
-                                    person={r.user}
+                                    person={r}
                                     groupHandle={groupHandle}
                                     type="tiny"
                                 />
                             </Link>
                         ))}
                     </span>
+
+                    <div className='ml-2'>
+                        <b className="forDirect white px-1 rounded">{forWeight?.toFixed(1)}</b>
+                        /
+                        <b className="againstDirect white px-1 rounded">{againstWeight?.toFixed(1)}</b>
+                    </div>
                 </small>
             )}
         </div>

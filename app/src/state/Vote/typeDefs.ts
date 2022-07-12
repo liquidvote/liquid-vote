@@ -22,8 +22,8 @@ export const VOTE = gql`
 `;
 
 export const VOTES = gql`
-  query($questionText: String, $choiceText: String, $groupHandle: String, $userHandle: String, $type: String, $sortBy: String) {
-    Votes(questionText: $questionText, choiceText: $choiceText,, groupHandle: $groupHandle, userHandle: $userHandle, type: $type, sortBy: $sortBy) {
+  query($questionText: String, $choiceText: String, $groupHandle: String, $userHandle: String, $type: String, $sortBy: String, $followsOnly: Boolean) {
+    Votes(questionText: $questionText, choiceText: $choiceText,, groupHandle: $groupHandle, userHandle: $userHandle, type: $type, sortBy: $sortBy, followsOnly: $followsOnly) {
         ...vote
         # choiceVotes {
         #     ...vote
@@ -118,9 +118,9 @@ export const VOTES = gql`
     forWeight
     againstWeight
     representatives{
-        representativeHandle
-        representativeAvatar
-        representativeName
+        handle
+        avatar
+        name
         position
         forWeight
         againstWeight

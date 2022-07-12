@@ -8,7 +8,6 @@ import { VotersAgg, representeesAndVoteAgg, representativeVotesAgg, VotesGeneral
 export const VoteResolvers = {
     Query: {
         Vote: async (_source, { questionText, group, channel }, { mongoDB, AuthUser }) => {
-
             const Vote = await mongoDB.collection("Votes")
                 .findOne({ questionText, group, channel });
 
@@ -22,17 +21,20 @@ export const VoteResolvers = {
             choiceText,
             groupHandle,
             userHandle,
+            followsOnly,
             type = 'directVotesMade',
             sortBy
         }, { mongoDB, AuthUser }) => {
+
+            console.log({ followsOnly });
 
             const User = !!userHandle && await mongoDB.collection("Users")
                 .findOne({ 'LiquidUser.handle': userHandle });
 
             const VotesSpecificAggregateLogic = await (async (type, routeParams) => {
                 return {
-                    'all': await VotesGeneralAggregateLogic({}),
-                    'directFor': VotesGeneralAggregateLogic({
+                    'all': () => VotesGeneralAggregateLogic({}),
+                    'directFor': () => VotesGeneralAggregateLogic({
                         filterAfterYourVoteAndBooleans: [{
                             '$match': {
                                 // 'position': 'for',
@@ -55,7 +57,7 @@ export const VoteResolvers = {
                         }],
                         ...routeParams
                     }),
-                    'directAgainst': VotesGeneralAggregateLogic({
+                    'directAgainst': () => VotesGeneralAggregateLogic({
                         filterAfterYourVoteAndBooleans: [{
                             '$match': {
                                 // 'position': 'against',
@@ -78,7 +80,7 @@ export const VoteResolvers = {
                         }],
                         ...routeParams
                     }),
-                    'directVotesMade': VotesGeneralAggregateLogic({
+                    'directVotesMade': () => VotesGeneralAggregateLogic({
                         filterAfterYourVoteAndBooleans: [{
                             '$match': {
                                 // 'isDirect': true
@@ -96,7 +98,7 @@ export const VoteResolvers = {
                         }],
                         ...routeParams
                     }),
-                    'directVotesInAgreement': VotesGeneralAggregateLogic({
+                    'directVotesInAgreement': () => VotesGeneralAggregateLogic({
                         filterAfterYourVoteAndBooleans: [{
                             '$match': {
                                 // 'youAndUserDetails.InAgreement': true,
@@ -115,7 +117,7 @@ export const VoteResolvers = {
                         }],
                         ...routeParams
                     }),
-                    'directVotesInDisagreement': VotesGeneralAggregateLogic({
+                    'directVotesInDisagreement': () => VotesGeneralAggregateLogic({
                         filterAfterYourVoteAndBooleans: [{
                             '$match': {
                                 // TODO: Get disagreement count
@@ -135,11 +137,11 @@ export const VoteResolvers = {
                         }],
                         ...routeParams
                     }),
-                    'indirectVotes': VotesGeneralAggregateLogic({
+                    'indirectVotes': () => VotesGeneralAggregateLogic({
                         filterAfterYourVoteAndBooleans: [{
                             '$match': {
-                                // position: "delegated",
-                                // isDirect: false
+                                position: "delegated",
+                                isDirect: false
                             }
                         }],
                         // filterAfterMerge: [{
@@ -158,7 +160,7 @@ export const VoteResolvers = {
                         }],
                         ...routeParams
                     }),
-                    'indirectVotesMade': VotesGeneralAggregateLogic({
+                    'indirectVotesMade': () => VotesGeneralAggregateLogic({
                         filterAfterYourVoteAndBooleans: [{
                             '$match': {
                                 // position: "delegated",
@@ -172,7 +174,7 @@ export const VoteResolvers = {
                         }],
                         ...routeParams
                     }),
-                    'indirectVotesMadeForUser': VotesGeneralAggregateLogic({
+                    'indirectVotesMadeForUser': () => VotesGeneralAggregateLogic({
                         filterAfterYourVoteAndBooleans: [{
                             '$match': {
                                 // position: "delegated",
@@ -186,7 +188,7 @@ export const VoteResolvers = {
                         }],
                         ...routeParams
                     }),
-                    'indirectVotesMadeByYou': VotesGeneralAggregateLogic({
+                    'indirectVotesMadeByYou': () => VotesGeneralAggregateLogic({
                         filterAfterYourVoteAndBooleans: [{
                             '$match': {
                                 // 'youAndUserDetails.yourVoteMadeForUser': true
@@ -199,7 +201,7 @@ export const VoteResolvers = {
                         }],
                         ...routeParams
                     }),
-                    'indirectVotesMadeForYou': VotesGeneralAggregateLogic({
+                    'indirectVotesMadeForYou': () => VotesGeneralAggregateLogic({
                         filterAfterYourVoteAndBooleans: [{
                             '$match': {
                                 //     'youAndUserDetails.yourVoteMadeByUser': true
@@ -212,7 +214,7 @@ export const VoteResolvers = {
                         }],
                         ...routeParams
                     }),
-                    'directVotesMadeByYou': VotesGeneralAggregateLogic({
+                    'directVotesMadeByYou': () => VotesGeneralAggregateLogic({
                         filterAfterYourVoteAndBooleans: [{
                             '$match': {
                                 'user': new ObjectId(AuthUser?._id), // stays
@@ -227,7 +229,7 @@ export const VoteResolvers = {
                         }],
                         ...routeParams
                     }),
-                }[type];
+                }[type]();
             })(type, {
                 questionText,
                 choiceText,
@@ -235,7 +237,8 @@ export const VoteResolvers = {
                 userHandle,
                 User,
                 AuthUser,
-                sortBy
+                sortBy,
+                followsOnly
             });
 
 
@@ -310,6 +313,7 @@ export const VoteResolvers = {
                         userHandle: u.LiquidUser.handle,
                         type: 'directVotesMade',
                         sortBy: null,
+                        followsOnly: false
                     }, { mongoDB, AuthUser })).length,
                     indirectVotesMadeByUser: (await VoteResolvers.Query.Votes(_source, {
                         questionText: null,
@@ -318,6 +322,7 @@ export const VoteResolvers = {
                         userHandle: u.LiquidUser.handle,
                         type: 'indirectVotesMade',
                         sortBy: null,
+                        followsOnly: false
                     }, { mongoDB, AuthUser })).length,
                     indirectVotesMadeForUser: (await VoteResolvers.Query.Votes(_source, {
                         questionText: null,
@@ -326,6 +331,7 @@ export const VoteResolvers = {
                         userHandle: u.LiquidUser.handle,
                         type: 'indirectVotesMadeForUser',
                         sortBy: null,
+                        followsOnly: false
                     }, { mongoDB, AuthUser })).length,
                 }
             })));
