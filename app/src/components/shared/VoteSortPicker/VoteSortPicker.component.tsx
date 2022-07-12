@@ -21,7 +21,7 @@ export const VoteSortPicker: FunctionComponent<{
 
         const sortHumanText = (sort: string) => ({
             'weight': 'weight',
-            'time': 'vote date',
+            'time': 'last voted on',
             'votersYouFollowOrRepresentingYouTimeWeight': 'followers votes'
         })[sort];
 
@@ -32,8 +32,9 @@ export const VoteSortPicker: FunctionComponent<{
                 </div>}
                 popperContent={
                     <ul className="p-0 m-0">
-                        <li className="pointer" onClick={() => setSortBy('weight')}>{sortHumanText('weight')}</li>
+                        {/* <li className="pointer" onClick={() => setSortBy('weight')}>{sortHumanText('weight')}</li> */}
                         <li className="pointer" onClick={() => setSortBy('time')}>{sortHumanText('time')}</li>
+                        <li className="pointer" onClick={() => setSortBy('votersYouFollowOrRepresentingYouTimeWeight')}>{sortHumanText('votersYouFollowOrRepresentingYouTimeWeight')}</li>
                     </ul>
                 }
             />

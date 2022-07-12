@@ -265,7 +265,7 @@ export const Profile: FunctionComponent<{}> = ({ }) => {
                         ) : null} */}
                     </div>
                 </div>
-                <small className="">Not followed by anyone you follow</small>
+                <small className="">Not followed by anyone you follow (🧪)</small>
             </div>
 
             <div>

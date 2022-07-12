@@ -312,7 +312,7 @@ export const Group: FunctionComponent<{}> = ({ }) => {
                                     ) : null}
 
                                     {!group.yourStats?.membersYouFollow?.length ? (
-                                        <small>No members you follow</small>
+                                        <small className='mt-n2'>No members you follow</small>
                                     ) : null}
                                 </div>
                             ) : null}

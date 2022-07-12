@@ -1,5 +1,6 @@
 import React, { FunctionComponent, useState } from 'react';
 import { Link } from "react-router-dom";
+import { useQuery, useMutation } from "@apollo/client";
 
 import Avatar from '@components/shared/Avatar';
 import GroupInProfileListVotes from "@shared/GroupInProfileListVotes";
@@ -7,74 +8,89 @@ import Popper from "@shared/Popper";
 import ThreeDotsSmallSVG from '@shared/Icons/ThreeDots-small-horizontal.svg';
 import useAuthUser from '@state/AuthUser/authUser.effect';
 import useUser from '@state/User/user.effect';
+import { USER, EDIT_USER_FOLLOWING_RELATION } from "@state/User/typeDefs";
+import useSearchParams from "@state/Global/useSearchParams.effect";
 
 import './style.sass';
 
 export const PersonInList: FunctionComponent<{
     person: any,
     groupHandle?: string,
-    isShowingRepresentativeRelation?: boolean
+    groupName?: string,
+    isShowingRepresentativeRelation?: boolean,
     includeVotes?: boolean
 }> = ({
     person,
     groupHandle,
+    groupName,
     isShowingRepresentativeRelation,
     includeVotes
 }) => {
 
-        const { user } = useUser({ userHandle: person.handle, groupHandle });
+        const { user, user_refetch } = useUser({ userHandle: person.handle, groupHandle });
 
         const { liquidUser } = useAuthUser();
 
         const [showVotes, setShowVotes] = useState(false);
 
+        const { updateParams } = useSearchParams();
+
+        const [editUserFollowingRelation, {
+            loading: editUserFollowingRelation_loading,
+            error: editUserFollowingRelation_error,
+            data: editUserFollowingRelation_data,
+        }] = useMutation(EDIT_USER_FOLLOWING_RELATION);
+
         return (
-            <div className="d-flex relative border-bottom py-2 mb-2">
+            <div className="d-flex relative border-bottom py-2 pb-3 mb-2">
                 <Link to={`/profile/${person.handle}`}>
                     <Avatar person={person} type="small" groupHandle={groupHandle} />
                 </Link>
                 <div className="flex-fill">
                     <div className="d-flex justify-content-between align-items-center flex-wrap">
                         <Link to={`/profile/${person.handle}`} className="d-flex flex-column mb-1">
-                            <b className="white">{person.name}</b>
+                            <div className='d-flex align-items-center'>
+                                <b className="white">{person.name}</b>
+                                {user?.followsYou ? (
+                                    <small
+                                        className={`badge ml-2 mt-n1`}
+                                    >follows you</small>
+                                ) : null}
+                            </div>
                             <small className="mt-n1">@{person.handle}</small>
                         </Link>
                         <div className="d-flex mb-1 ml-n1">
-
-
-
                             <div className="d-flex ml-n1 justify-content-center">
-
-                                <button
-                                    // onClick={() => !!liquidUser ? editGroupMemberChannelRelation({
-                                    //     variables: {
-                                    //         UserHandle: liquidUser?.handle,
-                                    //         GroupHandle: group.handle,
-                                    //         IsMember: !group?.yourMemberRelation?.isMember
-                                    //     }
-                                    // }) : updateParams({
-                                    //     paramsToAdd: {
-                                    //         modal: "RegisterBefore",
-                                    //         modalData: JSON.stringify({
-                                    //             toWhat: 'joinGroup',
-                                    //             groupHandle: group.handle,
-                                    //             groupName: group.name
-                                    //         })
-                                    //     }
-                                    // })}
-                                    // className={`button_ small ml-1 mb-0 ${isMember ? "selected" : ""}`}
-                                    className={`button_ small ml-1 mb-0`}
-                                // disabled={group.thisUserIsAdmin}
+                                <div
+                                    // onClick={() => setIsRepresenting(!isRepresenting)}
+                                    onClick={() => !!liquidUser ? editUserFollowingRelation({
+                                        variables: {
+                                            FollowedHandle: user?.handle,
+                                            FollowingHandle: liquidUser?.handle,
+                                            IsFollowing: !user?.isYouFollowing
+                                        }
+                                    })
+                                        .then((r) => {
+                                            user_refetch();
+                                        }) : (
+                                        updateParams({
+                                            paramsToAdd: {
+                                                modal: "RegisterBefore",
+                                                modalData: JSON.stringify({
+                                                    toWhat: 'followUser',
+                                                    userName: user?.name
+                                                })
+                                            }
+                                        })
+                                    )}
+                                    className={`button_ small mr-2 ${user?.isYouFollowing ? "selected" : ""}`}
                                 >
-                                    {/* {editGroupMemberChannelRelation_loading && (
-                                        <img
-                                            className="vote-avatar mr-1 my-n2"
-                                            src={'http://images.liquid-vote.com/system/loadingroup.gif'}
-                                        />
-                                    )} */}
-                                    {/* {isMember ? "Joined" : "Join"} */}
-                                    Follow
-                                </button>
+                                    {
+                                        user?.isYouFollowing ?
+                                            "Following" :
+                                            "Follow"
+                                    }
+                                </div>
                             </div>
 
                             {/* <div
@@ -99,15 +115,16 @@ export const PersonInList: FunctionComponent<{
                     {includeVotes ? (
                         <>
                             {!isShowingRepresentativeRelation ? (
-                                <div className="d-flex mb-n1">
+                                <div className="d-flex mt-1">
                                     <small className="d-flex mb-0">
-                                        <b className='white mr-1'>{' '}{person?.stats?.directVotesMade || 0}</b> votes
+                                        <b className='white mr-1'>{' '}{user?.groupStats?.stats?.directVotesMade || 0}</b> votes
+                                        {groupName ? ` on ${groupName}` : ''}
                                     </small>
                                 </div>
                             ) : null}
 
-                            {!!person?.stats?.directVotesMade && (
-                                <small className='white'>
+                            {!!user?.groupStats?.stats?.directVotesMade && (
+                                <small className='d-flex white'>
                                     <a className='link white pointer' onClick={() => setShowVotes(!showVotes)}>{showVotes ? 'hide' : 'show'} votes</a>
                                 </small>
                             )}
@@ -120,13 +137,10 @@ export const PersonInList: FunctionComponent<{
                             <GroupInProfileListVotes
                                 userHandle={person.handle}
                                 groupHandle={groupHandle}
-                            // subsection={null}
-                            // subsubsection={null}
                             />
                         </div>
                     )}
 
-                    {/* <pre>{JSON.stringify(person, null, 2)}</pre> */}
                     {(isShowingRepresentativeRelation && !!person.representationGroups) ? (
                         <div
                             className="d-flex flex-wrap justify-content-start"
@@ -144,19 +158,6 @@ export const PersonInList: FunctionComponent<{
                         </div>
 
                     ) : null}
-                    {/*
-                <small>
-                    Voted the same as you in
-                    {' '}<b className="white forDirect px-1 rounded">{useMemo(() => Math.floor(Math.random() * 100), [])}</b>
-                    {' '}polls and different in
-                    {' '}<b className="white againstDirect px-1 rounded">{useMemo(() => Math.floor(Math.random() * 100), [])}</b>
-                    {' '}🧪
-                </small> */}
-                    {/* <pre>{JSON.stringify({
-                    yourStats: person.yourStats,
-                    'stats.directVotesMade': person.stats?.directVotesMade,
-                }, null, 2)}</pre> */}
-
                 </div>
             </div >
         );

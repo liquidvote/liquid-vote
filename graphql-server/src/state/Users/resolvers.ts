@@ -196,10 +196,12 @@ export const UserResolvers = {
                         ...User?.yourStats
                     }
                 },
-                ...!!groupHandle && (!isUser) && {
+                ...!!groupHandle && {
                     groupStats: {
                         stats: User?.groupStats?.stats,
-                        yourStats: User?.groupStats?.yourStats,
+                        ...(!isUser) && {
+                            yourStats: User?.groupStats?.yourStats,
+                        }
                     },
                 },
                 isFollowingYou: User.isFollowingYou?.length === 1,

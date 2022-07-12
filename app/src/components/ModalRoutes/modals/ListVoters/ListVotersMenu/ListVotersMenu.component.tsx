@@ -81,7 +81,7 @@ export const ListVotersMenu: FunctionComponent<{
                                 }
                             }
                         >
-                            <b>{numeral(stats?.indirectVotes || stats?.indirectVotesMade).format('0a[.]0')}</b> Represented (🧪)
+                            <b>{numeral(stats?.indirectVotes || stats?.indirectVotesMade).format('0a[.]0')}</b> Represented <b>(🧪)</b>
                         </div>
                     </li>
                 </ul>
@@ -310,9 +310,9 @@ export const ListVotersMenu: FunctionComponent<{
                                         }
                                     }
                                 >
-                                    🧪
                                     {/* <b>{profile?.yourStats?.indirectVotesMadeByYou}</b> */}
                                     By you
+                                    {/* <b>(🧪)</b> */}
                                 </div>
                             </li>
                             <li className="nav-item">

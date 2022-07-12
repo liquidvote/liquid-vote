@@ -106,6 +106,7 @@ export const GroupPeople: FunctionComponent<{}> = ({ }) => {
                             key={'gp_members' + el.handle}
                             person={el}
                             groupHandle={handle}
+                            groupName={group?.name}
                             includeVotes={true}
                         />
                     ))}
@@ -123,6 +124,7 @@ export const GroupPeople: FunctionComponent<{}> = ({ }) => {
                             key={'gp_members' + el.handle}
                             person={el}
                             groupHandle={handle}
+                            groupName={group?.name}
                             includeVotes={true}
                         />
                     ))}
@@ -139,6 +141,7 @@ export const GroupPeople: FunctionComponent<{}> = ({ }) => {
                             key={'gp_representingYou' + el.handle}
                             person={el}
                             groupHandle={handle}
+                            groupName={group?.name}
                             includeVotes={true}
                         />
                     ))}
@@ -155,6 +158,7 @@ export const GroupPeople: FunctionComponent<{}> = ({ }) => {
                             key={'gp_representedByYou' + el.handle}
                             person={el}
                             groupHandle={handle}
+                            groupName={group?.name}
                             includeVotes={true}
                         />
                     ))}
