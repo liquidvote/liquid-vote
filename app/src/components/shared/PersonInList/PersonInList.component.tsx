@@ -92,20 +92,6 @@ export const PersonInList: FunctionComponent<{
                                     }
                                 </div>
                             </div>
-
-                            {/* <div
-                            // onClick={() => setIsRepresenting(!isRepresenting)}
-                            className={`button_ small mb-0`}
-                        >
-                            Invite to Group 🧪
-                        </div>
-                        <div
-                            onClick={() => setIsRepresenting(!isRepresenting)}
-                            className={`button_ small mb-0 ml-1 ${isRepresenting ? "selected" : ""}`}
-                        >
-                            {isRepresenting ? "Represents You" : "Delegate Votes To"} (TODO)
-                        </div> */}
-
                         </div>
                     </div>
                     <small className="d-flex mb-0">

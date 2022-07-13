@@ -8,6 +8,7 @@ import { USER_GROUPS } from "@state/User/typeDefs";
 import useAuthUser from '@state/AuthUser/authUser.effect';
 import DropAnimation from '@components/shared/DropAnimation';
 import useSearchParams from "@state/Global/useSearchParams.effect";
+import useUser from '@state/User/user.effect';
 
 import './style.sass';
 
@@ -17,6 +18,7 @@ export const Groups: FunctionComponent<{}> = ({ }) => {
     const { allSearchParams, updateParams } = useSearchParams();
 
     const { liquidUser } = useAuthUser();
+    const { user } = useUser({ userHandle: liquidUser?.handle });
 
     const {
         loading: yourGroups_loading,
@@ -41,14 +43,16 @@ export const Groups: FunctionComponent<{}> = ({ }) => {
                 <ul className="nav d-flex flex-nowrap justify-content-around align-items-center mt-1 mx-n3">
                     <li className="nav-item">
                         <Link className={`nav-link ${!section && 'active'}`} to={`/groups`}>
-                            Yours
+                            <b>{user?.stats?.groupsJoined || 0}</b>Joined
                         </Link>
                     </li>
-                    <li className="nav-item">
-                        <Link className={`nav-link ${section === 'other' && 'active'}`} to={`/groups/other`}>
-                            Other
-                        </Link>
-                    </li>
+                    {section === 'other' && (
+                        <li className="nav-item">
+                            <Link className={`nav-link ${section === 'other' && 'active'}`} to={`/groups/other`}>
+                                🧪 Other
+                            </Link>
+                        </li>
+                    )}
                 </ul>
             )}
 

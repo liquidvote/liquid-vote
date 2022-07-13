@@ -1,4 +1,4 @@
-import React, { FunctionComponent } from 'react';
+import React, { FunctionComponent, useState } from 'react';
 import { Link } from "react-router-dom";
 import { useQuery, useMutation } from "@apollo/client";
 import useAuthUser from '@state/AuthUser/authUser.effect';
@@ -6,6 +6,7 @@ import useAuthUser from '@state/AuthUser/authUser.effect';
 import LockSVG from "@shared/Icons/Lock-tiny.svg";
 import WorldSVG from "@shared/Icons/World-tiny.svg";
 import LinkSVG from "@shared/Icons/Link-tiny.svg";
+import GroupTiny from "@shared/Icons/Group-tiny.svg";
 import useSearchParams from "@state/Global/useSearchParams.effect";
 import { EDIT_GROUP_MEMBER_CHANNEL_RELATION } from "@state/User/typeDefs";
 import Avatar from '@components/shared/Avatar';
@@ -21,6 +22,9 @@ export const GroupInList: FunctionComponent<{
 }) => {
 
         const { liquidUser } = useAuthUser();
+
+        const visibilitytypes = ['everyone', 'members', 'self'];
+        const [voteVisibility, setVoteVisibility] = useState('everyone');
 
         const [editGroupMemberChannelRelation, {
             loading: editGroupMemberChannelRelation_loading,
@@ -60,34 +64,52 @@ export const GroupInList: FunctionComponent<{
                         <div className="d-flex mb-1 ml-n1">
                             {
                                 !alternativeButton && (
-                                    <button
-                                        onClick={() => !!liquidUser ? editGroupMemberChannelRelation({
-                                            variables: {
-                                                UserHandle: liquidUser?.handle,
-                                                GroupHandle: group.handle,
-                                                IsMember: !group?.yourMemberRelation?.isMember
-                                            }
-                                        }) : updateParams({
-                                            paramsToAdd: {
-                                                modal: "RegisterBefore",
-                                                modalData: JSON.stringify({
-                                                    toWhat: 'joinGroup',
-                                                    groupHandle: group.handle,
-                                                    groupName: group.name
-                                                })
-                                            }
-                                        })}
-                                        className={`button_ small ml-1 mb-0 ${isMember ? "selected" : ""}`}
-                                        disabled={group.thisUserIsAdmin}
-                                    >
-                                        {editGroupMemberChannelRelation_loading && (
-                                            <img
-                                                className="vote-avatar mr-1 my-n2"
-                                                src={'http://images.liquid-vote.com/system/loading.gif'}
-                                            />
-                                        )}
-                                        {isMember ? "Joined" : "Join"}
-                                    </button>
+                                    <>
+                                        {isMember ? (
+                                            <button className={`button_ inverted small mr-1`} onClick={() => {
+                                                const selectedIndex = visibilitytypes.indexOf(voteVisibility);
+                                                setVoteVisibility((selectedIndex + 1 === visibilitytypes.length) ? visibilitytypes[0] : visibilitytypes[selectedIndex + 1])
+                                            }}>
+                                                {voteVisibility === 'everyone' && (
+                                                    <WorldSVG data-tip="votes visible to everyone" />
+                                                )}
+                                                {voteVisibility === 'members' && (
+                                                    <GroupTiny data-tip="votes visible to other members" />
+                                                )}
+                                                {voteVisibility === 'self' && (
+                                                    <LockSVG data-tip="votes visible only to yourself" />
+                                                )}
+                                            </button>
+                                        ) : null}
+                                        <button
+                                            onClick={() => !!liquidUser ? editGroupMemberChannelRelation({
+                                                variables: {
+                                                    UserHandle: liquidUser?.handle,
+                                                    GroupHandle: group.handle,
+                                                    IsMember: !group?.yourMemberRelation?.isMember
+                                                }
+                                            }) : updateParams({
+                                                paramsToAdd: {
+                                                    modal: "RegisterBefore",
+                                                    modalData: JSON.stringify({
+                                                        toWhat: 'joinGroup',
+                                                        groupHandle: group.handle,
+                                                        groupName: group.name
+                                                    })
+                                                }
+                                            })}
+                                            className={`button_ small ml-1 mb-0 ${isMember ? "selected" : ""}`}
+                                            disabled={group.thisUserIsAdmin}
+                                        >
+                                            {editGroupMemberChannelRelation_loading && (
+                                                <img
+                                                    className="vote-avatar mr-1 my-n2"
+                                                    src={'http://images.liquid-vote.com/system/loading.gif'}
+                                                />
+                                            )}
+                                            {isMember ? "Joined" : "Join"}
+                                        </button>
+                                    </>
                                 )
                             }
                             {alternativeButton ? alternativeButton : null}

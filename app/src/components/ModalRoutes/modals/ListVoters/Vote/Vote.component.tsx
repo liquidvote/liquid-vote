@@ -1,5 +1,6 @@
 import React, { FunctionComponent, useState } from 'react';
 import { Link } from "react-router-dom";
+import { useQuery, useMutation } from "@apollo/client";
 
 import SingleVoteInList from "@shared/SingleVoteInList";
 import MultiVoteInList from "@shared/MultiVoteInList";
@@ -7,6 +8,10 @@ import './style.sass';
 import { timeAgo } from '@state/TimeAgo';
 import VotedExplanation from './VotedExplanation';
 import Avatar from "@components/shared/Avatar";
+import useUser from '@state/User/user.effect';
+import useAuthUser from '@state/AuthUser/authUser.effect';
+import { USER, EDIT_USER_FOLLOWING_RELATION } from "@state/User/typeDefs";
+import useSearchParams from "@state/Global/useSearchParams.effect";
 
 export const Vote: FunctionComponent<{
     v: any,
@@ -19,6 +24,21 @@ export const Vote: FunctionComponent<{
 }) => {
 
         console.log({ v });
+
+        const { user, user_refetch } = useUser({
+            userHandle: v.user.handle,
+            groupHandle: v?.question.group.handle
+        });
+
+        const { liquidUser } = useAuthUser();
+
+        const [editUserFollowingRelation, {
+            loading: editUserFollowingRelation_loading,
+            error: editUserFollowingRelation_error,
+            data: editUserFollowingRelation_data,
+        }] = useMutation(EDIT_USER_FOLLOWING_RELATION);
+
+        const { updateParams } = useSearchParams();
 
         const [showAllChoices, setShowAllChoices] = useState(!hideChoicesBesides);
 
@@ -41,10 +61,43 @@ export const Vote: FunctionComponent<{
                         <div className="mb-n1 flex-fill d-flex align-items-center justify-content-between">
                             <div className="w-75">
 
-                                <div className="d-flex align-items-end">
+                                <div className="d-flex align-items-center">
                                     <Link to={`/profile/${v.user?.handle}`} className="d-block">
                                         <b className="mr-1">{v.user?.name}</b>
                                     </Link>
+
+                                    <div className="d-flex ml-1">
+                                        <div
+                                            // onClick={() => setIsRepresenting(!isRepresenting)}
+                                            onClick={() => !!liquidUser ? editUserFollowingRelation({
+                                                variables: {
+                                                    FollowedHandle: user?.handle,
+                                                    FollowingHandle: liquidUser?.handle,
+                                                    IsFollowing: !user?.isYouFollowing
+                                                }
+                                            })
+                                                .then((r) => {
+                                                    user_refetch();
+                                                }) : (
+                                                updateParams({
+                                                    paramsToAdd: {
+                                                        modal: "RegisterBefore",
+                                                        modalData: JSON.stringify({
+                                                            toWhat: 'followUser',
+                                                            userName: user?.name
+                                                        })
+                                                    }
+                                                })
+                                            )}
+                                            className={`button_ small mr-2 ${user?.isYouFollowing ? "selected" : ""}`}
+                                        >
+                                            {
+                                                user?.isYouFollowing ?
+                                                    "Following" :
+                                                    "Follow"
+                                            }
+                                        </div>
+                                    </div>
                                 </div>
 
                                 <div className="d-flex flex-wrap align-items-center mt-0 mb-0">
