@@ -205,11 +205,11 @@ export const EditGroup: FunctionComponent<{}> = ({ }) => {
                                     {
                                         value: 'private',
                                         label: 'Private',
-                                        info: 'Only found by invite, hidden to non members'
+                                        info: 'Only found by invite, hidden from member profiles to non members'
                                     }, {
                                         value: 'linkonly',
                                         label: 'Link Only',
-                                        info: 'Visible with direct link, but not Searchable'
+                                        info: 'Visible by link and on member profiles, but not Searchable'
                                     }, {
                                         value: 'public',
                                         label: 'Public',

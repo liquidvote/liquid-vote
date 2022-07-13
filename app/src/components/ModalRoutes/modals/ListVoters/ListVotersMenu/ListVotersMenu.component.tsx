@@ -36,6 +36,19 @@ export const ListVotersMenu: FunctionComponent<{
                 <ul className="mt-1 nav d-flex justify-content-around">
                     <li className="nav-item">
                         <div
+                            className={`pointer nav-link active`}
+                        >
+                            <b>{numeral(
+                                (stats?.directVotes)
+                                +
+                                (stats?.indirectVotes)
+                            ).format('0a[.]0')}</b> Votes
+                        </div>
+                    </li>
+                </ul>
+                <ul className="mt-1 nav d-flex justify-content-around">
+                    <li className="nav-item">
+                        <div
                             className={`pointer nav-link ${(!subsection || subsection === 'direct') && 'active'}`}
                             // to={`/poll/${questionText}/${groupHandle}/timeline`}
                             onClick={

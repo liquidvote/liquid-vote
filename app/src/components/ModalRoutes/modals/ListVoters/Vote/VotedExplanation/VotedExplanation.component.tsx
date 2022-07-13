@@ -45,7 +45,7 @@ export const VotedExplanation: FunctionComponent<{
                     </>
                 ) : null}
                 {position && position === "delegated" ? <>Was</> : null}
-                {!position ? <>Did not vote</> : null}
+                {!position ? <span className='faded'>Did not vote</span> : null}
             </small>
 
             {position !== "delegated" && !!representeeVotes?.length && (
