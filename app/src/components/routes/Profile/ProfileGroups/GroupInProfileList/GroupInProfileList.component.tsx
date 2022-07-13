@@ -169,37 +169,44 @@ export const GroupInProfileList: FunctionComponent<{
                                     className="d-flex flex-column text-decoration-none"
                                     to={isSelected ? `/profile/${user.handle}/groups` : `/profile/${user.handle}/cause/${group.handle}`}
                                 >
-                                    <div className="d-flex align-items-center">
-                                        <small className="d-flex">
-                                            <b className='white mr-1'>{' '}{group?.userStats?.directVotesMade} votes</b>
-                                        </small>
-                                        {!!group?.yourUserStats?.directVotesInCommon ? (
-                                            <>
-                                                {/* ・
-                                                <small className="d-flex mb-0">
-                                                    <b className='white mr-1'>{' '}{group?.yourUserStats?.directVotesInCommon}</b> in common
-                                                </small> */}
-                                                ・
-                                                <small className="d-flex align-items-center">
-                                                    <b className='white mr-1 forDirect p-1 rounded'>{' '}{group?.yourUserStats?.directVotesInAgreement} </b> in agreement
-                                                </small>
-                                                ・
-                                                <small className="d-flex align-items-center">
-                                                    <b className='white mr-1 againstDirect p-1 rounded'>{' '}{group?.yourUserStats?.directVotesInDisagreement}</b> in disagreement
-                                                </small>
-                                            </>
-                                        ) : <span className='opacity-0'>・</span>}
-                                    </div>
-
-
                                     {
                                         (userWithMoreData?.groupStats?.stats?.representedBy || userWithMoreData?.groupStats?.stats?.representing) ?
-                                            <div className=' d-flex align-items-center'>
+                                            <div className='d-flex align-items-center mb-1 ml-1'>
+
+                                                <small className='primary-color d-flex'>
+                                                    <>
+                                                        {/* <div className="mr-1"><HandshakeSVG /></div> */}
+                                                        <div className="d-flex flex-column">
+                                                            <div className="d-flex flex-wrap">
+                                                                {userWithMoreData?.groupStats?.stats?.representedBy ? (
+                                                                    <>
+
+                                                                        <Link to={`/profile-people/${user.handle}/representedBy`} className="mr-1">
+                                                                            represents{' '}<b className="white ml-1">{userWithMoreData?.groupStats?.stats?.representedBy}</b>
+                                                                        </Link>
+                                                                    </>
+                                                                ) : null}
+                                                                {/* {userWithMoreData?.groupStats?.stats?.representing ? (
+                                                                    <>
+                                                                        ・
+                                                                        <Link to={`/profile-people/${user.handle}/representing`}>
+                                                                            is represented by{' '}<b className="white ml-1">{userWithMoreData?.groupStats?.stats?.representing}</b>
+                                                                        </Link>
+                                                                    </>
+                                                                ) : null} */}
+                                                            </div>
+                                                        </div>
+                                                    </>
+                                                    {/* {group.representativeRelation?.isRepresentingYou && !group.youToHimRepresentativeRelation?.isRepresentingYou ? "represents you" : ""}
+                                                    {!group.representativeRelation?.isRepresentingYou && group.youToHimRepresentativeRelation?.isRepresentingYou ? "represented by you" : ""}
+                                                    {group.representativeRelation?.isRepresentingYou && group.youToHimRepresentativeRelation?.isRepresentingYou ? "you represent each other" : ""} */}
+                                                </small>
+
                                                 <div
                                                     className={`
                                                         d-flex align-items-center ${(group.youToHimRepresentativeRelation?.isRepresentingYou ||
                                                             group.representativeRelation?.isRepresentingYou
-                                                        ) ? 'mr-2' : 'd-none'}
+                                                        ) ? 'ml-1' : 'd-none'}
                                                     `}
                                                 >
                                                     {group.representativeRelation?.isRepresentingYou &&
@@ -226,38 +233,36 @@ export const GroupInProfileList: FunctionComponent<{
                                                             ) : ""
                                                     }
                                                 </div>
-                                                <small className='primary-color d-flex'>
-                                                    <>
-                                                        {/* <div className="mr-1"><HandshakeSVG /></div> */}
-                                                        <div className="d-flex flex-column">
-                                                            <div className="d-flex flex-wrap">
-                                                                {userWithMoreData?.groupStats?.stats?.representedBy ? (
-                                                                    <Link to={`/profile-people/${user.handle}/representedBy`} className="mr-2">
-                                                                        Represents{' '}<b className="white ml-1">{userWithMoreData?.groupStats?.stats?.representedBy}</b>
-                                                                    </Link>
-                                                                ) : null}
-                                                                {userWithMoreData?.groupStats?.stats?.representing ? (
-                                                                    <Link to={`/profile-people/${user.handle}/representing`} className="mr-2">
-                                                                        Is Represented by{' '}<b className="white ml-1">{userWithMoreData?.groupStats?.stats?.representing}</b>
-                                                                    </Link>
-                                                                ) : null}
-                                                            </div>
-                                                        </div>
-                                                    </>
-                                                    {/* {group.representativeRelation?.isRepresentingYou && !group.youToHimRepresentativeRelation?.isRepresentingYou ? "represents you" : ""}
-                                                    {!group.representativeRelation?.isRepresentingYou && group.youToHimRepresentativeRelation?.isRepresentingYou ? "represented by you" : ""}
-                                                    {group.representativeRelation?.isRepresentingYou && group.youToHimRepresentativeRelation?.isRepresentingYou ? "you represent each other" : ""} */}
-                                                </small>
                                             </div>
                                             :
                                             <></>
                                     }
 
+                                    <div className="d-flex align-items-center">
+                                        <small className={`d-flex mr-1 button_ small ${isSelected && 'inverted'}`}>
+                                            <b className='white'>
+                                                {' '}{group?.userStats?.directVotesMade} votes
+                                                {' '}
+                                                {isSelected ? '⬆' : '⬇'}
+                                            </b>
+                                        </small>
+                                        {!!group?.yourUserStats?.directVotesInCommon ? (
+                                            <>
+                                                {/* ・
+                                                <small className="d-flex mb-0">
+                                                    <b className='white mr-1'>{' '}{group?.yourUserStats?.directVotesInCommon}</b> in common
+                                                </small> */}
 
-                                    {/* <div style={{ marginRight: 2, marginTop: -5 }}>⬇</div> */}
-                                    <small className={`d-flex button_ small mt-2 ${isSelected && 'inverted'}`}>
-                                        {isSelected ? '⬆' : '⬇'}
-                                    </small>
+                                                <small className="d-flex align-items-center ml-1">
+                                                    <b className='white mr-1 forDirect p-1 rounded'>{' '}{group?.yourUserStats?.directVotesInAgreement} </b> in agreement
+                                                </small>
+                                                ・
+                                                <small className="d-flex align-items-center">
+                                                    <b className='white mr-1 againstDirect p-1 rounded'>{' '}{group?.yourUserStats?.directVotesInDisagreement}</b> in disagreement
+                                                </small>
+                                            </>
+                                        ) : <span className='opacity-0'>・</span>}
+                                    </div>
                                 </Link>
                             </div>
                         </div>
