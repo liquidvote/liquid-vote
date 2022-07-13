@@ -73,243 +73,245 @@ export const GroupInProfileList: FunctionComponent<{
                         <div className="poll-cover-overlay">
                         </div>
                         <div className="poll-cover-info">
-                            {/* <Link to={`/group/${group?.handle}`}>
-                                <h5 className="white p-0 m-0">
-                                    {group?.name}
-                                </h5>
-                            </Link> */}
-
-                            <Link
-                                className="position-relative"
-                                style={{ top: 10 }}
-                                to={isSelected ? `/profile/${user.handle}` : `/profile/${user.handle}/cause/${group.handle}`}
-                            >
-                                <Avatar
-                                    person={{
-                                        ...user,
-                                        yourStats: group.yourUserStats,
-                                        stats: group.userStats
-                                    }}
-                                    groupHandle={group?.handle}
-                                    type="small"
-                                />
-                            </Link>
-
-                            {/* <Link to={`/group/${group.handle}`}>
-                                <div
-                                    className={`small-avatar square bg`}
-                                    style={{
-                                        background: group.cover && `url(${group.cover}) 50% 50% / cover no-repeat`
-                                    }}
-                                ></div>
-                            </Link> */}
                             <div className="flex-fill py-2">
                                 <div className="d-flex justify-content-between align-items-center flex-wrap">
                                     <div className="d-flex flex-column">
-                                        <div className="d-flex align-items-center">
-                                            <Link to={`/group/${group.handle}`}><b>{group.name}</b></Link>
+                                        <div className="d-flex align-items-center pt-1">
+                                            <div className="d-flex align-items-center">
+                                                <Link to={`/group/${group.handle}`} className="mr-2"><b>{group.name}</b></Link>
+                                            </div>
                                             {/* <small className="mt-n1">@DanPriceSeattle</small> */}
-                                            <div className="ml-2 mt-n1">
+                                            {/* <div className="ml-2 mt-n1">
                                                 {group?.privacy === "private" ? (
                                                     <LockSVG />
                                                 ) : group?.privacy === "public" ? (
                                                     <WorldSVG />
                                                 ) : <LinkSVG />}
-                                            </div>
+                                            </div> */}
                                         </div>
-                                        <small className='primary-color d-flex'>
-                                            {
-                                                (userWithMoreData?.groupStats?.stats?.representedBy || userWithMoreData?.groupStats?.stats?.representing) ?
-                                                    <>
-                                                        {/* <div className="mr-1"><HandshakeSVG /></div> */}
-                                                        <div className="d-flex flex-column">
-                                                            <div className="d-flex flex-wrap">
-                                                                {userWithMoreData?.groupStats?.stats?.representedBy ? (
-                                                                    <Link to={`/profile-people/${user.handle}/representedBy`} className="mr-2">
-                                                                        Representing{' '}<b className="white">{userWithMoreData?.groupStats?.stats?.representedBy}</b>
-                                                                        {group.representativeRelation?.isRepresentingYou ? " (including you)" : ""}
-                                                                    </Link>
-                                                                ) : null}
-                                                                {userWithMoreData?.groupStats?.stats?.representing ? (
-                                                                    <Link to={`/profile-people/${user.handle}/representing`} className="mr-2">
-                                                                        Represented by{' '}<b className="white">{userWithMoreData?.groupStats?.stats?.representing}</b>
-                                                                        {group.youToHimRepresentativeRelation?.isRepresentingYou ? " (including you)" : ""}
-                                                                    </Link>
-                                                                ) : null}
-                                                            </div>
-                                                        </div>
-                                                    </> :
-                                                    <></>
-                                            }
-                                            {/* {group.representativeRelation?.isRepresentingYou && !group.youToHimRepresentativeRelation?.isRepresentingYou ? "represents you" : ""}
-                                            {!group.representativeRelation?.isRepresentingYou && group.youToHimRepresentativeRelation?.isRepresentingYou ? "represented by you" : ""}
-                                            {group.representativeRelation?.isRepresentingYou && group.youToHimRepresentativeRelation?.isRepresentingYou ? "you represent each other" : ""} */}
-                                        </small>
                                     </div>
                                     <div className="d-flex ml-n1 justify-content-center">
-                                        <Popper
-                                            rightOnSmall={true}
-                                            button={
-                                                <div>
-                                                    <ThreeDotsSmallSVG />
-                                                </div>
-                                            }
-                                            oulineInstead={true}
-                                            popperContent={
-                                                <ul className="p-0 m-0 mx-2">
-                                                    <li className="d-flex justify-content-center mb-2">
-                                                        <button
-                                                            onClick={
-                                                                () => editUserRepresentativeGroupRelation({
-                                                                    variables: {
-                                                                        RepresenteeHandle: liquidUser?.handle,
-                                                                        RepresentativeHandle: user?.handle,
-                                                                        Group: group.handle,
-                                                                        IsRepresentingYou: !group.representativeRelation?.isRepresentingYou
-                                                                    }
-                                                                })
-                                                                    .then((r) => {
-                                                                        // userGroups_refetch();
-                                                                        updateParams({ paramsToAdd: { refetch: 'user' } })
-                                                                    })
-                                                            }
-                                                            className={`
-                                                                button_ small ml-1 mb-0
-                                                                ${group.representativeRelation?.isRepresentingYou ? 'selected' : null}
-                                                            `}
-                                                            disabled={!group.yourMemberRelation?.isMember}
-                                                        >
-                                                            {
-                                                                group.representativeRelation?.isRepresentingYou ?
-                                                                    `Represents you on ${group?.name}` :
-                                                                    `Delegate your votes on ${group?.name} to ${user?.name}`
-                                                            }
-                                                        </button>
-                                                    </li>
-                                                    <li className="d-flex justify-content-center">
-                                                        <button
-                                                            onClick={() => !!liquidUser ? editGroupMemberChannelRelation({
-                                                                variables: {
-                                                                    UserHandle: liquidUser?.handle,
-                                                                    GroupHandle: group.handle,
-                                                                    IsMember: !group?.yourMemberRelation?.isMember
-                                                                }
-                                                            }) : updateParams({
-                                                                paramsToAdd: {
-                                                                    modal: "RegisterBefore",
-                                                                    modalData: JSON.stringify({
-                                                                        toWhat: 'joinGroup',
-                                                                        groupHandle: group.handle,
-                                                                        groupName: group.name
-                                                                    })
-                                                                }
-                                                            })}
-                                                            className={`button_ small ml-1 mb-0 ${isMember ? "selected" : ""}`}
-                                                            disabled={group.thisUserIsAdmin}
-                                                        >
-                                                            {editGroupMemberChannelRelation_loading && (
-                                                                <img
-                                                                    className="vote-avatar mr-1 my-n2"
-                                                                    src={'http://images.liquid-vote.com/system/loadingroup.gif'}
-                                                                />
-                                                            )}
-                                                            {isMember ? "Joined" : "Join"}
-                                                        </button>
-                                                    </li>
-                                                    {liquidUser?.handle === user.handle && (
-                                                        <li className="d-flex mt-2 justify-content-center">
-                                                            <div
-                                                                className="button_ small ml-2"
-                                                                onClick={async () => {
-                                                                    const inviteLink = `${env.website}/invite/by/${liquidUser?.handle}/to/causeOnProfile/${group.handle}`;
 
-                                                                    try {
-                                                                        await navigator.share({
-                                                                            title: `Vote on ${group.name} with ${liquidUser?.name}`,
-                                                                            text: `${liquidUser?.name} is inviting you to vote on ${group.name} with him`,
-                                                                            url: inviteLink
-                                                                        })
-                                                                    } catch (err) {
-                                                                        updateParams({
-                                                                            paramsToAdd: {
-                                                                                modal: "InviteFor",
-                                                                                modalData: JSON.stringify({
-                                                                                    InviteType: 'toGroup',
-                                                                                    groupHandle: group.handle,
-                                                                                    groupName: group.name,
-                                                                                    inviteLink
-                                                                                })
-                                                                            }
-                                                                        })
-                                                                    }
-                                                                }}
-                                                            >
-                                                                Share Votes
-                                                            </div>
-                                                        </li>
-                                                    )}
-                                                </ul>
-                                            }
-                                        />
+                                        <button
+                                            onClick={() => !!liquidUser ? editGroupMemberChannelRelation({
+                                                variables: {
+                                                    UserHandle: liquidUser?.handle,
+                                                    GroupHandle: group.handle,
+                                                    IsMember: !group?.yourMemberRelation?.isMember
+                                                }
+                                            }) : updateParams({
+                                                paramsToAdd: {
+                                                    modal: "RegisterBefore",
+                                                    modalData: JSON.stringify({
+                                                        toWhat: 'joinGroup',
+                                                        groupHandle: group.handle,
+                                                        groupName: group.name
+                                                    })
+                                                }
+                                            })}
+                                            className={`button_ small ml-1 mb-0 ${isMember ? "selected" : ""}`}
+                                            disabled={group.thisUserIsAdmin}
+                                        >
+                                            {editGroupMemberChannelRelation_loading && (
+                                                <img
+                                                    className="vote-avatar mr-1 my-n2"
+                                                    src={'http://images.liquid-vote.com/system/loadingroup.gif'}
+                                                />
+                                            )}
+                                            {isMember ? `Joined${group.thisUserIsAdmin && ' as Admin'}` : "Join"}
+                                        </button>
                                     </div>
                                 </div>
-                                {/* <small className="d-flex mb-0 mt-n1 primary-color">
-                                    {group.bio}
-                                </small> */}
-                                {/* <div className="d-flex ml-2 mt-2">
-                                    {group?.stats?.mostRepresentingMembers?.slice(0, 6).map((m: any) => (
-                                        <Link
-                                            key={m.handle}
-                                            to={`/profile/${m.handle}`}
-                                            title={`${m.name}`}
-                                            className="vote-avatar avatar-2 ml-n2"
-                                            style={{
-                                                background: `url(${m.avatar}) 50% 50% / cover no-repeat`
-                                            }}
-                                        ></Link>
-                                    ))}
-                                    <Link
-                                        to={`/group-people/${group.handle}/members`}
-                                    >
-                                        <div className="vote-avatar count ml-n2">{group?.stats?.members}</div>
-                                    </Link>
-                                </div> */}
-
                             </div>
                         </div>
                     </div>
 
-                    <Link
-                        style={{ marginLeft: 58 }}
-                        className="d-flex flex-column text-decoration-none"
-                        to={isSelected ? `/profile/${user.handle}/groups` : `/profile/${user.handle}/cause/${group.handle}`}
-                    >
-                        <div className="d-flex">
-                            <small className="d-flex mb-0">
-                                <b className='white mr-1'>{' '}{group?.userStats?.directVotesMade} votes</b>
-                            </small>
-                            {!!group?.yourUserStats?.directVotesInCommon && (
-                                <>
-                                    {/* ・
-                                    <small className="d-flex mb-0">
-                                        <b className='white mr-1'>{' '}{group?.yourUserStats?.directVotesInCommon}</b> in common
-                                    </small> */}
-                                    ・
-                                    <small className="d-flex mb-0">
-                                        <b className='white mr-1'>{' '}{group?.yourUserStats?.directVotesInAgreement} </b> in agreement
+                    <div className='d-flex align-items-stretch mt-3'>
+                        <Link
+                            className="position-relative mt-n1"
+                            to={isSelected ? `/profile/${user.handle}/groups` : `/profile/${user.handle}/cause/${group.handle}`}
+                        >
+                            <Avatar
+                                person={{
+                                    ...user,
+                                    yourStats: group.yourUserStats,
+                                    stats: group.userStats
+                                }}
+                                groupHandle={group?.handle}
+                                type="small"
+                            />
+                        </Link>
+                        <div className='d-flex align-items-center'>
+                            <div className='d-flex flex-column'>
+                                <div className=' d-flex align-items-center'>
+                                    <small className='primary-color d-flex mr-2'>
+                                        {
+                                            (userWithMoreData?.groupStats?.stats?.representedBy || userWithMoreData?.groupStats?.stats?.representing) ?
+                                                <>
+                                                    {/* <div className="mr-1"><HandshakeSVG /></div> */}
+                                                    <div className="d-flex flex-column">
+                                                        <div className="d-flex flex-wrap">
+                                                            {userWithMoreData?.groupStats?.stats?.representedBy ? (
+                                                                <Link to={`/profile-people/${user.handle}/representedBy`} className="mr-2">
+                                                                    Representing{' '}<b className="white">{userWithMoreData?.groupStats?.stats?.representedBy}</b>
+                                                                </Link>
+                                                            ) : null}
+                                                            {userWithMoreData?.groupStats?.stats?.representing ? (
+                                                                <Link to={`/profile-people/${user.handle}/representing`} className="mr-2">
+                                                                    Represented by{' '}<b className="white">{userWithMoreData?.groupStats?.stats?.representing}</b>
+                                                                </Link>
+                                                            ) : null}
+                                                        </div>
+                                                    </div>
+                                                </> :
+                                                <></>
+                                        }
+                                        {/* {group.representativeRelation?.isRepresentingYou && !group.youToHimRepresentativeRelation?.isRepresentingYou ? "represents you" : ""}
+                                                    {!group.representativeRelation?.isRepresentingYou && group.youToHimRepresentativeRelation?.isRepresentingYou ? "represented by you" : ""}
+                                                    {group.representativeRelation?.isRepresentingYou && group.youToHimRepresentativeRelation?.isRepresentingYou ? "you represent each other" : ""} */}
                                     </small>
-                                    ・
-                                    <small className="d-flex mb-0">
-                                        <b className='white mr-1'>{' '}{group?.yourUserStats?.directVotesInDisagreement}</b> in disagreement
-                                    </small>
-                                </>
-                            )}
+                                    <div
+                                        className={`
+                                                        d-flex align-items-center ${(group.youToHimRepresentativeRelation?.isRepresentingYou ||
+                                                group.representativeRelation?.isRepresentingYou
+                                            ) ? '' : 'd-none'}
+                                                    `}
+                                    >
+                                        {group.representativeRelation?.isRepresentingYou &&
+                                            !group.youToHimRepresentativeRelation?.isRepresentingYou ?
+                                            (
+                                                <small
+                                                    className="badge inverted"
+                                                >represents you</small>
+                                            ) : ""}
+                                        {group.youToHimRepresentativeRelation?.isRepresentingYou &&
+                                            !group.representativeRelation?.isRepresentingYou ?
+                                            (
+                                                <small
+                                                    className="badge inverted"
+                                                >you represent him</small>
+                                            ) : ""}
+                                        {
+                                            group.youToHimRepresentativeRelation?.isRepresentingYou &&
+                                                group.representativeRelation?.isRepresentingYou ?
+                                                (
+                                                    <small
+                                                        className="badge inverted no-max-w"
+                                                    >you represent each other 🤝</small>
+                                                ) : ""
+                                        }
+                                    </div>
+                                </div>
+                                <Link
+                                    className="d-flex flex-column text-decoration-none"
+                                    to={isSelected ? `/profile/${user.handle}/groups` : `/profile/${user.handle}/cause/${group.handle}`}
+                                >
+                                    <div className="d-flex align-items-center">
+                                        <small className='d-flex white'>
+                                            {isSelected ? 'hide' : 'show'}
+                                        </small>
+                                        ・
+                                        <small className="d-flex">
+                                            <b className='white mr-1'>{' '}{group?.userStats?.directVotesMade} votes</b>
+                                        </small>
+                                        {!!group?.yourUserStats?.directVotesInCommon && (
+                                            <>
+                                                {/* ・
+                                                <small className="d-flex mb-0">
+                                                    <b className='white mr-1'>{' '}{group?.yourUserStats?.directVotesInCommon}</b> in common
+                                                </small> */}
+                                                ・
+                                                <small className="d-flex">
+                                                    <b className='white mr-1'>{' '}{group?.yourUserStats?.directVotesInAgreement} </b> in agreement
+                                                </small>
+                                                ・
+                                                <small className="d-flex">
+                                                    <b className='white mr-1'>{' '}{group?.yourUserStats?.directVotesInDisagreement}</b> in disagreement
+                                                </small>
+                                            </>
+                                        )}
+                                    </div>
+                                    {/* <div style={{ marginRight: 2, marginTop: -5 }}>⬇</div> */}
+                                </Link>
+                            </div>
                         </div>
-                        <small className='white'>
-                            {isSelected ? 'hide' : 'show'} votes
-                        </small>
-                        {/* <div style={{ marginRight: 2, marginTop: -5 }}>⬇</div> */}
-                    </Link>
+                        <div className='ml-auto'>
+                            <Popper
+                                rightOnSmall={true}
+                                button={
+                                    <div>
+                                        <ThreeDotsSmallSVG />
+                                    </div>
+                                }
+                                oulineInstead={true}
+                                popperContent={
+                                    <ul className="p-0 m-0 mx-2">
+                                        <li className="d-flex justify-content-center mb-2">
+                                            <button
+                                                onClick={
+                                                    () => editUserRepresentativeGroupRelation({
+                                                        variables: {
+                                                            RepresenteeHandle: liquidUser?.handle,
+                                                            RepresentativeHandle: user?.handle,
+                                                            Group: group.handle,
+                                                            IsRepresentingYou: !group.representativeRelation?.isRepresentingYou
+                                                        }
+                                                    })
+                                                        .then((r) => {
+                                                            // userGroups_refetch();
+                                                            updateParams({ paramsToAdd: { refetch: 'user' } })
+                                                        })
+                                                }
+                                                className={`
+                                                                    button_ small ml-1 mb-0
+                                                                    ${group.representativeRelation?.isRepresentingYou ? 'selected' : null}
+                                                                `}
+                                                disabled={!group.yourMemberRelation?.isMember}
+                                            >
+                                                {
+                                                    group.representativeRelation?.isRepresentingYou ?
+                                                        `Represents you on ${group?.name}` :
+                                                        `Delegate your votes on ${group?.name} to ${user?.name}`
+                                                }
+                                            </button>
+                                        </li>
+                                        {liquidUser?.handle === user.handle && (
+                                            <li className="d-flex mt-2 justify-content-center">
+                                                <div
+                                                    className="button_ small ml-2"
+                                                    onClick={async () => {
+                                                        const inviteLink = `${env.website}/invite/by/${liquidUser?.handle}/to/causeOnProfile/${group.handle}`;
+
+                                                        try {
+                                                            await navigator.share({
+                                                                title: `Vote on ${group.name} with ${liquidUser?.name}`,
+                                                                text: `${liquidUser?.name} is inviting you to vote on ${group.name} with him`,
+                                                                url: inviteLink
+                                                            })
+                                                        } catch (err) {
+                                                            updateParams({
+                                                                paramsToAdd: {
+                                                                    modal: "InviteFor",
+                                                                    modalData: JSON.stringify({
+                                                                        InviteType: 'toGroup',
+                                                                        groupHandle: group.handle,
+                                                                        groupName: group.name,
+                                                                        inviteLink
+                                                                    })
+                                                                }
+                                                            })
+                                                        }
+                                                    }}
+                                                >
+                                                    Share Votes
+                                                </div>
+                                            </li>
+                                        )}
+                                    </ul>
+                                }
+                            />
+                        </div>
+                    </div>
 
                     {/* <pre>{JSON.stringify(group, null, 2)}</pre> */}
                     {/* <pre>{JSON.stringify(group.yourUserStats, null, 2)}</pre>

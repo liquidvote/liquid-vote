@@ -57,6 +57,17 @@ export const ProfilePolls: FunctionComponent<{ userHandle: string, user: any }> 
                         </div>
                     ) : null}
 
+                    <div className="my-2 d-flex align-items-center flex-nowrap justify-content-between">
+                        <small
+                            className="d-flex justify-content-center align-items-center align-self-end"
+                        >
+                            {/* <small className="time-ago" data-tip="Last vote was"> */}
+                            {!!v?.createdBy && v?.createdBy?.name }
+                            {' '}launched{' '}
+                            {timeAgo.format(new Date(Number(v?.createdOn)))}
+                        </small>
+                    </div>
+
                     {v.questionType === 'multi' && (
                         <MultiVoteInList
                             key={`multi-${v.questionText}`}
@@ -73,26 +84,6 @@ export const ProfilePolls: FunctionComponent<{ userHandle: string, user: any }> 
                             user={user}
                         />
                     )}
-
-                    <div className="mt-4 d-flex align-items-center flex-nowrap justify-content-between">
-                        <small
-                            className="d-flex justify-content-center align-items-center align-self-end"
-                        >
-                            {/* <small className="time-ago" data-tip="Last vote was"> */}
-                            {!!v?.createdBy && (
-                                <Link to={`/profile/${v?.createdBy.handle}`}>
-                                    <div
-                                        className="vote-avatar none mr-1"
-                                        style={{
-                                            background: v?.createdBy.avatar && `url(${v?.createdBy.avatar}) 50% 50% / cover no-repeat`
-                                        }}
-                                    ></div>
-                                </Link>
-                            )}
-                            {' '}launched{' '}
-                            {timeAgo.format(new Date(Number(v?.createdOn)))}
-                        </small>
-                    </div>
 
                     <hr />
                 </div>
