@@ -95,7 +95,8 @@ export const QuestionTypeDefs = gql`
             groupHandle: String,
             sortBy: String,
             createdByHandle: String,
-            notUsers: Boolean
+            votedOnItHandle: String,
+            notUsers: Boolean, # not belonging on user's feed
         ): [Question]
         VotersAlsoVotedOn(
             questionText: String,

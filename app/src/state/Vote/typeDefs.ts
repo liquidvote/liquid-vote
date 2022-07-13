@@ -66,6 +66,11 @@ export const VOTES = gql`
                 group
                 channel
             }
+            group {
+                handle
+                name
+                cover
+            }
             resultsOn
             createdOn
             lastEditOn

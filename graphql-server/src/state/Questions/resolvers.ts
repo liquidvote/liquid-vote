@@ -58,6 +58,7 @@ export const QuestionResolvers = {
             groupHandle,
             sortBy,
             createdByHandle,
+            votedOnItHandle,
             notUsers
         }, { mongoDB, AuthUser }) => {
 

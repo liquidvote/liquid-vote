@@ -783,7 +783,17 @@ export const VotersAgg = ({
                 $addFields: {
                     question: { $first: '$question' }
                 }
-            }
+            },
+            {
+                $lookup: {
+                    from: 'Groups',
+                    localField: 'groupChannel.group',
+                    foreignField: 'handle',
+                    as: 'group'
+                }
+            }, {
+                $addFields: { 'question.group': { $first: '$group' } }
+            },
         ]
     ),
     userObject: (

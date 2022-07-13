@@ -23,6 +23,7 @@ import './style.sass';
 import ProfileGroups from "./ProfileGroups";
 import ProfilePolls from "./ProfilePolls";
 import ProfileFollowings from "./ProfileFollowings";
+import ProfileVotes from "./ProfileVotes";
 
 export const Profile: FunctionComponent<{}> = ({ }) => {
 
@@ -408,7 +409,12 @@ export const Profile: FunctionComponent<{}> = ({ }) => {
 
             <ul className="nav d-flex justify-content-around mt-n2 mx-n3">
                 <li className="nav-item">
-                    <Link className={`nav-link ${(!section || section === 'groups') && 'active'}`} to={`/profile/${handle}/groups`}>
+                    <Link className={`nav-link ${(!section || section === 'votes') && !groupHandle && 'active'}`} to={`/profile/${handle}/votes`}>
+                        <b>{profile?.stats?.directVotesMade}</b> Votes
+                    </Link>
+                </li>
+                <li className="nav-item">
+                    <Link className={`nav-link ${(section === 'groups' || !!groupHandle) && 'active'}`} to={`/profile/${handle}/groups`}>
                         <b>{profile?.stats?.groupsJoined}</b> Causes
                     </Link>
                 </li>
@@ -423,7 +429,8 @@ export const Profile: FunctionComponent<{}> = ({ }) => {
 
             <hr className="mt-n4" />
 
-            {(!section || section === 'groups' || !!groupHandle) && <ProfileGroups />}
+            {((!section || section === 'votes') && !groupHandle) && <ProfileVotes />}
+            {(section === 'groups' || !!groupHandle) && <ProfileGroups />}
             {(section === 'polls') && <ProfilePolls userHandle={profile.handle} user={profile} />}
             {(section === 'followings') && <ProfileFollowings />}
         </>

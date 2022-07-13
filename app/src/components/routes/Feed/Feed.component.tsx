@@ -75,7 +75,7 @@ export const Feed: FunctionComponent<{}> = ({ }) => {
 
             <div className="mt-3">
                 {questions_data?.Questions?.map((v: any, i: any) => (
-                    <div key={'polls-' + i}>
+                    <div key={'feed-poll-' + v?.group?.handle + '-' + v.questionText}>
 
                         {v?.group?.handle !== questions_data?.Questions[i - 1]?.group?.handle ? (
                             <div className="poll-cover-container">

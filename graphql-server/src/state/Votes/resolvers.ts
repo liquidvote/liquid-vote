@@ -242,11 +242,11 @@ export const VoteResolvers = {
             });
 
 
-            const writeToDebugFile = fs.writeFile(
-                process.cwd() + '/debug' + '/votes_'+type+'.json',
-                JSON.stringify(VotesSpecificAggregateLogic, null, 2),
-                { encoding: 'utf8' }
-            );
+            // const writeToDebugFile = fs.writeFile(
+            //     process.cwd() + '/debug' + '/votes_'+type+'.json',
+            //     JSON.stringify(VotesSpecificAggregateLogic, null, 2),
+            //     { encoding: 'utf8' }
+            // );
 
             const Votes = (await mongoDB.collection("Votes").aggregate(VotesSpecificAggregateLogic).toArray())
                 .map(v => ({
@@ -274,10 +274,12 @@ export const VoteResolvers = {
                         })),
                         yourVote: {
                             ...v.yourVote,
+                            user: AuthUser.LiquidUser,
                             // _id: `yourVote_${type}_${questionText}_${groupHandle}_${userHandle}_${v.user?.handle}_${v.questionText}`,
                         },
                         userVote: {
                             ...v.userVote,
+                            user: v.user,
                             // _id: `userVote_${type}_${questionText}_${groupHandle}_${userHandle}_${v.user?.handle}_${v.questionText}`,
                         }
                     },

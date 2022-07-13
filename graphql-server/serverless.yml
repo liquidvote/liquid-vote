@@ -33,5 +33,5 @@ custom:
     noPrependStageInUrl: true
   customDomain:
     domainName: graphql.liquid-vote.com
-    stage: live
+    stage: dev
     basePath: ""

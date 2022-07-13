@@ -181,8 +181,8 @@ export const GroupInProfileList: FunctionComponent<{
                                                         >
                                                             {
                                                                 group.representativeRelation?.isRepresentingYou ?
-                                                                    `Represents you` :
-                                                                    `Delegate to ${user?.name}`
+                                                                    `Represents you on ${group?.name}` :
+                                                                    `Delegate your votes on ${group?.name} to ${user?.name}`
                                                             }
                                                         </button>
                                                     </li>
@@ -282,11 +282,11 @@ export const GroupInProfileList: FunctionComponent<{
                     <Link
                         style={{ marginLeft: 58 }}
                         className="d-flex flex-column text-decoration-none"
-                        to={isSelected ? `/profile/${user.handle}` : `/profile/${user.handle}/cause/${group.handle}`}
+                        to={isSelected ? `/profile/${user.handle}/groups` : `/profile/${user.handle}/cause/${group.handle}`}
                     >
                         <div className="d-flex">
                             <small className="d-flex mb-0">
-                                <b className='white mr-1'>{' '}{group?.userStats?.directVotesMade}</b> votes
+                                <b className='white mr-1'>{' '}{group?.userStats?.directVotesMade} votes</b>
                             </small>
                             {!!group?.yourUserStats?.directVotesInCommon && (
                                 <>
