@@ -46,19 +46,19 @@ export const Groups: FunctionComponent<{}> = ({ }) => {
                             <b>{user?.stats?.groupsJoined || 0}</b>Joined
                         </Link>
                     </li>
-                    {section === 'other' && (
+                    {/* {section === 'other' && ( */}
                         <li className="nav-item">
                             <Link className={`nav-link ${section === 'other' && 'active'}`} to={`/groups/other`}>
                                 🧪 Other
                             </Link>
                         </li>
-                    )}
+                    {/* )} */}
                 </ul>
             )}
 
             {
                 !yourGroups_data && (
-                    <div className="d-flex justify-content-center mt-5">
+                    <div className="d-flex align-items-center justify-content-center min-vh-100 mt-n5">
                         <DropAnimation />
                     </div>
                 )

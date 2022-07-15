@@ -161,7 +161,7 @@ export const Feed: FunctionComponent<{}> = ({ }) => {
                 )}
 
                 {questions_loading && (
-                    <div className="d-flex justify-content-center mt-5">
+                    <div className="d-flex align-items-center justify-content-center min-vh-100 mt-n5">
                         <DropAnimation />
                     </div>
                 )}

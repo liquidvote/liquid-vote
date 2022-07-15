@@ -71,7 +71,7 @@ export default function Question() {
     // const maxVoteCount = question?.questionType === 'multi' && sortedChoices?.[0]?.stats?.directVotes + sortedChoices?.[0]?.stats?.indirectVotes;
 
     return question_loading ? (
-        <div className="d-flex justify-content-center mt-5">
+        <div className="d-flex align-items-center justify-content-center min-vh-100 mt-n5">
             <DropAnimation />
         </div>
     ) : (question_error) ? (<>Error</>) : (
@@ -117,11 +117,11 @@ export default function Question() {
                                 <Link
                                     key={`representatives-${r.handle}-${question?.group?.handle}`}
                                     to={`/profile/${r.handle}/cause/${question?.group?.handle}`}
-                                    // className={`vote-avatar tiny ml-n2`}
-                                    // style={{
-                                    //     background: `url(${r.avatar}) 50% 50% / cover no-repeat`
-                                    // }}
-                                    // title={r.name}
+                                // className={`vote-avatar tiny ml-n2`}
+                                // style={{
+                                //     background: `url(${r.avatar}) 50% 50% / cover no-repeat`
+                                // }}
+                                // title={r.name}
                                 >
                                     <Avatar
                                         person={r}

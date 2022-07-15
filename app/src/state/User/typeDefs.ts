@@ -209,6 +209,7 @@ export const USER_GROUPS = gql`
         bio
         avatar
         cover
+        privacy
         externalLink
         createdOn
         lastEditOn
@@ -225,6 +226,7 @@ export const USER_GROUPS = gql`
             createdOn
             lastEditOn
             isMember
+            visibility
             channels
         }
         representativeRelation {
@@ -314,19 +316,22 @@ export const EDIT_GROUP_MEMBER_CHANNEL_RELATION = gql`
       $UserHandle: String!,
       $GroupHandle: String!,
       $Channels: [String],
-      $IsMember: Boolean
+      $IsMember: Boolean,
+      $Visibility: String
     ) {
     editGroupMemberChannelRelation(
         UserHandle: $UserHandle,
         GroupHandle: $GroupHandle,
         Channels: $Channels,
-        IsMember: $IsMember
+        IsMember: $IsMember,
+        Visibility: $Visibility
     ) {
         groupId
         userId
         createdOn
         lastEditOn
         isMember
+        visibility
         channels
     }
   }

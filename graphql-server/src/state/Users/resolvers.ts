@@ -1171,7 +1171,8 @@ export const UserResolvers = {
             GroupHandle,
             Channels,
             IsMember,
-            InviteId
+            InviteId,
+            Visibility
         }, { mongoDB, AuthUser }) => {
 
             if (!AuthUser) return;
@@ -1202,6 +1203,7 @@ export const UserResolvers = {
                         $set: {
                             ...(typeof Channels !== 'undefined') && { 'channels': [...Channels] },
                             ...(typeof IsMember !== 'undefined') && { 'isMember': IsMember },
+                            ...(typeof Visibility !== 'undefined') && { 'visibility': Visibility },
                             'lastEditOn': Date.now(),
                         },
                     },
@@ -1218,6 +1220,7 @@ export const UserResolvers = {
                 })
             )?.ops[0] : null;
 
+            // TODO: use this
             if (InviteId) {
                 updateInviteStatus({
                     InviteId,

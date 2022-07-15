@@ -17,7 +17,7 @@ export default function App() {
 
     const Loader = ({ component }: any) =>
         <Suspense fallback={
-            <div className="d-flex justify-content-center my-5">
+            <div className="d-flex align-items-center justify-content-center min-vh-100 mt-n5">
                 <DropAnimation />
             </div>
         }>

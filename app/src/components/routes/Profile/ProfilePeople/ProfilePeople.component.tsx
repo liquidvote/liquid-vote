@@ -43,7 +43,7 @@ export const ProfilePeople: FunctionComponent<{}> = ({ }) => {
     const profile = user_data?.User;
 
     return user_loading ? (
-        <div className="d-flex justify-content-center mt-5">
+        <div className="d-flex align-items-center justify-content-center min-vh-100 mt-n5">
             <DropAnimation />
         </div>
     ) : user_error ? (<>Error</>) : (

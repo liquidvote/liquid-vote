@@ -51,6 +51,9 @@ $theme5-colors: ("bg": #0b414d, "primary": #08f3a5, "secondary": white, "border"
     .primary-color
         color: map-get($theme, "primary")
 
+    .border-primary
+        border-color: map-get($theme, "primary") !important
+
     .for
         fill: adjust-color(map-get($theme, "for"), $alpha: -0.4)
         background: adjust-color(map-get($theme, "for"), $alpha: -0.4)
@@ -941,3 +944,7 @@ small, .small
 
 .opacity-0
     opacity: 0
+
+.flex-basis-100
+    flex-basis: 100% !important
+

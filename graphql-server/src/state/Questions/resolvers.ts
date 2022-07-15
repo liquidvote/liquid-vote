@@ -142,11 +142,11 @@ export const QuestionResolvers = {
                 ] : []
             ]
 
-            const writeToDebugFile = fs.writeFile(
-                process.cwd() + '/debug' + '/Questions.json',
-                JSON.stringify(Agg, null, 2),
-                { encoding: 'utf8' }
-            );
+            // const writeToDebugFile = fs.writeFile(
+            //     process.cwd() + '/debug' + '/Questions.json',
+            //     JSON.stringify(Agg, null, 2),
+            //     { encoding: 'utf8' }
+            // );
 
             const Questions = await mongoDB.collection("Questions")
                 .aggregate(Agg)
@@ -469,17 +469,17 @@ export const updateQuestionVotingStats = async ({
         },
     ];
 
-    const writeToDebugFile = fs.writeFile(
-        process.cwd() + '/debug' + '/VoteCountsAgg' + undefined + '.json',
-        JSON.stringify(VoteCountsAgg({ choiceText: undefined }), null, 2),
-        { encoding: 'utf8' }
-    );
+    // const writeToDebugFile = fs.writeFile(
+    //     process.cwd() + '/debug' + '/VoteCountsAgg' + undefined + '.json',
+    //     JSON.stringify(VoteCountsAgg({ choiceText: undefined }), null, 2),
+    //     { encoding: 'utf8' }
+    // );
 
-    const writeToDebugFile_2 = fs.writeFile(
-        process.cwd() + '/debug' + '/VoteCountsAgg' + choiceText + '.json',
-        JSON.stringify(VoteCountsAgg({ choiceText }), null, 2),
-        { encoding: 'utf8' }
-    );
+    // const writeToDebugFile_2 = fs.writeFile(
+    //     process.cwd() + '/debug' + '/VoteCountsAgg' + choiceText + '.json',
+    //     JSON.stringify(VoteCountsAgg({ choiceText }), null, 2),
+    //     { encoding: 'utf8' }
+    // );
 
     const VoteCounts = async ({ choiceText }) => (await mongoDB.collection("Votes")
         .aggregate(VoteCountsAgg({ choiceText }))

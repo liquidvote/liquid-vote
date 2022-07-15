@@ -13,7 +13,7 @@
     "deploystaging": "aws s3 sync ./dist s3://staging.liquid-vote.com --profile pedro",
     "deployproduction": "aws s3 sync ./dist s3://app.liquid-vote.com --profile pedro",
     "emptyS3": "aws s3 rm s3://app.liquid-vote.com --recursive --profile pedro",
-    "aws:install": "curl 'https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip' -o 'awscliv2.zip'; unzip awscliv2.zip; sudo ./aws/install",
+    "aws:install": "open https://docs.aws.amazon.com/cli/latest/userguide/getting-started-install.html",
     "aws:login": "aws configure import --csv file://./credentials/pedro_accessKeys.csv",
     "storybook": "start-storybook -p 6006",
     "build-storybook": "build-storybook"

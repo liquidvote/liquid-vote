@@ -22,7 +22,7 @@ export const VoteSortPicker: FunctionComponent<{
         const sortHumanText = (sort: string) => ({
             'weight': 'weight',
             'time': 'last voted on',
-            'votersYouFollowOrRepresentingYouTimeWeight': 'followers votes'
+            'votersYouFollowOrRepresentingYouTimeWeight': 'recent followers votes'
         })[sort];
 
         return (

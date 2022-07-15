@@ -26,7 +26,7 @@ export const PollExplanation: FunctionComponent<{ p: any }> = ({ p }) => {
                     ))}
                 </div> */}
 
-                <small className='ml-0'>
+                <small className='ml-0 faded'>
                     {usersToShow.slice(0, 3).map((m: any, i) => (
                         <>
                             {' '}

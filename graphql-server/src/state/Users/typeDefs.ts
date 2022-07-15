@@ -108,7 +108,8 @@ export const UserTypeDefs = gql`
             GroupHandle: String,
             Channels: [String],
             IsMember: Boolean,
-            InviteId: String
+            InviteId: String,
+            Visibility: String
         ): GroupMemberRelation
         editUserRepresentativeGroupRelation(
             RepresenteeHandle: String,

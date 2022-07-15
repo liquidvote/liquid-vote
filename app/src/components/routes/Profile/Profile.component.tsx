@@ -59,7 +59,7 @@ export const Profile: FunctionComponent<{}> = ({ }) => {
     console.log({ profile });
 
     return !profile ? (
-        <div className="d-flex justify-content-center mt-5">
+        <div className="d-flex align-items-center justify-content-center min-vh-100 mt-n5">
             <DropAnimation />
         </div>
     ) : user_error ? (<>Error</>) : (

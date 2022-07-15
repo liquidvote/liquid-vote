@@ -73,6 +73,7 @@ export const GroupTypeDefs = gql`
         createdOn: String
         lastEditOn: String
         isMember: Boolean
+        visibility: String
         channels: [String]
     }
 

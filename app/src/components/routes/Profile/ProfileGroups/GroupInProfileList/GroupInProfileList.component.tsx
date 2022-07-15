@@ -33,9 +33,6 @@ export const GroupInProfileList: FunctionComponent<{
 
         let { section, subsection, subsubsection, handle, groupHandle } = useParams<any>();
 
-        const visibilitytypes = ['everyone', 'members', 'self'];
-        const [voteVisibility, setVoteVisibility] = useState('everyone');
-
         const { liquidUser } = useAuthUser();
 
         const { user: userWithMoreData } = useUser({ userHandle: user.handle, groupHandle: group.handle });
@@ -63,6 +60,12 @@ export const GroupInProfileList: FunctionComponent<{
         const isMember =
             group?.yourMemberRelation?.isMember ||
             editGroupMemberChannelRelation_data?.editGroupMemberChannelRelation?.isMember;
+
+        const visibility: "everyone" | "members" | "self" =
+            (group?.yourMemberRelation?.visibility ||
+                editGroupMemberChannelRelation_data?.editGroupMemberChannelRelation?.visibility
+            ) ||
+            (group?.privacy === 'private' ? 'members' : 'everyone');
 
         return (
             <div id={group.handle} className="relative border-bottom pb-3 mx-n3 px-3">
@@ -94,25 +97,119 @@ export const GroupInProfileList: FunctionComponent<{
                                             </div> */}
                                         </div>
                                     </div>
-                                    <div className="d-flex ml-n1 justify-content-center">
+                                    <div className="d-flex ml-n1 justify-content-center align-items-center">
+
+                                        {editGroupMemberChannelRelation_loading && (
+                                            <img
+                                                className="vote-avatar mr-1 my-n2"
+                                                src={'http://images.liquid-vote.com/system/loading.gif'}
+                                            />
+                                        )}
 
                                         {isMember ? (
-                                            <button className={`button_ inverted small mr-1`} onClick={() => {
-                                                const selectedIndex = visibilitytypes.indexOf(voteVisibility);
-                                                setVoteVisibility((selectedIndex + 1 === visibilitytypes.length) ? visibilitytypes[0] : visibilitytypes[selectedIndex + 1])
-                                            }}>
-                                                {voteVisibility === 'everyone' && (
-                                                    <WorldSVG data-tip="votes visible to everyone" />
-                                                )}
-                                                {voteVisibility === 'members' && (
-                                                    <GroupTiny data-tip="votes visible to other members" />
-                                                )}
-                                                {voteVisibility === 'self' && (
-                                                    <LockSVG data-tip="votes visible only to yourself" />
-                                                )}
-                                            </button>) :
-                                            null
-                                        }
+                                            <Popper
+                                                rightOnSmall={true}
+                                                button={
+                                                    <button className={`button_ inverted small mr-1`}>
+                                                        {visibility === 'everyone' && (
+                                                            <WorldSVG data-tip="votes visible to everyone" />
+                                                        )}
+                                                        {visibility === 'members' && (
+                                                            <GroupTiny data-tip="votes visible to other members" />
+                                                        )}
+                                                        {visibility === 'self' && (
+                                                            <LockSVG data-tip="votes visible only to yourself" />
+                                                        )}
+                                                    </button>
+                                                }
+                                                oulineInstead={true}
+                                                popperContent={
+                                                    <ul className="d-flex justify-content-start m-0 mx-2 flex-column pointer">
+                                                        <li
+                                                            className="d-flex align-items-center py-2"
+                                                        >
+                                                            <p className={`m-0`}>Your votes are visible to:</p>
+                                                        </li>
+                                                        {group.privacy !== 'private' ? (
+                                                            <li
+                                                                className="d-flex align-items-center py-2"
+                                                                onClick={() => editGroupMemberChannelRelation({
+                                                                    variables: {
+                                                                        UserHandle: liquidUser?.handle,
+                                                                        GroupHandle: group.handle,
+                                                                        Visibility: 'everyone'
+                                                                    }
+                                                                })}
+                                                            >
+                                                                <WorldSVG data-tip="votes visible to everyone" />
+                                                                <p className={`ml-2 m-0 ${visibility === 'everyone' && 'font-weight-bold'}`}>everyone</p>
+                                                            </li>
+                                                        ) : null}
+                                                        <li
+                                                            className="d-flex align-items-center py-2"
+                                                            onClick={() => editGroupMemberChannelRelation({
+                                                                variables: {
+                                                                    UserHandle: liquidUser?.handle,
+                                                                    GroupHandle: group.handle,
+                                                                    Visibility: 'members'
+                                                                }
+                                                            })}
+                                                        >
+                                                            <GroupTiny data-tip="votes visible to other members" />
+                                                            <p className={`ml-2 m-0 ${visibility === 'members' && 'font-weight-bold'}`}>other members</p>
+                                                        </li>
+                                                        <li
+                                                            className="d-flex align-items-center py-2"
+                                                            onClick={() => editGroupMemberChannelRelation({
+                                                                variables: {
+                                                                    UserHandle: liquidUser?.handle,
+                                                                    GroupHandle: group.handle,
+                                                                    Visibility: 'self'
+                                                                }
+                                                            })}
+                                                        >
+                                                            <LockSVG data-tip="votes visible only to yourself" />
+                                                            <p className={`ml-2 m-0 ${visibility === 'self' && 'font-weight-bold'}`}>only yourself</p>
+                                                        </li>
+                                                    </ul>
+                                                }
+                                            />
+
+
+                                            // <button className={`button_ inverted small mr-1`} onClick={() => {
+                                            //     const selectedIndex = availableVisibilitytypes.indexOf(visibility);
+
+                                            //     const nextVisibility = (selectedIndex + 1 === availableVisibilitytypes.length) ? availableVisibilitytypes[0] : availableVisibilitytypes[selectedIndex + 1];
+
+                                            //     console.log({
+                                            //         nextVisibility,
+                                            //         availableVisibilitytypes,
+                                            //         selectedIndex
+                                            //     })
+
+                                            //     editGroupMemberChannelRelation({
+                                            //         variables: {
+                                            //             UserHandle: liquidUser?.handle,
+                                            //             GroupHandle: group.handle,
+                                            //             Visibility: nextVisibility
+                                            //         }
+                                            //     })
+
+
+                                            //     // setVoteVisibility((selectedIndex + 1 === availableVisibilitytypes.length) ? availableVisibilitytypes[0] : availableVisibilitytypes[selectedIndex + 1])
+                                            // }}>
+                                            //     {visibility === 'everyone' && (
+                                            //         <WorldSVG data-tip="votes visible to everyone" />
+                                            //     )}
+                                            //     {visibility === 'members' && (
+                                            //         <GroupTiny data-tip="votes visible to other members" />
+                                            //     )}
+                                            //     {visibility === 'self' && (
+                                            //         <LockSVG data-tip="votes visible only to yourself" />
+                                            //     )}
+                                            // </button>) :
+                                            // null
+                                        ) : null}
 
                                         <button
                                             onClick={() => !!liquidUser ? editGroupMemberChannelRelation({
@@ -134,12 +231,6 @@ export const GroupInProfileList: FunctionComponent<{
                                             className={`button_ small ml-1 mb-0 ${isMember ? "selected" : ""}`}
                                             disabled={group.thisUserIsAdmin}
                                         >
-                                            {editGroupMemberChannelRelation_loading && (
-                                                <img
-                                                    className="vote-avatar mr-1 my-n2"
-                                                    src={'http://images.liquid-vote.com/system/loading.gif'}
-                                                />
-                                            )}
                                             {isMember ? `Joined${group.thisUserIsAdmin ? ' as Admin' : ''}` : "Join"}
                                         </button>
                                     </div>
