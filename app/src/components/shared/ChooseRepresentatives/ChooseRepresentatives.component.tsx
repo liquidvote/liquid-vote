@@ -140,6 +140,7 @@ export const ChooseRepresentatives: FunctionComponent<{ inviterHandle?: string }
                                 isRemoving={userHandlesRemoving.includes(r.handle)}
                                 buttonText="remove representation"
                                 buttonFunction={() => removeRepresentation(r)}
+                                groupHandle={modalData?.groupHandle}
                             />
                         ))}
                         {searchUsers?.
@@ -149,6 +150,7 @@ export const ChooseRepresentatives: FunctionComponent<{ inviterHandle?: string }
                                     key={r.handle}
                                     u={r}
                                     isAdding={true}
+                                    groupHandle={modalData?.groupHandle}
                                 />
                             ))
                         }
@@ -199,6 +201,7 @@ export const ChooseRepresentatives: FunctionComponent<{ inviterHandle?: string }
                                         // isRemoving={userHandlesRemoving.includes(u.handle)}
                                         buttonText="give representation"
                                         buttonFunction={() => giveRepresentation(u)}
+                                        groupHandle={modalData?.groupHandle}
                                     />
                                 )
                             )

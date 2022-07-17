@@ -264,6 +264,7 @@ export default function Question() {
                                     groupHandle={groupHandle}
                                     stats={c.stats}
                                     yourVote={c.yourVote}
+                                    yourStats={c?.yourStats}
                                 // maxVoteCount={maxVoteCount}
                                 />
                             </div>
@@ -274,7 +275,7 @@ export default function Question() {
                             groupHandle={groupHandle}
                             stats={question?.stats}
                             yourVote={question?.yourVote}
-                            showPercentages={true}
+                            yourStats={question?.yourStats}
                         />
                 }
 
