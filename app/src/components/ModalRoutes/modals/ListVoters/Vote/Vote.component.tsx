@@ -59,9 +59,8 @@ export const Vote: FunctionComponent<{
 
                     <div className="flex-fill">
                         <div className="mb-n1 flex-fill d-flex align-items-center justify-content-between">
-                            <div className="w-75">
-
-                                <div className="d-flex align-items-center">
+                            <div className="w-100">
+                                <div className="d-flex align-items-center justify-content-between">
                                     <Link to={`/profile/${v.user?.handle}`} className="d-block">
                                         <b className="mr-1">{v.user?.name}</b>
                                     </Link>
@@ -110,25 +109,11 @@ export const Vote: FunctionComponent<{
                                             representatives={userVote?.representatives}
                                             user={v.user}
                                             groupHandle={v?.groupChannel?.group}
+                                            when={timeAgo.format(new Date(Number(v?.lastEditOn)))}
                                         />
                                     </>
                                 </div>
                             </div>
-                            {(
-                                <div className="d-flex flex-column justify-content-end mw-25" style={{ flex: 1 }}>
-                                    <small className="text-right" data-tip={`Last vote by ${v?.user?.name} was`}>
-                                        {timeAgo.format(new Date(Number(v?.lastEditOn)))}
-                                    </small>
-                                    {/* <div className="d-flex justify-content-end">
-                                        <Link
-                                            to={`/group/${v.groupChannel?.group}`}
-                                            className="badge ml-1 mb-1 mt-1"
-                                        >
-                                            {v.groupChannel?.group}
-                                        </Link>
-                                    </div> */}
-                                </div>
-                            )}
                         </div>
                     </div>
                 </div>

@@ -31,6 +31,7 @@ export const QuestionTypeDefs = gql`
         # Count
         votersYouFollowCount: Float
         votersRepresentingYouCount: Float
+        usersYouAreRepresentingCount: Float
 
         # Time Weight
         votersYouFollowTimeWeight: Float

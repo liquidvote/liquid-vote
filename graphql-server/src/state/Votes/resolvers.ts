@@ -141,7 +141,8 @@ export const VoteResolvers = {
                         filterAfterYourVoteAndBooleans: [{
                             '$match': {
                                 position: "delegated",
-                                isDirect: false
+                                isDirect: false,
+                                'representatives.0': { $exists: true }
                             }
                         }],
                         // filterAfterMerge: [{
@@ -243,7 +244,7 @@ export const VoteResolvers = {
 
 
             // const writeToDebugFile = fs.writeFile(
-            //     process.cwd() + '/debug' + '/votes_'+type+'.json',
+            //     process.cwd() + '/debug' + '/votes_' + type + '.json',
             //     JSON.stringify(VotesSpecificAggregateLogic, null, 2),
             //     { encoding: 'utf8' }
             // );

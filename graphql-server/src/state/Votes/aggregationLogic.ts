@@ -117,68 +117,6 @@ export const VotersAgg = ({
                     'userVote': '$$ROOT',
                 }
             },
-
-            // {
-            //     '$unwind': {
-            //         'path': '$yourVote.representatives',
-            //         'preserveNullAndEmptyArrays': true
-            //     }
-            // }, {
-            //     '$lookup': {
-            //         'as': 'representativeUser',
-            //         'from': 'Users',
-            //         'localField': 'yourVote.representatives.representativeId',
-            //         'foreignField': '_id',
-            //     }
-            // }, {
-            //     '$addFields': {
-            //         'representativeUser': {
-            //             '$first': '$representativeUser.LiquidUser'
-            //         }
-            //     }
-            // }, {
-            //     '$addFields': {
-            //         'yourVote.representatives.representativeHandle': '$representativeUser.handle',
-            //         'yourVote.representatives.representativeName': '$representativeUser.name',
-            //         'yourVote.representatives.representativeAvatar': '$representativeUser.avatar'
-            //     }
-            // }, {
-            //     '$group': {
-            //         '_id': {
-            //             'user': '$user',
-            //             'questionText': '$questionText',
-            //             'choiceText': '$choiceText',
-            //             'groupChannel': '$groupChannel'
-            //         },
-            //         'questionText': { '$first': '$questionText' },
-            //         'choiceText': { '$first': '$choiceText' },
-            //         'groupChannel': { '$first': '$groupChannel' },
-            //         'lastEditOn': { '$first': '$lastEditOn' },
-            //         'userVote': { '$first': '$userVote' },
-            //         'yourVote': { '$first': '$yourVote' },
-            //         'youAndUserDetails': { '$first': '$youAndUserDetails' },
-            //         'yourVote_representatives': { '$push': '$yourVote.representatives' },
-            //         'user': { '$first': '$user' },
-            //     }
-            // }, {
-            //     '$addFields': {
-            //         'yourVote.representatives': {
-            //             '$filter': {
-            //                 'input': '$yourVote_representatives',
-            //                 'as': 'r',
-            //                 'cond': {
-            //                     "$gt": ["$$r", {}]
-            //                 }
-            //             }
-            //         }
-            //     }
-            // }, {
-            //     '$addFields': {
-            //         'yourVote.representatives': '$representatives'
-            //     }
-            // },
-
-
             {
                 '$addFields': {
                     'youAndUserDetails': {
@@ -191,6 +129,11 @@ export const VotersAgg = ({
                                 }, {
                                     '$eq': [
                                         '$yourVote.isDirect', true
+                                    ]
+                                },
+                                {
+                                    '$eq': [
+                                        '$yourVote.choiceText', choiceText
                                     ]
                                 }
                             ]
@@ -211,6 +154,11 @@ export const VotersAgg = ({
                                     '$eq': [
                                         '$position', '$yourVote.position'
                                     ]
+                                },
+                                {
+                                    '$eq': [
+                                        '$yourVote.choiceText', choiceText
+                                    ]
                                 }
                             ]
                         },
@@ -230,15 +178,22 @@ export const VotersAgg = ({
                                     '$ne': [
                                         '$position', '$yourVote.position'
                                     ]
+                                },
+                                {
+                                    '$eq': [
+                                        '$yourVote.choiceText', choiceText
+                                    ]
                                 }
                             ]
                         },
                         'yourVoteMadeByUser': {
                             $cond: {
+                                // if: false,
                                 if: {
                                     '$or': [
                                         { $not: ["$yourVote"] },
-                                        { $eq: ["$yourVote.isDirect", true] }
+                                        { $ne: ["$yourVote.choiceText", choiceText] },
+                                        { $ne: ["$isDirect", true] }
                                     ]
                                 },
                                 then: false,
@@ -267,7 +222,14 @@ export const VotersAgg = ({
                         },
                         'yourVoteMadeForUser': {
                             $cond: {
-                                if: { $eq: ["$isDirect", true] },
+                                // if: false,
+                                if: {
+                                    '$or': [
+                                        { $eq: ["$isDirect", true] },
+                                        { $ne: ["$yourVote.choiceText", choiceText] },
+                                        { $ne: ["$yourVote.isDirect", true] }
+                                    ]
+                                },
                                 then: false,
                                 else: {
                                     '$gte': [

@@ -91,10 +91,11 @@ export const Home: FunctionComponent<{}> = ({ }) => {
 
             <br />
 
-            <h4>What are the circles around User Avatars? Try it and see:</h4>
+            <h4>What are the circles around User Avatars?</h4>
+            <p>Try it and see:</p>
             <div className='d-flex align-items-center justify-content-center'>
                 <div className='p-5'>
-                    [Interactive Demo]
+                    [TODO: Interactive Demo]
                 </div>
             </div>
 
@@ -110,7 +111,7 @@ export const Home: FunctionComponent<{}> = ({ }) => {
             </p>
             <div className='d-flex align-items-center justify-content-center'>
                 <div className='p-5'>
-                    [Interactive Demo]
+                    [TODO: Interactive Demo]
                 </div>
             </div>
 

@@ -176,6 +176,12 @@ export const ListVoters: FunctionComponent<{}> = ({ }) => {
                     </div>
                 )}
 
+                { type === 'indirectVotesMadeForYou' && choice?.yourVote?.isDirect && votes_data?.Votes?.length  ? (
+                    <div className="p-2 text-center border-primary border rounded mt-n2 mb-3">
+                        Had you not voted, these would have been your representatives.
+                    </div>
+                ) : null}
+
                 <div>
                     {votes_data?.Votes?.map((n, i) => (
                         <Vote

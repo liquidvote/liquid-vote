@@ -435,6 +435,8 @@ export const UserResolvers = {
             const User = !!handle && await mongoDB.collection("Users")
                 .findOne({ 'LiquidUser.handle': handle });
 
+            const isYou = handle === AuthUser?.LiquidUser.handle;
+
             const UserGroupMemberRelations = !!User && await mongoDB.collection("GroupMembers")
                 .find({ 'userId': new ObjectId(User?._id), 'isMember': true })
                 .toArray();
@@ -451,6 +453,17 @@ export const UserResolvers = {
                         'isMember': true
                     })
                     .toArray();
+
+            
+            // visibility: self
+                // is self
+
+            // visibility: members
+                // you are member && visibility: members
+
+            // visibility: everyOne
+                // or visibility: undefined && group: public
+
 
             const Representative = await mongoDB.collection("Users")
                 .findOne({ 'LiquidUser.handle': representative });
@@ -494,10 +507,12 @@ export const UserResolvers = {
                                 }] : [],
                                 {
                                     $or: [
-                                        { privacy: 'public' },
+                                        { privacy: 'public' },  // and visibility: everyone
+                                        // you are member && visibility: members 
                                         ...!!YourGroupMemberRelations ? [
                                             { '_id': { '$in': YourGroupMemberRelations.map(r => new ObjectId(r.groupId)) } }
                                         ] : []
+                                        // is self && visibility: self
                                     ]
                                 }
                             ]

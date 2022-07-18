@@ -62,6 +62,7 @@ export const ListVotersMenu: FunctionComponent<{
                                                 choiceText,
                                                 groupHandle,
                                                 subsection: 'direct',
+                                                followsOnly: true
                                                 // subsubsection: 'foryou'
                                             })
                                         }
@@ -215,7 +216,7 @@ export const ListVotersMenu: FunctionComponent<{
                                         }
                                     }
                                 >
-                                    <b className="px-1 rounded">{numeral(yourStats?.votersYouFollowCount).format('0a[.]0')}</b> By Follows
+                                    <b className="px-1 rounded">{numeral(yourStats?.votersYouFollowCount).format('0a[.]0')}</b> By your follows
                                 </div>
                             </li>
                             <li className="nav-item">
@@ -323,7 +324,7 @@ export const ListVotersMenu: FunctionComponent<{
                                         }
                                     }
                                 >
-                                    {/* <b>{profile?.yourStats?.indirectVotesMadeByYou}</b> */}
+                                    <b>{yourStats?.usersYouAreRepresentingCount}</b>
                                     By you
                                     {/* <b>(🧪)</b> */}
                                 </div>

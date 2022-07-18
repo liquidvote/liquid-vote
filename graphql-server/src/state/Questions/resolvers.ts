@@ -17,23 +17,22 @@ export const QuestionResolvers = {
                 }))?.toArray())?.[0];
 
             // const writeToDebugFile = fs.writeFile(
-            //     process.cwd() + '/debug' + '/Question.json',
-            //     JSON.stringify({
-            //         QueryJSON: QuestionsAgg({
-            //             questionText,
-            //             group,
-            //             AuthUserId: AuthUser?._id,
-            //             userId: null
-            //         })
-            //     }, null, 2),
+            //     process.cwd() + '/debug' + '/Question' + questionText + '.json',
+            //     JSON.stringify(QuestionsAgg({
+            //         questionText,
+            //         group,
+            //         AuthUserId: AuthUser?._id,
+            //         userId: null
+            //     })
+            //         , null, 2),
             //     { encoding: 'utf8' }
             // );
 
-            console.log({ c: Question?.choices })
+            // console.log({ c: Question?.choices })
 
             return {
                 ...Question,
-                _id: Question?.id,
+                _id: 'Sole_Question' + Question?.id,
                 ...(Question?.questionType === 'single' && !!AuthUser) && {
                     yourVote: Question?.choices[0]?.yourVote
                 },
@@ -154,7 +153,7 @@ export const QuestionResolvers = {
 
             return (await Promise.all(Questions.map(async (q, i) => ({
                 ...q,
-                _id: q?.id,
+                _id: 'Question_InList_' + q?.id,
                 allowNewChoices: q.allowNewChoices || false, // TODO: this should be obsoleted
                 ...(q.questionType === 'single' && !!AuthUser) && {
                     yourVote: q?.choices[0]?.yourVote

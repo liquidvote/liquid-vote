@@ -126,6 +126,7 @@ export default function Question() {
                                     <Avatar
                                         person={r}
                                         type='vote'
+                                        groupHandle={groupHandle}
                                     />
                                 </Link>
                             ))}
@@ -319,12 +320,17 @@ export default function Question() {
                             {/* <small className="time-ago" data-tip="Last vote was"> */}
                             {!!question?.createdBy && (
                                 <Link to={`/profile/${question?.createdBy.handle}`}>
-                                    <div
+                                    <Avatar
+                                        person={question?.createdBy}
+                                        type='vote'
+                                        groupHandle={groupHandle}
+                                    />
+                                    {/* <div
                                         className="vote-avatar none mr-1"
                                         style={{
                                             background: question?.createdBy.avatar && `url(${question?.createdBy.avatar}) 50% 50% / cover no-repeat`
                                         }}
-                                    ></div>
+                                    ></div> */}
                                 </Link>
                             )}
                             {' '}launched{' '}

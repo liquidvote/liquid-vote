@@ -209,6 +209,7 @@ export const QuestionsAgg = ({
                 },
                 'yourVote_representatives': { '$push': '$yourVote.representatives' },
                 'yourStats_votersYouFollow': { '$push': '$yourStats.votersYouFollow' },
+                'yourStats_usersYouAreRepresentingCount': { '$sum': '$yourStats.usersYouAreRepresentingCount' },
                 'createdBy': {
                     '$first': '$createdBy'
                 },
@@ -232,7 +233,8 @@ export const QuestionsAgg = ({
                         'votersRepresentingYouCount': { '$size': '$yourVote_representatives' },
                         'votersYouFollowTimeWeight': '$yourStats_votersYouFollowTimeWeight',
                         'votersRepresentingYouTimeWeight': '$yourStats_votersRepresentingYouTimeWeight',
-                        'votersYouFollowOrRepresentingYouTimeWeight': { '$add' : [ '$yourStats_votersYouFollowTimeWeight', '$yourStats_votersRepresentingYouTimeWeight' ] }
+                        'votersYouFollowOrRepresentingYouTimeWeight': { '$add': ['$yourStats_votersYouFollowTimeWeight', '$yourStats_votersRepresentingYouTimeWeight'] },
+                        'usersYouAreRepresentingCount': '$yourStats_usersYouAreRepresentingCount',
                     }
                 }
             },
@@ -368,7 +370,21 @@ const getYourVoteRepresentativesUsers_On_QuestionsAgg = ({ AuthUserId }) => [
         }
     }, {
         '$addFields': {
-            'yourVote.representatives': '$yourVote_Representatives'
+            'yourVote.representatives': {
+                '$filter': {
+                    'input': '$yourVote_Representatives',
+                    'as': 'r',
+                    'cond': {
+                        '$and': [
+                            {
+                                '$ne': [
+                                    '$$r.position', 'delegated'
+                                ]
+                            }
+                        ]
+                    }
+                }
+            },
         }
     }, {
         '$sort': { 'i': 1 }
@@ -447,6 +463,7 @@ const mergedYourVoteUniqueRepresentatives = [
             'yourStats_votersYouFollow': { '$first': '$root.yourStats_votersYouFollow' },
             'yourStats_votersRepresentingYouTimeWeight': { '$sum': '$root.yourVote_representatives.vote.inverseDaysAgo' },
             'yourStats_votersYouFollowTimeWeight': { '$first': '$root.yourStats_votersYouFollowTimeWeight' },
+            'yourStats_usersYouAreRepresentingCount': { '$first': '$root.yourStats_usersYouAreRepresentingCount' },
             'createdBy': {
                 '$first': '$root.createdBy'
             },
@@ -529,6 +546,7 @@ const mergedYourStatsVotersYouFollow = [
             'yourStats_votersYouFollow': { '$push': '$root.yourStats_votersYouFollow' },
             'yourStats_votersYouFollowTimeWeight': { '$sum': '$root.yourStats_votersYouFollow.vote.inverseDaysAgo' },
             'yourStats_votersRepresentingYouTimeWeight': { '$first': '$root.yourStats_votersRepresentingYouTimeWeight' },
+            'yourStats_usersYouAreRepresentingCount': { '$first': '$root.yourStats_usersYouAreRepresentingCount' },
             'createdBy': {
                 '$first': '$root.createdBy'
             },
@@ -684,12 +702,88 @@ const yourStats = ({ AuthUserId }) => [
             }
         },
         {
+            '$lookup': {
+                as: "usersYouAreRepresenting",
+                from: "Votes",
+                let: {
+                    'loggedInUser': AuthUserId,
+                    "questionText": "$questionText",
+                    "choiceText": "$choiceText",
+                    "group": "$groupChannel.group"
+                },
+                'pipeline': [
+                    {
+                        '$match': {
+                            '$and': [
+                                { 'isDirect': false },
+                                { 'position': { $ne: null } },
+                                {
+                                    '$expr': {
+                                        '$eq': [
+                                            '$questionText', '$$questionText'
+                                        ]
+                                    }
+                                },
+                                {
+                                    '$expr': {
+                                        '$eq': [
+                                            '$choiceText', '$$choiceText'
+                                        ]
+                                    }
+                                },
+                                {
+                                    '$expr': {
+                                        '$eq': [
+                                            '$groupChannel.group', '$$group'
+                                        ]
+                                    }
+                                },
+                            ]
+                        }
+                    },
+                    {
+                        '$match': {
+                            '$expr': {
+                                '$gte': [
+                                    {
+                                        '$size': {
+                                            '$filter': {
+                                                'input': '$representatives',
+                                                'as': 'r',
+                                                'cond': {
+                                                    '$and': [
+                                                        {
+                                                            '$eq': [
+                                                                '$$r.representativeId', {
+                                                                    '$toObjectId': '$$loggedInUser'
+                                                                }
+                                                            ]
+                                                        },
+                                                        {
+                                                            '$ne': [
+                                                                '$$r.position', 'delegated'
+                                                            ]
+                                                        }
+                                                    ]
+                                                }
+                                            }
+                                        }
+                                    }, 1
+                                ]
+                            }
+                        }
+                    }
+                ]
+            }
+        },
+        {
             '$addFields': {
                 'yourStats': {
                     'votersYouFollow': '$votersYouFollow',
                     'votersYouFollowCount': { '$size': '$votersYouFollow' },
                     'votersRepresentingYou': '$yourVote.representatives',
                     'votersRepresentingYouCount': { '$size': '$yourVote.representatives' },
+                    'usersYouAreRepresentingCount': { '$size': '$usersYouAreRepresenting' },
                 }
             }
         },

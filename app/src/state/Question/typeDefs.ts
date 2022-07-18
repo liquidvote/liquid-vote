@@ -43,6 +43,7 @@ export const QUESTION = gql`
                 yourStats {
                     votersYouFollowCount
                     votersRepresentingYouCount
+                    usersYouAreRepresentingCount
                     votersYouFollowTimeWeight
                     votersRepresentingYouTimeWeight
                     votersYouFollow {
@@ -113,6 +114,7 @@ export const QUESTION = gql`
             yourStats {
                 votersYouFollowCount
                 votersRepresentingYouCount
+                usersYouAreRepresentingCount
                 votersYouFollowTimeWeight
                 votersRepresentingYouTimeWeight
                 votersYouFollow {
@@ -270,6 +272,7 @@ export const QUESTIONS = gql`
             yourStats {
                 votersYouFollowCount
                 votersRepresentingYouCount
+                usersYouAreRepresentingCount
                 votersYouFollowTimeWeight
                 votersRepresentingYouTimeWeight
                 votersYouFollow {
