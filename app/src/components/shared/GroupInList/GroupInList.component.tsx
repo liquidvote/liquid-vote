@@ -101,7 +101,7 @@ export const GroupInList: FunctionComponent<{
                                                         <li
                                                             className="d-flex align-items-center py-2"
                                                         >
-                                                            <p className={`m-0`}>Your votes and cause membership are visible to:</p>
+                                                            <p className={`m-0`}>Your votes and membership are visible to:</p>
                                                         </li>
                                                         {group.privacy !== 'private' ? (
                                                             <li

@@ -161,8 +161,9 @@ export const Feed: FunctionComponent<{}> = ({ }) => {
                 )}
 
                 {questions_loading && (
-                    <div className="d-flex align-items-center justify-content-center min-vh-100 mt-n5">
+                    <div className="d-flex align-items-center justify-content-center min-vh-100 mt-n5 flex-column">
                         <DropAnimation />
+                        <p className='mt-4'>The Feed Query takes up to 10s for now, sorry 🧪</p>
                     </div>
                 )}
             </div>
