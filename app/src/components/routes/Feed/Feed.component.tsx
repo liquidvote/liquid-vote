@@ -23,7 +23,7 @@ export const Feed: FunctionComponent<{}> = ({ }) => {
     const { user: yourUser } = useUser({ userHandle: liquidUser?.handle });
     const { loginWithPopup } = useAuth0();
 
-    console.log({ yourUser });
+    // console.log({ yourUser });
 
     const {
         loading: questions_loading,
@@ -38,11 +38,11 @@ export const Feed: FunctionComponent<{}> = ({ }) => {
         skip: !liquidUser || !yourUser?.stats?.following
     });
 
-    console.log({
-        liquidUser,
-        section,
-        questions_data
-    });
+    // console.log({
+    //     liquidUser,
+    //     section,
+    //     questions_data
+    // });
 
     return (
         <>

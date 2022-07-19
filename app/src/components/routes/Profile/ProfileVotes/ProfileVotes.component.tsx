@@ -67,9 +67,9 @@ export const ProfileVotes: FunctionComponent<{}> = ({ }) => {
         // fetchPolicy: "no-cache"
     });
 
-    console.log({
-        user_votes_data
-    });
+    // console.log({
+    //     user_votes_data
+    // });
 
     return (
         <>

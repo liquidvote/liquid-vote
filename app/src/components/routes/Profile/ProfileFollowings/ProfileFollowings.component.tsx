@@ -13,7 +13,7 @@ export const ProfileFollowings: FunctionComponent<{}> = ({ }) => {
 
     let { which, handle } = useParams<any>();
 
-    console.log({  which, handle });
+    // console.log({  which, handle });
 
     const {
         loading: user_loading,
@@ -42,7 +42,7 @@ export const ProfileFollowings: FunctionComponent<{}> = ({ }) => {
         variables: { handle }
     });
 
-    console.log({ user_following_data, user_followed_by_data });
+    // console.log({ user_following_data, user_followed_by_data });
 
     const profile = user_data?.User;
 

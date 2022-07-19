@@ -46,7 +46,7 @@ export default function useSearchParams_() {
             paramsToAdd
         })
 
-        console.log({ newParams });
+        // console.log({ newParams });
 
         setSearchParams(newParams);
     }

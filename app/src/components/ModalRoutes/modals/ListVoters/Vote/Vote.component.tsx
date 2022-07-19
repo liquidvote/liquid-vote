@@ -23,8 +23,6 @@ export const Vote: FunctionComponent<{
     hideChoicesBesides
 }) => {
 
-        console.log({ v });
-
         const { user, user_refetch } = useUser({
             userHandle: v.user.handle,
             groupHandle: v?.question.group.handle

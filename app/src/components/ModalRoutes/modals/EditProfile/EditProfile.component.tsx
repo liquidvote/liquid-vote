@@ -71,14 +71,14 @@ export const EditProfile: FunctionComponent<{}> = ({ }) => {
             cover: typeof values.cover === 'string' ? values.cover : await uploadFile({ file: values.cover })
         };
 
-        console.log({ User });
+        // console.log({ User });
 
         editUser({
             variables: {
                 User
             }
         }).then((r) => {
-            console.log({ r })
+            // console.log({ r })
         });
     }
 

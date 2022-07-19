@@ -60,9 +60,9 @@ export const EditQuestion: FunctionComponent<{}> = ({ }) => {
         skip: modalData.questionText === "new"
     });
 
-    console.log({
-        question_data
-    });
+    // console.log({
+    //     question_data
+    // });
 
     const [editQuestion, {
         loading: editQuestion_loading,

@@ -30,7 +30,7 @@ export const ProfilePolls: FunctionComponent<{ userHandle: string, user: any }> 
         skip: !userHandle
     });
 
-    console.log({ questions_data });
+    // console.log({ questions_data });
 
     return (
         <div className="mt-3">

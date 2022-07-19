@@ -39,7 +39,7 @@ export const GroupPolls: FunctionComponent<{
             }
         }, [allSearchParams.refetch]);
 
-        console.log({ questions_data });
+        // console.log({ questions_data });
 
         return (
             <>

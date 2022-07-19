@@ -37,7 +37,7 @@ export const GroupInProfileList: FunctionComponent<{
 
         const { user: userWithMoreData } = useUser({ userHandle: user.handle, groupHandle: group.handle });
 
-        console.log({ user, userWithMoreData });
+        // console.log({ user, userWithMoreData });
 
         const [editGroupMemberChannelRelation, {
             loading: editGroupMemberChannelRelation_loading,

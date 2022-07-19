@@ -25,7 +25,8 @@ export const Choice: FunctionComponent<{
     showPercentages?: boolean,
     showChart?: boolean,
     maxVoteCount?: number,
-    user?: any
+    user?: any,
+    extraRefetchQueries?: any,
 }> = ({
     choiceText,
     voteName,
@@ -38,7 +39,8 @@ export const Choice: FunctionComponent<{
     showPercentages,
     showChart = true,
     maxVoteCount,
-    user
+    user,
+    extraRefetchQueries
 }) => {
 
         const { allSearchParams, updateParams } = useSearchParams();
@@ -51,14 +53,22 @@ export const Choice: FunctionComponent<{
             data: editVote_data,
         }] = useMutation(EDIT_VOTE, {
             ...!!user && {
-                refetchQueries: () => [{
-                    query: USER,
-                    variables: {
-                        handle: user.handle,
-                        groupHandle
+                refetchQueries: () => [
+                    {
+                        query: USER,
+                        variables: {
+                            handle: user.handle,
+                            groupHandle
+                        },
                     },
-                }],
-            }
+                    ...extraRefetchQueries ? extraRefetchQueries : []
+                ],
+            },
+            ...!user && extraRefetchQueries && {
+                refetchQueries: () => [
+                    ...extraRefetchQueries ? extraRefetchQueries : []
+                ],
+            },
         });
 
         const yourVote_ = editVote_data ? editVote_data?.editVote : yourVote;
@@ -134,6 +144,10 @@ export const Choice: FunctionComponent<{
             //     ?.filter((u: any) => !yourStats?.votersYouFollow?.filter((r: any) => r?.vote?.position === 'against').find((u: any) => u.handle === u.handle))
             // || []
         ];
+
+        const representeeVotesCount = editVote_data ?
+            editVote_data?.editVote?.representeeVotes?.filter(v => v.isDirect === false)?.length :
+            yourStats?.usersYouAreRepresentingCount;
 
         // console.log({
         //     yourVote,
@@ -296,30 +310,28 @@ export const Choice: FunctionComponent<{
                                             groupHandle={groupHandle}
                                             type={inList ? 'tiny' : 'vote'}
                                         />
-
-                                        {/* <div
-                                            onClick={
-                                                e => {
-                                                    e.stopPropagation();
-                                                    updateParams({
-                                                        paramsToAdd: {
-                                                            modal: "ListVoters",
-                                                            modalData: JSON.stringify({
-                                                                questionText: voteName,
-                                                                choiceText,
-                                                                groupHandle,
-                                                                subsection: 'represented',
-                                                                subsubsection: 'byyou'
-                                                            })
-                                                        }
-                                                    })
+                                        {representeeVotesCount ? (
+                                            <div
+                                                onClick={
+                                                    e => {
+                                                        e.stopPropagation();
+                                                        updateParams({
+                                                            paramsToAdd: {
+                                                                modal: "ListVoters",
+                                                                modalData: JSON.stringify({
+                                                                    questionText: voteName,
+                                                                    choiceText,
+                                                                    groupHandle,
+                                                                    subsection: 'represented',
+                                                                    subsubsection: 'byyou'
+                                                                })
+                                                            }
+                                                        })
+                                                    }
                                                 }
-                                            }
-                                            // to={`/${choiceText ? 'multipoll' : 'poll'}/${voteName}/${groupHandle}/timeline/representingYou`}
-                                            // onClick={e => e.stopPropagation()}
-                                            className={`text-decoration-none count for ml-n2 ${inList ? 'tiny-avatar' : 'vote-avatar'}`}
-                                        >{yourVote_.representee.length}</div> */}
-
+                                                className={`text-decoration-none count for ml-n2 ${inList ? 'tiny-avatar' : 'vote-avatar'}`}
+                                            >{representeeVotesCount}</div>
+                                        ) : null}
                                     </div>
                                 )}
                             </div>
@@ -489,6 +501,29 @@ export const Choice: FunctionComponent<{
                                             groupHandle={groupHandle}
                                             type={inList ? 'tiny' : 'vote'}
                                         />
+
+                                        {representeeVotesCount ? (
+                                            <div
+                                                onClick={
+                                                    e => {
+                                                        e.stopPropagation();
+                                                        updateParams({
+                                                            paramsToAdd: {
+                                                                modal: "ListVoters",
+                                                                modalData: JSON.stringify({
+                                                                    questionText: voteName,
+                                                                    choiceText,
+                                                                    groupHandle,
+                                                                    subsection: 'represented',
+                                                                    subsubsection: 'byyou'
+                                                                })
+                                                            }
+                                                        })
+                                                    }
+                                                }
+                                                className={`text-decoration-none count against ml-n2 ${inList ? 'tiny-avatar' : 'vote-avatar'}`}
+                                            >{representeeVotesCount}</div>
+                                        ) : null}
                                     </div>
                                 )}
 

@@ -25,9 +25,9 @@ export const QuestionsVotersAlsoVotedOn: FunctionComponent<{}> = ({ }) => {
         }
     });
 
-    console.log({
-        questions_data
-    });
+    // console.log({
+    //     questions_data
+    // });
 
     return (
         <div className="mt-3">

@@ -123,6 +123,27 @@ export const ListVoters: FunctionComponent<{}> = ({ }) => {
                     inList={true}
                     showChart={true}
                     yourStats={choice?.yourStats}
+                    extraRefetchQueries={[
+                        {
+                            query: VOTES,
+                            variables: {
+                                questionText,
+                                choiceText,
+                                groupHandle,
+                                handleType: 'user',
+                                type,
+                                sortBy,
+                                followsOnly
+                            },
+                        },
+                        {
+                            query: QUESTION,
+                            variables: {
+                                questionText,
+                                group: groupHandle,
+                            },
+                        }
+                    ]}
                 />
             </div>
             <div className="">
@@ -176,7 +197,7 @@ export const ListVoters: FunctionComponent<{}> = ({ }) => {
                     </div>
                 )}
 
-                { type === 'indirectVotesMadeForYou' && choice?.yourVote?.isDirect && votes_data?.Votes?.length  ? (
+                {type === 'indirectVotesMadeForYou' && choice?.yourVote?.isDirect && votes_data?.Votes?.length ? (
                     <div className="p-2 text-center border-primary border rounded mt-n2 mb-3">
                         Had you not voted, these would have been your representatives.
                     </div>

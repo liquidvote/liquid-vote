@@ -236,6 +236,7 @@ export const QUESTIONS = gql`
                     ...vote
                 }
                 yourStats {
+                  usersYouAreRepresentingCount
                   votersYouFollow {
                     handle
                     avatar

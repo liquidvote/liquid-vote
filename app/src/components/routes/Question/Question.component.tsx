@@ -60,7 +60,7 @@ export default function Question() {
         groupHandle
     });
 
-    console.log({ representatives });
+    // console.log({ representatives });
 
     const question = question_data?.Question;
 
