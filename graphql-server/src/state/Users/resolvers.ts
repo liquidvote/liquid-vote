@@ -174,7 +174,7 @@ export const UserResolvers = {
             //     { encoding: 'utf8' }
             // );
 
-            const isUser = AuthUser?._id.toString() === User?._id.toString();
+            const isUser = !!AuthUser && AuthUser?._id?.toString() === User?._id?.toString();
 
             return !!User ? {
                 id: User?.LiquidUser?.handle + groupHandle,
@@ -435,7 +435,7 @@ export const UserResolvers = {
             const User = !!handle && await mongoDB.collection("Users")
                 .findOne({ 'LiquidUser.handle': handle });
 
-            const isYou = handle === AuthUser?.LiquidUser.handle;
+            const isYou = handle === AuthUser?.LiquidUser?.handle;
 
             const UserGroupMemberRelations = !!User && await mongoDB.collection("GroupMembers")
                 .find({ 'userId': new ObjectId(User?._id), 'isMember': true })
