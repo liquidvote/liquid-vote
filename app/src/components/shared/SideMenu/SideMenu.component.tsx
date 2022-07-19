@@ -3,7 +3,7 @@ import { Link, useLocation } from "react-router-dom";
 import { useAuth0 } from "@auth0/auth0-react";
 import { useQuery } from "@apollo/client";
 
-import HomeSvg from "@shared/Icons/Home.svg";
+import FeedSVG from "@shared/Icons/Feed.svg";
 import RippleDrop from "@shared/Icons/RippleDrop.svg";
 import DropPlusSVG from "@shared/Icons/Drop+.svg";
 import NotificationSvg from "@shared/Icons/Notification.svg";
@@ -51,8 +51,8 @@ export const SideMenu: FunctionComponent<{}> = ({ }) => {
             <Link to="/" className="hide-on-smaller-sideMenu">
                 <RippleDrop />
             </Link>
-            <Link to="/home" data-tip="Home">
-                <HomeSvg />
+            <Link to="/home" data-tip="Following Feed">
+                <FeedSVG />
             </Link>
             {/* {isAuthenticated && user && (
                 <>

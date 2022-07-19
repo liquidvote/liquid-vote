@@ -47,7 +47,7 @@ export const Feed: FunctionComponent<{}> = ({ }) => {
     return (
         <>
             <Header
-                title="Home"
+                title="Following Feed"
             // rightElement={
             //     () => <VoteSortPicker updateSortInParent={setSortBy} initialSort={sortBy} />
             // }
