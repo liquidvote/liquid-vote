@@ -239,7 +239,7 @@ export const GroupInProfileList: FunctionComponent<{
                         </div>
                     </div>
 
-                    <div className='d-flex align-items-stretch mt-1 pb-3'>
+                    <div className='d-flex align-items-stretch mt-1 pb-3 mx-n1'>
                         <Link
                             className="position-relative mt-n1"
                             to={isSelected ? `/profile/${user.handle}/groups` : `/profile/${user.handle}/cause/${group.handle}`}
@@ -262,7 +262,7 @@ export const GroupInProfileList: FunctionComponent<{
                                 >
                                     {
                                         (userWithMoreData?.groupStats?.stats?.representedBy || userWithMoreData?.groupStats?.stats?.representing) ?
-                                            <div className='d-flex align-items-center mb-1 ml-1'>
+                                            <div className='d-flex align-items-center mb-1'>
 
                                                 <small className='primary-color d-flex'>
                                                     <>
@@ -273,7 +273,7 @@ export const GroupInProfileList: FunctionComponent<{
                                                                     <>
 
                                                                         <Link to={`/profile-people/${user.handle}/representedBy`} className="mr-1">
-                                                                            represents{' '}<b className="white ml-1">{userWithMoreData?.groupStats?.stats?.representedBy}</b>
+                                                                            represents{' '}<b className="white mr-1">{userWithMoreData?.groupStats?.stats?.representedBy}</b>
                                                                         </Link>
                                                                     </>
                                                                 ) : null}
@@ -297,7 +297,7 @@ export const GroupInProfileList: FunctionComponent<{
                                                     className={`
                                                         d-flex align-items-center ${(group.youToHimRepresentativeRelation?.isRepresentingYou ||
                                                             group.representativeRelation?.isRepresentingYou
-                                                        ) ? 'ml-1' : 'd-none'}
+                                                        ) ? '' : 'd-none'}
                                                     `}
                                                 >
                                                     {group.representativeRelation?.isRepresentingYou &&
@@ -330,11 +330,11 @@ export const GroupInProfileList: FunctionComponent<{
                                     }
 
                                     <div className="d-flex align-items-center">
-                                        <small className={`d-flex mr-1 button_ small ${isSelected && 'inverted'}`}>
+                                        <small className={`d-flex`}>
                                             <b className='white'>
                                                 {' '}{group?.userStats?.directVotesMade} votes
-                                                {' '}
-                                                {isSelected ? '⬆' : '⬇'}
+                                                {/* {' '} */}
+                                                {/* {isSelected ? '⬆' : '⬇'} */}
                                             </b>
                                         </small>
                                         {!!group?.yourUserStats?.directVotesInCommon ? (
@@ -343,17 +343,21 @@ export const GroupInProfileList: FunctionComponent<{
                                                 <small className="d-flex mb-0">
                                                     <b className='white mr-1'>{' '}{group?.yourUserStats?.directVotesInCommon}</b> in common
                                                 </small> */}
-
-                                                <small className="d-flex align-items-center ml-1">
-                                                    <b className='white mr-1 forDirect p-1 rounded'>{' '}{group?.yourUserStats?.directVotesInAgreement} </b> in agreement
+                                                ・
+                                                <small className="d-flex align-items-center">
+                                                    <b className='white mr-1 forDirect px-1 rounded'>{' '}{group?.yourUserStats?.directVotesInAgreement} </b> same
                                                 </small>
                                                 ・
                                                 <small className="d-flex align-items-center">
-                                                    <b className='white mr-1 againstDirect p-1 rounded'>{' '}{group?.yourUserStats?.directVotesInDisagreement}</b> in disagreement
+                                                    <b className='white mr-1 againstDirect px-1 rounded'>{' '}{group?.yourUserStats?.directVotesInDisagreement}</b> differ
                                                 </small>
                                             </>
                                         ) : <span className='opacity-0'>・</span>}
                                     </div>
+
+                                    <small className='d-flex white mt-2'>
+                                        <a className='link white pointer underline'>{isSelected ? 'hide' : 'show'} votes</a>
+                                    </small>
                                 </Link>
                             </div>
                         </div>

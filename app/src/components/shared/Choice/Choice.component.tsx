@@ -411,7 +411,7 @@ export const Choice: FunctionComponent<{
                                 {(
                                     user && userVote?.position === "against" && (
                                         <div
-                                            className={`vote-avatar against ml-n2 ${inList && 'tiny'} pointer`}
+                                            className={`against ml-n2 ${inList ? 'tiny-avatar' : 'vote-avatar'} pointer`}
                                             style={{ background: `url(${user.avatar}) 50% 50% / cover no-repeat` }}
                                         ></div>
                                     )

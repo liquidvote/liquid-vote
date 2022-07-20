@@ -186,7 +186,7 @@ export const GroupInList: FunctionComponent<{
                             ...group?.stats?.mostRepresentingMembers.filter(
                                 (m: any) => !group.yourStats?.membersYouFollow.find((mm: any) => mm.handle === m.handle)
                             )
-                        ].slice(0, 7).map((m: any) => (
+                        ].slice(0, 3).map((m: any) => (
                             <Link
                                 key={m.handle + group.handle}
                                 to={`/profile/${m.handle}/cause/${group.handle}`}

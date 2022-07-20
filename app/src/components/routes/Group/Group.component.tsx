@@ -265,7 +265,7 @@ export const Group: FunctionComponent<{}> = ({ }) => {
                                 </div>
                             </div>
                             {liquidUser ? (
-                                <div className='d-flex ml-n2 mt-2'>
+                                <div className='d-flex ml-n2 mt-2 align-items-center'>
                                     {group.yourStats?.membersYouFollow?.length ? (
                                         <>
                                             {[
