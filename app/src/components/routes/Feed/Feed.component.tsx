@@ -125,45 +125,51 @@ export const Feed: FunctionComponent<{}> = ({ }) => {
                 ))}
 
                 {!liquidUser && (
-                    <div className="p-4 text-center">
-                        <h3>Login to see what your friends are voting on</h3>
+                    <div className="d-flex align-items-center justify-content-center min-vh-100 mt-n5 flex-column">
+                        <div className="p-4 text-center">
+                            <h3>Login to see what your friends are voting on</h3>
 
-                        <div className="d-flex align-items-center justify-content-center">
-                            <div
-                                className="button_ mx-5 my-4"
-                                onClick={loginWithPopup}
-                            >
-                                Log In
-                            </div>
-                            or
-                            <div
-                                className="button_ mx-5 my-4"
-                                onClick={loginWithPopup}
-                            >
-                                Sign Up
+                            <div className="d-flex align-items-center justify-content-center">
+                                <div
+                                    className="button_ mx-5 my-4"
+                                    onClick={loginWithPopup}
+                                >
+                                    Log In
+                                </div>
+                                or
+                                <div
+                                    className="button_ mx-5 my-4"
+                                    onClick={loginWithPopup}
+                                >
+                                    Sign Up
+                                </div>
                             </div>
                         </div>
                     </div>
                 )}
 
                 {liquidUser && !yourUser?.stats?.following && (
-                    <div className="p-4 text-center">
-                        <h3>Liquid Vote is more fun with friends.</h3>
+                    <div className="d-flex align-items-center justify-content-center min-vh-100 mt-n5 flex-column">
+                        <div className="p-4 text-center">
+                            <h3>Liquid Vote is more fun with friends.</h3>
 
-                        <p>Follow people to see here what they are voting on.</p>
+                            <p>Follow people to see here what they are voting on.</p>
+                        </div>
                     </div>
                 )}
 
                 {questions_data?.Questions?.length === 0 && (
-                    <div className="p-4 text-center">
-                        The people you follow haven't voted yet, at least not in any public groups, or groups you have joined yet
+                    <div className="d-flex align-items-center justify-content-center min-vh-100 mt-n5 flex-column">
+                        <div className="p-4 text-center">
+                            The people you follow haven't voted yet, at least not in any public groups, or groups you have joined yet
+                        </div>
                     </div>
                 )}
 
                 {questions_loading && (
                     <div className="d-flex align-items-center justify-content-center min-vh-100 mt-n5 flex-column">
                         <DropAnimation />
-                        <p className='mt-4'>The Feed Query takes up to 10s for now, sorry 🧪</p>
+                        {/* <p className='mt-4'>The Feed Query takes up to 10s for now, sorry 🧪</p> */}
                     </div>
                 )}
             </div>

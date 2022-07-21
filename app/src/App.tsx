@@ -78,7 +78,7 @@ export default function App() {
                             <Route path="/group/:handle/:section" element={<Loader component={<Group />} />} />
                             <Route path="/group/:handle" element={<Loader component={<Group />} />} />
                             <Route path="/group-people/:handle/:which" element={<Loader component={<GroupPeople />} />} />
-                            <Route path="/" element={<Loader component={<Home />} />} />
+                            <Route path="/" element={<Loader component={<Feed />} />} />
                         </Routes>
                         <div className="p-4 d-md-none"></div>
                     </div>

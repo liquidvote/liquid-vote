@@ -299,7 +299,7 @@ export const EditQuestion: FunctionComponent<{}> = ({ }) => {
                                 />
                             ))('allowNewChoices')}
                         </div>
-                        <div className="my-3 mt-4">
+                        {/* <div className="my-3 mt-4">
                             {((name: any) => (
                                 <ToggleInput
                                     name={name}
@@ -323,7 +323,7 @@ export const EditQuestion: FunctionComponent<{}> = ({ }) => {
                                 // disabled={modalData.questionText !== "new"}
                                 />
                             ))('allowMultipleVotes')}
-                        </div>
+                        </div> */}
 
                     </>
                 ) : null}
