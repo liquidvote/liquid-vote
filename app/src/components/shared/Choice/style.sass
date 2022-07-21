@@ -2,11 +2,22 @@
 .choice-text
     min-width: 100px
 
+.c-on-tiny, .cr-on-tiny
+    align-items: center
+
 .not-in-list
     .c-on-tiny
         @media (max-width: 400px)
             flex-direction: column
+            align-items: start
+
+            .forbtn
+                margin-bottom: 7px
 
     .cr-on-tiny
         @media (max-width: 400px)
             flex-direction: column-reverse
+            align-items: end
+
+            .againstbtn
+                margin-bottom: 7px

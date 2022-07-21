@@ -5,6 +5,7 @@ import React, {
     useEffect
 } from 'react';
 import { FieldError } from 'react-hook-form';
+import Choice from "@shared/Choice";
 
 import GroupSVG from "@shared/Icons/Group-small.svg";
 
@@ -39,7 +40,7 @@ export const MultiChoices: FunctionComponent<Props> = ({
 
     const handleChoiceChange = ({ i, text }: { i: number, text: string }) => {
         console.log({
-            i, 
+            i,
             text,
             value
         });
@@ -69,23 +70,38 @@ export const MultiChoices: FunctionComponent<Props> = ({
                     name={name}
                     type={'input'}
                     disabled={disabled}
-                    // autoFocus={autoFocus || false}
+                // autoFocus={autoFocus || false}
                 />
 
                 <div className="d-flex justify-content-between m-2">
-                    <div className="d-flex align-items-center cursor flex-wrap mt-4 w-100">
+                    <div className="d-flex align-items-center cursor flex-wrap mt-4 flex-row">
                         {value?.map((c, i) => (
-                            <input
-                                key={'option' + i}
-                                className="choice"
-                                placeholder={`Choice ${i + 1}${i > 1 ? ' (optional)' : ''}`}
-                                onBlur={() => setIsFocused(false)}
-                                onFocus={() => setIsFocused(true)}
-                                onChange={e => handleChoiceChange({ i, text: e.target.value })}
-                                value={value[i]?.text}
-                                maxLength={20}
-                                disabled={disabled}
-                            />
+                            <div className='w-100 py-2'>
+                                <input
+                                    key={'option' + i}
+                                    className="choice"
+                                    placeholder={`Choice ${i + 1}${i > 1 ? ' (optional)' : ''}`}
+                                    onBlur={() => setIsFocused(false)}
+                                    onFocus={() => setIsFocused(true)}
+                                    onChange={e => handleChoiceChange({ i, text: e.target.value })}
+                                    value={value[i]?.text}
+                                    maxLength={20}
+                                    disabled={disabled}
+                                />
+                                <div className='faded no-events'>
+                                    <Choice
+                                        voteName={'l.questionText'}
+                                        groupHandle={null}
+                                        stats={null}
+                                        yourVote={null}
+                                        userVote={null}
+                                        user={null}
+                                        inList={true}
+                                        showChart={true}
+                                        yourStats={null}
+                                    />
+                                </div>
+                            </div>
                         ))}
                     </div>
                 </div>

@@ -244,9 +244,9 @@ export const Choice: FunctionComponent<{
 
                 {showChart && (
                     <div className="d-flex d-flex justify-content-between mt-1">
-                        <div className="d-flex align-items-center c-on-tiny">
+                        <div className="d-flex c-on-tiny">
                             <div
-                                className={`button_ forDirectBorder justify-content-between min-w mr-1 ${yourVote_?.position === 'for' && 'forDirectBg'} ${inList && 'small'}`}
+                                className={`forbtn button_ forDirectBorder justify-content-between min-w mr-1 ${yourVote_?.position === 'for' && 'forDirectBg'} ${inList && 'small'}`}
                                 onClick={() => handleUserVote('for')}
                             >
                                 <span className="mr-1">
@@ -392,7 +392,7 @@ export const Choice: FunctionComponent<{
                             />
                         )}
 
-                        <div className="d-flex align-items-center cr-on-tiny">
+                        <div className="d-flex cr-on-tiny">
                             <div className="d-flex ml-2" data-tip={`Voted Nay`}>
                                 {
                                     (
@@ -411,7 +411,7 @@ export const Choice: FunctionComponent<{
                                 {(
                                     user && userVote?.position === "against" && (
                                         <div
-                                            className={`against ml-n2 ${inList ? 'tiny-avatar' : 'vote-avatar'} pointer`}
+                                            className={`vote-avatar against ml-n2 ${inList ? 'tiny-avatar' : 'vote-avatar'} pointer`}
                                             style={{ background: `url(${user.avatar}) 50% 50% / cover no-repeat` }}
                                         ></div>
                                     )
@@ -441,7 +441,7 @@ export const Choice: FunctionComponent<{
                                 </div>
                             </div>
                             <div
-                                className={`button_ againstDirectBorder min-w justify-content-between text-right ml-1 ${yourVote_?.position === 'against' && 'againstDirectBg'} ${inList && 'small'}`}
+                                className={`againstbtn button_ againstDirectBorder min-w justify-content-between text-right ml-1 ${yourVote_?.position === 'against' && 'againstDirectBg'} ${inList && 'small'}`}
                                 onClick={() => handleUserVote('against')}
                             >
                                 {

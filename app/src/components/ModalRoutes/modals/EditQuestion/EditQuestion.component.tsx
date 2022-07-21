@@ -12,6 +12,7 @@ import DropDownInput from "@shared/Inputs/DropDownInput";
 import GroupChannelPicker from "@shared/Inputs/GroupChannelPicker";
 import MultiChoices from "@shared/Inputs/MultiChoices";
 import { QUESTION, EDIT_QUESTION } from "@state/Question/typeDefs";
+import Choice from "@shared/Choice";
 
 import ModalHeader from "../../shared/ModalHeader";
 import './style.sass';
@@ -224,6 +225,22 @@ export const EditQuestion: FunctionComponent<{}> = ({ }) => {
                 </div>
 
                 {/* <pre>{JSON.stringify(errors, null, 2)}</pre> */}
+
+                {watch('questionType') === 'single' ? (
+                    <div className='faded no-events'>
+                        <Choice
+                            voteName={'l.questionText'}
+                            groupHandle={null}
+                            stats={null}
+                            yourVote={null}
+                            userVote={null}
+                            user={null}
+                            inList={true}
+                            showChart={true}
+                            yourStats={null}
+                        />
+                    </div>
+                ) : null}
 
                 <div className="my-3">
                     {((name: keyof IFormValues) => (
