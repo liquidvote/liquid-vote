@@ -46,12 +46,12 @@ export const Feed: FunctionComponent<{}> = ({ }) => {
 
     return (
         <>
-            <Header
+            {/* <Header
                 title="Following Feed"
             // rightElement={
             //     () => <VoteSortPicker updateSortInParent={setSortBy} initialSort={sortBy} />
             // }
-            />
+            /> */}
 
             {/* {
                 !!liquidUser && (
@@ -125,7 +125,7 @@ export const Feed: FunctionComponent<{}> = ({ }) => {
                 ))}
 
                 {!liquidUser && (
-                    <div className="d-flex align-items-center justify-content-center min-vh-100 mt-n5 flex-column">
+                    <div className="d-flex align-items-center justify-content-center min-vh-100 flex-column">
                         <div className="p-4 text-center">
                             <h3>Login to see what your friends are voting on</h3>
 
@@ -149,7 +149,7 @@ export const Feed: FunctionComponent<{}> = ({ }) => {
                 )}
 
                 {liquidUser && !yourUser?.stats?.following && (
-                    <div className="d-flex align-items-center justify-content-center min-vh-100 mt-n5 flex-column">
+                    <div className="d-flex align-items-center justify-content-center min-vh-100 flex-column">
                         <div className="p-4 text-center">
                             <h3>Liquid Vote is more fun with friends.</h3>
 
@@ -159,7 +159,7 @@ export const Feed: FunctionComponent<{}> = ({ }) => {
                 )}
 
                 {questions_data?.Questions?.length === 0 && (
-                    <div className="d-flex align-items-center justify-content-center min-vh-100 mt-n5 flex-column">
+                    <div className="d-flex align-items-center justify-content-center min-vh-100 flex-column">
                         <div className="p-4 text-center">
                             The people you follow haven't voted yet, at least not in any public groups, or groups you have joined yet
                         </div>
@@ -167,7 +167,7 @@ export const Feed: FunctionComponent<{}> = ({ }) => {
                 )}
 
                 {questions_loading && (
-                    <div className="d-flex align-items-center justify-content-center min-vh-100 mt-n5 flex-column">
+                    <div className="d-flex align-items-center justify-content-center min-vh-100 flex-column">
                         <DropAnimation />
                         {/* <p className='mt-4'>The Feed Query takes up to 10s for now, sorry 🧪</p> */}
                     </div>
