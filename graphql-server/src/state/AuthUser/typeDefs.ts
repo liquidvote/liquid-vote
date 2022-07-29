@@ -6,7 +6,7 @@ export const AuthUserTypeDefs = gql`
     }
 
     extend type Mutation {
-        authUserLoggedIn(Auth0User: JSON): JSON
+        authUserLoggedIn(Auth0User: JSON, firebase_token: String): JSON
     }
 
     # type AuthUser {

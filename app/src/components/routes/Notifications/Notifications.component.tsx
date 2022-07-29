@@ -5,7 +5,7 @@ import { Link, useParams } from "react-router-dom";
 import Header from "@shared/Header";
 import { VOTES } from "@state/Vote/typeDefs";
 import useAuthUser from '@state/AuthUser/authUser.effect';
-import { getToken_ } from "@services/firebase";
+// import { useFirebaseNotifications } from "@services/firebase";
 
 import DropAnimation from '@components/shared/DropAnimation';
 import CogSVG from "@shared/Icons/Cog.svg";
@@ -50,9 +50,9 @@ export const Notifications: FunctionComponent<{}> = ({ }) => {
                 🏗 Ignore this for now please
             </p>
 
-            <div className='d-flex justify-content-center'>
+            {/* <div className='d-flex justify-content-center'>
                 <button className='button_' onClick={getToken_}>allow notifications</button>
-            </div>
+            </div> */}
 
             {/* <ul className="nav d-flex flex-nowrap justify-content-around align-items-center mt-1 mx-n3">
                 <li className="nav-item">

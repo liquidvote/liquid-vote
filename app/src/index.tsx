@@ -12,6 +12,7 @@ import * as Sentry from "@sentry/react";
 import { Integrations } from "@sentry/tracing";
 
 import { AUTH_USER, AUTH_USER_LOGGEDIN } from '@state/AuthUser/typeDefs';
+import { getToken_ } from "@services/firebase";
 import App from './App';
 import './index.sass';
 
@@ -31,7 +32,7 @@ if (env?.environment === "production") {
         // We recommend adjusting this value in production
         tracesSampleRate: 1.0,
     });
-    
+
     if ('serviceWorker' in navigator) {
         window.addEventListener('load', () => {
             navigator.serviceWorker.register('/service-worker.js').then(registration => {
@@ -45,7 +46,7 @@ if (env?.environment === "production") {
 
 const AppolloAppWrapper: FunctionComponent<{}> = ({ }) => {
 
-    const { user, isLoading } = useAuth0();
+    const { user, isLoading, isAuthenticated } = useAuth0();
 
     const httpLink = createHttpLink({
         uri: env.graphql,
@@ -108,6 +109,9 @@ const AppolloAppWrapper: FunctionComponent<{}> = ({ }) => {
     useEffect(() => {
         if (user) {
             const login = async () => {
+                console.log({
+                    user
+                });
                 const authLink = await setContext((_, { headers }) => {
                     return {
                         headers: {
@@ -117,10 +121,16 @@ const AppolloAppWrapper: FunctionComponent<{}> = ({ }) => {
                     }
                 });
                 await client.setLink(authLink.concat(httpLink));
+
+                const firebase_token = await getToken_();
+                console.log({ firebase_token });
                 // TODO: perhaps there's a way to `reFetchObservableQueries` reacting to `setLink` instead of using a random setTimeout
                 await client.mutate({
                     mutation: AUTH_USER_LOGGEDIN,
-                    variables: { Auth0User: user }
+                    variables: {
+                        Auth0User: user,
+                        ...firebase_token ? { firebase_token } : {}
+                    }
                 }).then(() => client.reFetchObservableQueries());
                 await setTimeout(async () => await client.reFetchObservableQueries(), 1000);
             }
@@ -129,6 +139,16 @@ const AppolloAppWrapper: FunctionComponent<{}> = ({ }) => {
             client.setLink(httpLink);
         }
     }, [user]);
+
+    // const { permission, firebaseNotificationToken, message } = useFirebaseNotifications();
+
+    // useEffect(() => {
+    //     if (user && permission && firebaseNotificationToken) {
+    //         console.log("yep", { user, permission, firebaseNotificationToken })
+    //     } else {
+    //         console.log("nope", { user, permission, firebaseNotificationToken })
+    //     }
+    // }, [user, permission, firebaseNotificationToken]);
 
     return (
         <ApolloProvider client={client}>

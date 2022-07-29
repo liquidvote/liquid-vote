@@ -2,6 +2,7 @@ import { ObjectId } from 'mongodb';
 const { promises: fs } = require("fs");
 
 import { sendEmail } from './sendEmail';
+import { sendNotification } from './sendNotification';
 
 export const NotificationResolvers = {
     Query: {
@@ -21,9 +22,19 @@ export const NotificationResolvers = {
 
             if (!AuthUser) return;
 
+            const User = !!toUserHandle && await mongoDB.collection("Users")
+                .findOne({ 'LiquidUser.handle': toUserHandle });
+
+
             sendEmail({});
             
-            return {};
+            if (!!User?.firebase_token) {
+                sendNotification({ token: User?.firebase_token });
+            }
+
+            return {
+                User
+            };
         },
     },
 };

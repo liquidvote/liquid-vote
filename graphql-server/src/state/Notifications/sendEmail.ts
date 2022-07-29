@@ -2,8 +2,8 @@ var AWS = require("aws-sdk");
 
 const awsCredentials = require("../../../credentials/aws-credentials.json");
 
+// AWS
 AWS.config.credentials = awsCredentials;
-// Set the region
 AWS.config.update({ region: "eu-west-1" });
 
 export const sendEmail = async ({

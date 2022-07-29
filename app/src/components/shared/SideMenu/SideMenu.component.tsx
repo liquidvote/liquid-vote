@@ -2,7 +2,6 @@ import React, { FunctionComponent, useEffect } from 'react';
 import { Link, useLocation } from "react-router-dom";
 import { useAuth0 } from "@auth0/auth0-react";
 import { useQuery } from "@apollo/client";
-import { getMessaging, onMessage } from "firebase/messaging";
 
 import FeedSVG from "@shared/Icons/Feed.svg";
 import RippleDrop from "@shared/Icons/RippleDrop.svg";
@@ -16,7 +15,6 @@ import HashTagSvg from "@shared/Icons/HashTag.svg";
 import Popper from "@shared/Popper";
 import useSearchParams from "@state/Global/useSearchParams.effect";
 import useAuthUser from '@state/AuthUser/authUser.effect';
-import { getToken_ } from "@services/firebase";
 
 import './style.sass';
 
@@ -29,13 +27,10 @@ export const SideMenu: FunctionComponent<{}> = ({ }) => {
 
     const { liquidUser, liquidUser_refetch } = useAuthUser();
 
-    const { permission, firebaseNotificationToken} = getToken_();
-
-    console.log({ permission, firebaseNotificationToken });
-
-    const messaging = getMessaging();
-    onMessage(messaging, (payload) => {
-      console.log('Message received. ', payload);
+    console.log({
+        isAuthenticated,
+        user,
+        liquidUser
     });
 
     useEffect(() => {
@@ -46,7 +41,7 @@ export const SideMenu: FunctionComponent<{}> = ({ }) => {
                 const g = await liquidUser_refetch();
                 count = count + 1;
 
-                // console.log({ count, g });
+                console.log({ count, g });
 
                 if (!g?.data?.authUser) {
                     setTimeout(() => tryToGetUser(), 100 + (count * 50));

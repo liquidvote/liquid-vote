@@ -623,12 +623,11 @@ export const UserResolvers = {
 
             ];
 
-
-            const writeToDebugFile = fs.writeFile(
-                process.cwd() + '/debug' + '/UserGroups.json',
-                JSON.stringify(UserGroupsAggFromGroupMembers, null, 2),
-                { encoding: 'utf8' }
-            );
+            // const writeToDebugFile = fs.writeFile(
+            //     process.cwd() + '/debug' + '/UserGroups.json',
+            //     JSON.stringify(UserGroupsAggFromGroupMembers, null, 2),
+            //     { encoding: 'utf8' }
+            // );
 
             // const NotUsersAgg
             // Not Users &&liquidVoteApproved

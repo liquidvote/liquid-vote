@@ -7,7 +7,7 @@ export const AUTH_USER = gql`
 `;
 
 export const AUTH_USER_LOGGEDIN = gql`
-  mutation ($Auth0User: JSON!) {
-    authUserLoggedIn(Auth0User: $Auth0User)
+  mutation ($Auth0User: JSON!, $firebase_token: String) {
+    authUserLoggedIn(Auth0User: $Auth0User, firebase_token: $firebase_token)
   }
 `;
