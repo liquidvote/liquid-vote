@@ -25,6 +25,7 @@
     "@aws-sdk/types": "^3.29.0",
     "apollo-datasource-rest": "^3.2.0",
     "apollo-server-lambda": "^2",
+    "aws-sdk": "^2.1184.0",
     "graphql": "^15.6.1",
     "mongodb": "^3.7"
   },

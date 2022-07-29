@@ -435,7 +435,203 @@ export const UserResolvers = {
             const User = !!handle && await mongoDB.collection("Users")
                 .findOne({ 'LiquidUser.handle': handle });
 
+            const Representative = await mongoDB.collection("Users")
+                .findOne({ 'LiquidUser.handle': representative });
+
             const isYou = handle === AuthUser?.LiquidUser?.handle;
+
+            const UserGroupsAggFromGroupMembers = [
+                // get user member rel
+                {
+                    '$match': {
+                        'userId': new ObjectId(User?._id),
+                        'isMember': true
+                    },
+                },
+                {
+                    '$replaceRoot': {
+                        newRoot: {
+                            userRel: "$$ROOT"
+                        }
+                    }
+                },
+                // get your member rel
+                {
+                    '$lookup': {
+                        'as': 'yourRel',
+                        'from': 'GroupMembers',
+                        'let': {
+                            'groupId': '$userRel.groupId',
+                            'yourId': new ObjectId(AuthUser._id)
+                        },
+                        'pipeline': [
+                            {
+                                '$match': {
+                                    '$and': [
+                                        {
+                                            '$expr': {
+                                                '$eq': ['$userId', {
+                                                    '$toObjectId': '$$yourId'
+                                                }]
+                                            }
+                                        },
+                                        {
+                                            '$expr': {
+                                                '$eq': ['$groupId', {
+                                                    '$toObjectId': '$$groupId'
+                                                }]
+                                            }
+                                        },
+                                        { '$expr': { '$eq': ['$isMember', true] } }
+                                    ]
+                                }
+                            }
+                        ],
+                    }
+                },
+                {
+                    '$addFields': {
+                        yourRel: { '$first': '$yourRel' }
+                    }
+                },
+
+                // get user following you rel
+                {
+                    '$lookup': {
+                        'as': 'userFollowingYouRel',
+                        'from': 'UserFollows',
+                        'let': {
+                            'userId': '$userRel.userId',
+                            'yourId': new ObjectId(AuthUser._id)
+                        },
+                        'pipeline': [
+                            {
+                                '$match': {
+                                    '$and': [
+                                        {
+                                            '$expr': {
+                                                '$eq': ['$followedId', {
+                                                    '$toObjectId': '$$yourId'
+                                                }]
+                                            }
+                                        },
+                                        {
+                                            '$expr': {
+                                                '$eq': ['$followingId', {
+                                                    '$toObjectId': '$$userId'
+                                                }]
+                                            }
+                                        },
+                                        { '$expr': { '$eq': ['$isFollowing', true] } }
+                                    ]
+                                }
+                            }
+                        ],
+                    }
+                },
+                {
+                    '$addFields': {
+                        userFollowingYouRel: { '$first': '$userFollowingYouRel' }
+                    }
+                },
+
+                // get group
+                {
+                    '$lookup': {
+                        'as': 'group',
+                        'from': 'Groups',
+                        'let': {
+                            'groupId': '$userRel.groupId',
+                        },
+                        'pipeline': [
+                            {
+                                '$match': {
+                                    '$and': [
+                                        {
+                                            '$expr': {
+                                                '$eq': ['$_id', {
+                                                    '$toObjectId': '$$groupId'
+                                                }]
+                                            }
+                                        },
+                                    ]
+                                }
+                            }
+                        ],
+                    }
+                },
+                {
+                    '$addFields': {
+                        group: { '$first': '$group' }
+                    }
+                },
+
+                // FILTER
+                {
+                    '$match': {
+                        '$or': [
+                            // no user visibility, public group
+                            {
+                                '$and': [
+                                    { '$not': "$userRel.visibility" },
+                                    { '$eq': ["$group.privacy", "public"] }
+                                ]
+                            },
+                            // visibility: everyone, group not private
+                            {
+                                '$and': [
+                                    { '$eq': ["$userRel.visibility", "everyone"] },
+                                    { '$neq': ["$group.privacy", "private"] }
+                                ]
+                            },
+                            // no user visibility,, private group
+                            {
+                                '$and': [
+                                    { '$not': "$userRel.visibility" },
+                                    { '$eq': ["$group.privacy", "private"] },
+                                    { '$eq': ["$yourRel.isMember", true ] }
+                                ]
+                            },
+                            // visibility: members
+                            {
+                                '$and': [
+                                    { '$eq': ["$userRel.visibility", "members"] },
+                                    { '$eq': ["$yourRel.isMember", true ] }
+                                ]
+                            },
+                            // visibility: following
+                            {
+                                '$and': [
+                                    { '$eq': ["$userRel.visibility", "following"] },
+                                    { '$eq': ["$userFollowingYouRel.isFollowing", true ] }
+                                ]
+                            },
+                            // visibility: self
+                            {
+                                '$and': [
+                                    { '$eq': ["$userRel.visibility", "self"] },
+                                    { '$eq': ["$yourRel.userId", "$userRel.userId" ] }
+                                ]
+                            },
+                        ]
+                    }
+                },
+
+                // TODO: get stats
+
+                // TODO: sort
+
+            ];
+
+
+            const writeToDebugFile = fs.writeFile(
+                process.cwd() + '/debug' + '/UserGroups.json',
+                JSON.stringify(UserGroupsAggFromGroupMembers, null, 2),
+                { encoding: 'utf8' }
+            );
+
+            // const NotUsersAgg
+            // Not Users &&liquidVoteApproved
 
             const UserGroupMemberRelations = !!User && await mongoDB.collection("GroupMembers")
                 .find({ 'userId': new ObjectId(User?._id), 'isMember': true })
@@ -454,19 +650,19 @@ export const UserResolvers = {
                     })
                     .toArray();
 
-            
+
             // visibility: self
-                // is self
+            // is self
+
+            // visibility: following
 
             // visibility: members
-                // you are member && visibility: members
+            // you are member && visibility: members
 
             // visibility: everyOne
-                // or visibility: undefined && group: public
+            // or visibility: undefined && group: public
 
-
-            const Representative = await mongoDB.collection("Users")
-                .findOne({ 'LiquidUser.handle': representative });
+            // notUsers && liquidVoteApproved
 
             const RepresentativeGroupMemberRelations = !!AuthUser && await mongoDB.collection("GroupMembers")
                 .find({

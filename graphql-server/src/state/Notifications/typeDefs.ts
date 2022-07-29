@@ -5,57 +5,43 @@ export const NotificationTypeDefs = gql`
     type Notification {
         _id: ID!
         type: String
+        seen: Boolean
 
-            # YOU
-            # new like          on argument         to arguer
-            # new vote          on poll             to poller           and admins      and other pollers*
-            # new option        on poll             to poller           and admins      and other pollers*
-            # new argument      on poll             to poller           and admins      and other pollers*
-            # new representee   on group OR tag     to representative
-            # new member        on group            to inviter          and admins
-            # new poll          on group            to admin
+            # Following_voted_on_a_poll_you_voted
+                # actionUser
+                # poll
 
-            # * if other poller has had no notifications for 24h
+            # Someone_followed_you
+                # actionUser
+         
+            # Following_invited_you_to_vote_on_a_poll
+                # actionUser
+                # poll
 
-
-
-            # REPRESENTATIVES
-            # these can be got by querying indirect votes
-            # (if we forego or alternate on marking them as seen)
-
-            # SYSTEM
-            # welcome!
-            # member of one group! Check these others...
-            # why no representatives on [Group] yet?
+            # Someone_voted_on_a_poll_you_created
+                # actionUser
+                # poll
         
-        user: User # Id
-    }
+        toUser: User # Id
 
-    type NotificationData {
-        data: NotificationData
-        group: Group
-        question: Question
-        choice: String
-        users: [User]
-        votes: [Votes]
-        argument: Argument
+        actionUser: User # Id
+        poll: Question  # Id
+
     }
 
     extend type Query {
-        Notification(
-            questionText: String,
-            group: String,
-            channel: String
-        ): Question
-        Notifications(
-            group: String,
-            sortBy: String
-        ): [Question]
+        Notifications: [Notification]
     }
 
     extend type Mutation {
         markNotificationRead(
             id: String
+        ): JSON
+        sendTestNotification(
+            type: String
+            toUserHandle: String
+            actionUserHandle: String
+            pollId: String
         ): JSON
     }
 `;

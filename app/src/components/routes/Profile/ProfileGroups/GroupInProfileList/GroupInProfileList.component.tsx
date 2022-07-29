@@ -5,6 +5,7 @@ import { useQuery, useMutation } from "@apollo/client";
 import env from '@env';
 import useAuthUser from '@state/AuthUser/authUser.effect';
 import LockSVG from "@shared/Icons/Lock-tiny.svg";
+import ProfileSVG from "@shared/Icons/Profile-tiny.svg";
 import WorldSVG from "@shared/Icons/World-tiny.svg";
 import GroupTiny from "@shared/Icons/Group-tiny.svg";
 import LinkSVG from "@shared/Icons/Link-tiny.svg";
@@ -61,7 +62,7 @@ export const GroupInProfileList: FunctionComponent<{
             group?.yourMemberRelation?.isMember ||
             editGroupMemberChannelRelation_data?.editGroupMemberChannelRelation?.isMember;
 
-        const visibility: "everyone" | "members" | "self" =
+        const visibility: "everyone" | "members" | "self" | "following" =
             (group?.yourMemberRelation?.visibility ||
                 editGroupMemberChannelRelation_data?.editGroupMemberChannelRelation?.visibility
             ) ||
@@ -117,6 +118,9 @@ export const GroupInProfileList: FunctionComponent<{
                                                         {visibility === 'members' && (
                                                             <GroupTiny data-tip="votes visible to other members" />
                                                         )}
+                                                        {visibility === 'following' && (
+                                                            <ProfileSVG data-tip="votes visible to people you follow" />
+                                                        )}
                                                         {visibility === 'self' && (
                                                             <LockSVG data-tip="votes visible only to yourself" />
                                                         )}
@@ -141,7 +145,7 @@ export const GroupInProfileList: FunctionComponent<{
                                                                     }
                                                                 })}
                                                             >
-                                                                <WorldSVG data-tip="votes visible to everyone" />
+                                                                <WorldSVG />
                                                                 <p className={`ml-2 m-0 ${visibility === 'everyone' && 'font-weight-bold'}`}>everyone</p>
                                                             </li>
                                                         ) : null}
@@ -155,8 +159,21 @@ export const GroupInProfileList: FunctionComponent<{
                                                                 }
                                                             })}
                                                         >
-                                                            <GroupTiny data-tip="votes visible to other members" />
+                                                            <GroupTiny />
                                                             <p className={`ml-2 m-0 ${visibility === 'members' && 'font-weight-bold'}`}>other members</p>
+                                                        </li>
+                                                        <li
+                                                            className="d-flex align-items-center py-2"
+                                                            onClick={() => editGroupMemberChannelRelation({
+                                                                variables: {
+                                                                    UserHandle: liquidUser?.handle,
+                                                                    GroupHandle: group.handle,
+                                                                    Visibility: 'following'
+                                                                }
+                                                            })}
+                                                        >
+                                                            <ProfileSVG />
+                                                            <p className={`ml-2 m-0 ${visibility === 'following' && 'font-weight-bold'}`}>people you follow</p>
                                                         </li>
                                                         <li
                                                             className="d-flex align-items-center py-2"
@@ -168,7 +185,7 @@ export const GroupInProfileList: FunctionComponent<{
                                                                 }
                                                             })}
                                                         >
-                                                            <LockSVG data-tip="votes visible only to yourself" />
+                                                            <LockSVG />
                                                             <p className={`ml-2 m-0 ${visibility === 'self' && 'font-weight-bold'}`}>only yourself 🧪</p>
                                                         </li>
                                                     </ul>

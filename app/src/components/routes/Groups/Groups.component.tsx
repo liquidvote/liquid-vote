@@ -28,7 +28,7 @@ export const Groups: FunctionComponent<{}> = ({ }) => {
     } = useQuery(USER_GROUPS, {
         variables: {
             handle: liquidUser?.handle,
-            notUsers: section === 'other'
+            notUsers: section === 'other' || !liquidUser
         },
         // skip: !liquidUser
     });

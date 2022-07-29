@@ -17,6 +17,7 @@
         "@assets/*": ["src/assets/*"],
         "@shared/*": ["src/components/shared/*"],
         "@state/*": ["src/state/*"],
+        "@services/*": ["src/services/*"],
         "@mocks/*": ["src/mocks/*"]
     }
   },

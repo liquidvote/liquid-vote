@@ -7,6 +7,7 @@ const BundleAnalyzerPlugin =
 const WorkboxPlugin = require("workbox-webpack-plugin");
 const WebpackPwaManifest = require("webpack-pwa-manifest");
 const CompressionPlugin = require("compression-webpack-plugin");
+const CopyPlugin = require("copy-webpack-plugin");
 
 const isProd = process.env.NODE_ENV === "production";
 
@@ -66,11 +67,17 @@ const config = {
     ...(isProd
       ? [
           new CompressionPlugin(),
+          new CopyPlugin({
+            patterns: [
+              { from: "./src/service-worker" },
+            ],
+          }),
           new WorkboxPlugin.GenerateSW({
             // these options encourage the ServiceWorkers to get in there fast
             // and not allow any straggling "old" SWs to hang around
             clientsClaim: true,
             skipWaiting: true,
+            importScripts: ["./firebase-messaging-sw.js"],
 
             maximumFileSizeToCacheInBytes: 8 * 1024 * 1024,
           }),

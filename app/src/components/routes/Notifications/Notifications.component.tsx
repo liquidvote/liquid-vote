@@ -5,6 +5,7 @@ import { Link, useParams } from "react-router-dom";
 import Header from "@shared/Header";
 import { VOTES } from "@state/Vote/typeDefs";
 import useAuthUser from '@state/AuthUser/authUser.effect';
+import { getToken_ } from "@services/firebase";
 
 import DropAnimation from '@components/shared/DropAnimation';
 import CogSVG from "@shared/Icons/Cog.svg";
@@ -18,18 +19,6 @@ export const Notifications: FunctionComponent<{}> = ({ }) => {
     const { allSearchParams, updateParams } = useSearchParams();
     const { liquidUser } = useAuthUser();
 
-    const {
-        loading: user_votes_loading,
-        error: user_votes_error,
-        data: user_votes_data,
-        refetch: user_votes_refetch
-    } = useQuery(VOTES, {
-        variables: {
-            userHandle: liquidUser?.handle,
-            type: 'indirectVotesMadeForUser',
-            sortBy: 'time'
-        }
-    });
 
     // console.log({
     //     user_votes_data
@@ -58,10 +47,14 @@ export const Notifications: FunctionComponent<{}> = ({ }) => {
             />
 
             <p className="text-center py-4">
-                    🏗 Ignore these for now please
+                🏗 Ignore this for now please
             </p>
 
-            <ul className="nav d-flex flex-nowrap justify-content-around align-items-center mt-1 mx-n3">
+            <div className='d-flex justify-content-center'>
+                <button className='button_' onClick={getToken_}>allow notifications</button>
+            </div>
+
+            {/* <ul className="nav d-flex flex-nowrap justify-content-around align-items-center mt-1 mx-n3">
                 <li className="nav-item">
                     <Link className={`nav-link ${!section && 'active'}`} to={`/notifications`}>
                         Yours
@@ -72,40 +65,15 @@ export const Notifications: FunctionComponent<{}> = ({ }) => {
                         Representatives
                     </Link>
                 </li>
-            </ul>
+            </ul> */}
 
 
-            {user_votes_loading && (
-                <div className="d-flex justify-content-center mt-5">
-                    <DropAnimation />
-                </div>
-            )}
+
 
             <br />
             {/* <pre>{ JSON.stringify(user_votes_data, null, 2) }</pre> */}
 
-            {!section && (
-                <div>Hum</div>
-            )}
 
-            {section === 'representatives' && (
-                user_votes_data?.Votes.map((n, i) => (
-                    <>
-                        {/* <Notification
-                            key={'notification-uservote' + n.user?.handle + n.questionText + n.choiceText}
-                            v={{
-                                ...n,
-                                // user: profile
-                            }}
-                            showChart={true}
-                        /> */}
-                    </>
-                ))
-            )}
-
-            {(!user_votes_data?.Votes?.length) && (
-                <div className="p-4 text-center">{`You haven't been represented on any Polls yet`}</div>
-            )}
         </>
     );
 }

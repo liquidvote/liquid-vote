@@ -16,7 +16,7 @@ import { InviteTypeDefs, InviteResolvers } from "../state/Invites";
 import { S3TypeDefs, S3Resolvers } from "../state/S3";
 import { ArgumentTypeDefs, ArgumentResolvers } from "../state/Arguments";
 import { ArgumentUpVotesTypeDefs, ArgumentUpVotesResolvers } from "../state/ArgumentUpVotes";
-import { TagTypeDefs, TagResolvers } from "../state/Tags";
+import { NotificationTypeDefs, NotificationResolvers } from "../state/Notifications";
 
 const mongoClient = new MongoClient(
     `mongodb+srv://${atlasCredentials.username}:${atlasCredentials.password}@aiaiaiaminhavida.oobyz.mongodb.net/Enron?retryWrites=true&w=majority`,
@@ -66,7 +66,7 @@ export const configServer = async ({ ApolloServer, gql }) => {
             S3TypeDefs,
             ArgumentTypeDefs,
             ArgumentUpVotesTypeDefs,
-            TagTypeDefs
+            NotificationTypeDefs
         ],
         resolvers: {
             ...AuthUserResolvers,
@@ -78,7 +78,7 @@ export const configServer = async ({ ApolloServer, gql }) => {
             ...S3Resolvers,
             ...ArgumentResolvers,
             ...ArgumentUpVotesResolvers,
-            ...TagResolvers,
+            ...NotificationResolvers,
             Query: {
                 ...AuthUserResolvers.Query,
                 ...UserResolvers.Query,
@@ -89,7 +89,7 @@ export const configServer = async ({ ApolloServer, gql }) => {
                 // ...S3Resolvers.Query
                 ...ArgumentResolvers.Query,
                 ...ArgumentUpVotesResolvers.Query,
-                ...TagResolvers.Query
+                ...NotificationResolvers.Query
             },
             Mutation: {
                 ...AuthUserResolvers.Mutation,
@@ -101,7 +101,7 @@ export const configServer = async ({ ApolloServer, gql }) => {
                 ...S3Resolvers.Mutation,
                 ...ArgumentResolvers.Mutation,
                 ...ArgumentUpVotesResolvers.Mutation,
-                ...TagResolvers.Mutation
+                ...NotificationResolvers.Mutation
             }
         },
         context: async ({ req, event }) => {

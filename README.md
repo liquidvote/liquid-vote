@@ -18,11 +18,10 @@ npm run dev
 ### App
 ```
 cd react-app
-npm run deploy
+npm run deployproduction
 ```
 ### Server
 ```
 cd graphql-server
-npm run zip
-// upload dist.zip to elastic beanstalk manually (TODO: automate this step)
+npm run deploy
 ```

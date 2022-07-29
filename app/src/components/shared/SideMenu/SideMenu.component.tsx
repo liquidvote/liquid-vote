@@ -2,6 +2,7 @@ import React, { FunctionComponent, useEffect } from 'react';
 import { Link, useLocation } from "react-router-dom";
 import { useAuth0 } from "@auth0/auth0-react";
 import { useQuery } from "@apollo/client";
+import { getMessaging, onMessage } from "firebase/messaging";
 
 import FeedSVG from "@shared/Icons/Feed.svg";
 import RippleDrop from "@shared/Icons/RippleDrop.svg";
@@ -15,6 +16,7 @@ import HashTagSvg from "@shared/Icons/HashTag.svg";
 import Popper from "@shared/Popper";
 import useSearchParams from "@state/Global/useSearchParams.effect";
 import useAuthUser from '@state/AuthUser/authUser.effect';
+import { getToken_ } from "@services/firebase";
 
 import './style.sass';
 
@@ -26,6 +28,15 @@ export const SideMenu: FunctionComponent<{}> = ({ }) => {
     const { user, isAuthenticated, isLoading, loginWithRedirect, logout, loginWithPopup } = useAuth0();
 
     const { liquidUser, liquidUser_refetch } = useAuthUser();
+
+    const { permission, firebaseNotificationToken} = getToken_();
+
+    console.log({ permission, firebaseNotificationToken });
+
+    const messaging = getMessaging();
+    onMessage(messaging, (payload) => {
+      console.log('Message received. ', payload);
+    });
 
     useEffect(() => {
         if (!!isAuthenticated) {
@@ -54,15 +65,15 @@ export const SideMenu: FunctionComponent<{}> = ({ }) => {
             <Link to="/home" data-tip="Following Feed">
                 <FeedSVG />
             </Link>
-            {/* {isAuthenticated && user && (
+            {isAuthenticated && user && (
                 <>
                     <Link to="/notifications" data-tip="Notifications" className="notification-wrapper">
                         <NotificationSvg />
                         <div className="notif-you forDirect white">4</div>
-                        <div className="notif-representatives for white">4</div>
+                        {/* <div className="notif-representatives for white">4</div> */}
                     </Link>
                 </>
-            )} */}
+            )}
             <Link to="/groups" data-tip={isAuthenticated ? "Your Causes" : " Causes"}>
                 <GroupSvg />
             </Link>
