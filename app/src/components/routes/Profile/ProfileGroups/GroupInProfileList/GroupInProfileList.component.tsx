@@ -17,6 +17,7 @@ import Popper from "@shared/Popper";
 import GroupInProfileListVotes from "@shared/GroupInProfileListVotes";
 import useUser from '@state/User/user.effect';
 import HandshakeSVG from "@shared/Icons/Handshake.svg";
+import GroupVisibilityPicker from '@components/shared/GroupVisibilityPicker';
 
 import './style.sass';
 
@@ -38,7 +39,7 @@ export const GroupInProfileList: FunctionComponent<{
 
         const { user: userWithMoreData } = useUser({ userHandle: user.handle, groupHandle: group.handle });
 
-        // console.log({ user, userWithMoreData });
+        console.log({ user, userWithMoreData });
 
         const [editGroupMemberChannelRelation, {
             loading: editGroupMemberChannelRelation_loading,
@@ -61,12 +62,6 @@ export const GroupInProfileList: FunctionComponent<{
         const isMember =
             group?.yourMemberRelation?.isMember ||
             editGroupMemberChannelRelation_data?.editGroupMemberChannelRelation?.isMember;
-
-        const visibility: "everyone" | "members" | "self" | "following" =
-            (group?.yourMemberRelation?.visibility ||
-                editGroupMemberChannelRelation_data?.editGroupMemberChannelRelation?.visibility
-            ) ||
-            (group?.privacy === 'private' ? 'members' : 'everyone');
 
         return (
             <div id={group.handle} className="relative border-bottom pb-3 mx-n3 px-3">
@@ -108,124 +103,9 @@ export const GroupInProfileList: FunctionComponent<{
                                         )}
 
                                         {isMember ? (
-                                            <Popper
-                                                rightOnSmall={true}
-                                                button={
-                                                    <button className={`button_ inverted small mr-1`}>
-                                                        {visibility === 'everyone' && (
-                                                            <WorldSVG data-tip="votes visible to everyone" />
-                                                        )}
-                                                        {visibility === 'members' && (
-                                                            <GroupTiny data-tip="votes visible to other members" />
-                                                        )}
-                                                        {visibility === 'following' && (
-                                                            <ProfileSVG data-tip="votes visible to people you follow" />
-                                                        )}
-                                                        {visibility === 'self' && (
-                                                            <LockSVG data-tip="votes visible only to yourself" />
-                                                        )}
-                                                    </button>
-                                                }
-                                                oulineInstead={true}
-                                                popperContent={
-                                                    <ul className="d-flex justify-content-start m-0 mx-2 flex-column pointer">
-                                                        <li
-                                                            className="d-flex align-items-center py-2"
-                                                        >
-                                                            <p className={`m-0`}>Your votes and membership are visible to:</p>
-                                                        </li>
-                                                        {group.privacy !== 'private' ? (
-                                                            <li
-                                                                className="d-flex align-items-center py-2"
-                                                                onClick={() => editGroupMemberChannelRelation({
-                                                                    variables: {
-                                                                        UserHandle: liquidUser?.handle,
-                                                                        GroupHandle: group.handle,
-                                                                        Visibility: 'everyone'
-                                                                    }
-                                                                })}
-                                                            >
-                                                                <WorldSVG />
-                                                                <p className={`ml-2 m-0 ${visibility === 'everyone' && 'font-weight-bold'}`}>everyone</p>
-                                                            </li>
-                                                        ) : null}
-                                                        <li
-                                                            className="d-flex align-items-center py-2"
-                                                            onClick={() => editGroupMemberChannelRelation({
-                                                                variables: {
-                                                                    UserHandle: liquidUser?.handle,
-                                                                    GroupHandle: group.handle,
-                                                                    Visibility: 'members'
-                                                                }
-                                                            })}
-                                                        >
-                                                            <GroupTiny />
-                                                            <p className={`ml-2 m-0 ${visibility === 'members' && 'font-weight-bold'}`}>other members</p>
-                                                        </li>
-                                                        <li
-                                                            className="d-flex align-items-center py-2"
-                                                            onClick={() => editGroupMemberChannelRelation({
-                                                                variables: {
-                                                                    UserHandle: liquidUser?.handle,
-                                                                    GroupHandle: group.handle,
-                                                                    Visibility: 'following'
-                                                                }
-                                                            })}
-                                                        >
-                                                            <ProfileSVG />
-                                                            <p className={`ml-2 m-0 ${visibility === 'following' && 'font-weight-bold'}`}>people you follow</p>
-                                                        </li>
-                                                        <li
-                                                            className="d-flex align-items-center py-2"
-                                                            onClick={() => editGroupMemberChannelRelation({
-                                                                variables: {
-                                                                    UserHandle: liquidUser?.handle,
-                                                                    GroupHandle: group.handle,
-                                                                    Visibility: 'self'
-                                                                }
-                                                            })}
-                                                        >
-                                                            <LockSVG />
-                                                            <p className={`ml-2 m-0 ${visibility === 'self' && 'font-weight-bold'}`}>only yourself 🧪</p>
-                                                        </li>
-                                                    </ul>
-                                                }
+                                            <GroupVisibilityPicker
+                                                group={group}
                                             />
-
-
-                                            // <button className={`button_ inverted small mr-1`} onClick={() => {
-                                            //     const selectedIndex = availableVisibilitytypes.indexOf(visibility);
-
-                                            //     const nextVisibility = (selectedIndex + 1 === availableVisibilitytypes.length) ? availableVisibilitytypes[0] : availableVisibilitytypes[selectedIndex + 1];
-
-                                            //     console.log({
-                                            //         nextVisibility,
-                                            //         availableVisibilitytypes,
-                                            //         selectedIndex
-                                            //     })
-
-                                            //     editGroupMemberChannelRelation({
-                                            //         variables: {
-                                            //             UserHandle: liquidUser?.handle,
-                                            //             GroupHandle: group.handle,
-                                            //             Visibility: nextVisibility
-                                            //         }
-                                            //     })
-
-
-                                            //     // setVoteVisibility((selectedIndex + 1 === availableVisibilitytypes.length) ? availableVisibilitytypes[0] : availableVisibilitytypes[selectedIndex + 1])
-                                            // }}>
-                                            //     {visibility === 'everyone' && (
-                                            //         <WorldSVG data-tip="votes visible to everyone" />
-                                            //     )}
-                                            //     {visibility === 'members' && (
-                                            //         <GroupTiny data-tip="votes visible to other members" />
-                                            //     )}
-                                            //     {visibility === 'self' && (
-                                            //         <LockSVG data-tip="votes visible only to yourself" />
-                                            //     )}
-                                            // </button>) :
-                                            // null
                                         ) : null}
 
                                         <button
@@ -264,8 +144,8 @@ export const GroupInProfileList: FunctionComponent<{
                             <Avatar
                                 person={{
                                     ...user,
-                                    yourStats: group.yourUserStats,
-                                    stats: group.userStats
+                                    // yourStats: userWithMoreData.yourUserStats,
+                                    // stats: userWithMoreData.userStats
                                 }}
                                 groupHandle={group?.handle}
                                 type="small"
@@ -354,19 +234,19 @@ export const GroupInProfileList: FunctionComponent<{
                                                 {/* {isSelected ? '⬆' : '⬇'} */}
                                             </b>
                                         </small>
-                                        {!!group?.yourUserStats?.directVotesInCommon ? (
+                                        {!!userWithMoreData?.groupStats?.yourStats?.directVotesInCommon ? (
                                             <>
                                                 {/* ・
                                                 <small className="d-flex mb-0">
-                                                    <b className='white mr-1'>{' '}{group?.yourUserStats?.directVotesInCommon}</b> in common
+                                                    <b className='white mr-1'>{' '}{userWithMoreData?.groupStats?.yourStats?.directVotesInCommon}</b> in common
                                                 </small> */}
                                                 ・
                                                 <small className="d-flex align-items-center">
-                                                    <b className='white mr-1 forDirect px-1 rounded'>{' '}{group?.yourUserStats?.directVotesInAgreement} </b> same
+                                                    <b className='white mr-1 forDirect px-1 rounded'>{' '}{userWithMoreData?.groupStats?.yourStats?.directVotesInAgreement} </b> same
                                                 </small>
                                                 ・
                                                 <small className="d-flex align-items-center">
-                                                    <b className='white mr-1 againstDirect px-1 rounded'>{' '}{group?.yourUserStats?.directVotesInDisagreement}</b> differ
+                                                    <b className='white mr-1 againstDirect px-1 rounded'>{' '}{userWithMoreData?.groupStats?.yourStats?.directVotesInDisagreement}</b> differ
                                                 </small>
                                             </>
                                         ) : <span className='opacity-0'>・</span>}

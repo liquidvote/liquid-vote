@@ -9,6 +9,7 @@ import DropPlusSVG from "@shared/Icons/Drop+.svg";
 import NotificationSvg from "@shared/Icons/Notification.svg";
 import TrendingSvg from "@shared/Icons/Trending.svg";
 import GroupSvg from "@shared/Icons/Group.svg";
+import AdminSvg from "@shared/Icons/Admin.svg";
 import ThreeDotsSVG from '@shared/Icons/ThreeDots.svg';
 import LoginIcon from "@shared/Icons/LoginIcon.svg";
 import HashTagSvg from "@shared/Icons/HashTag.svg";
@@ -72,6 +73,15 @@ export const SideMenu: FunctionComponent<{}> = ({ }) => {
             <Link to="/groups" data-tip={isAuthenticated ? "Your Causes" : " Causes"}>
                 <GroupSvg />
             </Link>
+            
+            {liquidUser?.admin === 'total' && (
+                <>
+                    <Link to="/admin" data-tip="Admin">
+                        <AdminSvg />
+                    </Link>
+                </>
+            )}
+
             {/* <Link to="/tags" data-tip="Tags">
                 <HashTagSvg />
             </Link> */}

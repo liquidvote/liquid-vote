@@ -34,6 +34,8 @@ export default function App() {
     const Notifications = lazy(() => import('./components/routes/Notifications'));
     const Groups = lazy(() => import('./components/routes/Groups'));
     const GroupPeople = lazy(() => import('./components/routes/GroupPeople'));
+    const Admin = lazy(() => import('./components/routes/Admin'));
+
 
     return (
         <div className={`AppContainer theme3`}>
@@ -78,6 +80,8 @@ export default function App() {
                             <Route path="/group/:handle/:section" element={<Loader component={<Group />} />} />
                             <Route path="/group/:handle" element={<Loader component={<Group />} />} />
                             <Route path="/group-people/:handle/:which" element={<Loader component={<GroupPeople />} />} />
+                            <Route path="/admin" element={<Loader component={<Admin />} />} />
+                            <Route path="/admin/:section" element={<Loader component={<Admin />} />} />
                             <Route path="/" element={<Loader component={<Feed />} />} />
                         </Routes>
                         <div className="p-4 d-md-none"></div>

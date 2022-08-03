@@ -8,6 +8,7 @@ export const GROUP = gql`
         bio,
         avatar,
         cover,
+        adminApproved,
         externalLink,
         createdOn,
         lastEditOn,
@@ -77,6 +78,36 @@ export const GROUP = gql`
   }
 `;
 
+export const GROUPS = gql`
+  query {
+    Groups {
+        handle,
+        name,
+        bio,
+        avatar,
+        cover,
+        adminApproved,
+        externalLink,
+        createdOn,
+        lastEditOn,
+        admins {
+            name,
+            avatar,
+            handle
+        }
+        privacy,
+        stats {
+            lastDirectVoteOn
+            members
+            questions
+            representations
+            directVotesMade
+            indirectVotesMade
+        }
+    }
+  }
+`;
+
 export const GROUP_MEMBERS = gql`
   query($handle: String!) {
     GroupMembers(handle: $handle) {
@@ -134,5 +165,11 @@ export const GROUP_QUESTIONS = gql`
 export const EDIT_GROUP = gql`
   mutation ($handle: String!, $Group: JSON!) {
     editGroup(handle: $handle, Group: $Group)
+  }
+`;
+
+export const ADMIN_APPROVE_GROUP = gql`
+  mutation ($handle: String!, $newStatus: Boolean!) {
+    adminApproveGroup(handle: $handle, newStatus: $newStatus)
   }
 `;

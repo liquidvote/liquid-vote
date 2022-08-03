@@ -55,6 +55,7 @@ export const UserTypeDefs = gql`
         yourStats: YourUserStats
         groupStats: UserGroupStats  # this could go in "thisGroup"
         vote: Vote
+        admin: String
 
         representationGroups: [Group]
 
@@ -99,6 +100,11 @@ export const UserTypeDefs = gql`
             representative: String,
             notUsers: Boolean
         ): [Group],
+        UserGroups_old(
+            handle: String,
+            representative: String,
+            notUsers: Boolean
+        ): [Group],
     }
 
     extend type Mutation {
@@ -122,5 +128,9 @@ export const UserTypeDefs = gql`
             FollowingHandle: String,
             IsFollowing: Boolean
         ): UserFollowingRelation
+        editAdminStatus(
+            UserHandle: String,
+            NewStatus: String,
+        ): User
     }
 `;

@@ -6,11 +6,14 @@ import useAuthUser from '@state/AuthUser/authUser.effect';
 import LockSVG from "@shared/Icons/Lock-tiny.svg";
 import WorldSVG from "@shared/Icons/World-tiny.svg";
 import LinkSVG from "@shared/Icons/Link-tiny.svg";
+import ProfileSVG from "@shared/Icons/Profile-tiny.svg";
 import GroupTiny from "@shared/Icons/Group-tiny.svg";
 import useSearchParams from "@state/Global/useSearchParams.effect";
 import { EDIT_GROUP_MEMBER_CHANNEL_RELATION } from "@state/User/typeDefs";
 import Avatar from '@components/shared/Avatar';
 import Popper from "@shared/Popper";
+import ThreeDotsSmallSVG from '@shared/Icons/ThreeDots-small-horizontal.svg';
+import GroupVisibilityPicker from '@components/shared/GroupVisibilityPicker';
 
 import './style.sass';
 
@@ -24,9 +27,6 @@ export const GroupInList: FunctionComponent<{
 
         const { liquidUser } = useAuthUser();
 
-        const visibilitytypes = ['everyone', 'members', 'self'];
-        const [voteVisibility, setVoteVisibility] = useState('everyone');
-
         const [editGroupMemberChannelRelation, {
             loading: editGroupMemberChannelRelation_loading,
             error: editGroupMemberChannelRelation_error,
@@ -38,12 +38,6 @@ export const GroupInList: FunctionComponent<{
         const isMember =
             group?.yourMemberRelation?.isMember ||
             editGroupMemberChannelRelation_data?.editGroupMemberChannelRelation?.isMember;
-
-        const visibility: "everyone" | "members" | "self" =
-            (group?.yourMemberRelation?.visibility ||
-                editGroupMemberChannelRelation_data?.editGroupMemberChannelRelation?.visibility
-            ) ||
-            (group?.privacy === 'private' ? 'members' : 'everyone');
 
         return (
             <div className="d-flex relative border-bottom py-3 mx-n3 px-3">
@@ -60,13 +54,13 @@ export const GroupInList: FunctionComponent<{
                         <div className="d-flex align-items-center mb-1 ">
                             <Link to={`/group/${group.handle}`}><b>{group.name}</b></Link>
                             {/* <small className="mt-n1">@DanPriceSeattle</small> */}
-                            <div className="ml-2 d-flex align-items-center">
+                            {/* <div className="ml-2 d-flex align-items-center">
                                 {group?.privacy === "private" ? (
                                     <LockSVG data-tip="private" />
                                 ) : group?.privacy === "public" ? (
                                     <WorldSVG data-tip="public" />
                                 ) : <LinkSVG data-tip="link only" />}
-                            </div>
+                            </div> */}
                         </div>
                         <div className="d-flex mb-1 ml-n1">
                             {
@@ -80,72 +74,8 @@ export const GroupInList: FunctionComponent<{
                                         )}
 
                                         {isMember ? (
-                                            <Popper
-                                                rightOnSmall={true}
-                                                button={
-                                                    <button className={`button_ inverted small mr-1`}>
-                                                        {visibility === 'everyone' && (
-                                                            <WorldSVG data-tip="votes visible to everyone" />
-                                                        )}
-                                                        {visibility === 'members' && (
-                                                            <GroupTiny data-tip="votes visible to other members" />
-                                                        )}
-                                                        {visibility === 'self' && (
-                                                            <LockSVG data-tip="votes visible only to yourself" />
-                                                        )}
-                                                    </button>
-                                                }
-                                                oulineInstead={true}
-                                                popperContent={
-                                                    <ul className="d-flex justify-content-start m-0 mx-2 flex-column pointer">
-                                                        <li
-                                                            className="d-flex align-items-center py-2"
-                                                        >
-                                                            <p className={`m-0`}>Your votes and membership are visible to:</p>
-                                                        </li>
-                                                        {group.privacy !== 'private' ? (
-                                                            <li
-                                                                className="d-flex align-items-center py-2"
-                                                                onClick={() => editGroupMemberChannelRelation({
-                                                                    variables: {
-                                                                        UserHandle: liquidUser?.handle,
-                                                                        GroupHandle: group.handle,
-                                                                        Visibility: 'everyone'
-                                                                    }
-                                                                })}
-                                                            >
-                                                                <WorldSVG data-tip="votes visible to everyone" />
-                                                                <p className={`ml-2 m-0 ${visibility === 'everyone' && 'font-weight-bold'}`}>everyone</p>
-                                                            </li>
-                                                        ) : null}
-                                                        <li
-                                                            className="d-flex align-items-center py-2"
-                                                            onClick={() => editGroupMemberChannelRelation({
-                                                                variables: {
-                                                                    UserHandle: liquidUser?.handle,
-                                                                    GroupHandle: group.handle,
-                                                                    Visibility: 'members'
-                                                                }
-                                                            })}
-                                                        >
-                                                            <GroupTiny data-tip="votes visible to other members" />
-                                                            <p className={`ml-2 m-0 ${visibility === 'members' && 'font-weight-bold'}`}>other members</p>
-                                                        </li>
-                                                        <li
-                                                            className="d-flex align-items-center py-2"
-                                                            onClick={() => editGroupMemberChannelRelation({
-                                                                variables: {
-                                                                    UserHandle: liquidUser?.handle,
-                                                                    GroupHandle: group.handle,
-                                                                    Visibility: 'self'
-                                                                }
-                                                            })}
-                                                        >
-                                                            <LockSVG data-tip="votes visible only to yourself" />
-                                                            <p className={`ml-2 m-0 ${visibility === 'self' && 'font-weight-bold'}`}>only yourself 🧪</p>
-                                                        </li>
-                                                    </ul>
-                                                }
+                                            <GroupVisibilityPicker
+                                                group={group}
                                             />
                                         ) : null}
                                         <button
@@ -168,8 +98,12 @@ export const GroupInList: FunctionComponent<{
                                             className={`button_ small ml-1 mb-0 ${isMember ? "selected" : ""}`}
                                             disabled={group.thisUserIsAdmin}
                                         >
-                                            {isMember ? "Joined" : "Join"}
+                                            {
+                                                group.thisUserIsAdmin ?
+                                                    'Admin' : isMember ?
+                                                        "Joined" : "Join"}
                                         </button>
+
                                     </>
                                 )
                             }
@@ -181,11 +115,11 @@ export const GroupInList: FunctionComponent<{
                     </small>
                     <div className="d-flex align-items-center ml-n5 mt-3">
                         {[
-                            ...group.yourStats?.membersYouFollow || [],
+                            ...group?.yourStats?.membersYouFollow || [],
                             // TODO: representatives
-                            ...group?.stats?.mostRepresentingMembers.filter(
-                                (m: any) => !group.yourStats?.membersYouFollow.find((mm: any) => mm.handle === m.handle)
-                            )
+                            ...group?.stats?.mostRepresentingMembers?.filter(
+                                (m: any) => !group.yourStats?.membersYouFollow?.find((mm: any) => mm.handle === m.handle)
+                            ) || []
                         ].slice(0, 3).map((m: any) => (
                             <Link
                                 key={m.handle + group.handle}

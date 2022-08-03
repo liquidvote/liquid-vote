@@ -167,7 +167,7 @@ export default function Question() {
                 )} */}
                 <h2 className="mb-2 mt-4 white pre-wrap mw-95"><b>{voteName}</b>?</h2>
 
-                {question.thisUserIsAdmin && (
+                {(question.thisUserIsAdmin || liquidUser?.admin === 'total') && (
                     <div className='d-flex mt-3 justify-content-center'>
                         <div
                             className='d-flex justify-content-center pointer'

@@ -24,6 +24,7 @@ import TopPageInvite from '@components/shared/TopPageInvite';
 import env from '@env';
 import InviteTinySvg from "@shared/Icons/Invite-tiny.svg";
 import Avatar from '@components/shared/Avatar';
+import GroupVisibilityPicker from '@components/shared/GroupVisibilityPicker';
 
 import GroupPolls from './GroupPolls';
 import './style.sass';
@@ -119,19 +120,34 @@ export const Group: FunctionComponent<{}> = ({ }) => {
                 <div className="d-flex flex-column mb-1 mr-1 flex-nowrap">
                     <h4 className="d-flex white align-items-start m-0">
                         {group?.name}
-                        <div className="ml-2">
+                        {/* <div className="ml-2">
                             {group?.privacy === "private" ? (
                                 <LockSVG />
                             ) : group?.privacy === "public" ? (
                                 <WorldSVG />
                             ) : <LinkSVG />}
-                        </div>
+                        </div> */}
                     </h4>
-                    <p className="profile-handle">@{group?.handle}</p>
+
+                    <p className="profile-handle d-flex align-items-center">
+                        @{group?.handle}
+                        <small>
+                            ・ {group?.privacy}
+
+                            {/* {group?.privacy === "private" ? (
+                                <LockSVG />
+                            ) : group?.privacy === "public" ? (
+                                <WorldSVG />
+                            ) : <LinkSVG />} */}
+                        </small>
+                    </p>
                 </div>
                 <div className="d-flex mb-n1 ml-n1 flex-wrap align-content-start justify-content-end">
                     {isMember && (
                         <>
+                            <GroupVisibilityPicker
+                                group={group}
+                            />
                             <div
                                 className="button_ small mb-2 ml-2"
                                 onClick={async () => {
@@ -265,7 +281,7 @@ export const Group: FunctionComponent<{}> = ({ }) => {
                                 </div>
                             </div>
                             {liquidUser ? (
-                                <div className='d-flex ml-n2 mt-2 align-items-center'>
+                                <div className='d-flex ml-n2 align-items-center'>
                                     {group.yourStats?.membersYouFollow?.length ? (
                                         <>
                                             {[

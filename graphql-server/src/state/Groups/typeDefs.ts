@@ -33,6 +33,7 @@ export const GroupTypeDefs = gql`
         bio: String
         avatar: String
         privacy: String
+        adminApproved: Boolean
         cover: String
         externalLink: String
         createdOn: String
@@ -86,5 +87,6 @@ export const GroupTypeDefs = gql`
 
     extend type Mutation {
         editGroup(handle: String, Group: JSON): JSON
+        adminApproveGroup(handle: String, newStatus: Boolean): JSON
     }
 `;

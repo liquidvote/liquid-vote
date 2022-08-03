@@ -1,5 +1,6 @@
 import { ObjectId } from 'mongodb';
 import { votesInCommonPipelineForVotes } from '../Users/aggregationLogic/votesInCommonPipelineForVotes';
+import { yourGroupStats, groupStats } from './aggregationLogic';
 
 export const GroupResolvers = {
     Query: {
@@ -9,92 +10,16 @@ export const GroupResolvers = {
                 { '$match': { 'handle': handle } },
 
                 {
-                    '$lookup': {
-                        as: "membersYouFollow",
-                        from: "UserFollows",
-                        let: {
-                            'loggedInUser': new ObjectId(AuthUser._id),
-                            'groupId': '$_id',
-                            'groupHandle': '$handle'
-                        },
-                        'pipeline': [{
-                            '$match': {
-                                '$expr': {
-                                    '$eq': [
-                                        '$followingId', '$$loggedInUser'
-                                    ]
-                                }
-                            }
-                        }, {
-                            "$lookup": {
-                                "as": "isGroupMember",
-                                "from": "GroupMembers",
-                                let: {
-                                    'followedId': '$followedId',
-                                    'groupId': '$$groupId'
-                                },
-                                "pipeline": [
-                                    {
-                                        "$match": {
-                                            '$and': [
-                                                { "$expr": { "$eq": ["$userId", "$$followedId"] } },
-                                                { "$expr": { "$eq": ["$groupId", "$$groupId"] } },
-                                                { "$expr": { "$eq": ["$isMember", true] } }
-                                            ]
-                                        }
-                                    }
-                                ],
-                            }
-                        },
-                        {
-                            '$match': {
-                                '$expr': {
-                                    '$eq': [
-                                        { "$size": "$isGroupMember" }, 1
-                                    ]
-                                }
-                            }
-                        },
-                        {
-                            "$lookup": {
-                                "as": "user",
-                                "from": "Users",
-                                let: {
-                                    'followedId': '$followedId',
-                                },
-                                "pipeline": [
-                                    {
-                                        "$match": {
-                                            '$and': [
-                                                { "$expr": { "$eq": ["$_id", "$$followedId"] } }
-                                            ]
-                                        }
-                                    }
-                                ],
-                            }
-                        }, {
-                            "$replaceRoot": { newRoot: { "$first": "$user" } }
-                        }, {
-                            '$replaceRoot': {
-                                newRoot: {
-                                    $mergeObjects: [
-                                        { _id: "$_id" },
-                                        "$LiquidUser"
-                                    ]
-                                }
-                            }
-                        }]
-                    },
-                },
-                {
-                    '$addFields': {
-                        'yourStats': { 'membersYouFollow': '$membersYouFollow' }
+                    '$replaceRoot': {
+                        newRoot: {
+                            group: "$$ROOT"
+                        }
                     }
                 },
 
+                ...groupStats(),
+                ...yourGroupStats(AuthUser),
             ]).toArray())?.[0];
-
-
 
             if (!Group) return;
 
@@ -106,61 +31,27 @@ export const GroupResolvers = {
                     })) : {};
 
             return {
-                ...Group,
-                thisUserIsAdmin: !!Group.admins.find(u => u.handle === AuthUser?.LiquidUser?.handle),
+                ...Group.group,
+                thisUserIsAdmin: !!Group.group.admins.find(u => u.handle === AuthUser?.LiquidUser?.handle),
                 yourMemberRelation: GroupMemberRelation,
                 //TODO: replace with Aggregation
-                stats: await getGroupStats({
-                    groupHandle: Group.handle,
-                    groupId: Group._id,
-                    mongoDB,
-                    AuthUser
-                }),
-                //TODO: replace with Aggregation
+                stats: Group.groupStats,
+
                 yourStats: !!AuthUser && {
-                    ...Group.yourStats,
-                    ...await getYourGroupStats({
-                        groupHandle: Group.handle,
-                        groupId: Group._id,
-                        AuthUser,
-                        mongoDB,
-                    })
+                    ...Group.yourGroupStats,
                 },
             };
         },
-        Groups: async (_source, { userHandle }, { mongoDB, AuthUser }) => {
+        Groups: async (_source, { }, { mongoDB, AuthUser }) => {
+            if (!AuthUser || AuthUser?.LiquidUser?.admin !== 'total') return;
 
-            const User = await mongoDB.collection("Users")
-                .findOne({ 'LiquidUser.handle': userHandle });
-
-            const GroupsMemberRelations = await mongoDB.collection("GroupMembers")
-                .find({ 'userId': new ObjectId(User?._id) })
-                .toArray();
+            console.log('here');
 
             const Groups = await Promise.all((
-                await mongoDB.collection("Groups").find({
-                    "_id": {
-                        "$in": GroupsMemberRelations.map(r => new ObjectId(r.groupId))
-                    }
-                }).toArray()
-            )
-                .map(async (g) => ({
-                    ...g,
-                    thisUserIsAdmin: !!g.admins.find(u => u.handle === AuthUser?.LiquidUser?.handle),
-                    stats: await getGroupStats({
-                        groupHandle: g.handle,
-                        groupId: g._id,
-                        mongoDB,
-                        AuthUser
-                    }),
-                    //TODO: replace with Aggregation
-                    yourStats: !!AuthUser && await getYourGroupStats({
-                        groupHandle: g.handle,
-                        groupId: g._id,
-                        AuthUser,
-                        mongoDB,
-                    }),
-                })));
+                await mongoDB.collection("Groups").find().toArray()
+            ));
+
+            console.log({ Groups });
 
             return Groups;
         },
@@ -394,6 +285,28 @@ export const GroupResolvers = {
             };
         },
         // updateGroupRepresentatives
+        adminApproveGroup: async (_source, { handle, newStatus }, { mongoDB, AuthUser }) => {
+
+            if (!AuthUser || AuthUser?.LiquidUser?.admin !== 'total') return;
+
+            const Group = await mongoDB.collection("Groups")
+                .findOne({ 'handle': handle });
+
+            const updated = (AuthUser && Group) ? (
+                await mongoDB.collection("Groups").findOneAndUpdate(
+                    { _id: Group._id },
+                    {
+                        $set: {
+                            'adminApproved': newStatus,
+                            'lastAdminEditOn': Date.now(),
+                        },
+                    },
+                    { returnDocument: 'after' }
+                )
+            )?.value : null;
+
+            return updated;
+        },
     },
 };
 
