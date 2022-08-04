@@ -1,17 +1,15 @@
 import { ObjectId } from 'mongodb';
 const { promises: fs } = require("fs");
 
-import { getGroupStats } from '../Groups/resolvers';
 import { updateInviteStatus } from '../Invites/resolvers';
 import { updateRepresenteesVotes } from '../Votes/resolvers';
 import { updateQuestionVotingStats } from '../Questions/resolvers';
-import { QuestionsAgg } from '../Questions/aggregationLogic/QuestionsAgg';
-import { votesInCommonPipelineForVotes } from './aggregationLogic/votesInCommonPipelineForVotes';
 import { userRepresentedByComparissons } from './aggregationLogic/userRepresentedByComparissons';
 import { userRepresentingComparissons } from './aggregationLogic/UserRepresentingComparissons';
 import { userStatsAgg } from './aggregationLogic/userStats';
 import { yourUserStatsAgg } from './aggregationLogic/yourUserStats';
 import { yourGroupStats, groupStats, userGroupStats } from '../Groups/aggregationLogic';
+import { canViewUsersVoteOrCause } from "../ViewingPermission/aggregationLogic";
 
 export const UserResolvers = {
     Query: {
@@ -439,8 +437,6 @@ export const UserResolvers = {
             const Representative = await mongoDB.collection("Users")
                 .findOne({ 'LiquidUser.handle': representative });
 
-            const isYou = handle === AuthUser?.LiquidUser?.handle;
-
             const UserGroupsAggFromGroupMembers = [
                 // get user member rel
                 {
@@ -456,87 +452,7 @@ export const UserResolvers = {
                         }
                     }
                 },
-                // get your member rel
-                {
-                    '$lookup': {
-                        'as': 'yourRel',
-                        'from': 'GroupMembers',
-                        'let': {
-                            'groupId': '$userRel.groupId',
-                            'yourId': new ObjectId(AuthUser._id)
-                        },
-                        'pipeline': [
-                            {
-                                '$match': {
-                                    '$and': [
-                                        {
-                                            '$expr': {
-                                                '$eq': ['$userId', {
-                                                    '$toObjectId': '$$yourId'
-                                                }]
-                                            }
-                                        },
-                                        {
-                                            '$expr': {
-                                                '$eq': ['$groupId', {
-                                                    '$toObjectId': '$$groupId'
-                                                }]
-                                            }
-                                        },
-                                        { '$expr': { '$eq': ['$isMember', true] } }
-                                    ]
-                                }
-                            }
-                        ],
-                    }
-                },
-                {
-                    '$addFields': {
-                        yourRel: { '$first': '$yourRel' }
-                    }
-                },
 
-                // get user following you rel
-                {
-                    '$lookup': {
-                        'as': 'userFollowingYouRel',
-                        'from': 'UserFollows',
-                        'let': {
-                            'userId': '$userRel.userId',
-                            'yourId': new ObjectId(AuthUser._id)
-                        },
-                        'pipeline': [
-                            {
-                                '$match': {
-                                    '$and': [
-                                        {
-                                            '$expr': {
-                                                '$eq': ['$followedId', {
-                                                    '$toObjectId': '$$yourId'
-                                                }]
-                                            }
-                                        },
-                                        {
-                                            '$expr': {
-                                                '$eq': ['$followingId', {
-                                                    '$toObjectId': '$$userId'
-                                                }]
-                                            }
-                                        },
-                                        { '$expr': { '$eq': ['$isFollowing', true] } }
-                                    ]
-                                }
-                            }
-                        ],
-                    }
-                },
-                {
-                    '$addFields': {
-                        userFollowingYouRel: { '$first': '$userFollowingYouRel' }
-                    }
-                },
-
-                // get group
                 {
                     '$lookup': {
                         'as': 'group',
@@ -566,66 +482,7 @@ export const UserResolvers = {
                         group: { '$first': '$group' }
                     }
                 },
-
-                // FILTER
-
-                ...!notUsers ? [{
-                    '$match': {
-                        '$or': [
-                            // no user visibility, public group
-                            {
-                                '$and': [
-                                    { "$expr": { '$not': "$userRel.visibility" } },
-                                    { "$expr": { '$eq': ["$group.privacy", "public"] } }
-                                ]
-                            },
-                            // visibility: everyone, group not private
-                            {
-                                '$and': [
-                                    { "$expr": { '$eq': ["$userRel.visibility", "everyone"] } },
-                                    { "$expr": { '$ne': ["$group.privacy", "private"] } }
-                                ]
-                            },
-                            // no user visibility, private group
-                            {
-                                '$and': [
-                                    { "$expr": { '$ne': ["$userRel.visibility", "self"] } },
-                                    { "$expr": { '$eq': ["$group.privacy", "private"] } },
-                                    { "$expr": { '$eq': ["$yourRel.isMember", true] } }
-                                ]
-                            },
-                            // visibility: members
-                            {
-                                '$and': [
-                                    { "$expr": { '$eq': ["$userRel.visibility", "members"] } },
-                                    { "$expr": { '$eq': ["$yourRel.isMember", true] } }
-                                ]
-                            },
-                            // visibility: following
-                            {
-                                '$and': [
-                                    { "$expr": { '$eq': ["$userRel.visibility", "following"] } },
-                                    { "$expr": { '$eq': ["$userFollowingYouRel.isFollowing", true] } }
-                                ]
-                            },
-                            // visibility: self
-                            {
-                                '$and': [
-                                    { "$expr": { '$eq': ["$userRel.visibility", "self"] } },
-                                    { "$expr": { '$eq': ["$yourRel.userId", "$userRel.userId"] } }
-                                ]
-                            },
-                        ]
-                    }
-                }] : [{
-                    '$match': {
-                        '$and': [
-                            { "$expr": { '$ne': ["$yourRel.isMember", true] } },
-                            { "$expr": { '$eq': ["$group.privacy", "public"] } },
-                            { "$expr": { '$eq': ["$group.adminApproved", true] } }
-                        ]
-                    }
-                }],
+                ...canViewUsersVoteOrCause({ User, AuthUser }),
 
                 ...Representative ? [
                     // representativeRelation
@@ -802,11 +659,11 @@ export const UserResolvers = {
 
             ];
 
-            const writeToDebugFile = fs.writeFile(
-                process.cwd() + '/debug' + '/UserGroups.json',
-                JSON.stringify(UserGroupsAggFromGroupMembers, null, 2),
-                { encoding: 'utf8' }
-            );
+            // const writeToDebugFile = fs.writeFile(
+            //     process.cwd() + '/debug' + '/UserGroups.json',
+            //     JSON.stringify(UserGroupsAggFromGroupMembers, null, 2),
+            //     { encoding: 'utf8' }
+            // );
 
             const UserGroups = !notUsers && (await mongoDB.collection("GroupMembers").aggregate(UserGroupsAggFromGroupMembers)
                 .toArray()).map((g) => ({
@@ -832,426 +689,15 @@ export const UserResolvers = {
                     yourStats: g.yourGroupStats,
                 }));
 
-            const writeToDebugFile2 = fs.writeFile(
-                process.cwd() + '/debug' + '/NotUsersGroups.json',
-                JSON.stringify(NotUsersGroupsAgg, null, 2),
-                { encoding: 'utf8' }
-            );
-    
+            // const writeToDebugFile2 = fs.writeFile(
+            //     process.cwd() + '/debug' + '/NotUsersGroups.json',
+            //     JSON.stringify(NotUsersGroupsAgg, null, 2),
+            //     { encoding: 'utf8' }
+            // );
+
             // console.log({ notUsers, NotUsersGroups });
 
             return notUsers ? NotUsersGroups : UserGroups;
-        },
-        UserGroups_old: async (_source, { handle, representative, notUsers }, { mongoDB, AuthUser }) => {
-
-            const User = !!handle && await mongoDB.collection("Users")
-                .findOne({ 'LiquidUser.handle': handle });
-
-            const Representative = await mongoDB.collection("Users")
-                .findOne({ 'LiquidUser.handle': representative });
-
-            const isYou = handle === AuthUser?.LiquidUser?.handle;
-
-            const UserGroupMemberRelations = !!User && await mongoDB.collection("GroupMembers")
-                .find({ 'userId': new ObjectId(User?._id), 'isMember': true })
-                .toArray();
-
-            const YourGroupMemberRelations = (!!AuthUser && !!UserGroupMemberRelations) &&
-                await mongoDB.collection("GroupMembers")
-                    .find({
-                        'userId': new ObjectId(AuthUser?._id),
-                        'groupId': {
-                            "$in": UserGroupMemberRelations.map(
-                                r => new ObjectId(r.groupId)
-                            )
-                        },
-                        'isMember': true
-                    })
-                    .toArray();
-
-            const RepresentativeGroupMemberRelations = !!AuthUser && await mongoDB.collection("GroupMembers")
-                .find({
-                    'userId': new ObjectId(Representative?._id),
-                    ...!!UserGroupMemberRelations && {
-                        'groupId': {
-                            "$in": UserGroupMemberRelations.map(
-                                r => new ObjectId(r.groupId)
-                            )
-                        },
-                        'isMember': true
-                    },
-                })
-                .toArray();
-
-            const Groups = await Promise.all((
-                (await mongoDB.collection("Groups").aggregate([
-                    // {
-                    //     '$match': {
-                    //         ...!!UserGroupMemberRelations && {
-                    //             "_id": {
-                    //                 [`${notUsers ? '$nin' : '$in'}`]: UserGroupMemberRelations.map(r => new ObjectId(r.groupId))
-                    //             },
-                    //         },
-                    //         ...(notUsers || !(!!handle)) && {
-                    //             privacy: 'public'
-                    //         }
-                    //     },
-                    // },
-                    // filter out Non Public UserGroups you don't belong to
-                    {
-                        '$match': {
-                            $and: [
-                                ...!!UserGroupMemberRelations ? [{
-                                    "_id": {
-                                        [`${notUsers ? '$nin' : '$in'}`]: UserGroupMemberRelations.map(r => new ObjectId(r.groupId))
-                                    },
-                                }] : [],
-                                {
-                                    $or: [
-                                        { privacy: 'public' },  // and visibility: everyone
-                                        // you are member && visibility: members 
-                                        ...!!YourGroupMemberRelations ? [
-                                            { '_id': { '$in': YourGroupMemberRelations.map(r => new ObjectId(r.groupId)) } }
-                                        ] : []
-                                        // is self && visibility: self
-                                    ]
-                                }
-                            ]
-                        }
-                    },
-                    // ...userStatsAgg({ groupHandle, groupId: group._id }),
-                    {
-                        '$lookup': {
-                            'as': 'directVotesMadeByUser',
-                            'from': 'Votes',
-                            'let': {
-                                'userId': new ObjectId(User?._id),
-                                'groupHandle': '$handle'
-                            },
-                            'pipeline': [
-                                {
-                                    '$match': {
-                                        '$and': [
-                                            {
-                                                '$expr': {
-                                                    '$eq': [
-                                                        '$user', '$$userId'
-                                                    ]
-                                                }
-                                            },
-                                            {
-                                                '$expr': {
-                                                    '$eq': [
-                                                        '$isDirect', true
-                                                    ]
-                                                }
-                                            },
-                                            {
-                                                '$expr': {
-                                                    '$ne': [
-                                                        '$position', null
-                                                    ]
-                                                }
-                                            },
-                                            {
-                                                '$expr': {
-                                                    '$eq': [
-                                                        '$groupChannel.group', '$$groupHandle'
-                                                    ]
-                                                }
-                                            },
-                                        ],
-                                    }
-                                },
-                            ]
-                        }
-                    },
-                    {
-                        '$addFields': {
-                            'userStats': {
-                                'directVotesMade': {
-                                    $size: '$directVotesMadeByUser'
-                                }
-                            }
-                        }
-                    },
-                    {
-                        $sort: { 'userStats.directVotesMade': -1 }
-                    },
-                    //  On Your Groups - membersYouFollow
-                    ...(!!AuthUser?._id && handle === AuthUser?.LiquidUser.handle) ? [
-                        {
-                            '$lookup': {
-                                as: "membersYouFollow",
-                                from: "UserFollows",
-                                let: {
-                                    'loggedInUser': new ObjectId(AuthUser._id),
-                                    'groupId': '$_id',
-                                    'groupHandle': '$handle'
-                                },
-                                'pipeline': [{
-                                    '$match': {
-                                        '$expr': {
-                                            '$eq': [
-                                                '$followingId', '$$loggedInUser'
-                                            ]
-                                        }
-                                    }
-                                }, {
-                                    "$lookup": {
-                                        "as": "isGroupMember",
-                                        "from": "GroupMembers",
-                                        let: {
-                                            'followedId': '$followedId',
-                                            'groupId': '$$groupId'
-                                        },
-                                        "pipeline": [
-                                            {
-                                                "$match": {
-                                                    '$and': [
-                                                        { "$expr": { "$eq": ["$userId", "$$followedId"] } },
-                                                        { "$expr": { "$eq": ["$groupId", "$$groupId"] } },
-                                                        { "$expr": { "$eq": ["$isMember", true] } }
-                                                    ]
-                                                }
-                                            }
-                                        ],
-                                    }
-                                },
-                                {
-                                    '$match': {
-                                        '$expr': {
-                                            '$eq': [
-                                                { "$size": "$isGroupMember" }, 1
-                                            ]
-                                        }
-                                    }
-                                },
-                                {
-                                    "$lookup": {
-                                        "as": "user",
-                                        "from": "Users",
-                                        let: {
-                                            'followedId': '$followedId',
-                                        },
-                                        "pipeline": [
-                                            {
-                                                "$match": {
-                                                    '$and': [
-                                                        { "$expr": { "$eq": ["$_id", "$$followedId"] } }
-                                                    ]
-                                                }
-                                            }
-                                        ],
-                                    }
-                                }, {
-                                    "$replaceRoot": { newRoot: { "$first": "$user" } }
-                                }, {
-                                    '$replaceRoot': {
-                                        newRoot: {
-                                            $mergeObjects: [
-                                                { _id: "$_id" },
-                                                "$LiquidUser"
-                                            ]
-                                        }
-                                    }
-                                }, { //
-                                    '$lookup': {
-                                        'as': 'yourStats',
-                                        'from': 'Votes',
-                                        'let': {
-                                            'userId': "$_id",
-                                            'groupHandle': '$$groupHandle'
-                                        },
-                                        'pipeline': [
-                                            {
-                                                '$match': {
-                                                    '$and': [
-                                                        {
-                                                            '$expr': {
-                                                                '$eq': [
-                                                                    '$user', new ObjectId(AuthUser._id)
-                                                                ]
-                                                            }
-                                                        },
-                                                        {
-                                                            '$expr': {
-                                                                '$eq': [
-                                                                    '$groupChannel.group', '$$groupHandle'
-                                                                ]
-                                                            }
-                                                        }
-                                                    ],
-                                                }
-                                            },
-                                            ...votesInCommonPipelineForVotes()
-                                        ]
-                                    }
-                                }, {
-                                    '$addFields': {
-                                        'yourStats': { '$first': '$yourStats' }
-                                    }
-                                }, {
-                                    '$lookup': {
-                                        'as': 'directVotesMadeByUser',
-                                        'from': 'Votes',
-                                        'let': {
-                                            'userId': "$_id",
-                                            'groupHandle': '$$groupHandle'
-                                        },
-                                        'pipeline': [
-                                            {
-                                                '$match': {
-                                                    '$and': [
-                                                        {
-                                                            '$expr': {
-                                                                '$eq': [
-                                                                    '$user', '$$userId'
-                                                                ]
-                                                            }
-                                                        },
-                                                        {
-                                                            '$expr': {
-                                                                '$eq': [
-                                                                    '$isDirect', true
-                                                                ]
-                                                            }
-                                                        },
-                                                        {
-                                                            '$expr': {
-                                                                '$ne': [
-                                                                    '$position', null
-                                                                ]
-                                                            }
-                                                        },
-                                                        {
-                                                            '$expr': {
-                                                                '$eq': [
-                                                                    '$groupChannel.group', '$$groupHandle'
-                                                                ]
-                                                            }
-                                                        },
-                                                    ],
-                                                }
-                                            },
-                                        ]
-                                    }
-                                }, {
-                                    '$addFields': {
-                                        'stats': {
-                                            'directVotesMade': {
-                                                $size: '$directVotesMadeByUser'
-                                            }
-                                        }
-                                    }
-                                }, {
-                                    $sort: { 'yourStats.directVotesInCommon': -1 }
-                                },]
-                            },
-                        },
-                        {
-                            '$addFields': {
-                                'yourStats': { 'membersYouFollow': '$membersYouFollow' }
-                            }
-                        },
-                    ] : [],
-                    //  On Another User's Groups
-                    ...(!!AuthUser?._id && handle !== AuthUser?.LiquidUser.handle) ? [
-                        {
-                            '$lookup': {
-                                'as': 'yourUserStats',
-                                'from': 'Votes',
-                                'let': {
-                                    'userId': new ObjectId(User._id),
-                                    'groupHandle': '$handle'
-                                },
-                                'pipeline': [
-                                    {
-                                        '$match': {
-                                            '$and': [
-                                                {
-                                                    '$expr': {
-                                                        '$eq': [
-                                                            '$user', new ObjectId(AuthUser._id)
-                                                        ]
-                                                    }
-                                                },
-                                                {
-                                                    '$expr': {
-                                                        '$eq': [
-                                                            '$groupChannel.group', '$$groupHandle'
-                                                        ]
-                                                    }
-                                                }
-                                            ],
-                                        }
-                                    },
-                                    ...votesInCommonPipelineForVotes()
-                                ]
-                            }
-                        }, {
-                            '$addFields': {
-                                'yourUserStats': { '$first': '$yourUserStats' }
-                            }
-                        },
-                        // {
-                        //     $sort: { 'yourUserStats.directVotesInCommon': -1 }
-                        // }
-                    ] : [],
-                ])
-                    .toArray())
-                    .map(async (g) => ({
-                        ...g,
-                        thisUserIsAdmin: !!g.admins.find(u => u.handle === AuthUser?.LiquidUser?.handle),
-
-                        stats: await getGroupStats({
-                            groupHandle: g.handle,
-                            groupId: g._id,
-                            mongoDB,
-                            AuthUser
-                        }),
-                        ...!!UserGroupMemberRelations && {
-                            userMemberRelation: UserGroupMemberRelations?.find(
-                                r => r.groupId.toString() === g._id.toString()
-                            ),
-                            yourMemberRelation: YourGroupMemberRelations && YourGroupMemberRelations.find(
-                                r => r.groupId.toString() === g._id.toString()
-                            ),
-                            representativeRelation: await (async r => ({
-                                isGroupMember: !!r && r?.isMember,
-                                ...(!!r) && {
-                                    ... await mongoDB.collection("UserRepresentations")
-                                        .findOne({
-                                            representativeId: new ObjectId(Representative?._id),
-                                            representeeId: new ObjectId(AuthUser?._id),
-                                            groupId: new ObjectId(g?._id),
-                                        })
-                                }
-                            }))(RepresentativeGroupMemberRelations && RepresentativeGroupMemberRelations.find(
-                                r => r.groupId.toString() === g._id.toString()
-                            )),
-                            youToHimRepresentativeRelation: await (async r => ({
-                                isGroupMember: !!r && r?.isMember,
-                                ...(!!r) && {
-                                    ... await mongoDB.collection("UserRepresentations")
-                                        .findOne({
-                                            representativeId: new ObjectId(AuthUser?._id),
-                                            representeeId: new ObjectId(Representative?._id),
-                                            groupId: new ObjectId(g?._id),
-                                        })
-                                }
-                            }))(RepresentativeGroupMemberRelations && RepresentativeGroupMemberRelations.find(
-                                r => r.groupId.toString() === g._id.toString()
-                            )),
-                            yourUserStats: g.yourUserStats,
-                            userStats: g.userStats,
-                            yourStats: g.yourStats      //TODO: are these really needed here?
-                        }
-                    }))));
-
-            // console.log({ GroupsR: Groups.map(r => r.representativeRelation) });
-
-            return Groups;
         },
         UserFollowing: async (_source, { handle }, { mongoDB, AuthUser }) => {
             const User = await mongoDB.collection("Users")

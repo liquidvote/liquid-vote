@@ -572,13 +572,24 @@ const yourStats = ({ AuthUserId }) => [
                 'pipeline': [
                     {
                         '$match': {
-                            '$expr': {
-                                '$eq': [
-                                    '$followingId', {
-                                        '$toObjectId': '$$loggedInUser'
+                            '$and': [
+                                {
+                                    '$expr': {
+                                        '$eq': [
+                                            '$followingId', {
+                                                '$toObjectId': '$$loggedInUser'
+                                            }
+                                        ]
                                     }
-                                ]
-                            }
+                                },
+                                {
+                                    '$expr': {
+                                        '$eq': [
+                                            '$isFollowing', true
+                                        ]
+                                    }
+                                }
+                            ]
                         }
                     },
                     {

@@ -243,7 +243,7 @@ export const Choice: FunctionComponent<{
                 {/* <pre>{JSON.stringify(stats_, null, 2) }</pre> */}
 
                 {showChart && (
-                    <div className="d-flex d-flex justify-content-between mt-1">
+                    <div className={`d-flex d-flex justify-content-between mt-1 ${userVote?.position === "against" && 'voted-right againstBorderColor'} ${userVote?.position === "for" && 'voted-left forBorderColor'}`}>
                         <div className="d-flex c-on-tiny">
                             <div
                                 className={`forbtn button_ forDirectBorder justify-content-between min-w mr-1 ${yourVote_?.position === 'for' && 'forDirectBg'} ${inList && 'small'}`}
@@ -335,8 +335,15 @@ export const Choice: FunctionComponent<{
                                     </div>
                                 )}
                             </div>
+
                             <div
-                                className="d-flex ml-2"
+                                className={`pointer text-decoration-none count for mr-n2 ${inList ? 'tiny-avatar' : 'vote-avatar'}`}
+                            >
+                                {numeral(stats_.forCount).format('0a[.]0')}
+                            </div>
+
+                            <div
+                                className="d-flex ml-4"
                                 data-tip={`Voted Yay`}
                                 onClick={
                                     e => {
@@ -370,18 +377,27 @@ export const Choice: FunctionComponent<{
 
                                 {(
                                     user && userVote?.position === "for" && (
-                                        <div
-                                            className={`for ml-n2 ${inList ? 'tiny-avatar' : 'vote-avatar'} pointer`}
-                                            style={{ background: `url(${user.avatar}) 50% 50% / cover no-repeat` }}
-                                        ></div>
+                                        <div className='d-flex justify-content-center align-items-center mx-2'>
+                                            <Avatar
+                                                person={user}
+                                                groupHandle={groupHandle}
+                                                type={inList ? 'tiny' : 'vote'}
+                                            />
+
+                                            <small>
+                                                <b className='ml-2 mr-1 forColor'>
+                                                    voted
+                                                </b>
+                                                {userVote?.position === 'for' && (
+                                                    <b className='white mr-1 forDirect px-1 rounded'>yay</b>
+                                                )}
+                                                {userVote?.position === 'against' && (
+                                                    <b className='white mr-1 againstDirect px-1 rounded'>nay</b>
+                                                )}
+                                            </small>
+                                        </div>
                                     )
                                 )}
-
-                                <div
-                                    className={`pointer text-decoration-none count for ml-n2 ${inList ? 'tiny-avatar' : 'vote-avatar'}`}
-                                >
-                                    {numeral(stats_.forCount).format('0a[.]0')}
-                                </div>
                             </div>
                         </div>
 
@@ -410,10 +426,19 @@ export const Choice: FunctionComponent<{
 
                                 {(
                                     user && userVote?.position === "against" && (
-                                        <div
-                                            className={`vote-avatar against ml-n2 ${inList ? 'tiny-avatar' : 'vote-avatar'} pointer`}
-                                            style={{ background: `url(${user.avatar}) 50% 50% / cover no-repeat` }}
-                                        ></div>
+                                        <div className='d-flex justify-content-center align-items-center mx-2'>
+                                            <Avatar
+                                                person={user}
+                                                groupHandle={groupHandle}
+                                                type={inList ? 'tiny' : 'vote'}
+                                            />
+                                            <small>
+                                                <b className='ml-2 mr-1 againstColor'>
+                                                    voted
+                                                </b>
+                                                <b className='white mr-1 againstDirect px-1 rounded'>nay</b>
+                                            </small>
+                                        </div>
                                     )
                                 )}
 
@@ -436,7 +461,7 @@ export const Choice: FunctionComponent<{
                                             })
                                         }
                                     }
-                                    className={`text-decoration-none count against ml-n2 ${inList ? 'tiny-avatar' : 'vote-avatar'}`}>
+                                    className={`text-decoration-none count against ml-2 ${inList ? 'tiny-avatar' : 'vote-avatar'}`}>
                                     {numeral(stats_.againstCount).format('0a[.]0')}
                                 </div>
                             </div>

@@ -100,11 +100,6 @@ export const UserTypeDefs = gql`
             representative: String,
             notUsers: Boolean
         ): [Group],
-        UserGroups_old(
-            handle: String,
-            representative: String,
-            notUsers: Boolean
-        ): [Group],
     }
 
     extend type Mutation {

@@ -1,6 +1,6 @@
 import { ObjectId } from 'mongodb';
 
-import { votesInCommonPipelineForVotes } from '../Users/aggregationLogic/votesInCommonPipelineForVotes';
+import { canViewUsersVoteOrCause } from "../ViewingPermission/aggregationLogic";
 
 export const VotersAgg = ({
     questionText,
@@ -707,7 +707,7 @@ export const VotersAgg = ({
             }
         ]
     ),
-    question: (
+    questionAndGroup: (
         [
             {
                 $lookup: {
@@ -754,7 +754,10 @@ export const VotersAgg = ({
                     as: 'group'
                 }
             }, {
-                $addFields: { 'question.group': { $first: '$group' } }
+                $addFields: {
+                    'question.group': { $first: '$group' },
+                    'group': { $first: '$group' }
+                }
             },
         ]
     ),
@@ -918,11 +921,6 @@ export const VotesGeneralAggregateLogic = async ({
         sortBy
     });
 
-    console.log({
-        followsOnly,
-        AuthUser
-    });
-
     return [
         ...AggregateLogic.matchVoteToParams,
         ...AggregateLogic.removeRepresentativesIfNotDelegated,
@@ -941,8 +939,10 @@ export const VotesGeneralAggregateLogic = async ({
         ] : [],
         ...AggregateLogic.matchChoiceParam(choiceFilters),
         ...AggregateLogic.sortLogic,
-        ...AggregateLogic.question,
+        ...AggregateLogic.questionAndGroup,
+        ...canViewUsersVoteOrCause({ User, AuthUser }),
         ...AggregateLogic.userObject,
+        
         ...(followsOnly && AuthUser) ? AggregateLogic.filterFollows : []
     ];
 };

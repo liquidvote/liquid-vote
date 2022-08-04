@@ -89,7 +89,7 @@ export const SingleVoteInList: FunctionComponent<{
                     </small>
                 )} */}
                 <div>
-                    <div className="bar-wrapper">
+                    <div className="">
                         {(!!l.questionText && !hideTitle) && (
                             <div className="d-flex align-items-center flex-wrap">
                                 <a
@@ -117,7 +117,7 @@ export const SingleVoteInList: FunctionComponent<{
                         )}
 
                         {showGroupAndTime && (
-                            <div className="d-flex flex-column justify-content-end mb-1 mt-n1">
+                            <div className="d-flex flex-column justify-content-end mb-2">
                                 <small className="tiny-text" data-tip="Last vote was">
                                     {!!l?.stats.lastVoteOn ?
                                         'last vote was ' + timeAgo.format(new Date(Number(l?.stats?.lastVoteOn))) :

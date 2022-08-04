@@ -117,7 +117,7 @@ export const MultiVoteInList: FunctionComponent<{
                 </div>
 
                 {showGroupAndTime && (
-                    <div className="d-flex flex-column justify-content-end mb-n1">
+                    <div className="d-flex flex-column justify-content-end mt-1">
                         <small className="tiny-text" data-tip="Last vote was">
                             {!!v?.stats.lastVoteOn ?
                                 'last vote was ' + timeAgo.format(new Date(Number(v?.stats?.lastVoteOn))) :

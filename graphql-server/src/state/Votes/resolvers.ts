@@ -25,8 +25,6 @@ export const VoteResolvers = {
             sortBy
         }, { mongoDB, AuthUser }) => {
 
-            console.log({ followsOnly });
-
             const User = !!userHandle && await mongoDB.collection("Users")
                 .findOne({ 'LiquidUser.handle': userHandle });
 

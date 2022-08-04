@@ -96,6 +96,18 @@ $theme5-colors: ("bg": #0b414d, "primary": #08f3a5, "secondary": white, "border"
     .against-stroke
         stroke: adjust-color(map-get($theme, "against"))
 
+    .forBorderColor
+        border-color: map-get($theme, "for") !important
+
+    .againstBorderColor
+        border-color: map-get($theme, "against") !important
+
+    .forColor
+        color: map-get($theme, "for") !important
+
+    .againstColor
+        color: map-get($theme, "against") !important
+
     .icon, .icon-large, .icon-small, .icon-tiny
         *
             fill: map-get($theme, "primary")
@@ -637,7 +649,7 @@ hr
     z-index: 1
 
 .tiny-text
-    font-size: 60%
+    font-size: 70%
     opacity: 0.6
 
 .behind

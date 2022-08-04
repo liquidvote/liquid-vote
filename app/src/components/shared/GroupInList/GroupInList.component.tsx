@@ -145,7 +145,7 @@ export const GroupInList: FunctionComponent<{
                         </Link>
 
                         {group.yourStats?.membersYouFollow?.length ? (
-                            <small className='ml-2'>
+                            <small className='ml-2 faded'>
                                 {group.yourStats?.membersYouFollow.slice(0, 3).map((m: any, i) => (
                                     <>
                                         {' '}
