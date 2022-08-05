@@ -148,7 +148,7 @@ export const GroupVisibilityPicker: FunctionComponent<{
                             </ul>
                         }
                     />
-                ) : (
+                ) : liquidUser ? (
                     <div className='d-flex align-items-center justify-content-center'>
                         <small>
                             only yourself
@@ -157,7 +157,7 @@ export const GroupVisibilityPicker: FunctionComponent<{
                             <LockSVG data-tip="votes visible only to yourself" />
                         </div>
                     </div>
-                )}
+                ) : null}
                 <button
                     onClick={() => !!liquidUser ? editGroupMemberChannelRelation({
                         variables: {

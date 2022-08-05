@@ -4,6 +4,7 @@ import { useQuery, useMutation } from "@apollo/client";
 import { useNavigate } from "react-router-dom";
 
 import TextInput from "@shared/Inputs/TextInput";
+import ToggleInput from "@shared/Inputs/ToggleInput";
 import ImageInput from "@shared/Inputs/ImageInput";
 import TextAreaInput from "@shared/Inputs/TextAreaInput";
 import DropDownInput from "@shared/Inputs/DropDownInput";
@@ -28,6 +29,7 @@ interface IFormValues {
     channels: any,
     admins: any
     privacy: string
+    allowRepresentation: boolean
 }
 
 export const EditGroup: FunctionComponent<{}> = ({ }) => {
@@ -78,6 +80,7 @@ export const EditGroup: FunctionComponent<{}> = ({ }) => {
             avatar: liquidUser?.avatar,
         }]);
         setValue('privacy', group?.privacy || 'public');
+        setValue('allowRepresentation', group?.allowRepresentation || false)
     }, [group, liquidUser]);
 
     useEffect(() => {
@@ -219,6 +222,32 @@ export const EditGroup: FunctionComponent<{}> = ({ }) => {
                             />
                         ))('privacy')}
                     </div>
+
+                    <div className="my-3 mt-4">
+                            {((name: any) => (
+                                <ToggleInput
+                                    name={name}
+                                    labelName="Allow representations"
+                                    register={register(name, {
+                                        // validate: {
+                                        //     minimum2: (v) =>
+                                        //         v.reduce((acc: any, curr: any) => acc + !!curr.text, 0) >= 2 ||
+                                        //         'please present at least 2 choices',
+                                        // }
+                                    })}
+                                    value={watch(name)}
+                                    error={errors[name]}
+                                    setValue={setValue}
+                                    info={
+                                        watch('allowRepresentation') ? `
+                                            Group members may represent each other
+                                        ` : `
+                                            Group members may only vote directly
+                                        `}
+                                // disabled={modalData.questionText !== "new"}
+                                />
+                            ))('allowRepresentation')}
+                        </div>
 
                     <br />
                     <br />
