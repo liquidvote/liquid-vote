@@ -197,82 +197,87 @@ export const GroupInProfileList: FunctionComponent<{
                                     </Link>
                                 </div>
                             </div>
-                            <div className='d-flex align-items-center ml-auto'>
-                                <Popper
-                                    rightOnSmall={true}
-                                    button={
-                                        <div>
-                                            <ThreeDotsSmallSVG />
-                                        </div>
-                                    }
-                                    oulineInstead={true}
-                                    popperContent={
-                                        <ul className="p-0 m-0 mx-2">
-                                            <li className="d-flex justify-content-center mb-2">
-                                                <button
-                                                    onClick={
-                                                        () => editUserRepresentativeGroupRelation({
-                                                            variables: {
-                                                                RepresenteeHandle: liquidUser?.handle,
-                                                                RepresentativeHandle: user?.handle,
-                                                                Group: group.handle,
-                                                                IsRepresentingYou: !group.representativeRelation?.isRepresentingYou
-                                                            }
-                                                        })
-                                                            .then((r) => {
-                                                                // userGroups_refetch();
-                                                                updateParams({ paramsToAdd: { refetch: 'user' } })
-                                                            })
-                                                    }
-                                                    className={`
-                                                                        button_ small ml-1 mb-0
-                                                                        ${group.representativeRelation?.isRepresentingYou ? 'selected' : null}
-                                                                    `}
-                                                    disabled={!group.yourMemberRelation?.isMember}
-                                                >
-                                                    {
-                                                        group.representativeRelation?.isRepresentingYou ?
-                                                            `Represents you on ${group?.name}` :
-                                                            `Delegate your votes on ${group?.name} to ${user?.name}`
-                                                    }
-                                                </button>
-                                            </li>
-                                            {liquidUser?.handle === user.handle && (
-                                                <li className="d-flex mt-2 justify-content-center">
-                                                    <div
-                                                        className="button_ small ml-2"
-                                                        onClick={async () => {
-                                                            const inviteLink = `${env.website}/invite/by/${liquidUser?.handle}/to/causeOnProfile/${group.handle}`;
+                            {group?.allowRepresentation || liquidUser?.handle === user.handle ? (
+                                <div className='d-flex align-items-center ml-auto'>
+                                    <Popper
+                                        rightOnSmall={true}
+                                        button={
+                                            <div>
+                                                <ThreeDotsSmallSVG />
+                                            </div>
+                                        }
+                                        oulineInstead={true}
+                                        popperContent={
+                                            <ul className="p-0 m-0 mx-2">
 
-                                                            try {
-                                                                await navigator.share({
-                                                                    title: `Vote on ${group.name} with ${liquidUser?.name}`,
-                                                                    text: `${liquidUser?.name} is inviting you to vote on ${group.name} with him`,
-                                                                    url: inviteLink
-                                                                })
-                                                            } catch (err) {
-                                                                updateParams({
-                                                                    paramsToAdd: {
-                                                                        modal: "InviteFor",
-                                                                        modalData: JSON.stringify({
-                                                                            InviteType: 'toGroup',
-                                                                            groupHandle: group.handle,
-                                                                            groupName: group.name,
-                                                                            inviteLink
-                                                                        })
+                                                {group?.allowRepresentation ? (
+                                                    <li className="d-flex justify-content-center mb-2">
+                                                        <button
+                                                            onClick={
+                                                                () => editUserRepresentativeGroupRelation({
+                                                                    variables: {
+                                                                        RepresenteeHandle: liquidUser?.handle,
+                                                                        RepresentativeHandle: user?.handle,
+                                                                        Group: group.handle,
+                                                                        IsRepresentingYou: !group.representativeRelation?.isRepresentingYou
                                                                     }
                                                                 })
+                                                                    .then((r) => {
+                                                                        // userGroups_refetch();
+                                                                        updateParams({ paramsToAdd: { refetch: 'user' } })
+                                                                    })
                                                             }
-                                                        }}
-                                                    >
-                                                        Share Votes
-                                                    </div>
-                                                </li>
-                                            )}
-                                        </ul>
-                                    }
-                                />
-                            </div>
+                                                            className={`
+                                                                                button_ small ml-1 mb-0
+                                                                                ${group.representativeRelation?.isRepresentingYou ? 'selected' : null}
+                                                                            `}
+                                                            disabled={!group.yourMemberRelation?.isMember}
+                                                        >
+                                                            {
+                                                                group.representativeRelation?.isRepresentingYou ?
+                                                                    `Represents you on ${group?.name}` :
+                                                                    `Delegate your votes on ${group?.name} to ${user?.name}`
+                                                            }
+                                                        </button>
+                                                    </li>
+                                                ) : null}
+                                                {liquidUser?.handle === user.handle && (
+                                                    <li className="d-flex mt-2 justify-content-center">
+                                                        <div
+                                                            className="button_ small ml-2"
+                                                            onClick={async () => {
+                                                                const inviteLink = `${env.website}/invite/by/${liquidUser?.handle}/to/causeOnProfile/${group.handle}`;
+
+                                                                try {
+                                                                    await navigator.share({
+                                                                        title: `Vote on ${group.name} with ${liquidUser?.name}`,
+                                                                        text: `${liquidUser?.name} is inviting you to vote on ${group.name} with him`,
+                                                                        url: inviteLink
+                                                                    })
+                                                                } catch (err) {
+                                                                    updateParams({
+                                                                        paramsToAdd: {
+                                                                            modal: "InviteFor",
+                                                                            modalData: JSON.stringify({
+                                                                                InviteType: 'toGroup',
+                                                                                groupHandle: group.handle,
+                                                                                groupName: group.name,
+                                                                                inviteLink
+                                                                            })
+                                                                        }
+                                                                    })
+                                                                }
+                                                            }}
+                                                        >
+                                                            Share Votes
+                                                        </div>
+                                                    </li>
+                                                )}
+                                            </ul>
+                                        }
+                                    />
+                                </div>
+                            ) : null}
                         </div>
 
                         {/* <pre>{JSON.stringify(group, null, 2)}</pre> */}

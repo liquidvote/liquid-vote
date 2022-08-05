@@ -34,6 +34,7 @@ export const GroupTypeDefs = gql`
         avatar: String
         privacy: String
         adminApproved: Boolean
+        allowRepresentation: Boolean
         cover: String
         externalLink: String
         createdOn: String

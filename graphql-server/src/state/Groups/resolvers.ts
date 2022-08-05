@@ -221,9 +221,7 @@ export const GroupResolvers = {
                     'createdOn': Date.now(),
                     'admins': Group.admins,
                     'privacy': Group.privacy,
-                    'channels': [{
-                        name: 'general',
-                    }]
+                    'allowRepresentation': Group.allowRepresentation
                 }))?.ops[0] : (
                     AuthUser &&
                     Group_.admins.find(u => u.handle === AuthUser.LiquidUser.handle)
@@ -239,9 +237,7 @@ export const GroupResolvers = {
                             'lastEditOn': Date.now(),
                             'admins': Group.admins,
                             'privacy': Group.privacy,
-                            'channels': Group.channels.map(c => ({
-                                name: c.name
-                            }))
+                            'allowRepresentation': Group.allowRepresentation
                         },
                     },
                     { returnDocument: 'after' }

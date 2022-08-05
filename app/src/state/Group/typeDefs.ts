@@ -17,6 +17,7 @@ export const GROUP = gql`
             avatar,
             handle
         }
+        allowRepresentation
         thisUserIsAdmin
         yourMemberRelation {
             groupId
@@ -27,17 +28,6 @@ export const GROUP = gql`
             channels
         }
         privacy,
-        channels {
-            name,
-            # purpose,
-            # privacy,
-            # createdOn,
-            # lastEditOn,
-            # members,
-            # questions,
-            # admins,
-            # thisUserIsAdmin
-        }
         stats {
             lastDirectVoteOn
             members

@@ -66,6 +66,7 @@ export const QUESTION = gql`
                 handle
                 cover
                 name
+                allowRepresentation
             }
             stats {
                 lastVoteOn
@@ -291,6 +292,7 @@ export const QUESTIONS = gql`
                 cover
                 name
                 thisUserIsAdmin
+                allowRepresentation
                 yourMemberRelation {
                     groupId
                     userId

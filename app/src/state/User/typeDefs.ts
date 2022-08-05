@@ -219,6 +219,7 @@ export const USER_GROUPS = gql`
         createdOn
         lastEditOn
         thisUserIsAdmin
+        allowRepresentation
         admins {
             name
             avatar

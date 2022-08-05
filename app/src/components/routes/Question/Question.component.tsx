@@ -107,57 +107,58 @@ export default function Question() {
                 </div>
             </div>
 
-            <div className={`mt-3 mb-n2 d-flex ${!!representatives?.length && 'justify-content-between'} align-items-center`}>
-                <div className="d-flex">
-                    <p className="mb-0">Vote or {!!representatives?.length && 'be represented by'}</p>
+            {group?.allowRepresentation ? (
+                <div className={`mt-3 mb-n2 d-flex ${!!representatives?.length && 'justify-content-between'} align-items-center`}>
+                    <div className="d-flex">
+                        <p className="mb-0">Vote or {!!representatives?.length && 'be represented by'}</p>
 
-                    {!!representatives?.length && (
-                        <div className="d-flex ml-2 pl-1 mr-1 align-items-center">
-                            {representatives?.map((r: any) => (
-                                <Link
-                                    key={`representatives-${r.handle}-${question?.group?.handle}`}
-                                    to={`/profile/${r.handle}/cause/${question?.group?.handle}`}
-                                // className={`vote-avatar tiny ml-n2`}
-                                // style={{
-                                //     background: `url(${r.avatar}) 50% 50% / cover no-repeat`
-                                // }}
-                                // title={r.name}
-                                >
-                                    <Avatar
-                                        person={r}
-                                        type='vote'
-                                        groupHandle={groupHandle}
-                                    />
-                                </Link>
-                            ))}
-                        </div>
-                    )}
+                        {!!representatives?.length && (
+                            <div className="d-flex ml-2 pl-1 mr-1 align-items-center">
+                                {representatives?.map((r: any) => (
+                                    <Link
+                                        key={`representatives-${r.handle}-${question?.group?.handle}`}
+                                        to={`/profile/${r.handle}/cause/${question?.group?.handle}`}
+                                    // className={`vote-avatar tiny ml-n2`}
+                                    // style={{
+                                    //     background: `url(${r.avatar}) 50% 50% / cover no-repeat`
+                                    // }}
+                                    // title={r.name}
+                                    >
+                                        <Avatar
+                                            person={r}
+                                            type='vote'
+                                            groupHandle={groupHandle}
+                                        />
+                                    </Link>
+                                ))}
+                            </div>
+                        )}
+                    </div>
+
+                    <div
+                        className="button_ small mb-0 ml-2"
+                        onClick={() => !liquidUser ? updateParams({
+                            paramsToAdd: {
+                                modal: "RegisterBefore",
+                                modalData: JSON.stringify({
+                                    toWhat: 'chooseRepresentatives',
+                                    groupHandle: group.handle,
+                                    groupName: group.name
+                                })
+                            }
+                        }) : updateParams({
+                            paramsToAdd: {
+                                modal: "ChooseRepresentatives",
+                                modalData: JSON.stringify({
+                                    groupHandle: question?.groupChannel.group
+                                })
+                            }
+                        })}
+                    >
+                        Choose Representatives
+                    </div>
                 </div>
-
-                <div
-                    className="button_ small mb-0 ml-2"
-                    onClick={() => !liquidUser ? updateParams({
-                        paramsToAdd: {
-                            modal: "RegisterBefore",
-                            modalData: JSON.stringify({
-                                toWhat: 'chooseRepresentatives',
-                                groupHandle: group.handle,
-                                groupName: group.name
-                            })
-                        }
-                    }) : updateParams({
-                        paramsToAdd: {
-                            modal: "ChooseRepresentatives",
-                            modalData: JSON.stringify({
-                                groupHandle: question?.groupChannel.group
-                            })
-                        }
-                    })}
-                >
-                    Choose Representatives
-                </div>
-
-            </div>
+            ) : null}
 
             <div className="position-relative d-flex justify-content-between">
                 {/* {question?.questionType === 'single' ? (
@@ -165,10 +166,10 @@ export default function Question() {
                 ) : (
                     <div className="mt-4"></div>
                 )} */}
-                <h2 className="mb-2 mt-4 white pre-wrap mw-95"><b>{voteName}</b>?</h2>
+                <h2 className="mb-2 mt-4 white pre-wrap mw-95"><b>{voteName}</b></h2>
 
                 {(question.thisUserIsAdmin || liquidUser?.admin === 'total') && (
-                    <div className='d-flex mt-3 justify-content-center'>
+                    <div className='d-flex mt-3 justify-content-center align-items-center'>
                         <div
                             className='d-flex justify-content-center pointer'
                             role="button"

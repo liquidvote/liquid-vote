@@ -196,7 +196,7 @@ export const Profile: FunctionComponent<{}> = ({ }) => {
                                 >
                                     {
                                         profile.isRepresentingYou ?
-                                            `Represents you in ${profile.isRepresentingYou} group` :
+                                            `Represents you in ${profile.isRepresentingYou} group${profile.isRepresentingYou >1 ? 's' : null}` :
                                             "Delegate Votes To"
                                     }
                                 </div>
