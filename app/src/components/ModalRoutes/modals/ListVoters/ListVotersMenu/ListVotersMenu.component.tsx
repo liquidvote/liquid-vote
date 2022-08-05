@@ -31,6 +31,8 @@ export const ListVotersMenu: FunctionComponent<{
 
         const { allSearchParams, updateParams } = useSearchParams();
 
+        const showRepresentedMenuOptions = (stats?.indirectVotes > 0 || stats?.indirectVotesMade > 0) || subsection === 'represented';
+
         return (
             <>
                 <ul className="mt-1 nav d-flex justify-content-around">
@@ -46,59 +48,61 @@ export const ListVotersMenu: FunctionComponent<{
                         </div>
                     </li>
                 </ul>
-                <ul className="mt-1 nav d-flex justify-content-around">
-                    <li className="nav-item">
-                        <div
-                            className={`pointer nav-link ${(!subsection || subsection === 'direct') && 'active'}`}
-                            // to={`/poll/${questionText}/${groupHandle}/timeline`}
-                            onClick={
-                                e => {
-                                    e.stopPropagation();
-                                    updateParams({
-                                        paramsToAdd: {
-                                            modal: "ListVoters",
-                                            modalData: JSON.stringify({
-                                                questionText,
-                                                choiceText,
-                                                groupHandle,
-                                                subsection: 'direct',
-                                                followsOnly: true
-                                                // subsubsection: 'foryou'
-                                            })
-                                        }
-                                    })
+                {showRepresentedMenuOptions ? (
+                    <ul className="mt-1 nav d-flex justify-content-around">
+                        <li className="nav-item">
+                            <div
+                                className={`pointer nav-link ${(!subsection || subsection === 'direct') && 'active'}`}
+                                // to={`/poll/${questionText}/${groupHandle}/timeline`}
+                                onClick={
+                                    e => {
+                                        e.stopPropagation();
+                                        updateParams({
+                                            paramsToAdd: {
+                                                modal: "ListVoters",
+                                                modalData: JSON.stringify({
+                                                    questionText,
+                                                    choiceText,
+                                                    groupHandle,
+                                                    subsection: 'direct',
+                                                    followsOnly: true
+                                                    // subsubsection: 'foryou'
+                                                })
+                                            }
+                                        })
+                                    }
                                 }
-                            }
-                        >
-                            <b>{numeral(stats?.directVotes || stats?.directVotesMade).format('0a[.]0')}</b> Direct
-                        </div>
-                    </li>
-                    <li className="nav-item">
-                        <div
-                            className={`small pointer nav-link ${(subsection === 'represented') && 'active'}`}
-                            // to={`/poll/${questionText}/${groupHandle}/timeline/represented`}
-                            onClick={
-                                e => {
-                                    e.stopPropagation();
-                                    updateParams({
-                                        paramsToAdd: {
-                                            modal: "ListVoters",
-                                            modalData: JSON.stringify({
-                                                questionText,
-                                                choiceText,
-                                                groupHandle,
-                                                subsection: 'represented',
-                                                // subsubsection: 'foryou'
-                                            })
-                                        }
-                                    })
+                            >
+                                <b>{numeral(stats?.directVotes || stats?.directVotesMade).format('0a[.]0')}</b> Direct
+                            </div>
+                        </li>
+                        <li className="nav-item">
+                            <div
+                                className={`small pointer nav-link ${(subsection === 'represented') && 'active'}`}
+                                // to={`/poll/${questionText}/${groupHandle}/timeline/represented`}
+                                onClick={
+                                    e => {
+                                        e.stopPropagation();
+                                        updateParams({
+                                            paramsToAdd: {
+                                                modal: "ListVoters",
+                                                modalData: JSON.stringify({
+                                                    questionText,
+                                                    choiceText,
+                                                    groupHandle,
+                                                    subsection: 'represented',
+                                                    // subsubsection: 'foryou'
+                                                })
+                                            }
+                                        })
+                                    }
                                 }
-                            }
-                        >
-                            <b>{numeral(stats?.indirectVotes || stats?.indirectVotesMade).format('0a[.]0')}</b> Represented <b>(🧪)</b>
-                        </div>
-                    </li>
-                </ul>
+                            >
+                                <b>{numeral(stats?.indirectVotes || stats?.indirectVotesMade).format('0a[.]0')}</b> Represented
+                            </div>
+                        </li>
+                    </ul>
+                ) : null}
 
                 <hr className="mt-n4 mx-0 mb-0" />
 

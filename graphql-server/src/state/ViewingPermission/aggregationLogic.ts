@@ -1,7 +1,7 @@
 import { ObjectId } from 'mongodb';
 
 // groupId AuthUserId UserId
-export const canViewUsersVoteOrCause = ({ User, AuthUser }) => [
+export const canViewUsersVoteOrCause = ({ AuthUser }) => [
 
     // get group - put this above 
     // {
@@ -34,6 +34,13 @@ export const canViewUsersVoteOrCause = ({ User, AuthUser }) => [
     //     }
     // },
 
+    // get userId - put this above 
+    // {
+    //     '$addFields': {
+    //         userId: '$userId'
+    //     }
+    // },
+
     // userRel
     {
         '$lookup': {
@@ -41,7 +48,7 @@ export const canViewUsersVoteOrCause = ({ User, AuthUser }) => [
             'from': 'GroupMembers',
             'let': {
                 'groupId': '$group._id',
-                'userId': new ObjectId(User._id)
+                'userId': '$userId'
             },
             'pipeline': [
                 {
@@ -79,7 +86,7 @@ export const canViewUsersVoteOrCause = ({ User, AuthUser }) => [
             'as': 'yourRel',
             'from': 'GroupMembers',
             'let': {
-                'groupId': '$userRel.groupId',
+                'groupId': '$group._id',
                 'yourId': new ObjectId(AuthUser._id)
             },
             'pipeline': [
@@ -161,7 +168,8 @@ export const canViewUsersVoteOrCause = ({ User, AuthUser }) => [
                 {
                     '$and': [
                         { "$expr": { '$not': "$userRel.visibility" } },
-                        { "$expr": { '$eq': ["$group.privacy", "public"] } }
+                        { "$expr": { '$eq': ["$group.privacy", "public"] } },
+                        { "$expr": { '$eq': ["$userRel.isMember", true] } }
                     ]
                 },
                 // visibility: everyone, group not private
@@ -196,8 +204,15 @@ export const canViewUsersVoteOrCause = ({ User, AuthUser }) => [
                 // visibility: self
                 {
                     '$and': [
-                        { "$expr": { '$eq': ["$userRel.visibility", "self"] } },
-                        { "$expr": { '$eq': ["$yourRel.userId", "$userRel.userId"] } }
+                        // { "$expr": { '$eq': ["$userRel.visibility", "self"] } }, // Always show to self
+                        // { "$expr": { '$eq': ["$yourRel.userId", "$userRel.userId"] } },
+                        {
+                            '$expr': {
+                                '$eq': ['$user', {
+                                    '$toObjectId': new ObjectId(AuthUser._id)
+                                }]
+                            }
+                        },
                     ]
                 },
             ]

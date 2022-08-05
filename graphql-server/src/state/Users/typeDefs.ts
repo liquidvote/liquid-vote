@@ -33,6 +33,8 @@ export const UserTypeDefs = gql`
         directVotesInDisagreement: Int          # inUse
         indirectVotesMadeByYou: Int             # inUse
         indirectVotesMadeForYou: Int            # inUse
+
+        followersYouFollow: [User]
     }
 
     type User {

@@ -306,7 +306,7 @@ export const Group: FunctionComponent<{}> = ({ }) => {
                                             ))}
 
                                             {group.yourStats?.membersYouFollow?.length ? (
-                                                <small className='ml-2'>
+                                                <small className='ml-2 faded'>
                                                     {group.yourStats?.membersYouFollow.slice(0, 3).map((m: any, i) => (
                                                         <>
                                                             {' '}
@@ -328,7 +328,7 @@ export const Group: FunctionComponent<{}> = ({ }) => {
                                     ) : null}
 
                                     {!group.yourStats?.membersYouFollow?.length ? (
-                                        <small className='mt-n2'>No members you follow</small>
+                                        <small className='mt-n2 faded'>No members you follow</small>
                                     ) : null}
                                 </div>
                             ) : null}

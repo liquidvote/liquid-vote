@@ -759,8 +759,20 @@ export const VotersAgg = ({
                     'group': { $first: '$group' }
                 }
             },
+            {
+                '$addFields': {
+                    'userId': '$user'
+                }
+            },
         ]
     ),
+    addMemberRelationToGroup: ([
+        {
+            $addFields: {
+                'question.group.yourMemberRelation': '$yourRel',
+            }
+        }
+    ]),
     userObject: (
         [
             {
@@ -940,9 +952,10 @@ export const VotesGeneralAggregateLogic = async ({
         ...AggregateLogic.matchChoiceParam(choiceFilters),
         ...AggregateLogic.sortLogic,
         ...AggregateLogic.questionAndGroup,
-        ...canViewUsersVoteOrCause({ User, AuthUser }),
+        ...canViewUsersVoteOrCause({ AuthUser }),
+        ...AggregateLogic.addMemberRelationToGroup,
         ...AggregateLogic.userObject,
-        
+
         ...(followsOnly && AuthUser) ? AggregateLogic.filterFollows : []
     ];
 };

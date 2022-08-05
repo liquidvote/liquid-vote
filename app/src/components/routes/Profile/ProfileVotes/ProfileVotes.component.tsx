@@ -13,6 +13,7 @@ import DropAnimation from '@components/shared/DropAnimation';
 import SingleVoteInList from "@shared/SingleVoteInList";
 import MultiVoteInList from "@shared/MultiVoteInList";
 import { timeAgo } from '@state/TimeAgo';
+import GroupPollListCover from "@shared/GroupPollListCover";
 
 import './style.sass';
 
@@ -165,81 +166,63 @@ export const ProfileVotes: FunctionComponent<{}> = ({ }) => {
                 // remove repeated
                 .filter((v, i, a) => a.findIndex(v2 => (v2.question.questionText === v.question.questionText)) === i)
                 .map((v, i) => (
-
-                    <div key={'feed-poll-' + v?.question?.group?.handle + '-' + v?.question?.questionText}>
-
+                    <>
                         {v?.question?.group?.handle !== user_votes_data?.Votes[i - 1]?.question?.group?.handle ? (
-                            <div className="poll-cover-container">
-                                <div
-                                    className="poll-cover"
-                                    style={{
-                                        background: v?.question?.group?.cover && `url(${v?.question?.group?.cover}) 50% 50% / cover no-repeat`
-                                    }}
-                                />
-                                <div className="poll-cover-overlay">
-                                </div>
-                                <div className="poll-cover-info">
-                                    <Link to={`/group/${v?.question?.group?.handle}`}>
-                                        <h5 className="white p-0 m-0">
-                                            {v?.question?.group?.name}
-                                        </h5>
-                                    </Link>
-                                </div>
-                            </div>
+                            // <div className='sticky-top'>
+                            //     <div className="poll-cover-container">
+                            //         <div
+                            //             className="poll-cover"
+                            //             style={{
+                            //                 background: v?.question?.group?.cover && `url(${v?.question?.group?.cover}) 50% 50% / cover no-repeat`
+                            //             }}
+                            //         />
+                            //         <div className="poll-cover-overlay">
+                            //         </div>
+                            //         <div className="poll-cover-info">
+                            //             <Link to={`/group/${v?.question?.group?.handle}`}>
+                            //                 <h5 className="white p-0 m-0">
+                            //                     {v?.question?.group?.name}
+                            //                 </h5>
+                            //             </Link>
+                            //         </div>
+                            //     </div>
+                            // </div>
+
+                            <GroupPollListCover
+                                group={v?.question?.group}
+                            />
                         ) : null}
+                        <div key={'feed-poll-' + v?.question?.group?.handle + '-' + v?.question?.questionText}>
+                            <div className='d-flex align-items-center mt-3 mb-1'>
 
+                                <small className='ml-0 faded'>
+                                    {profile?.name}
+                                    {' '}
+                                    voted
+                                    {' '}
+                                    {timeAgo.format(new Date(Number(v?.lastEditOn)))}
+                                </small>
+                            </div>
 
-                        {/* {liquidUser ? (
-                        <PollExplanation
-                            p={v}
-                        />
-                    ) : null} */}
-
-                        <div className='d-flex align-items-center mt-3 mb-1'>
-                            {/* <div className="d-flex ml-1 mr-2">
-                    {usersToShow?.slice(0, 3).map((v: any) => (
-                        <div key={`pollExpalanation_avatar-${p?.questionText}-${p?.group?.handle}-${v.handle}`} className="ml-n1">
-                            <Avatar
-                                person={v}
-                                groupHandle={p?.group?.handle}
-                                type={'tiny'}
-                            />
+                            {v?.question?.questionType === 'multi' && (
+                                <MultiVoteInList
+                                    key={`multi-${v?.question?.questionText}`}
+                                    v={v?.question}
+                                    showGroupAndTime={true}
+                                    user={profile}
+                                />
+                            )}
+                            {v?.question?.questionType === 'single' && (
+                                <SingleVoteInList
+                                    key={`single-${v?.question?.questionText}`}
+                                    l={v?.question}
+                                    showGroupAndTime={true}
+                                    user={profile}
+                                />
+                            )}
+                            <hr />
                         </div>
-                    ))}
-                </div> */}
-
-                            <small className='ml-0'>
-                                {profile?.name}
-                                {' '}
-                                voted
-                                {' '}
-                                {timeAgo.format(new Date(Number(v?.lastEditOn)))}
-                            </small>
-
-
-                        </div>
-
-
-                        {/* <pre className='small'>{JSON.stringify(v?.stats, null, 2)}</pre> */}
-
-                        {v?.question?.questionType === 'multi' && (
-                            <MultiVoteInList
-                                key={`multi-${v?.question?.questionText}`}
-                                v={v?.question}
-                                showGroupAndTime={true}
-                                user={profile}
-                            />
-                        )}
-                        {v?.question?.questionType === 'single' && (
-                            <SingleVoteInList
-                                key={`single-${v?.question?.questionText}`}
-                                l={v?.question}
-                                showGroupAndTime={true}
-                                user={profile}
-                            />
-                        )}
-                        <hr />
-                    </div>
+                    </>
                 ))
             }
 

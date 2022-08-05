@@ -47,11 +47,11 @@ export const Groups: FunctionComponent<{}> = ({ }) => {
                         </Link>
                     </li>
                     {/* {section === 'other' && ( */}
-                        <li className="nav-item">
-                            <Link className={`nav-link ${section === 'other' && 'active'}`} to={`/groups/other`}>
-                                🧪 Other
-                            </Link>
-                        </li>
+                    <li className="nav-item">
+                        <Link className={`nav-link ${section === 'other' && 'active'}`} to={`/groups/other`}>
+                            Other
+                        </Link>
+                    </li>
                     {/* )} */}
                 </ul>
             )}
@@ -69,9 +69,15 @@ export const Groups: FunctionComponent<{}> = ({ }) => {
                     <GroupInList key={el.name + i} group={el} />
                 ))}
 
-                {(!yourGroups_data?.UserGroups?.length && !!yourGroups_data) && (
-                    <div className="p-4 text-center">
-                        You aren't a member of any group yet.
+                {(!yourGroups_data?.UserGroups?.length && !!yourGroups_data && section !== 'other') && (
+                    <div className="p-4 mt-4 text-center">
+                        You aren't a member of any Cause yet.
+                    </div>
+                )}
+
+                {(!yourGroups_data?.UserGroups?.length && !!yourGroups_data && section === 'other') && (
+                    <div className="p-4 mt-4 text-center">
+                        Other Causes selected by <b className='white'>Liquid Vote</b> will appear here.
                     </div>
                 )}
             </div>
@@ -86,7 +92,7 @@ export const Groups: FunctionComponent<{}> = ({ }) => {
                         }
                     })} className="button_ m-5">
                         {/* <DropPlusSVG /> */}
-                        <div className="ml-2">Create a New Group</div>
+                        <div className="ml-2">Create a New Cause</div>
                     </div>
                 </div>
             )}

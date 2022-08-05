@@ -479,10 +479,11 @@ export const UserResolvers = {
                 },
                 {
                     '$addFields': {
-                        group: { '$first': '$group' }
+                        group: { '$first': '$group' },
+                        userId: new ObjectId(User?._id),
                     }
                 },
-                ...canViewUsersVoteOrCause({ User, AuthUser }),
+                ...canViewUsersVoteOrCause({ AuthUser }),
 
                 ...Representative ? [
                     // representativeRelation

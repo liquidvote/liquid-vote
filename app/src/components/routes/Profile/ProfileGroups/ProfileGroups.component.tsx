@@ -10,8 +10,6 @@ import { USER, USER_GROUPS, EDIT_USER_REPRESENTATIVE_GROUP_RELATION } from "@sta
 import useAuthUser from '@state/AuthUser/authUser.effect';
 import useUserGroups from '@state/User/userGroups.effect';
 import DropAnimation from '@components/shared/DropAnimation';
-import ThreeDotsSmallSVG from '@shared/Icons/ThreeDots-small-horizontal.svg';
-import Popper from "@shared/Popper";
 import './style.sass';
 
 export const ProfileGroups: FunctionComponent<{}> = () => {
@@ -52,12 +50,18 @@ export const ProfileGroups: FunctionComponent<{}> = () => {
         data: editUserRepresentativeGroupRelation_data,
     }] = useMutation(EDIT_USER_REPRESENTATIVE_GROUP_RELATION);
 
+    useEffect(() => {
+        if (groupHandle) {
+            document?.getElementById?.(groupHandle)?.scrollIntoView({ behavior: 'smooth' });
+        }
+    }, [userGroups_loading]);
+
     return (
         <>
             <div className="mt-n3">
                 {userGroups?.map((g: any, i: Number) => (
                     <GroupInProfileList
-                        key={g.name + i}
+                        key={'profile-cause' + g.name + i}
                         group={g}
                         user={user_data?.User}
                         isSelected={groupHandle === g.handle}

@@ -80,7 +80,7 @@ export const ListVoters: FunctionComponent<{}> = ({ }) => {
             handleType: 'user',
             type,
             sortBy,
-            followsOnly
+            followsOnly: Boolean(followsOnly)
         },
         skip: !type
     });

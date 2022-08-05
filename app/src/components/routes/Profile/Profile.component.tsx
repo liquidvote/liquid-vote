@@ -243,35 +243,8 @@ export const Profile: FunctionComponent<{}> = ({ }) => {
             </div>
 
             <div>
-                <div className="profile-stats-container mt-3 flex-nowrap">
-                    <div className="mr-1"><ProfileSmallSVG /></div>
-                    <div className="d-flex flex-column">
-                        <div className="d-flex flex-wrap align-items-center">
-                            <Link to={`/profile-follows/${profile.handle}/followedby`} className="mr-2">
-                                Following {' '}<b className="white">{profile?.stats?.following || 0}</b>
-                            </Link>
-                            <Link to={`/profile-follows/${profile.handle}/following`} className="mr-2">
-                                Followed by{' '}<b className="white">{profile?.stats?.followedBy || 0}</b>
-                            </Link>
-                        </div>
-                        {/* {(profile?.stats?.representedBy || profile?.stats?.representing) ? (
-                            <div className="d-flex flex-wrap">
-                                <Link to={`/profile-people/${profile.handle}/representedBy`} className="mr-2">
-                                    Representing{' '}<b className="white">{profile?.stats?.representedBy}</b>
-                                </Link>
-                                <Link to={`/profile-people/${profile.handle}/representing`} className="mr-2">
-                                    Represented by{' '}<b className="white">{profile?.stats?.representing}</b>
-                                </Link>
-                            </div>
-                        ) : null} */}
-                    </div>
-                </div>
-                <small className="">Not followed by anyone you follow (🧪)</small>
-            </div>
-
-            <div>
                 {(profile?.stats?.representedBy || profile?.stats?.representing) ? (
-                    <div className="profile-stats-container mt-3 flex-nowrap">
+                    <div className="profile-stats-container mt-2 flex-nowrap">
                         <div className="mr-1"><HandshakeSVG /></div>
                         <div className="d-flex flex-column">
                             <div className="d-flex flex-wrap">
@@ -286,6 +259,74 @@ export const Profile: FunctionComponent<{}> = ({ }) => {
                     </div>
                 ) : null}
                 {/* <small className="">Not represented by anyone you follow</small> */}
+            </div>
+
+            <div>
+                <div className="profile-stats-container mt-2 flex-nowrap">
+                    <div className="mr-1"><ProfileSmallSVG /></div>
+                    <div className="d-flex flex-column flex-nowrap">
+                        <div className="d-flex flex-wrap align-items-center">
+                            <Link to={`/profile-follows/${profile.handle}/followedby`} className="mr-2">
+                                Following {' '}<b className="white">{profile?.stats?.following || 0}</b>
+                            </Link>
+                            <Link to={`/profile-follows/${profile.handle}/following`} className="mr-3">
+                                Followed by{' '}<b className="white">{profile?.stats?.followedBy || 0}</b>
+                            </Link>
+                            {liquidUser ? (
+                                <div className='d-flex align-items-center'>
+                                    {profile.yourStats?.followersYouFollow?.length ? (
+                                        <>
+                                            {[
+                                                ...profile.yourStats?.followersYouFollow || []
+                                                // TODO: representatives
+                                            ].slice(0, 3).map((m: any) => (
+                                                <Link
+                                                    key={m.handle + profile.handle}
+                                                    to={`/profile/${m.handle}`}
+                                                    title={`${m.name}`}
+                                                >
+                                                    <Avatar
+                                                        person={{
+                                                            ...m,
+                                                            yourStats: m.yourStats,
+                                                            stats: m.stats
+                                                        }}
+                                                        // groupHandle={group.handle}
+                                                        type="tiny"
+                                                    />
+                                                </Link>
+                                            ))}
+
+                                            {profile.yourStats?.followersYouFollow?.length ? (
+                                                <small className='ml-2 faded'>
+                                                    Followed by
+                                                    {' '}
+                                                    {profile.yourStats?.followersYouFollow.slice(0, 3).map((m: any, i) => (
+                                                        <>
+                                                            {' '}
+                                                            <Link
+                                                                key={`porfileFollower_name-${profile?.handle}-${m.handle}`}
+                                                                to={`/profile/${m.handle}`}
+                                                                title={`${m.name}`}
+                                                            >{m.name}</Link>
+                                                            {(i + 2) < profile.yourStats?.followersYouFollow?.length ? ", " : ""}
+                                                            {(i + 2) === profile.yourStats?.followersYouFollow?.length ? " and " : ""}
+                                                            {i === 2 && profile.yourStats?.followersYouFollow?.length > 3 ? ` and ${profile.yourStats?.followersYouFollow?.length - 3} other you follow ` : ""}
+                                                        </>
+                                                    ))}
+                                                </small>
+                                            ) : null}
+                                        </>
+                                    ) : null}
+
+                                    {!profile.yourStats?.followersYouFollow?.length ? (
+                                        <small className='faded'>Not followed by anyone you follow</small>
+                                    ) : null}
+                                </div>
+                            ) : null}
+                        </div>
+                    </div>
+                </div>
             </div>
             {/* {profile?.yourStats?.groupsInCommon && (
                     <Link to={`/profile-people/${profile.handle}/groups`} className="mr-2">
@@ -431,6 +472,7 @@ export const Profile: FunctionComponent<{}> = ({ }) => {
 
             {((!section || section === 'votes') && !groupHandle) && <ProfileVotes />}
             {(section === 'groups' || !!groupHandle) && <ProfileGroups />}
+            {/* Polls Created */}
             {(section === 'polls') && <ProfilePolls userHandle={profile.handle} user={profile} />}
             {(section === 'followings') && <ProfileFollowings />}
         </>

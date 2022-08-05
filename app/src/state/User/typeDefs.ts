@@ -39,6 +39,11 @@ export const USER = gql`
             directVotesInDisagreement
             indirectVotesMadeByYou
             indirectVotesMadeForYou
+            followersYouFollow {
+                name
+                avatar
+                handle
+            }
         }
         groupStats {
           stats {
@@ -227,7 +232,6 @@ export const USER_GROUPS = gql`
             lastEditOn
             isMember
             visibility
-            channels
         }
         representativeRelation {
             representativeId

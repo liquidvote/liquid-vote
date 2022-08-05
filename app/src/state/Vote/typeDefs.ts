@@ -70,6 +70,17 @@ export const VOTES = gql`
                 handle
                 name
                 cover
+                bio
+                privacy
+                thisUserIsAdmin
+                yourMemberRelation {
+                    groupId
+                    userId
+                    createdOn
+                    lastEditOn
+                    isMember
+                    visibility
+                }
             }
             resultsOn
             createdOn

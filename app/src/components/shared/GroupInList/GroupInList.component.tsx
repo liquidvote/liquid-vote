@@ -66,44 +66,9 @@ export const GroupInList: FunctionComponent<{
                             {
                                 !alternativeButton && (
                                     <>
-                                        {editGroupMemberChannelRelation_loading && (
-                                            <img
-                                                className="vote-avatar mr-1 my-n2"
-                                                src={'http://images.liquid-vote.com/system/loading.gif'}
-                                            />
-                                        )}
-
-                                        {isMember ? (
-                                            <GroupVisibilityPicker
-                                                group={group}
-                                            />
-                                        ) : null}
-                                        <button
-                                            onClick={() => !!liquidUser ? editGroupMemberChannelRelation({
-                                                variables: {
-                                                    UserHandle: liquidUser?.handle,
-                                                    GroupHandle: group.handle,
-                                                    IsMember: !group?.yourMemberRelation?.isMember
-                                                }
-                                            }) : updateParams({
-                                                paramsToAdd: {
-                                                    modal: "RegisterBefore",
-                                                    modalData: JSON.stringify({
-                                                        toWhat: 'joinGroup',
-                                                        groupHandle: group.handle,
-                                                        groupName: group.name
-                                                    })
-                                                }
-                                            })}
-                                            className={`button_ small ml-1 mb-0 ${isMember ? "selected" : ""}`}
-                                            disabled={group.thisUserIsAdmin}
-                                        >
-                                            {
-                                                group.thisUserIsAdmin ?
-                                                    'Admin' : isMember ?
-                                                        "Joined" : "Join"}
-                                        </button>
-
+                                        <GroupVisibilityPicker
+                                            group={group}
+                                        />
                                     </>
                                 )
                             }

@@ -1,6 +1,7 @@
 import React, { FunctionComponent, useState } from 'react';
 import { useQuery } from "@apollo/client";
 import { Link, useParams } from "react-router-dom";
+import { useAuth0 } from "@auth0/auth0-react";
 
 import Header from "@shared/Header";
 import { QUESTIONS } from "@state/Question/typeDefs";
@@ -11,7 +12,7 @@ import useAuthUser from '@state/AuthUser/authUser.effect';
 import VoteSortPicker from '@components/shared/VoteSortPicker';
 import PollExplanation from '@shared/PollExplanation';
 import useUser from '@state/User/user.effect';
-import { useAuth0 } from "@auth0/auth0-react";
+import GroupPollListCover from "@shared/GroupPollListCover";
 
 import './style.sass';
 
@@ -75,53 +76,55 @@ export const Feed: FunctionComponent<{}> = ({ }) => {
 
             <div className="mt-3">
                 {questions_data?.Questions?.map((v: any, i: any) => (
-                    <div key={'feed-poll-' + v?.group?.handle + '-' + v.questionText}>
-
+                    <>
                         {v?.group?.handle !== questions_data?.Questions[i - 1]?.group?.handle ? (
-                            <div className="poll-cover-container">
-                                <div
-                                    className="poll-cover"
-                                    style={{
-                                        background: v?.group?.cover && `url(${v?.group?.cover}) 50% 50% / cover no-repeat`
-                                    }}
+                            // <div className="sticky-top">
+                            //     <div className="poll-cover-container">
+                            //         <div
+                            //             className="poll-cover"
+                            //             style={{
+                            //                 background: v?.group?.cover && `url(${v?.group?.cover}) 50% 50% / cover no-repeat`
+                            //             }}
+                            //         />
+                            //         <div className="poll-cover-overlay">
+                            //         </div>
+                            //         <div className="poll-cover-info">
+                            //             <Link to={`/group/${v?.group?.handle}`}>
+                            //                 <h5 className="white p-0 m-0">
+                            //                     {v?.group?.name}
+                            //                 </h5>
+                            //             </Link>
+                            //         </div>
+                            //     </div>
+                            // </div>
+
+                            <GroupPollListCover group={v?.group} />
+                        ) : null}
+                        <div key={'feed-poll-' + v?.group?.handle + '-' + v.questionText}>
+
+                            {liquidUser ? (
+                                <PollExplanation
+                                    p={v}
                                 />
-                                <div className="poll-cover-overlay">
-                                </div>
-                                <div className="poll-cover-info">
-                                    <Link to={`/group/${v?.group?.handle}`}>
-                                        <h5 className="white p-0 m-0">
-                                            {v?.group?.name}
-                                        </h5>
-                                    </Link>
-                                </div>
-                            </div>
-                        ) : null}
+                            ) : null}
 
-
-                        {liquidUser ? (
-                            <PollExplanation
-                                p={v}
-                            />
-                        ) : null}
-
-                        {/* <pre className='small'>{JSON.stringify(v?.stats, null, 2)}</pre> */}
-
-                        {v.questionType === 'multi' && (
-                            <MultiVoteInList
-                                key={`multi-${v.questionText}`}
-                                v={v}
-                                showGroupAndTime={true}
-                            />
-                        )}
-                        {v.questionType === 'single' && (
-                            <SingleVoteInList
-                                key={`single-${v.questionText}`}
-                                l={v}
-                                showGroupAndTime={true}
-                            />
-                        )}
-                        <hr />
-                    </div>
+                            {v.questionType === 'multi' && (
+                                <MultiVoteInList
+                                    key={`multi-${v.questionText}`}
+                                    v={v}
+                                    showGroupAndTime={true}
+                                />
+                            )}
+                            {v.questionType === 'single' && (
+                                <SingleVoteInList
+                                    key={`single-${v.questionText}`}
+                                    l={v}
+                                    showGroupAndTime={true}
+                                />
+                            )}
+                            <hr />
+                        </div>
+                    </>
                 ))}
 
                 {!liquidUser && (

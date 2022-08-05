@@ -167,6 +167,10 @@ export const QuestionResolvers = {
                         }
                     })))
                 },
+                group: {
+                    ...q.group,
+                    thisUserIsAdmin: q?.group?.admins?.map(a => a?.handle)?.includes(AuthUser?.LiquidUser?.handle)
+                },
                 thisUserIsAdmin: !!AuthUser && (
                     q?.createdBy?.handle === AuthUser?.LiquidUser?.handle ||
                     q?.group?.admins?.map(a => a?.handle)?.includes(AuthUser?.LiquidUser?.handle)

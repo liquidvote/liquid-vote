@@ -290,6 +290,15 @@ export const QUESTIONS = gql`
                 handle
                 cover
                 name
+                thisUserIsAdmin
+                yourMemberRelation {
+                    groupId
+                    userId
+                    createdOn
+                    lastEditOn
+                    isMember
+                    visibility
+                }
             }
             createdBy {
                 name

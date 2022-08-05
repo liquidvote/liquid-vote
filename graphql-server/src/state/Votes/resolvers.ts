@@ -239,7 +239,6 @@ export const VoteResolvers = {
                 followsOnly
             });
 
-
             // const writeToDebugFile = fs.writeFile(
             //     process.cwd() + '/debug' + '/votes_' + type + '.json',
             //     JSON.stringify(VotesSpecificAggregateLogic, null, 2),
@@ -279,7 +278,11 @@ export const VoteResolvers = {
                             ...v.userVote,
                             user: v.user,
                             // _id: `userVote_${type}_${questionText}_${groupHandle}_${userHandle}_${v.user?.handle}_${v.questionText}`,
-                        }
+                        },
+                        group: {
+                            ...v.question.group,
+                            thisUserIsAdmin: v.question.group?.admins?.map(a => a?.handle)?.includes(AuthUser?.LiquidUser?.handle)
+                        },
                     },
                     // _id: `choiceaggregate_${type}_${questionText}_${choiceText}_${groupHandle}_${userHandle}_${v.user?.handle}_${v.questionText}`,
                 }));;

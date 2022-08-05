@@ -66,7 +66,7 @@ export const EditRepresentativeRelation: FunctionComponent<{}> = ({ }) => {
                     {!!yourGroups && [
                         ...yourGroups
                     ].
-                        filter((g: any) => g?.representativeRelation?.isGroupMember)?.
+                        filter((g: any) => g?.representativeRelation)?.
                         sort((a: any, b: any) => (
                             b.stats.members - a.stats.members ||
                             // +!!b.representativeRelation.isGroupMember - +!!a.representativeRelation.isGroupMember ||
@@ -77,7 +77,7 @@ export const EditRepresentativeRelation: FunctionComponent<{}> = ({ }) => {
                                 key={g.name + i}
                                 group={g}
                                 alternativeButton={(
-                                    g.representativeRelation.isGroupMember ?
+                                    g.representativeRelation ?
                                         <div
                                             onClick={
                                                 () => editUserRepresentativeGroupRelation({

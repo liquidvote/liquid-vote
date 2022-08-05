@@ -62,70 +62,7 @@ export const GroupInProfileListVotes: FunctionComponent<{ userHandle?: string, g
     });
 
     return (
-        <div className="mx-2">
-
-            {/* <ul className="nav d-flex justify-content-around mt-n2 mx-n3">
-                <li className="nav-item">
-                    <Link className={`nav-link ${(!subsection || subsection === 'direct') && 'active'}`} to={`/profile/${handle}/votes/direct`}>
-                        <b>{profile?.stats?.directVotesMade}</b> Direct Votes
-                    </Link>
-                </li>
-                <li className="nav-item">
-                    <Link className={`nav-link ${subsection === 'represented' && 'active'}`} to={`/profile/${handle}/votes/represented`}>
-                        <b>{profile?.stats?.indirectVotesMadeForUser}</b> Represented
-                    </Link>
-                </li>
-                <li className="px-4 mt-1">
-                    <VoteSortPicker updateSortInParent={setSortBy} />
-                </li>
-            </ul>
-            <hr className="mt-n4" />
-
-            {!!liquidUser && profile.handle !== liquidUser.handle && (!subsection || subsection === 'direct') && (
-                <>
-                    <ul className="nav d-flex justify-content-around mt-n2 mx-n3">
-                        <li className="nav-item">
-                            <Link className={`nav-link ${!subsubsection && 'active'}`} to={`/profile/${handle}/votes/direct`}>
-                                <b>{profile?.stats?.directVotesMade}</b> All
-                            </Link>
-                        </li>
-                        <li className="nav-item">
-                            <Link className={`nav-link ${subsubsection === 'same' && 'active'}`} to={`/profile/${handle}/votes/direct/same`}>
-                                <b className="white forDirect px-1 rounded" >{profile?.yourStats?.directVotesInAgreement}</b> Same as you
-                            </Link>
-                        </li>
-                        <li className="nav-item">
-                            <Link className={`nav-link ${subsubsection === 'different' && 'active'}`} to={`/profile/${handle}/votes/direct/different`}>
-                                <b className="white againstDirect px-1 rounded" >{profile?.yourStats?.directVotesInDisagreement}</b> Different
-                            </Link>
-                        </li>
-                    </ul>
-                    <hr className="mt-n4" />
-                </>
-            )}
-
-            {!!liquidUser && profile.handle !== liquidUser.handle && subsection === 'represented' && (
-                <>
-                    <ul className="nav d-flex justify-content-around mt-n2 mx-n3">
-                        <li className="nav-item">
-                            <Link className={`nav-link ${!subsubsection && 'active'}`} to={`/profile/${handle}/votes/represented`}>
-                                <b>{profile?.stats?.indirectVotesMadeForUser}</b> By anyone
-                            </Link>
-                        </li>
-                        <li className="nav-item">
-                            <Link className={`nav-link ${subsubsection === 'byyou' && 'active'}`} to={`/profile/${handle}/votes/represented/byyou`}>
-                                <b>{profile?.yourStats?.indirectVotesMadeByYou}</b> By you
-                            </Link>
-                        </li>
-                        <li className="nav-item">
-                            <Link className={`nav-link ${subsubsection === 'foryou' && 'active'}`} to={`/profile/${handle}/votes/represented/foryou`}>
-                                <b>{profile?.yourStats?.indirectVotesMadeForYou}</b> For you
-                            </Link>
-                        </li>
-                    </ul>
-                    <hr className="mt-n4" />
-                </>
-            )} */}
+        <div className="mx-2 mb-5">
 
             {user_votes_data?.Votes.length === 0 && (
                 <div className="p-4 text-center">

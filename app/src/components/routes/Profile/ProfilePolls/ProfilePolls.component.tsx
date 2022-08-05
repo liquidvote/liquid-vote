@@ -8,6 +8,7 @@ import SingleVoteInList from "@shared/SingleVoteInList";
 import MultiVoteInList from "@shared/MultiVoteInList";
 import DropAnimation from "@components/shared/DropAnimation";
 import useAuthUser from '@state/AuthUser/authUser.effect';
+import GroupPollListCover from "@shared/GroupPollListCover";
 
 import './style.sass';
 
@@ -38,31 +39,34 @@ export const ProfilePolls: FunctionComponent<{ userHandle: string, user: any }> 
                 <div key={'polls-' + i}>
 
                     {v?.group?.handle !== questions_data?.Questions[i - 1]?.group?.handle ? (
-                        <div className="poll-cover-container">
-                            <div
-                                className="poll-cover"
-                                style={{
-                                    background: v?.group?.cover && `url(${v?.group?.cover}) 50% 50% / cover no-repeat`
-                                }}
-                            />
-                            <div className="poll-cover-overlay">
-                            </div>
-                            <div className="poll-cover-info">
-                                <Link to={`/group/${v?.group?.handle}`}>
-                                    <h5 className="white p-0 m-0">
-                                        {v?.group?.name}
-                                    </h5>
-                                </Link>
-                            </div>
-                        </div>
+                        // <div className="poll-cover-container">
+                        //     <div
+                        //         className="poll-cover"
+                        //         style={{
+                        //             background: v?.group?.cover && `url(${v?.group?.cover}) 50% 50% / cover no-repeat`
+                        //         }}
+                        //     />
+                        //     <div className="poll-cover-overlay">
+                        //     </div>
+                        //     <div className="poll-cover-info">
+                        //         <Link to={`/group/${v?.group?.handle}`}>
+                        //             <h5 className="white p-0 m-0">
+                        //                 {v?.group?.name}
+                        //             </h5>
+                        //         </Link>
+                        //     </div>
+                        // </div>
+                        <GroupPollListCover
+                            group={v?.group}
+                        />
                     ) : null}
 
                     <div className="my-2 d-flex align-items-center flex-nowrap justify-content-between">
                         <small
-                            className="d-flex justify-content-center align-items-center align-self-end"
+                            className="d-flex justify-content-center align-items-center align-self-end faded"
                         >
                             {/* <small className="time-ago" data-tip="Last vote was"> */}
-                            {!!v?.createdBy && v?.createdBy?.name }
+                            {!!v?.createdBy && v?.createdBy?.name}
                             {' '}launched{' '}
                             {timeAgo.format(new Date(Number(v?.createdOn)))}
                         </small>

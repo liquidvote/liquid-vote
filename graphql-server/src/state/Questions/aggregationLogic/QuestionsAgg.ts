@@ -41,6 +41,44 @@ export const QuestionsAgg = ({
         }, {
             $addFields: { 'group': { $first: '$group' } }
         },
+        {
+            '$lookup': {
+                'as': 'yourRel',
+                'from': 'GroupMembers',
+                'let': {
+                    'groupId': '$group._id',
+                    'yourId': new ObjectId(AuthUserId)
+                },
+                'pipeline': [
+                    {
+                        '$match': {
+                            '$and': [
+                                {
+                                    '$expr': {
+                                        '$eq': ['$userId', {
+                                            '$toObjectId': '$$yourId'
+                                        }]
+                                    }
+                                },
+                                {
+                                    '$expr': {
+                                        '$eq': ['$groupId', {
+                                            '$toObjectId': '$$groupId'
+                                        }]
+                                    }
+                                },
+                                { '$expr': { '$eq': ['$isMember', true] } }
+                            ]
+                        }
+                    }
+                ],
+            }
+        },
+        {
+            '$addFields': {
+                'group.yourMemberRelation': { '$first': '$yourRel' }
+            }
+        },
         // TODO: confirm public group or user belongs to Link Only Group
         {
             '$unwind': {
