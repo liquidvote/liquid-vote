@@ -11,14 +11,14 @@ npm start
 ### terminal 2 - Server
 ```
 cd graphql-server
-npm run dev
+npm start
 ```
 
 ## Deploy
 ### App
 ```
 cd react-app
-npm run deployproduction
+npm run deploy
 ```
 ### Server
 ```

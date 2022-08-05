@@ -208,7 +208,7 @@ export const canViewUsersVoteOrCause = ({ AuthUser }) => [
                         // { "$expr": { '$eq': ["$yourRel.userId", "$userRel.userId"] } },
                         {
                             '$expr': {
-                                '$eq': ['$user', {
+                                '$eq': ['$userId', {
                                     '$toObjectId': new ObjectId(AuthUser._id)
                                 }]
                             }

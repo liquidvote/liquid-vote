@@ -669,7 +669,7 @@ export const UserResolvers = {
             const UserGroups = !notUsers && (await mongoDB.collection("GroupMembers").aggregate(UserGroupsAggFromGroupMembers)
                 .toArray()).map((g) => ({
                     ...g.group,
-                    thisUserIsAdmin: !!g.group.admins.find(u => u.handle === AuthUser?.LiquidUser?.handle),
+                    thisUserIsAdmin: !!g.group?.admins.find(u => u.handle === AuthUser?.LiquidUser?.handle),
                     userMemberRelation: g.userRel,
                     yourMemberRelation: g.yourRel,
                     representativeRelation: g.representativeRel,
