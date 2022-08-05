@@ -13,6 +13,7 @@
     "predeployproduction": "npm run build:production",
     "deploystaging": "aws s3 sync ./dist s3://staging.liquid-vote.com --profile pedro",
     "deployproduction": "aws s3 sync ./dist s3://app.liquid-vote.com --profile pedro",
+    "deploy": "npm run deployproduction",
     "emptyS3": "aws s3 rm s3://app.liquid-vote.com --recursive --profile pedro",
     "aws:install": "open https://docs.aws.amazon.com/cli/latest/userguide/getting-started-install.html",
     "aws:login": "aws configure import --csv file://./credentials/pedro_accessKeys.csv",
