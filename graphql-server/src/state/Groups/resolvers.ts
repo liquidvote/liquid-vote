@@ -27,14 +27,13 @@ export const GroupResolvers = {
                 await mongoDB.collection("GroupMembers")
                     .findOne({
                         'userId': new ObjectId(AuthUser._id),
-                        'groupId': new ObjectId(Group._id)
+                        'groupId': new ObjectId(Group.group._id)
                     })) : {};
 
             return {
                 ...Group.group,
                 thisUserIsAdmin: !!Group.group.admins.find(u => u.handle === AuthUser?.LiquidUser?.handle),
                 yourMemberRelation: GroupMemberRelation,
-                //TODO: replace with Aggregation
                 stats: Group.groupStats,
 
                 yourStats: !!AuthUser && {
@@ -45,13 +44,13 @@ export const GroupResolvers = {
         Groups: async (_source, { }, { mongoDB, AuthUser }) => {
             if (!AuthUser || AuthUser?.LiquidUser?.admin !== 'total') return;
 
-            console.log('here');
+            // console.log('here');
 
             const Groups = await Promise.all((
                 await mongoDB.collection("Groups").find().toArray()
             ));
 
-            console.log({ Groups });
+            // console.log({ Groups });
 
             return Groups;
         },

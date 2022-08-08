@@ -85,21 +85,37 @@ export const ListVoters: FunctionComponent<{}> = ({ }) => {
         skip: !type
     });
 
-    // console.log({
-    //     // stats,
-    //     // modalData,
-    //     // question_data,
-    //     // type,
-    //     // subsection,
-    //     // subsubsection,
-    //     followsOnly,
-    //     // votes_data
-    // });
-
     const choice = question_data?.Question?.questionType === 'single' ?
         question_data?.Question :
         question_data?.Question?.choices?.find(c => c.text === choiceText);
 
+    const selectedCount = {
+        all: (choice?.stats?.directVotes + choice?.stats?.indirectVotes) || 0,
+        for: (choice?.stats?.forCount) || 0,
+        against: (choice?.stats?.againstCount) || 0,
+        directVotesMade: (choice?.stats?.directVotes || choice?.stats?.directVotesMade || 0),
+        directFor: (choice?.stats?.forDirectCount) || 0,
+        directAgainst: (choice?.stats?.againstDirectCount) || 0,
+        indirectVotes: 0,
+        directVotesMadeByYou: 0,
+        indirectVotesMadeByYou: 0,
+        indirectVotesMadeForYou: 0,
+        none: 0
+    }[type || 'none'];
+
+    console.log({
+        stats: {
+            stats: choice?.stats,
+            yourStats: choice?.yourStats
+        },
+        // modalData,
+        // question_data,
+        // type,
+        // subsection,
+        // subsubsection,
+        // followsOnly,
+        // votes_data
+    });
 
     return (
         <>
@@ -171,7 +187,6 @@ export const ListVoters: FunctionComponent<{}> = ({ }) => {
 
                 <br />
 
-
                 {votes_data?.Votes.length === 0 && (
                     <div className="p-4 text-center">
                         {
@@ -213,6 +228,13 @@ export const ListVoters: FunctionComponent<{}> = ({ }) => {
                             hideChoicesBesides={choiceText}
                         />
                     ))}
+                    {/* {[...Array(10).keys()].map((k) => (
+                        <Vote
+                            key={'vote_' + type + '_anonymous_' + k}
+                            v={null}
+                            hideChoicesBesides={choiceText}
+                        />
+                    ))} */}
                 </div>
 
                 {votes_loading && (

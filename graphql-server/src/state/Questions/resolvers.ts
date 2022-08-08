@@ -184,48 +184,54 @@ export const QuestionResolvers = {
             sortBy
         }, { mongoDB, AuthUser }) => {
 
+            const VotersAlsoVotedOnAgg = [
+                ...QuestionsInCommonAgg({
+                    questionText,
+                    group
+                }),
+                ...QuestionsAgg({
+                    questionText: null,
+                    group: null,
+                    AuthUserId: AuthUser?._id,
+                    userId: null
+                }),
+                {
+                    $match: {
+                        'group.privacy': 'public'
+                    }
+                },
+                {
+                    '$addFields': {
+                        'stats.lastEditOrVote': {
+                            '$cond': [
+                                {
+                                    '$gt': [
+                                        '$lastEditOn', '$stats.lastVoteOn'
+                                    ]
+                                }, '$lastEditOn', '$stats.lastVoteOn'
+                            ]
+                        },
+                        'stats.totalVotes': {
+                            '$sum': [
+                                '$stats.directVotes', '$stats.indirectVotes'
+                            ]
+                        },
+                    }
+                },
+                {
+                    '$sort': { 'votersInCommonStats.voterCount': -1 }
+                }
+            ];
+
             const Questions = await mongoDB.collection("Questions")
-                .aggregate(
-                    [
-                        ...QuestionsInCommonAgg({
-                            questionText,
-                            group
-                        }),
-                        ...QuestionsAgg({
-                            questionText: null,
-                            group: null,
-                            AuthUserId: AuthUser?._id,
-                            userId: null
-                        }),
-                        {
-                            $match: {
-                                'group.privacy': 'public'
-                            }
-                        },
-                        {
-                            '$addFields': {
-                                'stats.lastEditOrVote': {
-                                    '$cond': [
-                                        {
-                                            '$gt': [
-                                                '$lastEditOn', '$stats.lastVoteOn'
-                                            ]
-                                        }, '$lastEditOn', '$stats.lastVoteOn'
-                                    ]
-                                },
-                                'stats.totalVotes': {
-                                    '$sum': [
-                                        '$stats.directVotes', '$stats.indirectVotes'
-                                    ]
-                                },
-                            }
-                        },
-                        {
-                            '$sort': { 'votersInCommonStats.voterCount': -1 }
-                        }
-                    ]
-                )
+                .aggregate(VotersAlsoVotedOnAgg)
                 .toArray();
+
+            // const writeToDebugFile = fs.writeFile(
+            //     process.cwd() + '/debug' + '/VotersAlsoVotedOnAgg.json',
+            //     JSON.stringify(VotersAlsoVotedOnAgg, null, 2),
+            //     { encoding: 'utf8' }
+            // );
 
             return Questions.map((q, i) => ({
                 ...q,

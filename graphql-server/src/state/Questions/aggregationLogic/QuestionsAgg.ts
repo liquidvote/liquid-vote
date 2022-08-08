@@ -253,6 +253,9 @@ export const QuestionsAgg = ({
                 },
                 'group': {
                     '$first': '$group'
+                },
+                'votersInCommonStats': {
+                    '$first': '$votersInCommonStats'
                 }
             }
         },
@@ -404,6 +407,9 @@ const getYourVoteRepresentativesUsers_On_QuestionsAgg = ({ AuthUserId }) => [
             },
             "choiceText": {
                 "$first": "$choiceText"
+            },
+            'votersInCommonStats': {
+                '$first': '$votersInCommonStats'
             }
         }
     }, {
@@ -507,6 +513,9 @@ const mergedYourVoteUniqueRepresentatives = [
             },
             'group': {
                 '$first': '$root.group'
+            },
+            'votersInCommonStats': {
+                '$first': '$root.votersInCommonStats'
             }
         }
     }
@@ -590,6 +599,9 @@ const mergedYourStatsVotersYouFollow = [
             },
             'group': {
                 '$first': '$root.group'
+            },
+            'votersInCommonStats': {
+                '$first': '$root.votersInCommonStats'
             }
         }
     }

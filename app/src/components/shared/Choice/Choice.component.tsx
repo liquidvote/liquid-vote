@@ -15,12 +15,12 @@ import './style.sass';
 
 export const Choice: FunctionComponent<{
     choiceText?: string,
-    voteName: string, // TODO: change to `questionText`
-    groupHandle: string,
+    voteName?: string, // TODO: change to `questionText`
+    groupHandle?: string,
     stats: any,
     yourVote: any,
     yourStats: any,
-    userVote: any,
+    userVote?: any,
     inList?: boolean,
     showPercentages?: boolean,
     showChart?: boolean,
@@ -127,22 +127,32 @@ export const Choice: FunctionComponent<{
 
         const forDisplayed = [
             ...yourStats?.votersYouFollow?.filter((r: any) => r?.vote?.position === 'for') || [],
-            // ...(
-            //     !!editVote_data ? editVote_data?.editVote?.QuestionStats?.forMostRepresentingVoters : stats?.forMostRepresentingVoters
-            // )
-            //     ?.filter((u: any) => u?.handle !== liquidUser?.handle)
-            //     ?.filter((u: any) => !yourStats?.votersYouFollow?.filter((r: any) => r?.vote?.position === 'for').find((u: any) => u.handle === u.handle))
-            // || []
+            ...(
+                (!!editVote_data ? editVote_data?.editVote?.QuestionStats?.forMostRepresentingVoters : stats?.forMostRepresentingVoters) || []
+            )
+                ?.filter((u: any) => u?.handle !== liquidUser?.handle)
+                ?.filter((u: any) => !yourStats?.votersYouFollow
+                    ?.filter((r: any) => r?.vote?.position === 'for')
+                    ?.find((u_: any) => u_.handle === u.handle))
+                ?.map(v => ({ ...v, hideComparisson: true }))
         ];
+
+        console.log({
+            votersYouFollow: yourStats?.votersYouFollow,
+            stats,
+            forDisplayed
+        });
 
         const againstDisplayed = [
             ...yourStats?.votersYouFollow?.filter((r: any) => r?.vote?.position === 'against') || [],
-            // ...(
-            //     !!editVote_data ? editVote_data?.editVote?.QuestionStats?.againstMostRepresentingVoters : stats?.againstMostRepresentingVoters
-            // )
-            //     ?.filter((u: any) => u?.handle !== liquidUser?.handle)
-            //     ?.filter((u: any) => !yourStats?.votersYouFollow?.filter((r: any) => r?.vote?.position === 'against').find((u: any) => u.handle === u.handle))
-            // || []
+            ...(
+                (!!editVote_data ? editVote_data?.editVote?.QuestionStats?.againstMostRepresentingVoters : stats?.againstMostRepresentingVoters) || []
+            )
+                ?.filter((u: any) => u?.handle !== liquidUser?.handle)
+                ?.filter((u: any) => !yourStats?.votersYouFollow
+                    ?.filter((r: any) => r?.vote?.position === 'against')
+                    ?.find((u_: any) => u_.handle === u.handle))
+                ?.map(v => ({ ...v, hideComparisson: true }))
         ];
 
         const representeeVotesCount = editVote_data ?
@@ -211,40 +221,9 @@ export const Choice: FunctionComponent<{
                     )}
                 </div>
 
-                {/* {showPercentages && (
-                    <div className="d-flex color-legend my-3">
-                        <div>
-                            <small>Direct For</small>
-                            <div className="color forDirect count">
-                                {stats_?.forDirectPercentage.toFixed(0)}%
-                            </div>
-                        </div>
-                        <div>
-                            <small>Delegated For</small>
-                            <div className="color for count">
-                                {stats_?.forDelegatedPercentage.toFixed(0)}%
-                            </div>
-                        </div>
-                        <div>
-                            <small>Direct Against</small>
-                            <div className="color againstDirect count">
-                                {stats_?.againstDirectPercentage.toFixed(0)}%
-                            </div>
-                        </div>
-                        <div>
-                            <small>Delegated Against</small>
-                            <div className="color against count">
-                                {stats_?.againstDelegatedPercentage.toFixed(0)}%
-                            </div>
-                        </div>
-                    </div>
-                )} */}
-
-                {/* <pre>{JSON.stringify(stats_, null, 2) }</pre> */}
-
                 {showChart && (
                     <div className={`d-flex d-flex justify-content-between mt-1 ${userVote?.position === "against" && 'voted-right againstBorderColor'} ${userVote?.position === "for" && 'voted-left forBorderColor'}`}>
-                        <div className="d-flex c-on-tiny">
+                        <div className="d-flex c-on-tiny flex-wrap">
                             <div
                                 className={`forbtn button_ forDirectBorder justify-content-between min-w mr-1 ${yourVote_?.position === 'for' && 'forDirectBg'} ${inList && 'small'}`}
                                 onClick={() => handleUserVote('for')}
@@ -359,41 +338,62 @@ export const Choice: FunctionComponent<{
                                 {numeral(stats_.forCount).format('0a[.]0')}
                             </div>
 
-                            <div
-                                className="d-flex ml-3 pointer"
-                                data-tip={`Voted Yay`}
-                                onClick={
-                                    e => {
-                                        e.stopPropagation();
-                                        updateParams({
-                                            paramsToAdd: {
-                                                modal: "ListVoters",
-                                                modalData: JSON.stringify({
-                                                    questionText: voteName,
-                                                    choiceText,
-                                                    groupHandle,
-                                                    subsection: 'direct',
-                                                    subsubsection: 'all',
-                                                    followsOnly: true
-                                                })
-                                            }
-                                        })
+                            {inList ? (
+                                <div
+                                    className="d-flex ml-3 pointer"
+                                    data-tip={`Voted Yay`}
+                                    onClick={
+                                        e => {
+                                            e.stopPropagation();
+                                            updateParams({
+                                                paramsToAdd: {
+                                                    modal: "ListVoters",
+                                                    modalData: JSON.stringify({
+                                                        questionText: voteName,
+                                                        choiceText,
+                                                        groupHandle,
+                                                        subsection: 'direct',
+                                                        subsubsection: 'all',
+                                                        followsOnly: true
+                                                    })
+                                                }
+                                            })
+                                        }
                                     }
-                                }
-                            >
-                                {(
-                                    !!user ? [] : forDisplayed
-                                )?.slice(0, 3).map((p: any) => (
-                                    <div key={`forDisplayedVoter-${voteName}-${p?.handle}`} className="ml-n1">
-                                        <Avatar
-                                            person={p}
-                                            groupHandle={groupHandle}
-                                            type={inList ? 'tiny' : 'vote'}
-                                        />
-                                    </div>
-                                ))}
+                                >
+                                    {(
+                                        !!user ? [] : forDisplayed
+                                    )?.slice(0, 3)?.map((p: any) => (
+                                        <div key={`forDisplayedVoter-${voteName}-${p?.handle}`} className="ml-n1">
+                                            <Avatar
+                                                person={p}
+                                                groupHandle={groupHandle}
+                                                type={inList ? 'tiny' : 'vote'}
+                                                hideComparisson={p.hideComparisson}
+                                            />
+                                        </div>
+                                    ))}
 
-                            </div>
+                                </div>
+                            ) : (
+                                <div
+                                    className="d-flex pointer flex-wrap mt-2 w-100"
+                                >
+                                    {(
+                                        !!user ? [] : forDisplayed
+                                    )?.map((p: any) => (
+                                        <div key={`forDisplayedVoter-${voteName}-${p?.handle}`} className="mr-2 mb-2">
+                                            <Avatar
+                                                person={p}
+                                                groupHandle={groupHandle}
+                                                type={inList ? 'tiny' : 'vote'}
+                                                hideComparisson={p.hideComparisson}
+                                            />
+                                        </div>
+                                    ))}
+
+                                </div>
+                            )}
                             <div>
                                 {(
                                     user && userVote?.position === "for" && (
@@ -405,14 +405,11 @@ export const Choice: FunctionComponent<{
                                             />
 
                                             <small>
-                                                <b className='ml-2 mr-1 forColor'>
+                                                {/* <b className='ml-2 mr-1 forColor'>
                                                     voted
-                                                </b>
+                                                </b> */}
                                                 {userVote?.position === 'for' && (
                                                     <b className='white mr-1 forDirect px-1 rounded'>yay</b>
-                                                )}
-                                                {userVote?.position === 'against' && (
-                                                    <b className='white mr-1 againstDirect px-1 rounded'>nay</b>
                                                 )}
                                             </small>
                                         </div>
@@ -428,7 +425,7 @@ export const Choice: FunctionComponent<{
                             />
                         )}
 
-                        <div className="d-flex cr-on-tiny justify-content-end">
+                        <div className="d-flex cr-on-tiny justify-content-end flex-wrap-reverse">
                             <div>
                                 {(
                                     user && userVote?.position === "against" && (
@@ -439,9 +436,9 @@ export const Choice: FunctionComponent<{
                                                 type={inList ? 'tiny' : 'vote'}
                                             />
                                             <small>
-                                                <b className='ml-2 mr-1 againstColor'>
+                                                {/* <b className='ml-2 mr-1 againstColor'>
                                                     voted
-                                                </b>
+                                                </b> */}
                                                 <b className='white mr-1 againstDirect px-1 rounded'>nay</b>
                                             </small>
                                         </div>
@@ -449,41 +446,61 @@ export const Choice: FunctionComponent<{
                                 )}
                             </div>
 
-                            <div
-                                className="d-flex ml-2 pointer" data-tip={`Voted Nay`}
-                                onClick={
-                                    e => {
-                                        e.stopPropagation();
-                                        updateParams({
-                                            paramsToAdd: {
-                                                modal: "ListVoters",
-                                                modalData: JSON.stringify({
-                                                    questionText: voteName,
-                                                    choiceText,
-                                                    groupHandle,
-                                                    subsection: 'direct',
-                                                    subsubsection: 'all',
-                                                    followsOnly: true
-                                                })
-                                            }
-                                        })
+                            {inList ? (
+                                <div
+                                    className="d-flex ml-2 pointer" data-tip={`Voted Nay`}
+                                    onClick={
+                                        e => {
+                                            e.stopPropagation();
+                                            updateParams({
+                                                paramsToAdd: {
+                                                    modal: "ListVoters",
+                                                    modalData: JSON.stringify({
+                                                        questionText: voteName,
+                                                        choiceText,
+                                                        groupHandle,
+                                                        subsection: 'direct',
+                                                        subsubsection: 'all',
+                                                        followsOnly: true
+                                                    })
+                                                }
+                                            })
+                                        }
                                     }
-                                }
+                                >
+                                    {
+                                        (
+                                            !!user ? [] : againstDisplayed
+                                        )?.slice(0, 3).map((p: any) => (
+                                            <div key={`againstDisplayedVoter-${voteName}-${p?.handle}`} className="ml-n1">
+                                                <Avatar
+                                                    person={p}
+                                                    groupHandle={groupHandle}
+                                                    type={inList ? 'tiny' : 'vote'}
+                                                    hideComparisson={p.hideComparisson}
+                                                />
+                                            </div>
+                                        ))
+                                    }
+                                </div>
+                            ) : <div
+                                className="d-flex mr-n2 pointer w-100 flex-wrap mt-2 justify-content-end"
                             >
                                 {
                                     (
                                         !!user ? [] : againstDisplayed
-                                    )?.slice(0, 3).map((p: any) => (
-                                        <div key={`againstDisplayedVoter-${voteName}-${p?.handle}`} className="ml-n1">
+                                    )?.map((p: any) => (
+                                        <div key={`againstDisplayedVoter-${voteName}-${p?.handle}`} className="mr-2 mb-2">
                                             <Avatar
                                                 person={p}
                                                 groupHandle={groupHandle}
                                                 type={inList ? 'tiny' : 'vote'}
+                                                hideComparisson={p.hideComparisson}
                                             />
                                         </div>
                                     ))
                                 }
-                            </div>
+                            </div>}
 
                             <div
                                 // to={`/${choiceText ? 'multipoll' : 'poll'}/${voteName}/${groupHandle}/timeline/direct/against`}
@@ -507,97 +524,97 @@ export const Choice: FunctionComponent<{
                                 className={`text-decoration-none count against ml-1 ${inList ? 'tiny-avatar' : 'vote-avatar'}`}>
                                 {numeral(stats_.againstCount).format('0a[.]0')}
                             </div>
-                        </div>
-                        <div
-                            className={`againstbtn button_ againstDirectBorder min-w justify-content-between text-right ml-1 ${yourVote_?.position === 'against' && 'againstDirectBg'} ${inList && 'small'}`}
-                            onClick={() => handleUserVote('against')}
-                        >
-                            {
-                                (
-                                    !!againstRepresentatives?.length &&
-                                    yourVote?.position === 'delegated' &&
-                                    (!editVote_data || editVote_data?.editVote?.position === 'delegated')
-                                ) && (
-                                    <div className={`d-flex mr-1 my-n2 ${inList ? 'ml-n1' : 'ml-n2'}`} data-tip={`Representing you`}>
-                                        <Link
-                                            to={`/profile/${againstRepresentatives[0].representativeHandle}`}
-                                            onClick={e => e.stopPropagation()}
-                                        >
-                                            <Avatar
-                                                person={{
-                                                    avatar: againstRepresentatives[0].representativeAvatar,
-                                                    handle: againstRepresentatives[0].representativeHandle,
-                                                    name: againstRepresentatives[0].representativeName,
-                                                    yourStats: againstRepresentatives[0].yourStats,
-                                                    stats: againstRepresentatives[0].stats
-                                                }}
-                                                groupHandle={groupHandle}
-                                                type={inList ? 'tiny' : 'vote'}
-                                            />
-                                        </Link>
-                                        <div
-                                            // to={`/${choiceText ? 'multipoll' : 'poll'}/${voteName}/${groupHandle}/timeline/representingYou`}
-                                            onClick={
-                                                e => {
-                                                    e.stopPropagation();
-                                                    updateParams({
-                                                        paramsToAdd: {
-                                                            modal: "ListVoters",
-                                                            modalData: JSON.stringify({
-                                                                questionText: voteName,
-                                                                choiceText,
-                                                                groupHandle,
-                                                                subsection: 'represented',
-                                                                subsubsection: 'foryou'
-                                                            })
-                                                        }
-                                                    })
+                            <div
+                                className={`againstbtn button_ againstDirectBorder min-w justify-content-between text-right ml-1 ${yourVote_?.position === 'against' && 'againstDirectBg'} ${inList && 'small'}`}
+                                onClick={() => handleUserVote('against')}
+                            >
+                                {
+                                    (
+                                        !!againstRepresentatives?.length &&
+                                        yourVote?.position === 'delegated' &&
+                                        (!editVote_data || editVote_data?.editVote?.position === 'delegated')
+                                    ) && (
+                                        <div className={`d-flex mr-1 my-n2 ${inList ? 'ml-n1' : 'ml-n2'}`} data-tip={`Representing you`}>
+                                            <Link
+                                                to={`/profile/${againstRepresentatives[0].representativeHandle}`}
+                                                onClick={e => e.stopPropagation()}
+                                            >
+                                                <Avatar
+                                                    person={{
+                                                        avatar: againstRepresentatives[0].representativeAvatar,
+                                                        handle: againstRepresentatives[0].representativeHandle,
+                                                        name: againstRepresentatives[0].representativeName,
+                                                        yourStats: againstRepresentatives[0].yourStats,
+                                                        stats: againstRepresentatives[0].stats
+                                                    }}
+                                                    groupHandle={groupHandle}
+                                                    type={inList ? 'tiny' : 'vote'}
+                                                />
+                                            </Link>
+                                            <div
+                                                // to={`/${choiceText ? 'multipoll' : 'poll'}/${voteName}/${groupHandle}/timeline/representingYou`}
+                                                onClick={
+                                                    e => {
+                                                        e.stopPropagation();
+                                                        updateParams({
+                                                            paramsToAdd: {
+                                                                modal: "ListVoters",
+                                                                modalData: JSON.stringify({
+                                                                    questionText: voteName,
+                                                                    choiceText,
+                                                                    groupHandle,
+                                                                    subsection: 'represented',
+                                                                    subsubsection: 'foryou'
+                                                                })
+                                                            }
+                                                        })
+                                                    }
                                                 }
-                                            }
-                                            className={`text-decoration-none count against ml-n2 ${inList ? 'tiny-avatar' : 'vote-avatar'}`}
-                                        >{againstRepresentatives.length}</div>
+                                                className={`text-decoration-none count against ml-n2 ${inList ? 'tiny-avatar' : 'vote-avatar'}`}
+                                            >{againstRepresentatives.length}</div>
+                                        </div>
+                                    )
+                                }
+
+                                {yourVote_?.position === 'against' && (
+                                    <div className={`d-flex mr-1 my-n2 ${inList ? 'ml-n1' : 'ml-n2'}`}>
+                                        <Avatar
+                                            person={{
+                                                ...liquidUser
+                                            }}
+                                            groupHandle={groupHandle}
+                                            type={inList ? 'tiny' : 'vote'}
+                                        />
+
+                                        {representeeVotesCount ? (
+                                            <div
+                                                onClick={
+                                                    e => {
+                                                        e.stopPropagation();
+                                                        updateParams({
+                                                            paramsToAdd: {
+                                                                modal: "ListVoters",
+                                                                modalData: JSON.stringify({
+                                                                    questionText: voteName,
+                                                                    choiceText,
+                                                                    groupHandle,
+                                                                    subsection: 'represented',
+                                                                    subsubsection: 'byyou'
+                                                                })
+                                                            }
+                                                        })
+                                                    }
+                                                }
+                                                className={`text-decoration-none count against ml-n2 ${inList ? 'tiny-avatar' : 'vote-avatar'}`}
+                                            >{representeeVotesCount}</div>
+                                        ) : null}
                                     </div>
-                                )
-                            }
+                                )}
 
-                            {yourVote_?.position === 'against' && (
-                                <div className={`d-flex mr-1 my-n2 ${inList ? 'ml-n1' : 'ml-n2'}`}>
-                                    <Avatar
-                                        person={{
-                                            ...liquidUser
-                                        }}
-                                        groupHandle={groupHandle}
-                                        type={inList ? 'tiny' : 'vote'}
-                                    />
-
-                                    {representeeVotesCount ? (
-                                        <div
-                                            onClick={
-                                                e => {
-                                                    e.stopPropagation();
-                                                    updateParams({
-                                                        paramsToAdd: {
-                                                            modal: "ListVoters",
-                                                            modalData: JSON.stringify({
-                                                                questionText: voteName,
-                                                                choiceText,
-                                                                groupHandle,
-                                                                subsection: 'represented',
-                                                                subsubsection: 'byyou'
-                                                            })
-                                                        }
-                                                    })
-                                                }
-                                            }
-                                            className={`text-decoration-none count against ml-n2 ${inList ? 'tiny-avatar' : 'vote-avatar'}`}
-                                        >{representeeVotesCount}</div>
-                                    ) : null}
-                                </div>
-                            )}
-
-                            <span className='ml-auto'>
-                                Nay
-                            </span>
+                                <span className='ml-auto'>
+                                    Nay
+                                </span>
+                            </div>
                         </div>
                     </div>
                 )

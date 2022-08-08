@@ -109,7 +109,7 @@ export default function Question() {
 
             {group?.allowRepresentation ? (
                 <div className={`mt-3 mb-n2 d-flex ${!!representatives?.length && 'justify-content-between'} align-items-center`}>
-                    <div className="d-flex">
+                    <div className="d-flex align-items-center">
                         <p className="mb-0">Vote or {!!representatives?.length && 'be represented by'}</p>
 
                         {!!representatives?.length && (
@@ -136,7 +136,7 @@ export default function Question() {
                     </div>
 
                     <div
-                        className="button_ small mb-0 ml-2"
+                        className={`button_ small mb-0 ml-2 ${group?.yourStats.representing && 'inverted'}`}
                         onClick={() => !liquidUser ? updateParams({
                             paramsToAdd: {
                                 modal: "RegisterBefore",
@@ -155,7 +155,10 @@ export default function Question() {
                             }
                         })}
                     >
-                        Choose Representatives
+                        {group?.yourStats.representing ?
+                            `${group?.yourStats.representing} represent you` :
+                            'Choose Representatives'
+                        }
                     </div>
                 </div>
             ) : null}
@@ -167,80 +170,6 @@ export default function Question() {
                     <div className="mt-4"></div>
                 )} */}
                 <h2 className="mb-2 mt-4 white pre-wrap mw-95"><b>{voteName}</b></h2>
-
-                {(question.thisUserIsAdmin || liquidUser?.admin === 'total') && (
-                    <div className='d-flex mt-3 justify-content-center align-items-center'>
-                        <div
-                            className='d-flex justify-content-center pointer'
-                            role="button"
-                            onClick={async () => {
-                                const inviteLink = `${env.website}/invite/by/${liquidUser?.handle}/to/voteOn/${voteName}/${groupHandle}`;
-                                try {
-                                    await navigator.share({
-                                        title: `Vote on ${voteName} with ${liquidUser?.name}`,
-                                        text: `${liquidUser?.name} is inviting you to vote on ${voteName} with him`,
-                                        url: inviteLink
-                                    })
-                                } catch (err) {
-                                    updateParams({
-                                        paramsToAdd: {
-                                            modal: "InviteFor",
-                                            modalData: JSON.stringify({
-                                                InviteType: 'toVote',
-                                                inviteLink,
-                                                voteName
-                                            })
-                                        }
-                                    })
-                                }
-                            }}
-                        >
-
-                            <InviteTinySvg />
-                        </div>
-                        <div className="d-flex flex-column justify-content-center pointer ml-2">
-                            <Popper
-                                rightOnSmall={true}
-                                button={<div>
-                                    <ThreeDotsSmallSVG />
-                                </div>}
-                                popperContent={
-                                    <ul className="p-0 m-0 mx-2">
-                                        <li
-                                            className="pointer my-2 text-danger"
-                                            onClick={() => updateParams({
-                                                paramsToAdd: {
-                                                    modal: "DeletePoll",
-                                                    modalData: JSON.stringify({
-                                                        questionText: question?.questionText,
-                                                        group: question?.groupChannel?.group,
-                                                        navToGroup: true
-                                                    })
-                                                }
-                                            })}
-                                        >
-                                            Delete
-                                        </li>
-                                        <li
-                                            className="pointer my-2"
-                                            onClick={() => updateParams({
-                                                paramsToAdd: {
-                                                    modal: "EditQuestion",
-                                                    modalData: JSON.stringify({
-                                                        questionText: question?.questionText,
-                                                        groupHandle: question?.groupChannel?.group,
-                                                    })
-                                                }
-                                            })}
-                                        >
-                                            Edit
-                                        </li>
-                                    </ul>
-                                }
-                            />
-                        </div>
-                    </div>
-                )}
             </div>
 
             {!!question?.description && (
@@ -305,14 +234,70 @@ export default function Question() {
 
                     <div className="mt-4 d-flex align-items-center flex-nowrap justify-content-between">
                         <div className="d-flex flex-nowrap">
-                            <div><GroupSmallSvg /></div>
-                            <div className="d-flex flex-wrap justify-content-start">
-                                <Link
-                                    to={`/group/${groupHandle}`}
-                                    className="badge ml-1 mb-1 mt-1"
+
+                            <div className='d-flex justify-content-center align-items-center'>
+                                <div
+                                    className='d-flex justify-content-center pointer ml-2'
+                                    role="button"
+                                    onClick={async () => {
+                                        const inviteLink = `${env.website}/invite/by/${liquidUser?.handle}/to/voteOn/${voteName}/${groupHandle}`;
+                                        try {
+                                            await navigator.share({
+                                                title: `Vote on ${voteName} with ${liquidUser?.name}`,
+                                                text: `${liquidUser?.name} is inviting you to vote on ${voteName} with him`,
+                                                url: inviteLink
+                                            })
+                                        } catch (err) {
+                                            updateParams({
+                                                paramsToAdd: {
+                                                    modal: "InviteFor",
+                                                    modalData: JSON.stringify({
+                                                        InviteType: 'toVote',
+                                                        inviteLink,
+                                                        voteName
+                                                    })
+                                                }
+                                            })
+                                        }
+                                    }}
                                 >
-                                    {question?.groupChannel?.group}
-                                </Link>
+
+                                    <InviteTinySvg />
+                                </div>
+
+                                {(question.thisUserIsAdmin || liquidUser?.admin === 'total') && (
+                                    <>
+                                        <div
+                                            className="pointer text-danger  ml-2"
+                                            onClick={() => updateParams({
+                                                paramsToAdd: {
+                                                    modal: "DeletePoll",
+                                                    modalData: JSON.stringify({
+                                                        questionText: question?.questionText,
+                                                        group: question?.groupChannel?.group,
+                                                        navToGroup: true
+                                                    })
+                                                }
+                                            })}
+                                        >
+                                            Archive
+                                        </div>
+                                        <div
+                                            className="pointer  ml-2"
+                                            onClick={() => updateParams({
+                                                paramsToAdd: {
+                                                    modal: "EditQuestion",
+                                                    modalData: JSON.stringify({
+                                                        questionText: question?.questionText,
+                                                        groupHandle: question?.groupChannel?.group,
+                                                    })
+                                                }
+                                            })}
+                                        >
+                                            Edit
+                                        </div>
+                                    </>
+                                )}
                             </div>
                         </div>
                         <small
@@ -363,7 +348,7 @@ export default function Question() {
                 <ul className="nav d-flex justify-content-around mt-1 mx-n3">
                     <li className="nav-item">
                         <Link className={`nav-link active`} to={`/poll/${voteName}/${groupHandle}`}>
-                            People also voted on
+                            People also voted on 🧪
                         </Link>
                     </li>
                 </ul>

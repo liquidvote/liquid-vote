@@ -52,7 +52,7 @@ export const GroupVisibilityPicker: FunctionComponent<{
                         rightOnSmall={true}
                         button={
                             <div className='d-flex align-items-center'>
-                                <small>
+                                {/* <small>
                                     {visibility === 'everyone' && (
                                         "everyone"
                                     )}
@@ -64,7 +64,7 @@ export const GroupVisibilityPicker: FunctionComponent<{
                                     {visibility === 'self' && (
                                         "only yourself"
                                     )}
-                                </small>
+                                </small> */}
                                 <button className={`button_ inverted small mx-1`}>
                                     {visibility === 'everyone' && (
                                         <WorldSVG data-tip="votes visible to everyone" />
@@ -150,9 +150,9 @@ export const GroupVisibilityPicker: FunctionComponent<{
                     />
                 ) : liquidUser ? (
                     <div className='d-flex align-items-center justify-content-center'>
-                        <small>
+                        {/* <small>
                             only yourself
-                        </small>
+                        </small> */}
                         <div className='mx-1 d-flex align-items-center justify-content-center'>
                             <LockSVG data-tip="votes visible only to yourself" />
                         </div>
@@ -178,7 +178,7 @@ export const GroupVisibilityPicker: FunctionComponent<{
                     className={`button_ small ml-1 mb-0 ${isMember ? "selected" : ""}`}
                     disabled={group.thisUserIsAdmin}
                 >
-                    {isMember ?
+                    {(isMember || group.thisUserIsAdmin) ?
                         group.thisUserIsAdmin ?
                             'Admin' :
                             'Joined' :

@@ -43,12 +43,12 @@ export const VotedExplanation: FunctionComponent<{
                         <>
                             Voted
                             <b className={`white ml-1 ${position?.toLowerCase()}Direct px-1 rounded`}>
-                                {position}
+                                {position === 'for' ? 'yay' : position === 'against' ? 'nay' : position}
                             </b>
                         </>
                     ) : null}
                     {position && position === "delegated" ? <>Was</> : null}
-                    {!position ? <span className='faded'>Did not vote</span> : null}
+                    {/* {!position ? <span className='faded'>Did not vote</span> : null} */}
                 </small>
 
                 {position !== "delegated" && !!representeeVotes?.length && (

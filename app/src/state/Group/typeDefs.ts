@@ -77,6 +77,7 @@ export const GROUPS = gql`
         avatar,
         cover,
         adminApproved,
+        allowRepresentation,
         externalLink,
         createdOn,
         lastEditOn,

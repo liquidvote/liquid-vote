@@ -117,7 +117,7 @@ export const Group: FunctionComponent<{}> = ({ }) => {
                 />
             </div>
             <div className="d-flex flex-wrap mt-2 mb-n1 justify-content-between flex-nowrap">
-                <div className="d-flex flex-column mb-1 mr-1 flex-nowrap">
+                <div className="d-flex flex-column mb-1 mr-1 flex-nowrap flex-1">
                     <h4 className="d-flex white align-items-start m-0">
                         {group?.name}
                         {/* <div className="ml-2">
@@ -142,55 +142,57 @@ export const Group: FunctionComponent<{}> = ({ }) => {
                         </small>
                     </p>
                 </div>
-                <div className="d-flex mb-n1 ml-n1 flex-wrap align-content-start justify-content-end">
-                    {isMember && (
-                        <>
-                            <GroupVisibilityPicker
-                                group={group}
-                            />
-                            <div
-                                className="button_ small mb-2 ml-2"
-                                onClick={async () => {
-                                    const inviteLink = `${env.website}/invite/by/${liquidUser?.handle}/to/group/${group.handle}`;
+                <div className="d-flex mb-n1 ml-n1 flex-wrap align-content-start justify-content-end flex-1">
+                    <div
+                        className="button_ small mb-2 ml-2"
+                        onClick={async () => {
+                            const inviteLink = `${env.website}/invite/by/${liquidUser?.handle}/to/group/${group.handle}`;
 
-                                    try {
-                                        await navigator.share({
-                                            title: `Vote on ${group.name} with ${liquidUser?.name}`,
-                                            text: `${liquidUser?.name} is inviting you to vote on ${group.name}`,
-                                            url: inviteLink
-                                        })
+                            try {
+                                await navigator.share({
+                                    title: `Vote on ${group.name} with ${liquidUser?.name}`,
+                                    text: `${liquidUser?.name} is inviting you to vote on ${group.name}`,
+                                    url: inviteLink
+                                })
 
-                                    } catch (err) {
-                                        updateParams({
-                                            paramsToAdd: {
-                                                modal: "InviteFor",
-                                                modalData: JSON.stringify({
-                                                    InviteType: 'toGroup',
-                                                    groupHandle: group.handle,
-                                                    groupName: group.name,
-                                                    inviteLink
-                                                })
-                                            }
-                                        })
-                                    }
-                                }}
-                            >
-                                <InviteTinySvg />
-                            </div>
-                            <div
-                                className="button_ small mb-2 ml-2"
-                                onClick={() => updateParams({
+                            } catch (err) {
+                                updateParams({
                                     paramsToAdd: {
-                                        modal: "ChooseRepresentatives",
+                                        modal: "InviteFor",
                                         modalData: JSON.stringify({
-                                            groupHandle: group.handle
+                                            InviteType: 'toGroup',
+                                            groupHandle: group.handle,
+                                            groupName: group.name,
+                                            inviteLink
                                         })
                                     }
-                                })}
-                            >
-                                Choose Representatives
-                            </div>
-                        </>
+                                })
+                            }
+                        }}
+                    >
+                        <InviteTinySvg />
+                    </div>
+                    <div className='mb-2 ml-2'>
+                        <GroupVisibilityPicker
+                            group={group}
+                        />
+                    </div>
+                    {(group?.yourStats.representing || group.allowRepresentation) && (
+                        <div
+                            className={`button_ small mb-2 ml-2 ${group?.yourStats.representing && 'inverted'}`}
+                            onClick={() => updateParams({
+                                paramsToAdd: {
+                                    modal: "ChooseRepresentatives",
+                                    modalData: JSON.stringify({
+                                        groupHandle: group.handle
+                                    })
+                                }
+                            })}
+                        > {group?.yourStats.representing ?
+                            `${group?.yourStats.representing} represent you` :
+                            'Choose Representatives'
+                            }
+                        </div>
                     )}
                     {
                         group?.thisUserIsAdmin ? (
@@ -205,35 +207,7 @@ export const Group: FunctionComponent<{}> = ({ }) => {
                             >
                                 Edit
                             </div>
-                        ) : (
-                            <div
-                                onClick={() => !!liquidUser ? editGroupMemberChannelRelation({
-                                    variables: {
-                                        UserHandle: liquidUser?.handle,
-                                        GroupHandle: group?.handle,
-                                        IsMember: !isMember
-                                    }
-                                }) : updateParams({
-                                    paramsToAdd: {
-                                        modal: "RegisterBefore",
-                                        modalData: JSON.stringify({
-                                            toWhat: 'joinGroup',
-                                            groupHandle: group.handle,
-                                            groupName: group.name
-                                        })
-                                    }
-                                })}
-                                className={`button_ small ml-2 mb-0 ${isMember ? "selected" : ""}`}
-                            >
-                                {editGroupMemberChannelRelation_loading && (
-                                    <img
-                                        className="vote-avatar mr-1 my-n2"
-                                        src={'http://images.liquid-vote.com/system/loading.gif'}
-                                    />
-                                )}
-                                {isMember ? "Joined" : "Join"}
-                            </div>
-                        )}
+                        ) : null}
                     {/* <div
                         onClick={() => setIsRepresenting(!isRepresenting)}
                         className={`button_ small mb-0 ${isRepresenting ? "selected" : ""}`}

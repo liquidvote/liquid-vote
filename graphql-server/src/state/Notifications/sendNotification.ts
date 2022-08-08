@@ -16,8 +16,8 @@ export const sendNotification = async ({
 }) => {
     const message = {
         notification: {
-            "title": "Background Message Title",
-            "body": "Background message body",
+            "title": "Recebeste esta fritaria?",
+            "body": "Recebeste esta fritaria?",
             "image": "https://images.liquid-vote.com/system/logo.png"
         },
         token

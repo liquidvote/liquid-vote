@@ -67,13 +67,13 @@ export const DeletePoll: FunctionComponent<{}> = ({ }) => {
     return (
         <form>
             <ModalHeader
-                title="Delete Poll?"
+                title="Archive Poll?"
                 hideSubmitButton={true}
             />
 
             <div className="Modal-Content">
                 <p className="my-3 mx-5">
-                    This can’t be undone. <br/>
+                    This can’t be easily undone. <br/>
                     <i className="white">"{modalData.questionText}?"</i>{' '}
                     will become unavailable to everyone.
                 </p>
@@ -93,7 +93,7 @@ export const DeletePoll: FunctionComponent<{}> = ({ }) => {
                             })
                         }
                     >
-                        Delete
+                        Archive
                     </div>
                     <div
                         className="button_ w-100"

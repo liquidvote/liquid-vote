@@ -4,10 +4,12 @@ import { USER } from "@state/User/typeDefs";
 
 export default function useUser({
     userHandle,
-    groupHandle
+    groupHandle,
+    skip
 }: {
     userHandle?: string,
-    groupHandle?: string
+    groupHandle?: string,
+    skip?: boolean
 }) {
     const {
         loading: user_loading,
@@ -16,7 +18,7 @@ export default function useUser({
         refetch: user_refetch
     } = useQuery(USER, {
         variables: { handle: userHandle, groupHandle },
-        skip: userHandle === "new" || !userHandle
+        skip: skip || userHandle === "new" || !userHandle
     });
 
     return {

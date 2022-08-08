@@ -24,8 +24,8 @@ export const Vote: FunctionComponent<{
 }) => {
 
         const { user, user_refetch } = useUser({
-            userHandle: v.user.handle,
-            groupHandle: v?.question.group.handle
+            userHandle: v?.user?.handle,
+            groupHandle: v?.question?.group.handle
         });
 
         const { liquidUser } = useAuthUser();
@@ -40,62 +40,77 @@ export const Vote: FunctionComponent<{
 
         const [showAllChoices, setShowAllChoices] = useState(!hideChoicesBesides);
 
-        const userVote = v.question?.questionType === 'single' ? v.question?.userVote :
-            v.question?.choices?.find(c => c.text === hideChoicesBesides)?.userVote;
+        const userVote = v?.question?.questionType === 'single' ? v?.question?.userVote :
+            v?.question?.choices?.find(c => c.text === hideChoicesBesides)?.userVote;
 
         return (
             <>
                 <div className="d-flex relative align-items-center">
 
-                    <Link to={`/profile/${v.user?.handle}`}>
+                    {v?.user ? (
+                        <Link to={`/profile/${v?.user?.handle}`}>
+                            <Avatar
+                                person={v?.user}
+                                groupHandle={v?.groupChannel?.group}
+                                type="small"
+                            />
+                        </Link>
+                    ) : (
                         <Avatar
-                            person={v.user}
-                            groupHandle={v?.groupChannel?.group}
+                            person={null}
+                            groupHandle={null}
                             type="small"
                         />
-                    </Link>
+                    )}
 
                     <div className="flex-fill">
                         <div className="mb-n1 flex-fill d-flex align-items-center justify-content-between">
                             <div className="w-100">
-                                <div className="d-flex align-items-center justify-content-between">
-                                    <Link to={`/profile/${v.user?.handle}`} className="d-block">
-                                        <b className="mr-1">{v.user?.name}</b>
-                                    </Link>
+                                {v?.user ? (
+                                    <div className="d-flex align-items-center justify-content-between">
+                                        <Link to={`/profile/${v?.user?.handle}`} className="d-block">
+                                            <b className="mr-1">{v?.user?.name}</b>
+                                        </Link>
 
-                                    <div className="d-flex ml-1">
-                                        <div
-                                            // onClick={() => setIsRepresenting(!isRepresenting)}
-                                            onClick={() => !!liquidUser ? editUserFollowingRelation({
-                                                variables: {
-                                                    FollowedHandle: user?.handle,
-                                                    FollowingHandle: liquidUser?.handle,
-                                                    IsFollowing: !user?.isYouFollowing
-                                                }
-                                            })
-                                                .then((r) => {
-                                                    user_refetch();
-                                                }) : (
-                                                updateParams({
-                                                    paramsToAdd: {
-                                                        modal: "RegisterBefore",
-                                                        modalData: JSON.stringify({
-                                                            toWhat: 'followUser',
-                                                            userName: user?.name
-                                                        })
+                                        <div className="d-flex ml-1">
+                                            <div
+                                                // onClick={() => setIsRepresenting(!isRepresenting)}
+                                                onClick={() => !!liquidUser ? editUserFollowingRelation({
+                                                    variables: {
+                                                        FollowedHandle: user?.handle,
+                                                        FollowingHandle: liquidUser?.handle,
+                                                        IsFollowing: !user?.isYouFollowing
                                                     }
                                                 })
-                                            )}
-                                            className={`button_ small mr-2 ${user?.isYouFollowing ? "selected" : ""}`}
-                                        >
-                                            {
-                                                user?.isYouFollowing ?
-                                                    "Following" :
-                                                    "Follow"
-                                            }
+                                                    .then((r) => {
+                                                        user_refetch();
+                                                    }) : (
+                                                    updateParams({
+                                                        paramsToAdd: {
+                                                            modal: "RegisterBefore",
+                                                            modalData: JSON.stringify({
+                                                                toWhat: 'followUser',
+                                                                userName: user?.name
+                                                            })
+                                                        }
+                                                    })
+                                                )}
+                                                className={`button_ small mr-2 ${user?.isYouFollowing ? "selected" : ""}`}
+                                            >
+                                                {
+                                                    user?.isYouFollowing ?
+                                                        "Following" :
+                                                        "Follow"
+                                                }
+                                            </div>
                                         </div>
                                     </div>
-                                </div>
+
+                                ) : (
+                                    <div className="d-flex align-items-center justify-content-between">
+                                        <b className="mr-1">Anonymous</b>
+                                    </div>
+                                )}
 
                                 <div className="d-flex flex-wrap align-items-center mt-0 mb-0">
                                     <>
@@ -105,9 +120,9 @@ export const Vote: FunctionComponent<{
                                             againstWeight={userVote?.againstWeight}
                                             representeeVotes={userVote?.representeeVotes}
                                             representatives={userVote?.representatives}
-                                            user={v.user}
+                                            user={v?.user}
                                             groupHandle={v?.groupChannel?.group}
-                                            when={timeAgo.format(new Date(Number(v?.lastEditOn)))}
+                                            when={v ? timeAgo.format(new Date(Number(v?.lastEditOn))) : null}
                                         />
                                     </>
                                 </div>
@@ -122,16 +137,16 @@ export const Vote: FunctionComponent<{
                 )} */}
 
 
-                {(v.question?.questionType === 'multi' && (showAllChoices)) && (
+                {(v?.question?.questionType === 'multi' && (showAllChoices)) && (
                     <div className="mt-2">
 
-                        {v.question?.choices?.map(c => (
+                        {v?.question?.choices?.map(c => (
                             <div className='d-flex my-2'>
                                 <b>{c.text}</b>:
                                 <span className="d-flex mx-2">
-                                    <Link to={`/profile/${v.user.handle}/cause/${v?.groupChannel?.group}`}>
+                                    <Link to={`/profile/${v?.user?.handle}/cause/${v?.groupChannel?.group}`}>
                                         <Avatar
-                                            person={v.user}
+                                            person={v?.user}
                                             groupHandle={v?.groupChannel?.group}
                                             type="tiny"
                                         />
@@ -144,7 +159,7 @@ export const Vote: FunctionComponent<{
                                     againstWeight={userVote?.againstWeight}
                                     representeeVotes={c.userVote?.representeeVotes}
                                     representatives={c.userVote?.representatives}
-                                    user={v.user}
+                                    user={v?.user}
                                     groupHandle={v?.groupChannel?.group}
                                 />
                             </div>
