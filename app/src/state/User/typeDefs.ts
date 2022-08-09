@@ -226,6 +226,10 @@ export const USER_GROUPS = gql`
             handle
         }
         privacy,
+        # userMemberRelation {
+        #     groupId
+        #     visibility
+        # }
         yourMemberRelation {
             groupId
             userId

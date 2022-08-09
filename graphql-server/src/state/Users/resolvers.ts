@@ -484,6 +484,11 @@ export const UserResolvers = {
                     }
                 },
                 ...canViewUsersVoteOrCause({ AuthUser }),
+                {
+                    '$match': {
+                        'visibility.hasViewingPermission': true
+                    }
+                },
 
                 ...Representative ? [
                     // representativeRelation
@@ -587,7 +592,9 @@ export const UserResolvers = {
 
                 // sort
                 ...handle ? [{
-                    $sort: { 'userGroupStats.inverseDaysAgoSum': -1 }
+                    $sort: { 'userGroupStats.inverseDaysAgoSum': -1 },
+                }, {
+                    $sort: { 'visibility.visibilityLevel': 1 }
                 }] : AuthUser ? [{
                     $sort: { 'yourStats.membersYouFollowCount': -1 }
                 }] : [{
@@ -666,8 +673,30 @@ export const UserResolvers = {
             //     { encoding: 'utf8' }
             // );
 
-            const UserGroups = !notUsers && (await mongoDB.collection("GroupMembers").aggregate(UserGroupsAggFromGroupMembers)
-                .toArray()).map((g) => ({
+            // TODO: this could go into the Agg
+            // const VisibilitySortOrder = {
+            //     'everyone': 1,
+            //     'members': 2,
+            //     'following': 3,
+            //     'self': 4,
+            //     'none': 5
+            // };
+
+            const UserGroups = !notUsers && (
+                await mongoDB.collection("GroupMembers").aggregate(UserGroupsAggFromGroupMembers
+                ).toArray())
+                // .map(
+                //     (g) => {
+
+                //         console.log({
+                //             v: VisibilitySortOrder[g?.userRel?.visibility || 'none'],
+                //             vv: g?.userRel?.visibility
+                //         });
+
+                //         return g;
+                //     }
+                // )
+                .map((g) => ({
                     ...g.group,
                     thisUserIsAdmin: !!g.group?.admins.find(u => u.handle === AuthUser?.LiquidUser?.handle),
                     userMemberRelation: g.userRel,

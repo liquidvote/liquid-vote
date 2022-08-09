@@ -235,7 +235,7 @@ export const QuestionResolvers = {
 
             return Questions.map((q, i) => ({
                 ...q,
-                _id: q?.id,
+                _id: 'Question_VotersAlsoVotedOn_' + q?.id,
                 ...(q.questionType === 'single' && !!AuthUser) && {
                     yourVote: q?.choices[0]?.yourVote
                 },

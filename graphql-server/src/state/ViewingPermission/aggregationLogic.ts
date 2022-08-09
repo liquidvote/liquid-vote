@@ -161,60 +161,176 @@ export const canViewUsersVoteOrCause = ({ AuthUser }) => [
     },
 
     // FILTER
+    // TODO: replace with param: hasViewingPermission
+
     {
-        '$match': {
-            '$or': [
-                // no user visibility, public group
-                {
+        '$addFields':
+        {
+            'visibility': {
+                'noVisibility_publicGroup': {
                     '$and': [
-                        { "$expr": { '$not': "$userRel.visibility" } },
-                        { "$expr": { '$eq': ["$group.privacy", "public"] } },
-                        { "$expr": { '$eq': ["$userRel.isMember", true] } }
+                        { '$not': "$userRel.visibility" },
+                        { '$eq': ["$group.privacy", "public"] },
+                        { '$eq': ["$userRel.isMember", true] }
                     ]
                 },
-                // visibility: everyone, group not private
-                {
+                'visibilityEveryone_groupNotPrivate': {
                     '$and': [
-                        { "$expr": { '$eq': ["$userRel.visibility", "everyone"] } },
-                        { "$expr": { '$ne': ["$group.privacy", "private"] } }
+                        { '$eq': ["$userRel.visibility", "everyone"] },
+                        { '$ne': ["$group.privacy", "private"] }
                     ]
                 },
-                // no user visibility, private group
-                {
+                'noVisibility_privateGroup_yourMember': {
                     '$and': [
-                        { "$expr": { '$ne': ["$userRel.visibility", "self"] } },
-                        { "$expr": { '$eq': ["$group.privacy", "private"] } },
-                        { "$expr": { '$eq': ["$yourRel.isMember", true] } }
+                        { '$ne': ["$userRel.visibility", "self"] },
+                        { '$eq': ["$group.privacy", "private"] },
+                        { '$eq': ["$yourRel.isMember", true] }
                     ]
                 },
-                // visibility: members
-                {
+                'visibilityMembers': {
                     '$and': [
-                        { "$expr": { '$eq': ["$userRel.visibility", "members"] } },
-                        { "$expr": { '$eq': ["$yourRel.isMember", true] } }
+                        { '$eq': ["$userRel.visibility", "members"] },
+                        { '$eq': ["$yourRel.isMember", true] }
                     ]
                 },
-                // visibility: following
-                {
+                'visibilityFollowing': {
                     '$and': [
-                        { "$expr": { '$eq': ["$userRel.visibility", "following"] } },
-                        { "$expr": { '$eq': ["$userFollowingYouRel.isFollowing", true] } }
+                        { '$eq': ["$userRel.visibility", "following"] },
+                        { '$eq': ["$userFollowingYouRel.isFollowing", true] }
                     ]
                 },
-                // visibility: self
-                {
+                'visibilitySelf': {
                     '$and': [
-                        // { "$expr": { '$eq': ["$userRel.visibility", "self"] } }, // Always show to self
-                        // { "$expr": { '$eq': ["$yourRel.userId", "$userRel.userId"] } },
                         {
-                            '$expr': {
-                                '$eq': ['$userId', {
-                                    '$toObjectId': new ObjectId(AuthUser._id)
-                                }]
-                            }
+                            '$eq': [{
+                                '$toObjectId': '$userId'
+                            }, {
+                                '$toObjectId': new ObjectId(AuthUser._id)
+                            }]
                         },
                     ]
-                },
-            ]
+                }
+            }
         }
-    }];
+    },
+    {
+        '$addFields': {
+            'visibility.hasViewingPermission': {
+                '$or': [
+                    { '$eq': ['$visibility.noVisibility_publicGroup', true] },
+                    { '$eq': ['$visibility.visibilityEveryone_groupNotPrivate', true] },
+                    { '$eq': ['$visibility.noVisibility_privateGroup_yourMember', true] },
+                    { '$eq': ['$visibility.visibilityMembers', true] },
+                    { '$eq': ['$visibility.visibilityFollowing', true] },
+                    { '$eq': ['$visibility.visibilitySelf', true] },
+                ]
+            },
+        }
+    },
+    {
+        '$addFields': {
+            "visibility.visibilityLevel": {
+                "$cond": {
+                    "if": {
+                        "$or": [{
+                            "$eq": ["$visibility.noVisibility_publicGroup", true]
+                        }, {
+                            "$eq": ["$visibility.visibilityEveryone_groupNotPrivate", true]
+                        }]
+                    },
+                    "then": 1,
+                    "else": {
+                        "$cond": {
+                            "if": {
+                                "$or": [{
+                                    "$eq": ["$visibility.noVisibility_privateGroup_yourMember", true]
+                                }, {
+                                    "$eq": ["$visibility.visibilityMembers", true]
+                                }]
+                            },
+                            "then": 2,
+                            "else": {
+                                "$cond": {
+                                    "if": {
+                                        "$or": [{
+                                            "$eq": ["$visibility.visibilityFollowing", true]
+                                        }]
+                                    },
+                                    "then": 3,
+                                    "else": {
+                                        "$cond": {
+                                            "if": {
+                                                "$or": [{
+                                                    "$eq": ["$visibility.visibilitySelf", true]
+                                                }]
+                                            },
+                                            "then": 4,
+                                            "else": 5
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    },
+    // {
+    //     '$match': {
+    //         '$or': [
+    //             // no user visibility, public group
+    //             {
+    //                 '$and': [
+    //                     { "$expr": { '$not': "$userRel.visibility" } },
+    //                     { "$expr": { '$eq': ["$group.privacy", "public"] } },
+    //                     { "$expr": { '$eq': ["$userRel.isMember", true] } }
+    //                 ]
+    //             },
+    //             // visibility: everyone, group not private
+    //             {
+    //                 '$and': [
+    //                     { "$expr": { '$eq': ["$userRel.visibility", "everyone"] } },
+    //                     { "$expr": { '$ne': ["$group.privacy", "private"] } }
+    //                 ]
+    //             },
+    //             // no user visibility, private group
+    //             {
+    //                 '$and': [
+    //                     { "$expr": { '$ne': ["$userRel.visibility", "self"] } },
+    //                     { "$expr": { '$eq': ["$group.privacy", "private"] } },
+    //                     { "$expr": { '$eq': ["$yourRel.isMember", true] } }
+    //                 ]
+    //             },
+    //             // visibility: members
+    //             {
+    //                 '$and': [
+    //                     { "$expr": { '$eq': ["$userRel.visibility", "members"] } },
+    //                     { "$expr": { '$eq': ["$yourRel.isMember", true] } }
+    //                 ]
+    //             },
+    //             // visibility: following
+    //             {
+    //                 '$and': [
+    //                     { "$expr": { '$eq': ["$userRel.visibility", "following"] } },
+    //                     { "$expr": { '$eq': ["$userFollowingYouRel.isFollowing", true] } }
+    //                 ]
+    //             },
+    //             // visibility: self
+    //             {
+    //                 '$and': [
+    //                     // { "$expr": { '$eq': ["$userRel.visibility", "self"] } }, // Always show to self
+    //                     // { "$expr": { '$eq': ["$yourRel.userId", "$userRel.userId"] } },
+    //                     {
+    //                         '$expr': {
+    //                             '$eq': ['$userId', {
+    //                                 '$toObjectId': new ObjectId(AuthUser._id)
+    //                             }]
+    //                         }
+    //                     },
+    //                 ]
+    //             },
+    //         ]
+    //     }
+    // }
+];

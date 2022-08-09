@@ -22,7 +22,7 @@ export const Feed: FunctionComponent<{}> = ({ }) => {
     let { section } = useParams<any>();
     const { liquidUser } = useAuthUser();
     const { user: yourUser } = useUser({ userHandle: liquidUser?.handle });
-    const { loginWithPopup } = useAuth0();
+    const { loginWithPopup, isLoading: auth0_loading } = useAuth0();
 
     // console.log({ yourUser });
 
@@ -127,10 +127,13 @@ export const Feed: FunctionComponent<{}> = ({ }) => {
                     </>
                 ))}
 
-                {!liquidUser && (
+                {(!liquidUser && !auth0_loading) && (
                     <div className="d-flex align-items-center justify-content-center min-vh-100 flex-column">
                         <div className="p-4 text-center">
-                            <h3>Login to see what your friends are voting on</h3>
+
+                            <h3>Liquid Vote is more fun with friends.</h3>
+
+                            <p>Login to see what they are voting on.</p>
 
                             <div className="d-flex align-items-center justify-content-center">
                                 <div
@@ -151,7 +154,7 @@ export const Feed: FunctionComponent<{}> = ({ }) => {
                     </div>
                 )}
 
-                {liquidUser && !yourUser?.stats?.following && (
+                {(liquidUser && !!questions_data?.Questions && !yourUser?.stats?.following && !auth0_loading) && (
                     <div className="d-flex align-items-center justify-content-center min-vh-100 flex-column">
                         <div className="p-4 text-center">
                             <h3>Liquid Vote is more fun with friends.</h3>
@@ -161,7 +164,7 @@ export const Feed: FunctionComponent<{}> = ({ }) => {
                     </div>
                 )}
 
-                {questions_data?.Questions?.length === 0 && (
+                {(questions_data?.Questions?.length === 0 && !questions_loading && !auth0_loading) && (
                     <div className="d-flex align-items-center justify-content-center min-vh-100 flex-column">
                         <div className="p-4 text-center">
                             The people you follow haven't voted yet, at least not in any public groups, or groups you have joined yet
@@ -169,7 +172,7 @@ export const Feed: FunctionComponent<{}> = ({ }) => {
                     </div>
                 )}
 
-                {questions_loading && (
+                {(questions_loading || auth0_loading) && (
                     <div className="d-flex align-items-center justify-content-center min-vh-100 flex-column">
                         <DropAnimation />
                         {/* <p className='mt-4'>The Feed Query takes up to 10s for now, sorry 🧪</p> */}

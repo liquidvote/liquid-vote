@@ -791,6 +791,13 @@ export const VotersAgg = ({
                         ]
                     }
                 }
+            },
+            {
+                '$addFields': {
+                    'user': {
+                        $cond: { if: { $eq: ['$visibility.hasViewingPermission', true] }, then: '$user', else: null }
+                    }
+                }
             }
         ]
     ),
@@ -953,6 +960,13 @@ export const VotesGeneralAggregateLogic = async ({
         ...AggregateLogic.sortLogic,
         ...AggregateLogic.questionAndGroup,
         ...canViewUsersVoteOrCause({ AuthUser }),
+        ...userHandle ? [
+            {
+                '$match': {
+                    'visibility.hasViewingPermission': true
+                }
+            },
+        ] : [],
         ...AggregateLogic.addMemberRelationToGroup,
         ...AggregateLogic.userObject,
 

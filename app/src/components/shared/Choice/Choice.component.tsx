@@ -383,12 +383,17 @@ export const Choice: FunctionComponent<{
                                         !!user ? [] : forDisplayed
                                     )?.map((p: any) => (
                                         <div key={`forDisplayedVoter-${voteName}-${p?.handle}`} className="mr-2 mb-2">
-                                            <Avatar
-                                                person={p}
-                                                groupHandle={groupHandle}
-                                                type={inList ? 'tiny' : 'vote'}
-                                                hideComparisson={p.hideComparisson}
-                                            />
+                                            <Link
+                                                to={`/profile/${p.handle}`}
+                                                onClick={e => e.stopPropagation()}
+                                            >
+                                                <Avatar
+                                                    person={p}
+                                                    groupHandle={groupHandle}
+                                                    type={inList ? 'tiny' : 'vote'}
+                                                    hideComparisson={p.hideComparisson}
+                                                />
+                                            </Link>
                                         </div>
                                     ))}
 
@@ -491,12 +496,17 @@ export const Choice: FunctionComponent<{
                                         !!user ? [] : againstDisplayed
                                     )?.map((p: any) => (
                                         <div key={`againstDisplayedVoter-${voteName}-${p?.handle}`} className="mr-2 mb-2">
-                                            <Avatar
-                                                person={p}
-                                                groupHandle={groupHandle}
-                                                type={inList ? 'tiny' : 'vote'}
-                                                hideComparisson={p.hideComparisson}
-                                            />
+                                            <Link
+                                                to={`/profile/${p.handle}`}
+                                                onClick={e => e.stopPropagation()}
+                                            >
+                                                <Avatar
+                                                    person={p}
+                                                    groupHandle={groupHandle}
+                                                    type={inList ? 'tiny' : 'vote'}
+                                                    hideComparisson={p.hideComparisson}
+                                                />
+                                            </Link>
                                         </div>
                                     ))
                                 }

@@ -56,6 +56,10 @@ export const ProfileGroups: FunctionComponent<{}> = () => {
         }
     }, [userGroups_loading]);
 
+    // console.log({
+    //     userGroups
+    // });
+
     return (
         <>
             <div className="mt-n3">
