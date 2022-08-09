@@ -6,6 +6,7 @@ import SingleVoteInList from "@shared/SingleVoteInList";
 import MultiVoteInList from "@shared/MultiVoteInList";
 import { QUESTIONS_VOTERS_ALSO_VOTED_ON } from '@state/Question/typeDefs';
 import DropAnimation from '@components/shared/DropAnimation';
+import GroupPollListCover from "@shared/GroupPollListCover";
 
 import './style.sass';
 
@@ -32,25 +33,13 @@ export const QuestionsVotersAlsoVotedOn: FunctionComponent<{}> = ({ }) => {
     return (
         <div className="mt-3">
             {questions_data?.VotersAlsoVotedOn?.map((v: any, i: any) => (
-                <div key={'polls-' + i}>
+                <div key={'alsoVotedOnpolls-' + i}>
 
-                    <div className="poll-cover-container">
-                        <div
-                            className="poll-cover"
-                            style={{
-                                background: v?.group?.cover && `url(${v?.group?.cover}) 50% 50% / cover no-repeat`
-                            }}
+                    {v?.group?.handle !== questions_data?.VotersAlsoVotedOn[i - 1]?.group?.handle ? (
+                        <GroupPollListCover
+                            group={v?.group}
                         />
-                        <div className="poll-cover-overlay">
-                        </div>
-                        <div className="poll-cover-info">
-                            <Link to={`/group/${v?.group?.handle}`}>
-                                <h5 className="white p-0 m-0">
-                                    {v?.group?.name}
-                                </h5>
-                            </Link>
-                        </div>
-                    </div>
+                    ) : null}
 
                     <p className="faded small my-2 white">
                         {v?.votersInCommonStats?.voterCount} voters in common
@@ -68,7 +57,6 @@ export const QuestionsVotersAlsoVotedOn: FunctionComponent<{}> = ({ }) => {
                             key={`single-${v.questionText}`}
                             l={v}
                             showGroupAndTime={true}
-                            showIntroMessage={true}
                         />
                     )}
                     <hr />

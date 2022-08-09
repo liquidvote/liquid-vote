@@ -243,7 +243,8 @@ export const QuestionResolvers = {
                     choices: q?.choices?.map((c) => ({
                         ...c?.choice,
                         ...(!!AuthUser) && {
-                            yourVote: c?.yourVote
+                            yourVote: c?.yourVote,
+                            yourStats: c?.yourStats
                         }
                     }))
                 },

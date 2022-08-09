@@ -444,6 +444,27 @@ export const QUESTIONS_VOTERS_ALSO_VOTED_ON = gql`
                 yourVote {
                     ...vote
                 }
+                yourStats {
+                  usersYouAreRepresentingCount
+                  votersYouFollow {
+                    handle
+                    avatar
+                    name
+                    stats {
+                      directVotesMade
+                    }
+                    yourStats {
+                      directVotesInCommon
+                      directVotesInAgreement
+                      directVotesInDisagreement
+                      indirectVotesMadeByYou
+                      indirectVotesMadeForYou
+                    }
+                    vote {
+                      position
+                    }
+                  }
+                }
             }
             allowNewChoices
             groupChannel {
@@ -461,6 +482,27 @@ export const QUESTIONS_VOTERS_ALSO_VOTED_ON = gql`
             yourVote {
                 ...vote
             }
+            yourStats {
+                usersYouAreRepresentingCount
+                votersYouFollow {
+                handle
+                avatar
+                name
+                stats {
+                    directVotesMade
+                }
+                yourStats {
+                    directVotesInCommon
+                    directVotesInAgreement
+                    directVotesInDisagreement
+                    indirectVotesMadeByYou
+                    indirectVotesMadeForYou
+                }
+                vote {
+                    position
+                }
+                }
+            }
             createdOn
             lastEditOn
             thisUserIsAdmin
@@ -473,6 +515,16 @@ export const QUESTIONS_VOTERS_ALSO_VOTED_ON = gql`
                 handle
                 cover
                 name
+                thisUserIsAdmin
+                allowRepresentation
+                yourMemberRelation {
+                    groupId
+                    userId
+                    createdOn
+                    lastEditOn
+                    isMember
+                    visibility
+                }
             }
         }
     }
