@@ -962,10 +962,13 @@ export const VotesGeneralAggregateLogic = async ({
         ...canViewUsersVoteOrCause({ AuthUser }),
         ...userHandle ? [
             {
-                '$match': {
+                $match: {
                     'visibility.hasViewingPermission': true
                 }
             },
+            {
+                $sort: { 'visibility.visibilityLevel': 1 }
+            }
         ] : [],
         ...AggregateLogic.addMemberRelationToGroup,
         ...AggregateLogic.userObject,

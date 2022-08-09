@@ -168,26 +168,6 @@ export const ProfileVotes: FunctionComponent<{}> = ({ }) => {
                 .map((v, i) => (
                     <>
                         {v?.question?.group?.handle !== user_votes_data?.Votes[i - 1]?.question?.group?.handle ? (
-                            // <div className='sticky-top'>
-                            //     <div className="poll-cover-container">
-                            //         <div
-                            //             className="poll-cover"
-                            //             style={{
-                            //                 background: v?.question?.group?.cover && `url(${v?.question?.group?.cover}) 50% 50% / cover no-repeat`
-                            //             }}
-                            //         />
-                            //         <div className="poll-cover-overlay">
-                            //         </div>
-                            //         <div className="poll-cover-info">
-                            //             <Link to={`/group/${v?.question?.group?.handle}`}>
-                            //                 <h5 className="white p-0 m-0">
-                            //                     {v?.question?.group?.name}
-                            //                 </h5>
-                            //             </Link>
-                            //         </div>
-                            //     </div>
-                            // </div>
-
                             <GroupPollListCover
                                 group={v?.question?.group}
                             />
