@@ -18,3 +18,5 @@ export default Object.assign(
     website: string
     graphql: string
 }
+
+export const commitHash = __COMMIT_HASH__; //process?.env?.commitHash;

@@ -33,34 +33,36 @@ export const QuestionsVotersAlsoVotedOn: FunctionComponent<{}> = ({ }) => {
     return (
         <div className="mt-3">
             {questions_data?.VotersAlsoVotedOn?.map((v: any, i: any) => (
-                <div key={'alsoVotedOnpolls-' + i}>
-
+                <>
                     {v?.group?.handle !== questions_data?.VotersAlsoVotedOn[i - 1]?.group?.handle ? (
                         <GroupPollListCover
                             group={v?.group}
                         />
                     ) : null}
+                    <div key={'alsoVotedOnpolls-' + i}>
 
-                    <p className="faded small my-2 white">
-                        {v?.votersInCommonStats?.voterCount} voters in common
-                    </p>
 
-                    {v.questionType === 'multi' && (
-                        <MultiVoteInList
-                            key={`multi-${v.questionText}`}
-                            v={v}
-                            showGroupAndTime={true}
-                        />
-                    )}
-                    {v.questionType === 'single' && (
-                        <SingleVoteInList
-                            key={`single-${v.questionText}`}
-                            l={v}
-                            showGroupAndTime={true}
-                        />
-                    )}
-                    <hr />
-                </div>
+                        <p className="faded small my-2 white">
+                            {v?.votersInCommonStats?.voterCount} voters in common
+                        </p>
+
+                        {v.questionType === 'multi' && (
+                            <MultiVoteInList
+                                key={`multi-${v.questionText}`}
+                                v={v}
+                                showGroupAndTime={true}
+                            />
+                        )}
+                        {v.questionType === 'single' && (
+                            <SingleVoteInList
+                                key={`single-${v.questionText}`}
+                                l={v}
+                                showGroupAndTime={true}
+                            />
+                        )}
+                        <hr />
+                    </div>
+                </>
             ))}
 
             {questions_data?.VotersAlsoVotedOn?.length === 0 && (

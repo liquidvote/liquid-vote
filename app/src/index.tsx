@@ -7,7 +7,7 @@ import { setContext } from '@apollo/client/link/context';
 import { persistCache, LocalStorageWrapper } from 'apollo3-cache-persist';
 import localforage from "localforage";
 import { useAuth0 } from "@auth0/auth0-react";
-import env from '@env';
+import env, { commitHash } from '@env';
 import * as Sentry from "@sentry/react";
 import { Integrations } from "@sentry/tracing";
 
@@ -17,7 +17,8 @@ import App from './App';
 import './index.sass';
 
 console.log({
-    env
+    env,
+    commitHash
 });
 
 if (env?.environment === "production") {

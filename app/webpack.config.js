@@ -9,11 +9,17 @@ const WebpackPwaManifest = require("webpack-pwa-manifest");
 const CompressionPlugin = require("compression-webpack-plugin");
 const CopyPlugin = require("copy-webpack-plugin");
 
+let commitHash = require('child_process')
+  .execSync('git rev-parse --short HEAD')
+  .toString()
+  .trim();
+
 const isProd = process.env.NODE_ENV === "production";
 
 console.log({
   e: process.env.NODE_ENV,
   __dirname,
+  commitHash
 });
 
 const config = {
@@ -58,11 +64,13 @@ const config = {
       template: "src/index.html",
       templateParameters: {
         env: process.env.NODE_ENV,
+        commitHash
       },
       favicon: "src/assets/favicon.ico",
     }),
     new webpack.DefinePlugin({
       "process.env.NODE_ENV": JSON.stringify(process.env.NODE_ENV),
+      "__COMMIT_HASH__": JSON.stringify(commitHash)
     }),
     ...(isProd
       ? [
