@@ -369,7 +369,8 @@ export const QuestionResolvers = {
                                         againstCount: 0,
                                         againstDirectCount: 0,
                                         lastVoteOn: null,
-                                    }
+                                    },
+                                    createdBy: AuthUser?._id
                                 }]
                             ],
                             lastEditOn: Date.now()
@@ -606,7 +607,6 @@ export const updateQuestionVotingStats = async ({
     const updatedQuestion = (await mongoDB.collection("Questions").findOneAndUpdate(
         { _id: Question_._id },
         {
-
             $set: {
                 'stats.forCount': questionVoteCounts?.forVotes || 0,
                 'stats.forDirectCount': questionVoteCounts?.forDirectVotes || 0,

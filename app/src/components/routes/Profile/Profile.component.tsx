@@ -227,7 +227,7 @@ export const Profile: FunctionComponent<{}> = ({ }) => {
                     <div>
                         <div className="mr-1"><LinkSVG /></div>
                         <a
-                            href={profile.externalLink}
+                            href={`//${profile.externalLink}`}
                             target="_blank"
                             rel="noreferrer"
                             className="white"

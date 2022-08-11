@@ -5,32 +5,46 @@ export const NotificationTypeDefs = gql`
     type Notification {
         _id: ID!
         type: String
-        seen: Boolean
 
-            # Following_voted_on_a_poll_you_voted
+            # voted_on_a_poll_you_voted
                 # actionUser
                 # poll
 
-            # Someone_followed_you
+            # followed_you
                 # actionUser
          
-            # Following_invited_you_to_vote_on_a_poll
+            # invited_you_to_vote_on_a_poll
                 # actionUser
                 # poll
 
-            # Someone_voted_on_a_poll_you_created
+            # voted_on_a_poll
                 # actionUser
                 # poll
+
+            # invited_you_to_join_group
+                #actionUser
+                #group
+
+        seen: Boolean
         
         toUser: User # Id
 
         actionUser: User # Id
-        poll: Question  # Id
-
+        question: Question  # Id
+        choiceText: String
+        group: Group # Id
+        agreesWithYou: Boolean
+        lastEditOn: String
     }
 
     extend type Query {
-        Notifications: [Notification]
+        YourNotifications: [Notification]
+        InvitationsSentAndThatCouldBeSent(
+            type: String
+            question: String
+            actionUserHandle: String
+            group: String
+        ): [Notification]
     }
 
     extend type Mutation {
@@ -41,7 +55,10 @@ export const NotificationTypeDefs = gql`
             type: String
             toUserHandle: String
             actionUserHandle: String
-            pollId: String
+            questionText: String
+            choiceText: String
+            groupHandle: String
+            agreesWithYou: Boolean
         ): JSON
     }
 `;

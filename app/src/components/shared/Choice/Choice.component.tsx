@@ -137,11 +137,11 @@ export const Choice: FunctionComponent<{
                 ?.map(v => ({ ...v, hideComparisson: true }))
         ];
 
-        console.log({
-            votersYouFollow: yourStats?.votersYouFollow,
-            stats,
-            forDisplayed
-        });
+        // console.log({
+        //     votersYouFollow: yourStats?.votersYouFollow,
+        //     stats,
+        //     forDisplayed
+        // });
 
         const againstDisplayed = [
             ...yourStats?.votersYouFollow?.filter((r: any) => r?.vote?.position === 'against') || [],

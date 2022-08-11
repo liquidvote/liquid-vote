@@ -6,7 +6,7 @@ import useUser from '@state/User/user.effect';
 import './style.sass';
 
 export const Avatar: FunctionComponent<{
-    person?: any, type?: 'profile' | 'small' | 'vote' | 'tiny', groupHandle?: string, hideComparisson?: boolean
+    person?: any, type?: 'profile' | 'small' | 'vote' | 'tiny', groupHandle?: string | null, hideComparisson?: boolean
 }> = ({
     person, type = 'small', groupHandle, hideComparisson
 }) => {

@@ -179,7 +179,7 @@ export const UserResolvers = {
                 id: User?.LiquidUser?.handle + groupHandle,
                 ...User?.LiquidUser,
                 ...isUser ? {
-                    email: User.email
+                    email: User?.LiquidUser?.email
                 } : {
                     email: null
                 },

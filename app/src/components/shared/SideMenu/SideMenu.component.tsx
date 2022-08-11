@@ -41,7 +41,7 @@ export const SideMenu: FunctionComponent<{}> = ({ }) => {
                 const g = await liquidUser_refetch();
                 count = count + 1;
 
-                console.log({ count, g });
+                // console.log({ count, g });
 
                 if (!g?.data?.authUser) {
                     setTimeout(() => tryToGetUser(), 100 + (count * 50));

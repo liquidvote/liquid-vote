@@ -96,7 +96,7 @@ export const EditGroup: FunctionComponent<{}> = ({ }) => {
                 });
             }
         }
-    }, [editedGroup])
+    }, [editedGroup]);
 
     return (
         <form onSubmit={handleSubmit(onSubmit)}>

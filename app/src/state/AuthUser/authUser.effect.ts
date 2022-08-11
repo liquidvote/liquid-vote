@@ -11,6 +11,7 @@ export default function useAuthUser() {
 
     return {
         liquidUser: authUser_data?.authUser?.LiquidUser,
+        notificationSettings: authUser_data?.authUser?.NotificationSettings,
         liquidUser_refetch: authUser_refetch,
     };
 }

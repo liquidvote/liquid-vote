@@ -3,7 +3,7 @@ import { useQuery } from "@apollo/client";
 import { Link, useParams } from "react-router-dom";
 
 import Header from "@shared/Header";
-import { VOTES } from "@state/Vote/typeDefs";
+import { YOUR_NOTIFICATIONS } from "@state/Notifications/typeDefs";
 import useAuthUser from '@state/AuthUser/authUser.effect';
 // import { useFirebaseNotifications } from "@services/firebase";
 
@@ -12,6 +12,7 @@ import CogSVG from "@shared/Icons/Cog.svg";
 import useSearchParams from "@state/Global/useSearchParams.effect";
 
 import './style.sass';
+import { Notification } from './Notification/Notification.component';
 
 export const Notifications: FunctionComponent<{}> = ({ }) => {
 
@@ -19,10 +20,16 @@ export const Notifications: FunctionComponent<{}> = ({ }) => {
     const { allSearchParams, updateParams } = useSearchParams();
     const { liquidUser } = useAuthUser();
 
+    const {
+        loading: yourNotifications_loading,
+        error: yourNotifications_error,
+        data: yourNotifications_data,
+        refetch: yourNotifications_refetch
+    } = useQuery(YOUR_NOTIFICATIONS);
 
-    // console.log({
-    //     user_votes_data
-    // });
+    console.log({
+        yourNotifications_data
+    });
 
     return (
         <>
@@ -32,13 +39,6 @@ export const Notifications: FunctionComponent<{}> = ({ }) => {
                     <div onClick={() => updateParams({
                         paramsToAdd: {
                             modal: "NotificationSettings",
-                            // modalData: JSON.stringify({
-                            //     questionText,
-                            //     choiceText,
-                            //     groupHandle,
-                            //     subsection: 'total',
-                            //     // subsubsection: 'foryou'
-                            // })
                         }
                     })} className="pointer">
                         <CogSVG />
@@ -46,10 +46,50 @@ export const Notifications: FunctionComponent<{}> = ({ }) => {
                 )}
             />
 
-            <p className="text-center py-4">
-                🏗 Ignore this for now please
-            </p>
+            <br />
 
+            {yourNotifications_data?.YourNotifications?.map((n: any) => (
+                <Notification
+                    user={n.actionUser}
+                    type={n.type}
+                    question={n.question}
+                    choiceText={n.choiceText}
+                    group={n.group}
+                    agreesWithYou={n.agreesWithYou}
+                    when={n.lastEditOn}
+                    seen={n.seen}
+                />
+            ))}
+
+            <Notification
+                user={liquidUser}
+                type="voted_on_a_poll_you_voted"
+            />
+            <Notification
+                user={liquidUser}
+                type="followed_you"
+            />
+            <Notification
+                user={liquidUser}
+                type="invited_you_to_vote_on_a_poll"
+            />
+            <Notification
+                user={liquidUser}
+                type="voted_on_a_poll_you_created"
+            />
+            <Notification
+                user={liquidUser}
+                type="invited_you_to_join_group"
+            />
+
+            {/* {[...Array(10).keys()].map((k) => (
+                <>
+                    <Notification
+                        key={k}
+                        user={liquidUser}
+                    />
+                </>
+            ))} */}
             {/* <div className='d-flex justify-content-center'>
                 <button className='button_' onClick={getToken_}>allow notifications</button>
             </div> */}
@@ -71,7 +111,7 @@ export const Notifications: FunctionComponent<{}> = ({ }) => {
 
 
             <br />
-            {/* <pre>{ JSON.stringify(user_votes_data, null, 2) }</pre> */}
+            <pre>{JSON.stringify(yourNotifications_data?.YourNotifications, null, 2)}</pre>
 
 
         </>

@@ -98,7 +98,7 @@ export const ListVotersMenu: FunctionComponent<{
                                     }
                                 }
                             >
-                                <b>{numeral(stats?.indirectVotes || stats?.indirectVotesMade).format('0a[.]0')}</b> Represented
+                                <b>{numeral(stats?.indirectVotes || stats?.indirectVotesMade).format('0a[.]0')}</b> Represented 🧪
                             </div>
                         </li>
                     </ul>

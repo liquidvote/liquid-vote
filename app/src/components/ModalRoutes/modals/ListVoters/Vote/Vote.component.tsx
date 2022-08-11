@@ -2,8 +2,6 @@ import React, { FunctionComponent, useState } from 'react';
 import { Link } from "react-router-dom";
 import { useQuery, useMutation } from "@apollo/client";
 
-import SingleVoteInList from "@shared/SingleVoteInList";
-import MultiVoteInList from "@shared/MultiVoteInList";
 import './style.sass';
 import { timeAgo } from '@state/TimeAgo';
 import VotedExplanation from './VotedExplanation';
@@ -176,7 +174,7 @@ export const Vote: FunctionComponent<{
                 )}
 
                 {!!hideChoicesBesides && (
-                    <div className="d-flex justify-content-end">
+                    <div className={`d-flex mt-3 faded`}>
                         <small
                             className="white pointer"
                             onClick={() => setShowAllChoices(!showAllChoices)}

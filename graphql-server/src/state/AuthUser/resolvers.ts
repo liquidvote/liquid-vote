@@ -9,6 +9,8 @@ export const AuthUserResolvers = {
     Mutation: {
         authUserLoggedIn: async (_source, { Auth0User, firebase_token }, { mongoDB, AuthUser }) => {
 
+            console.log({ firebase_token });
+
             const getUniqueUserHandle = async (handle, count) => {
 
                 const newHandle = `${handle}${count !== 0 ? count : ''}`;
@@ -33,7 +35,7 @@ export const AuthUserResolvers = {
                     'Auth0User.sub': AuthUser?.Auth0User?.sub || Auth0User.sub
                 }, {
                     $set: {
-                        ...firebase_token ? { 'firebase_token': firebase_token } : {},
+                        ...firebase_token ? { 'NotificationSettings.firebase_token': firebase_token } : {},
                         // 'LiquidUser.lastLogin': Date.now(),
                     },
                     $setOnInsert: {
@@ -59,6 +61,29 @@ export const AuthUserResolvers = {
                 ))?.value;
 
             return dbDoc;
+        },
+        editNotificationSettings: async (_source, { notificationSettings }, { mongoDB, AuthUser }) => {
+
+            if (!AuthUser && !notificationSettings) return;
+
+            const dbDoc = (await mongoDB.collection("Users")
+                .findOneAndUpdate({
+                    'Auth0User.sub': AuthUser?.Auth0User?.sub
+                }, {
+                    $set: {
+                        'NotificationSettings.allowEmails': notificationSettings?.allowEmails,
+                        'NotificationSettings.allowNotifications': notificationSettings?.allowNotifications,
+                    },
+                },
+                    {
+                        upsert: true,
+                        returnDocument: 'after'
+                    }
+                ))?.value;
+
+            console.log({ dbDoc });
+
+            return dbDoc?.NotificationSettings;
         }
     },
 };

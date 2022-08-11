@@ -28,17 +28,16 @@ export const PollExplanation: FunctionComponent<{ p: any }> = ({ p }) => {
 
                 <small className='ml-0 faded'>
                     {usersToShow.slice(0, 3).map((m: any, i) => (
-                        <>
+                        <span key={`pollExpalanation-${p?.questionText}-${p?.group?.handle}-${m.handle}`}>
                             {' '}
                             <Link
-                                key={`pollExpalanation_avatar-${p?.questionText}-${p?.group?.handle}-${m.handle}`}
                                 to={`/profile/${m.handle}/cause/${p.group.handle}`}
                                 title={`${m.name}`}
                             >{m.name}</Link>
                             {(i + 2) < p?.yourStats?.votersYouFollowCount ? ", " : ""}
                             {(i + 2) === p?.yourStats?.votersYouFollowCount ? " and " : ""}
                             {i === 2 && p?.yourStats?.votersYouFollowCount > 3 ? ` and ${p?.yourStats?.votersYouFollowCount - 3} other you follow ` : "" }
-                        </>
+                        </span>
                     ))}
                     {' '}
                     voted

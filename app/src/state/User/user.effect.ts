@@ -8,7 +8,7 @@ export default function useUser({
     skip
 }: {
     userHandle?: string,
-    groupHandle?: string,
+    groupHandle?: string | null,
     skip?: boolean
 }) {
     const {

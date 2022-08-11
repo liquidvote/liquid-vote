@@ -7,7 +7,7 @@ admin.initializeApp({
     credential: admin.credential.cert(serviceAccount)
 });
 
-export const sendNotification = async ({
+export const sendPushNotification = async ({
     token
     // toAddress,
     // fromWhom,

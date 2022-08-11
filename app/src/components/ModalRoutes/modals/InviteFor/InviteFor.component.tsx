@@ -42,11 +42,11 @@ export const InviteFor: FunctionComponent<{}> = ({ }) => {
         <form>
             <ModalHeader
                 title={
-                    modalData.InviteType === 'representation' ? `Invite others to be represented by you` :
-                        modalData.InviteType === 'toGroup' ? `Invite others to join ${modalData.groupName}` :
-                            modalData.InviteType === 'toVote' ? `Invite others to Vote on ${modalData.voteName}` :
-                                modalData.InviteType === 'toCompare' ? `Invite others to Compare with ${modalData.userHandle === liquidUser.handle ? 'You' : `${modalData.userName}`}` :
-                                ''
+                    modalData.InviteType === 'representation' ? `Invite to be represented by you` :
+                        modalData.InviteType === 'toGroup' ? `Invite to join ${modalData.groupName}` :
+                            modalData.InviteType === 'toVote' ? `Invite to Vote on ${modalData.voteName}` :
+                                modalData.InviteType === 'toCompare' ? `Invite to Compare with ${modalData.userHandle === liquidUser.handle ? 'You' : `${modalData.userName}`}` :
+                                    ''
                 }
                 hideSubmitButton={true}
             />
@@ -66,6 +66,30 @@ export const InviteFor: FunctionComponent<{}> = ({ }) => {
                     />
                 </div>
                 <br />
+
+                {/* <hr className="mt-0 pt-3 mb-4" />
+
+                <p className="text-center mb-4">
+                    Or invite your followers
+                </p>
+
+                <div className="my-3">
+                    {((name: keyof IFormValues) => (
+                        <InvitesInput
+                            name={name}
+                            label={'E-Mail Invites'}
+                            register={register(name, {
+                                required: true
+                            })}
+                            value={watch(name)}
+                            error={errors[name]}
+                            setValue={setValue}
+                            groupHandle={modalData.groupHandle}
+                            userHandle={modalData.userHandle}
+                            questionText={modalData.questionText}
+                        />
+                    ))('invitedUsers')}
+                </div> */}
 
             </div>
         </form>

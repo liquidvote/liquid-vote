@@ -2,9 +2,6 @@ import React, { FunctionComponent } from 'react';
 import { useNavigate } from "react-router-dom";
 
 import BackArrowSVG from "@shared/Icons/BackArrow.svg";
-import GroupSvg from "@shared/Icons/Group.svg";
-import DropSVG from "@shared/Icons/Drop.svg";
-import ProfileSVG from "@shared/Icons/Profile.svg";
 
 import './style.sass';
 
@@ -28,7 +25,7 @@ export const Header: FunctionComponent<{
             if (backLink) {
                 navigate(backLink);
             } else {
-                navigate(-1, { replace: false })
+                navigate(-1, { replace: true })
             }
         }
 
