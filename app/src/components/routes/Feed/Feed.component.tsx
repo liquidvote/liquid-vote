@@ -1,4 +1,4 @@
-import React, { FunctionComponent, useState } from 'react';
+import React, { FunctionComponent, useState, useEffect } from 'react';
 import { useQuery } from "@apollo/client";
 import { Link, useParams } from "react-router-dom";
 import { useAuth0 } from "@auth0/auth0-react";
@@ -23,6 +23,27 @@ export const Feed: FunctionComponent<{}> = ({ }) => {
     const { liquidUser } = useAuthUser();
     const { user: yourUser } = useUser({ userHandle: liquidUser?.handle });
     const { loginWithPopup, isLoading: auth0_loading } = useAuth0();
+
+
+    const loadingMessages = [
+        'gathering all the votes',
+        'confirming the count is reliable',
+        'ups, it wasn\'t, counting again..',
+        'apparently someone wanted to count votes remotely and took a vote box',
+        'which makes no sense at all. since no one here counts votes.',
+        'the computer does that, but she\'s still new at this',
+        'yes, our computer has a gender, and we\'re proud of her',
+    ];
+
+    const [selectedLoadingMessage, setSelectedLoadingMessage] = useState(0);
+
+    useEffect(() => {
+        if (selectedLoadingMessage < (loadingMessages.length - 1)) {
+            setTimeout(() => setSelectedLoadingMessage(selectedLoadingMessage + 1), 1000 + selectedLoadingMessage * 400);
+        }
+    }, [selectedLoadingMessage]);
+
+    // const setNextLoadingMessage = () => setSelectedLoadingMessage(selectedLoadingMessage + 1);
 
     // console.log({ yourUser });
 
@@ -158,7 +179,7 @@ export const Feed: FunctionComponent<{}> = ({ }) => {
                 {(questions_loading || auth0_loading) && (
                     <div className="d-flex align-items-center justify-content-center min-vh-100 flex-column">
                         <DropAnimation />
-                        {/* <p className='mt-4'>The Feed Query takes up to 10s for now, sorry 🧪</p> */}
+                        <p className='mt-4 text-center px-5'>{loadingMessages[selectedLoadingMessage]}</p>
                     </div>
                 )}
             </div>

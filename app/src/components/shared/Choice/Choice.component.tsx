@@ -169,16 +169,12 @@ export const Choice: FunctionComponent<{
         //     againstMostRepresenting: stats?.againstMostRepresentingVoters,
         // })
 
+        const maxVoteCount_ = maxVoteCount || (stats_?.forCount + stats_?.againstCount);
+
         return (
             <div className={`${!inList && 'not-in-list'}`}>
                 <div
                     className="d-flex flex-column mb-1"
-                // style={{
-                //     ...(maxVoteCount) && {
-                //         'maxWidth':
-                //             ((stats?.directVotes + stats?.indirectVotes | 0) / maxVoteCount) * 30 + 70 + '%'
-                //     }
-                // }}
                 >
                     {!!choiceText && (
                         <div className={`d-flex align-items-center mr-2 ${inList && 'small'}`}>
@@ -209,15 +205,29 @@ export const Choice: FunctionComponent<{
 
                     {/* <pre>{JSON.stringify(userVote, null, 2)}</pre> */}
                     {showChart && (
-                        <Chart
-                            name={choiceText || null}
-                            forDirectCount={stats_.forDirectCount}
-                            forCount={stats_.forCount}
-                            againstDirectCount={stats_.againstDirectCount}
-                            againstCount={stats_.againstCount}
-                            userDelegatedVotes={null}
-                            inList={inList}
-                        />
+                        <div
+                            className='d-flex justify-content-center w-100'
+                        >
+                            <span
+                                className='w-100'
+                                style={{
+                                    ...(maxVoteCount_) && {
+                                        'maxWidth':
+                                            ((stats?.directVotes + stats?.indirectVotes | 0) / maxVoteCount_) * 100 + '%'
+                                    }
+                                }}
+                            >
+                                <Chart
+                                    name={choiceText || null}
+                                    forDirectCount={stats_.forDirectCount}
+                                    forCount={stats_.forCount}
+                                    againstDirectCount={stats_.againstDirectCount}
+                                    againstCount={stats_.againstCount}
+                                    userDelegatedVotes={null}
+                                    inList={inList}
+                                />
+                            </span>
+                        </div>
                     )}
                 </div>
 
@@ -315,29 +325,6 @@ export const Choice: FunctionComponent<{
                                 )}
                             </div>
 
-                            <div
-                                className={`pointer text-decoration-none count for mr-n2 ${inList ? 'tiny-avatar' : 'vote-avatar'}`}
-                                onClick={
-                                    e => {
-                                        e.stopPropagation();
-                                        updateParams({
-                                            paramsToAdd: {
-                                                modal: "ListVoters",
-                                                modalData: JSON.stringify({
-                                                    questionText: voteName,
-                                                    choiceText,
-                                                    groupHandle,
-                                                    subsection: 'direct',
-                                                    subsubsection: 'for',
-                                                })
-                                            }
-                                        })
-                                    }
-                                }
-                            >
-                                {numeral(stats_.forCount).format('0a[.]0')}
-                            </div>
-
                             {inList ? (
                                 <div
                                     className="d-flex ml-3 pointer"
@@ -421,16 +408,86 @@ export const Choice: FunctionComponent<{
                                     )
                                 )}
                             </div>
+
                         </div>
 
-                        {editVote_loading && (
+                        {editVote_loading ? (
                             <img
                                 className={`vote-avatar ${inList && 'tiny'}`}
                                 src={'http://images.liquid-vote.com/system/loading.gif'}
                             />
+                        ) : (
+                            <>
+                                <div
+                                    className={`
+                                        pointer text-decoration-none count for mr-n1
+                                        ${inList ? 'tiny-avatar' : 'vote-avatar'}
+                                        ${stats_?.forCount > stats_?.againstCount && 'z-2'}
+                                    `}
+                                    style={{
+                                        ...(maxVoteCount_) && {
+                                            'transform':
+                                                `scale(${((stats_?.forCount | 0) / maxVoteCount_) * 0.8 + 0.8})`
+                                        }
+                                    }}
+                                    onClick={
+                                        e => {
+                                            e.stopPropagation();
+                                            updateParams({
+                                                paramsToAdd: {
+                                                    modal: "ListVoters",
+                                                    modalData: JSON.stringify({
+                                                        questionText: voteName,
+                                                        choiceText,
+                                                        groupHandle,
+                                                        subsection: 'direct',
+                                                        subsubsection: 'for',
+                                                    })
+                                                }
+                                            })
+                                        }
+                                    }
+                                >
+                                    {numeral(stats_.forCount).format('0a[.]0')}
+                                </div>
+                                <div
+                                    // to={`/${choiceText ? 'multipoll' : 'poll'}/${voteName}/${groupHandle}/timeline/direct/against`}
+                                    onClick={
+                                        e => {
+                                            e.stopPropagation();
+                                            updateParams({
+                                                paramsToAdd: {
+                                                    modal: "ListVoters",
+                                                    modalData: JSON.stringify({
+                                                        questionText: voteName,
+                                                        choiceText,
+                                                        groupHandle,
+                                                        subsection: 'direct',
+                                                        subsubsection: 'against'
+                                                    })
+                                                }
+                                            })
+                                        }
+                                    }
+                                    className={`
+                                        text-decoration-none count against ml-1
+                                        ${inList ? 'tiny-avatar' : 'vote-avatar'}
+                                        ${stats_?.forCount < stats_?.againstCount && 'z-2'}
+                                    `}
+                                    style={{
+                                        ...(maxVoteCount_) && {
+                                            'transform':
+                                                `scale(${((stats_?.againstCount | 0) / maxVoteCount_) * 0.8 + 0.8})`
+                                        }
+                                    }}
+                                >
+                                    {numeral(stats_.againstCount).format('0a[.]0')}
+                                </div>
+                            </>
                         )}
 
                         <div className="d-flex cr-on-tiny justify-content-end flex-wrap-reverse">
+
                             <div>
                                 {(
                                     user && userVote?.position === "against" && (
@@ -512,28 +569,6 @@ export const Choice: FunctionComponent<{
                                 }
                             </div>}
 
-                            <div
-                                // to={`/${choiceText ? 'multipoll' : 'poll'}/${voteName}/${groupHandle}/timeline/direct/against`}
-                                onClick={
-                                    e => {
-                                        e.stopPropagation();
-                                        updateParams({
-                                            paramsToAdd: {
-                                                modal: "ListVoters",
-                                                modalData: JSON.stringify({
-                                                    questionText: voteName,
-                                                    choiceText,
-                                                    groupHandle,
-                                                    subsection: 'direct',
-                                                    subsubsection: 'against'
-                                                })
-                                            }
-                                        })
-                                    }
-                                }
-                                className={`text-decoration-none count against ml-1 ${inList ? 'tiny-avatar' : 'vote-avatar'}`}>
-                                {numeral(stats_.againstCount).format('0a[.]0')}
-                            </div>
                             <div
                                 className={`againstbtn button_ againstDirectBorder min-w justify-content-between text-right ml-1 ${yourVote_?.position === 'against' && 'againstDirectBg'} ${inList && 'small'}`}
                                 onClick={() => handleUserVote('against')}

@@ -14,6 +14,7 @@
     "remove:dev": "npx sls remove --stage dev",
     "remove:live": "npx sls remove --stage live",
     "logs": "npx sls logs -f graphql -t -s dev",
+    "demo:emails": "ejs src/state/Notifications/email-template.ejs -f src/state/Notifications/email-template.json -o debug/emails.html",
     "db:dumpLiveToLocal": "node migrations/dumpLiveToLocal.js"
   },
   "keywords": [],
@@ -32,6 +33,7 @@
   },
   "devDependencies": {
     "apollo-server": "^2",
+    "ejs": "^3.1.8",
     "nodemon": "^2.0.14",
     "serverless": "^3.20.0",
     "serverless-domain-manager": "^6.0.3",

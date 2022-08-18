@@ -1,4 +1,5 @@
 var AWS = require("aws-sdk");
+const ejs = require("ejs");
 
 const awsCredentials = require("../../../credentials/aws-credentials.json");
 
@@ -18,6 +19,20 @@ export const sendEmail = async ({
     //     toAddress
     // });
 
+
+    const emailHtml = await (new Promise(resolve => {
+        ejs.renderFile(__dirname + "/emailTemplate.ejs", {}, (err, result) => {
+            if (err) {
+                console.log(err);
+            }
+            resolve(result);
+        });
+    }));
+
+    console.log({ emailHtml });
+
+
+
     const sendPromise = new AWS.SES({ apiVersion: "2010-12-01" })
         .sendEmail({
             Source: 'Liquid Vote <notification@liquid-vote.com>',
@@ -32,7 +47,7 @@ export const sendEmail = async ({
                 Body: {
                     Html: {
                         Charset: "UTF-8",
-                        Data: "🧪",
+                        Data: emailHtml,
                     },
                     Text: {
                         Charset: "UTF-8",

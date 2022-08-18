@@ -50,6 +50,7 @@ export const GroupVisibilityPicker: FunctionComponent<{
                 {isMember ? (
                     <Popper
                         rightOnSmall={true}
+                        bellow={true}
                         button={
                             <div className='d-flex align-items-center'>
                                 {/* <small>

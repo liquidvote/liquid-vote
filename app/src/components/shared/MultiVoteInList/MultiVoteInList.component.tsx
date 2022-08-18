@@ -24,7 +24,9 @@ export const MultiVoteInList: FunctionComponent<{
 
         const [showAllChoices, setShowAllChoices] = useState(false);
 
-        // console.log({ v })
+        const arrayOfCounts = v.choices.map(c => c.stats?.forCount + c.stats?.againstCount);
+
+        const maxCount = Math.max(...arrayOfCounts);
 
         // const sortedChoices = [...v.choices]?.
         //     sort((a, b) => (b?.stats?.directVotes + b?.stats?.indirectVotes) - (a?.stats?.directVotes + a?.stats?.indirectVotes));
@@ -142,7 +144,7 @@ export const MultiVoteInList: FunctionComponent<{
                                     yourStats={c.yourStats}
                                     userVote={c.userVote}
                                     inList={true}
-                                    // maxVoteCount={maxVoteCount}
+                                    maxVoteCount={maxCount}
                                     user={user}
                                     showChart={showChart}
                                 />
