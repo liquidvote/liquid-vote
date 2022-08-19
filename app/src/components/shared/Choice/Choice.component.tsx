@@ -327,7 +327,7 @@ export const Choice: FunctionComponent<{
 
                             {inList ? (
                                 <div
-                                    className="d-flex ml-3 pointer"
+                                    className="d-flex ml-1 pointer"
                                     data-tip={`Voted Yay`}
                                     onClick={
                                         e => {
