@@ -85,6 +85,7 @@ export const QuestionTypeDefs = gql`
 
     type VotersInCommonStats {
         voterCount: Int
+        choices: JSON
     }
 
     extend type Query {

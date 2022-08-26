@@ -478,6 +478,7 @@ export const QUESTIONS_VOTERS_ALSO_VOTED_ON = gql`
             }
             votersInCommonStats {
                 voterCount
+                choices
             }
             yourVote {
                 ...vote
