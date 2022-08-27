@@ -48,8 +48,11 @@ export const NotificationResolvers = {
                         }
                     }
                 }, {
-                    '$sort': { 'lastEditOn': -1 }
+                    '$sort': { 'lastEditOn': -1 },
                 }
+
+                // Filter:
+                    // show less than 100 or unseen
             ];
 
             const YourNotifications = await mongoDB.collection("Notifications")

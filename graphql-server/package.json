@@ -29,11 +29,11 @@
     "aws-sdk": "^2.1184.0",
     "firebase-admin": "^11.0.0",
     "graphql": "^15.6.1",
-    "mongodb": "^3.7"
+    "mongodb": "^3.7",
+    "ejs": "^3.1.8"
   },
   "devDependencies": {
     "apollo-server": "^2",
-    "ejs": "^3.1.8",
     "nodemon": "^2.0.14",
     "serverless": "^3.20.0",
     "serverless-domain-manager": "^6.0.3",

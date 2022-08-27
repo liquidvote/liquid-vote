@@ -235,7 +235,7 @@ export const QuestionsInCommonAgg = ({ questionText, group }) => [
                 "group": "$_id.group"
             },
             "count": {
-                "$sum": 1
+                "$first": "$count"
             },
             "choices": {
                 "$push": {
