@@ -24,7 +24,6 @@ export const Feed: FunctionComponent<{}> = ({ }) => {
     const { user: yourUser } = useUser({ userHandle: liquidUser?.handle });
     const { loginWithPopup, isLoading: auth0_loading } = useAuth0();
 
-
     const loadingMessages = [
         'gathering all the votes',
         'confirming the count is reliable',

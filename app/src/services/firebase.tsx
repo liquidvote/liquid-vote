@@ -17,7 +17,7 @@ const firebaseApp = initializeApp(firebaseConfig);
 const analytics = getAnalytics(firebaseApp);
 const messaging = getMessaging(firebaseApp);
 
-export const useFirebaseNotifications = async () => {
+export const useFirebaseNotifications = () => {
 
     const [message, setMessage] = useState<any>(false);
 

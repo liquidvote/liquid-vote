@@ -8,17 +8,16 @@ admin.initializeApp({
 });
 
 export const sendPushNotification = async ({
-    token
-    // toAddress,
-    // fromWhom,
-    // toWhat,
-    // inviteId
+    token,
+    title,
+    body,
+    image
 }) => {
     const message = {
         notification: {
-            "title": "Recebeste esta fritaria?",
-            "body": "Recebeste esta fritaria?",
-            "image": "https://images.liquid-vote.com/system/logo.png"
+            "title": title,
+            "body": body,
+            "image": image
         },
         token
     };

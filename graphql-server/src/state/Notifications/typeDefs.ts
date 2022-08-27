@@ -10,7 +10,7 @@ export const NotificationTypeDefs = gql`
                 # actionUser
                 # poll
 
-            # followed_you
+            # followed_you ✅
                 # actionUser
          
             # invited_you_to_vote_on_a_poll
@@ -48,9 +48,7 @@ export const NotificationTypeDefs = gql`
     }
 
     extend type Mutation {
-        markNotificationRead(
-            id: String
-        ): JSON
+        markUnseenNotificationsAsSeen: JSON
         sendTestNotification(
             type: String
             toUserHandle: String

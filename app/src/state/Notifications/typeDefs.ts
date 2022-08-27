@@ -24,3 +24,9 @@ export const YOUR_NOTIFICATIONS = gql`
         }
     }
 `;
+
+export const MARK_UNSEEN_NOTIFICATIONS_AS_SEEN = gql`
+    mutation {
+        markUnseenNotificationsAsSeen
+    }
+`;

@@ -3,6 +3,7 @@ const { promises: fs } = require("fs");
 
 import { updateQuestionVotingStats } from '../Questions/resolvers';
 import { VotersAgg, representeesAndVoteAgg, representativeVotesAgg, VotesGeneralAggregateLogic } from './aggregationLogic';
+import { saveAndSendNotification } from "../Notifications/resolvers";
 
 export const VoteResolvers = {
     Query: {
@@ -353,7 +354,10 @@ export const VoteResolvers = {
     },
     Mutation: {
         editVote: async (_source, {
-            Vote, questionText, choiceText, group
+            Vote,
+            questionText,
+            choiceText,
+            group
         }, {
             mongoDB, AuthUser
         }) => {
@@ -457,7 +461,21 @@ export const VoteResolvers = {
             // Update Group Stats
             // Update Tags Stats
 
-            console.log({ savedVote });
+            // Notify Followers that also voted on this Poll
+            const notifiedFollowers = savedVote?.isDirect && await notifyFollowers({
+                AuthUser,
+                UserId: AuthUser._id,
+                questionText,
+                choiceText,
+                groupHandle: group,
+                position: savedVote?.position,
+                mongoDB
+            });
+
+            console.log({
+                notifiedFollowers,
+                savedVote
+            });
 
             return {
                 ...savedVote,
@@ -687,3 +705,149 @@ export const updateQuestionDelegatedVotes = async ({
     // update representee votes
 
 }
+
+export const notifyFollowers = async ({
+    AuthUser,
+    UserId,
+    questionText,
+    choiceText,
+    groupHandle,
+    position,
+    mongoDB
+}) => {
+    const followersThatVotedAgg = [
+        {
+            '$match': {
+                '$and': [
+                    {
+                        '$expr': {
+                            '$eq': [
+                                '$followedId', {
+                                    '$toObjectId': ObjectId(UserId)
+                                }
+                            ]
+                        }
+                    },
+                    {
+                        '$expr': {
+                            '$eq': [
+                                '$isFollowing', true
+                            ]
+                        }
+                    },
+                ],
+            }
+        },
+        {
+            '$lookup': {
+                'as': 'followerVote',
+                'from': 'Votes',
+                'let': {
+                    'user': '$followingId',
+                    'questionText': questionText,
+                    'choiceText': choiceText,
+                    'group': groupHandle
+                },
+                'pipeline': [
+                    {
+                        '$match': {
+                            '$expr': {
+                                '$and': [
+                                    {
+                                        '$eq': [
+                                            '$questionText', '$$questionText'
+                                        ]
+                                    }, {
+                                        '$eq': [
+                                            '$choiceText', '$$choiceText'
+                                        ]
+                                    }, {
+                                        '$eq': [
+                                            '$groupChannel.group', '$$group'
+                                        ]
+                                    }, {
+                                        '$eq': [
+                                            '$user', {
+                                                '$toObjectId': '$$user'
+                                            }
+                                        ]
+                                    },
+                                    { 'isDirect': true },
+                                ]
+                            }
+                        }
+                    }
+                ]
+            }
+        },
+        {
+            '$match': {
+                '$expr': {
+                    '$eq': [
+                        { "$size": "$followerVote" }, 1
+                    ]
+                }
+            }
+        },
+        {
+            "$lookup": {
+                "as": "user",
+                "from": "Users",
+                let: {
+                    'followingId': '$followingId',
+                },
+                "pipeline": [
+                    {
+                        "$match": {
+                            '$and': [
+                                { "$expr": { "$eq": ["$_id", "$$followingId"] } }
+                            ]
+                        }
+                    }
+                ],
+            }
+        },
+        {
+            '$addFields': {
+                'user': {
+                    '$first': '$user'
+                },
+                'followerVote': {
+                    '$first': '$followerVote'
+                }
+            }
+        },
+    ];
+
+    const followersThatVoted = (await mongoDB.collection("UserFollows")
+        .aggregate(followersThatVotedAgg).toArray()
+    );
+
+    const followersThatVotedNotified = await Promise.all(followersThatVoted.map(async (u) => {
+
+        const notification = await saveAndSendNotification({
+            type: 'voted_on_a_poll_you_voted',
+            toUser: u.user,
+            toUserHandle: null,
+            actionUser: AuthUser,
+            actionUserHandle: null,
+            question: null,
+            questionText,
+            choiceText,
+            group: null,
+            groupHandle,
+            agreesWithYou: position === u.followerVote?.position,
+
+            mongoDB,
+            AuthUser
+        });
+
+        return {
+            u,
+            notification
+        };
+    }));
+
+
+    return followersThatVotedNotified;
+};

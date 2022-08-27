@@ -1,11 +1,10 @@
-import React, { FunctionComponent } from 'react';
-import { useQuery } from "@apollo/client";
+import React, { FunctionComponent, useEffect } from 'react';
+import { useQuery, useMutation } from "@apollo/client";
 import { Link, useParams } from "react-router-dom";
 
 import Header from "@shared/Header";
-import { YOUR_NOTIFICATIONS } from "@state/Notifications/typeDefs";
+import { YOUR_NOTIFICATIONS, MARK_UNSEEN_NOTIFICATIONS_AS_SEEN } from "@state/Notifications/typeDefs";
 import useAuthUser from '@state/AuthUser/authUser.effect';
-// import { useFirebaseNotifications } from "@services/firebase";
 
 import DropAnimation from '@components/shared/DropAnimation';
 import CogSVG from "@shared/Icons/Cog.svg";
@@ -18,7 +17,7 @@ export const Notifications: FunctionComponent<{}> = ({ }) => {
 
     let { section, handle } = useParams<any>();
     const { allSearchParams, updateParams } = useSearchParams();
-    const { liquidUser } = useAuthUser();
+    // const { liquidUser } = useAuthUser();
 
     const {
         loading: yourNotifications_loading,
@@ -27,9 +26,18 @@ export const Notifications: FunctionComponent<{}> = ({ }) => {
         refetch: yourNotifications_refetch
     } = useQuery(YOUR_NOTIFICATIONS);
 
-    console.log({
-        yourNotifications_data
-    });
+    const [markUnseenNotificationsAsSeen, {
+        loading: markUnseenNotificationsAsSeen_loading,
+        error: markUnseenNotificationsAsSeen_error,
+        data: markUnseenNotificationsAsSeen_data,
+    }] = useMutation(MARK_UNSEEN_NOTIFICATIONS_AS_SEEN);
+
+    useEffect(() => {
+        if (yourNotifications_data?.YourNotifications?.length) {
+            setTimeout(() => markUnseenNotificationsAsSeen(), 3000);
+        }
+
+    }, [yourNotifications_data?.YourNotifications])
 
     return (
         <>
@@ -61,7 +69,21 @@ export const Notifications: FunctionComponent<{}> = ({ }) => {
                 />
             ))}
 
-            <Notification
+            {(yourNotifications_data?.YourNotifications?.length === 0) && (
+                <div className="d-flex align-items-center justify-content-center min-vh-100 flex-column">
+                    <div className="p-4 text-center">
+                        No notifications yet
+                    </div>
+                </div>
+            )}
+
+            {(yourNotifications_loading) && (
+                <div className="d-flex align-items-center justify-content-center min-vh-100 flex-column">
+                    <DropAnimation />
+                </div>
+            )}
+
+            {/* <Notification
                 user={liquidUser}
                 type="voted_on_a_poll_you_voted"
             />
@@ -80,7 +102,7 @@ export const Notifications: FunctionComponent<{}> = ({ }) => {
             <Notification
                 user={liquidUser}
                 type="invited_you_to_join_group"
-            />
+            /> */}
 
             {/* {[...Array(10).keys()].map((k) => (
                 <>
@@ -110,8 +132,8 @@ export const Notifications: FunctionComponent<{}> = ({ }) => {
 
 
 
-            <br />
-            <pre>{JSON.stringify(yourNotifications_data?.YourNotifications, null, 2)}</pre>
+            {/* <br />
+            <pre>{JSON.stringify(yourNotifications_data?.YourNotifications, null, 2)}</pre> */}
 
 
         </>

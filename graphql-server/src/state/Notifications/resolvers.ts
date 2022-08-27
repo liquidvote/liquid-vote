@@ -56,10 +56,6 @@ export const NotificationResolvers = {
                 .aggregate(YourNotificationsAgg)
                 .toArray();
 
-            console.log({
-                YourNotifications
-            });
-
             return YourNotifications;
         },
         InvitationsSentAndThatCouldBeSent: async (_source, { }, { mongoDB, AuthUser }) => {
@@ -67,6 +63,20 @@ export const NotificationResolvers = {
         },
     },
     Mutation: {
+        markUnseenNotificationsAsSeen: async (_source, { }, { mongoDB, AuthUser }) => {
+
+            const seenNotifications = await mongoDB.collection("Notifications").updateMany({
+                'toUser': new ObjectId(AuthUser?._id),
+                'seen': false,
+            }, {
+                $set: {
+                    seenOn: Date.now(),
+                    seen: true
+                },
+            })
+
+            return seenNotifications?.modifiedCount;
+        },
         sendTestNotification: async (_source, {
             type,
             toUserHandle,
@@ -79,7 +89,7 @@ export const NotificationResolvers = {
             mongoDB, AuthUser
         }) => {
 
-            if (!AuthUser) return;
+            if (!AuthUser || AuthUser?.LiquidUser?.admin !== 'total') return;
 
             const notification = await saveAndSendNotification({
                 type,
@@ -105,7 +115,7 @@ export const NotificationResolvers = {
     },
 };
 
-const saveAndSendNotification = async ({
+export const saveAndSendNotification = async ({
     type,
     toUser,
     toUserHandle,
@@ -124,11 +134,14 @@ const saveAndSendNotification = async ({
 
     if (!AuthUser) return;
 
-    const User = toUser || !!toUserHandle && await mongoDB.collection("Users")
+    const ToUser = toUser || !!toUserHandle && await mongoDB.collection("Users")
         .findOne({ 'LiquidUser.handle': toUserHandle });
 
-    const ActionUser = actionUser || !!actionUserHandle ? await mongoDB.collection("Users")
-        .findOne({ 'LiquidUser.handle': actionUserHandle }) : AuthUser;
+    const ActionUser = actionUser || (
+        !!actionUserHandle ?
+            await mongoDB.collection("Users").findOne({ 'LiquidUser.handle': actionUserHandle }) :
+            AuthUser
+    );
 
     const Question = question || (!!groupHandle && !!questionText) ? await mongoDB.collection("Questions")
         .findOne({ questionText, 'groupChannel.group': groupHandle }) : null;
@@ -136,46 +149,68 @@ const saveAndSendNotification = async ({
     const Group = group || (!!groupHandle) ? await mongoDB.collection("Groups")
         .findOne({ 'handle': groupHandle }) : null;
 
+    console.log({
+        type,
+        toUser,
+        toUserHandle,
+        actionUser,
+        actionUserHandle,
+        question,
+        questionText,
+        choiceText,
+        group,
+        groupHandle,
+        agreesWithYou,
+    });
+
     const savedNotification = (await mongoDB.collection("Notifications").findOneAndUpdate(
         {
             type,
-            toUser: User?._id,
+            toUser: ToUser?._id,
             actionUser: ActionUser?._id,
             question: Question?._id,
             group: Group?._id
         },
         {
             $set: {
-                lastEditOn: Date.now()
+                lastEditOn: Date.now(),
+                agreesWithYou,
+                seen: false
             },
             $setOnInsert: {
                 type,
-                toUser: User?._id,
+                toUser: ToUser?._id,
                 actionUser: ActionUser?._id,
                 question: Question?._id,
                 choiceText: choiceText,
                 group: Group?._id,
                 createdOn: Date.now(),
-                agreesWithYou
             }
         },
         {
             upsert: true,
             returnDocument: 'after'
         }
-    ))?.value
+    ))?.value;
 
     // if user allows Email
-    const emailStatus = (User.NotificationSettings.allowEmails || typeof User.NotificationSettings?.allowEmails === undefined) ?
+    const emailStatus = false && (
+        ToUser.NotificationSettings.allowEmails ||
+        typeof ToUser.NotificationSettings?.allowEmails === undefined
+    ) ?
         sendEmail({
-            toAddress: User.LiquidUser.email,
+            toAddress: ToUser.LiquidUser.email,
             subject: `${ActionUser?.LiquidUser?.name} - ${type}`
         }) :
         null;
 
-    // if user allows Notification
-    const pushNotificationStatus = ((User.NotificationSettings.allowNotifications || typeof User.NotificationSettings?.allowNotifications === undefined) && !!User?.NotificationSettings?.firebase_token) ?
-        sendPushNotification({ token: User?.NotificationSettings?.firebase_token }) :
+    const pushNotificationStatus = ( !!ToUser?.NotificationSettings?.firebase_token ) ?
+        sendPushNotification({
+            token: ToUser?.NotificationSettings?.firebase_token,
+            title: `${ActionUser?.LiquidUser?.name} - ${type}`,
+            body: `${ActionUser?.LiquidUser?.name} - ${type}`,
+            image: `${ActionUser?.LiquidUser?.avatar}`
+        }) :
         null;
 
     return {

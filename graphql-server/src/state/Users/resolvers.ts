@@ -10,6 +10,7 @@ import { userStatsAgg } from './aggregationLogic/userStats';
 import { yourUserStatsAgg } from './aggregationLogic/yourUserStats';
 import { yourGroupStats, groupStats, userGroupStats } from '../Groups/aggregationLogic';
 import { canViewUsersVoteOrCause } from "../ViewingPermission/aggregationLogic";
+import { saveAndSendNotification } from "../Notifications/resolvers";
 
 export const UserResolvers = {
     Query: {
@@ -878,7 +879,7 @@ export const UserResolvers = {
                 .aggregate(Agg).toArray()
             );
 
-            console.log({ Users });
+            // console.log({ Users });
 
             return Users.map(u => ({ ...u, email: null }));
         },
@@ -1243,6 +1244,24 @@ export const UserResolvers = {
                     }
                 )
             )?.value : null;
+
+            const notification = UpdatedUserFollowingRelation?.isFollowing ?
+                await saveAndSendNotification({
+                    type: 'followed_you',
+                    toUser: FollowedUser,
+                    toUserHandle: null,
+                    actionUser: AuthUser,
+                    actionUserHandle: null,
+                    question: null,
+                    questionText: null,
+                    choiceText: null,
+                    group: null,
+                    groupHandle: null,
+                    agreesWithYou: null,
+
+                    mongoDB,
+                    AuthUser
+                }) : null;
 
             return {
                 id: UpdatedUserFollowingRelation._id,

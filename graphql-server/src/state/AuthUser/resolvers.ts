@@ -1,9 +1,22 @@
-
+import { ObjectId } from 'mongodb';
 
 export const AuthUserResolvers = {
     Query: {
         authUser: async (_source, { }, { mongoDB, AuthUser }) => {
-            return AuthUser;
+
+            const unseenNotificationCount = await mongoDB.collection("Notifications").find({
+                'toUser': new ObjectId(AuthUser?._id),
+                'seen': false,
+            }).count();
+
+            console.log({
+                unseenNotificationCount
+            })
+
+            return AuthUser && {
+                ...AuthUser,
+                unseenNotificationCount
+            };
         },
     },
     Mutation: {

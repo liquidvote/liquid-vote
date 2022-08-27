@@ -15,6 +15,7 @@ import HashTagSvg from "@shared/Icons/HashTag.svg";
 import Popper from "@shared/Popper";
 import useSearchParams from "@state/Global/useSearchParams.effect";
 import useAuthUser from '@state/AuthUser/authUser.effect';
+import { useFirebaseNotifications } from '@services/firebase';
 
 import './style.sass';
 
@@ -25,13 +26,13 @@ export const SideMenu: FunctionComponent<{}> = ({ }) => {
 
     const { user, isAuthenticated, isLoading, loginWithRedirect, logout, loginWithPopup } = useAuth0();
 
-    const { liquidUser, liquidUser_refetch } = useAuthUser();
+    const { liquidUser, liquidUser_refetch, unseenNotificationCount } = useAuthUser();
 
-    // console.log({
-    //     isAuthenticated,
-    //     user,
-    //     liquidUser
-    // });
+    const { message } = useFirebaseNotifications();
+
+    console.log({
+        message
+    });
 
     useEffect(() => {
         if (!!isAuthenticated) {
@@ -64,7 +65,9 @@ export const SideMenu: FunctionComponent<{}> = ({ }) => {
                 <>
                     <Link to="/notifications" data-tip="Notifications" className="notification-wrapper">
                         <NotificationSvg />
-                        <div className="notif-you forDirect white">4</div>
+                        {unseenNotificationCount ? (
+                            <div className="notif-you forDirect white">{unseenNotificationCount}</div>
+                        ) : null}
                         {/* <div className="notif-representatives for white">4</div> */}
                     </Link>
                 </>
