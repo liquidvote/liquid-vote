@@ -36,9 +36,9 @@ export const ButtonPicker: FunctionComponent<Props> = ({
             </label> */}
 
 
-            <div className="d-flex justify-content-around m-3 mx-5 px-5">
+            <div className="d-flex justify-content-around w-100 align-items-center px-3">
                 <div
-                    className={`button_ ${value === 'single' ? 'selected inverted' : ''} ${disabled && 'no-events'}`}
+                    className={`button_ w-50 ${value === 'single' ? 'selected inverted' : ''} ${disabled && 'no-events'}`}
                     onClick={() => !disabled && setValue(
                         name,
                         'single',
@@ -50,11 +50,11 @@ export const ButtonPicker: FunctionComponent<Props> = ({
                     )}
                 // disabled={disabled}
                 >
-                    <DropSVG />{' '}
-                    For or Against
+                    <span className='pr-1'><DropSVG /></span>{' '}
+                    Yay or Nay
                 </div>
                 <div
-                    className={`button_ ml-2 ${value === 'multi' ? 'selected inverted' : ''} ${disabled && 'no-events'}`}
+                    className={`button_ ml-2 w-50 ${value === 'multi' ? 'selected inverted' : ''} ${disabled && 'no-events'}`}
                     onClick={() => !disabled && setValue(
                         name,
                         'multi',
@@ -66,8 +66,8 @@ export const ButtonPicker: FunctionComponent<Props> = ({
                     )}
                 // disabled={disabled}
                 >
-                    <MultiDropSVG />{' '}
-                    Multiple Choices
+                    <span className='pr-2'><MultiDropSVG /></span>{' '}
+                    Multiple
                 </div>
             </div>
 

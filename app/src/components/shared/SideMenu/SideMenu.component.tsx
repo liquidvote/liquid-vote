@@ -154,7 +154,7 @@ export const SideMenu: FunctionComponent<{}> = ({ }) => {
                     )}
                     <div
                         data-tip="Create Poll"
-                        className="button_ inverted icon-contain hide-on-smaller-sideMenu mt-3"
+                        className="button_ inverted icon-contain create-poll mt-3"
                         onClick={() => updateParams({
                             paramsToAdd: {
                                 modal: "EditQuestion",
