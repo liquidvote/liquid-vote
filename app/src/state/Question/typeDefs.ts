@@ -215,13 +215,15 @@ export const QUESTIONS = gql`
         $groupHandle: String,
         $sortBy: String,
         $createdByHandle: String,
-        $notUsers: Boolean
+        $notUsers: Boolean,
+        $inviterHandle: String
     ) {
         Questions(
             groupHandle: $groupHandle,
             sortBy: $sortBy,
             createdByHandle: $createdByHandle,
-            notUsers: $notUsers
+            notUsers: $notUsers,
+            inviterHandle: $inviterHandle
         ) {
             _id
             questionText
@@ -234,6 +236,9 @@ export const QUESTIONS = gql`
                     ...stats
                 }
                 yourVote {
+                    ...vote
+                }
+                userVote {
                     ...vote
                 }
                 yourStats {
@@ -269,6 +274,9 @@ export const QUESTIONS = gql`
                 ...stats
             }
             yourVote {
+                ...vote
+            }
+            userVote {
                 ...vote
             }
             yourStats {

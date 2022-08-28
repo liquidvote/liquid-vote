@@ -51,7 +51,7 @@ export const PersonInList: FunctionComponent<{
                         <Link to={`/profile/${person.handle}`} className="d-flex flex-column mb-1">
                             <div className='d-flex align-items-center'>
                                 <b className="white">{person.name}</b>
-                                {user?.followsYou ? (
+                                {user?.isFollowingYou ? (
                                     <small
                                         className={`badge ml-2 mt-n1`}
                                     >follows you</small>

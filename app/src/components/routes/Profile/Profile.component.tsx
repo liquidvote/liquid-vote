@@ -208,7 +208,7 @@ export const Profile: FunctionComponent<{}> = ({ }) => {
             <h2 className="profile-name white mt-2">{profile.name}</h2>
             <div className="d-flex align-items-center">
                 <p className="profile-handle">@{profile.handle}</p>
-                {profile.followsYou ? (
+                {profile.isYouFollowing ? (
                     <small
                         className={`badge ml-2 mt-n1`}
                     >follows you</small>

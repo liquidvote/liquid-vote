@@ -1,21 +1,11 @@
 import React, { FunctionComponent, useEffect } from 'react';
 import { Link } from "react-router-dom";
-import numeral from 'numeral';
-import { useQuery, useMutation } from "@apollo/client";
-import ReactTooltip from 'react-tooltip';
 
-// import VoteGraph1 from "@shared/VoteGraph1";
-import Chart from "@shared/VoteGraph1/chart.svg";
-import ProfilePlus from "@shared/Icons/Profile+-small.svg";
-import { EDIT_VOTE } from '@state/Vote/typeDefs';
-import { voteStatsMap } from '@state/Question/map';
 import useSearchParams from "@state/Global/useSearchParams.effect";
 import Choice from "@shared/Choice";
-import GroupSvg from "@shared/Icons/Group.svg";
 import { timeAgo } from '@state/TimeAgo';
 import ThreeDotsSmallSVG from '@shared/Icons/ThreeDots-small-horizontal.svg';
 import Popper from "@shared/Popper";
-import VotedExplanation from "@shared/VotedExplanation";
 
 import './style.sass';
 
@@ -33,7 +23,7 @@ export const SingleVoteInList: FunctionComponent<{
     showChart
 }) => {
 
-        // console.log({ user });
+        console.log({ l });
 
         const { allSearchParams, updateParams } = useSearchParams();
 

@@ -33,8 +33,8 @@ export const InvitesLink: FunctionComponent<Props> = ({
 
             <div className="inputElementWrapper">
                 <div className="inputElementWrapper">
-                    <input
-                        type={'input'}
+                    <textarea
+                        // type={'input'}
                         value={inviteLink}
                         onClick={e => (e.target as any).select()}
                         onBlur={() => setIsFocused(false)}

@@ -57,16 +57,13 @@ export const QuestionResolvers = {
             groupHandle,
             sortBy,
             createdByHandle,
-            votedOnItHandle,
+            inviterHandle,
             notUsers
         }, { mongoDB, AuthUser }) => {
 
-            // console.log({
-            //     groupHandle,
-            //     sortBy,
-            //     createdByHandle,
-            //     notUsers
-            // });
+            console.log({
+                inviterHandle
+            });
 
             const AuthUserGroupMemberRelations = !!AuthUser && await mongoDB.collection("GroupMembers")
                 .find({ 'userId': new ObjectId(AuthUser?._id) })
@@ -79,13 +76,16 @@ export const QuestionResolvers = {
             })
                 .toArray();
 
+            const CreatedByUser = !!createdByHandle && await mongoDB.collection("Users")
+                .findOne({ 'LiquidUser.handle': createdByHandle });
+
+            const InviterUser = !!inviterHandle && await mongoDB.collection("Users")
+                .findOne({ 'LiquidUser.handle': inviterHandle });
+
             const Agg = [
                 ...createdByHandle ? [{
                     '$match': {
-                        "createdBy": new ObjectId(
-                            (await mongoDB.collection("Users")
-                                .findOne({ 'LiquidUser.handle': createdByHandle }))._id
-                        ),
+                        "createdBy": new ObjectId(CreatedByUser?._id),
                     }
                 }] : [],
                 ...QuestionsAgg({
@@ -99,7 +99,7 @@ export const QuestionResolvers = {
                                 { '$nin': AuthUserGroups.map(g => g.handle) } :
                                 null,
                     AuthUserId: AuthUser?._id,
-                    userId: null
+                    userId: CreatedByUser ? new ObjectId(CreatedByUser?._id) : InviterUser ? new ObjectId(InviterUser?._id) : null
                 }),
                 ...(!!notUsers || !AuthUser) ? [{
                     $match: {
@@ -156,13 +156,15 @@ export const QuestionResolvers = {
                 _id: 'Question_InList_' + q?.id,
                 allowNewChoices: q.allowNewChoices || false, // TODO: this should be obsoleted
                 ...(q.questionType === 'single' && !!AuthUser) && {
-                    yourVote: q?.choices[0]?.yourVote
+                    yourVote: q?.choices[0]?.yourVote,
+                    userVote: q?.choices[0]?.userVote,
                 },
                 ...(q.questionType === 'multi') && {
                     choices: await Promise.all(q?.choices?.map(async (c) => ({
                         ...c?.choice,
                         ...(!!AuthUser) && {
                             yourVote: c?.yourVote,
+                            userVote: c?.userVote,
                             yourStats: c?.yourStats
                         }
                     })))

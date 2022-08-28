@@ -6,18 +6,18 @@ export const NotificationTypeDefs = gql`
         _id: ID!
         type: String
 
-            # voted_on_a_poll_you_voted
+            # voted_on_a_poll_you_voted ✅
                 # actionUser
                 # poll
 
             # followed_you ✅
                 # actionUser
-         
-            # invited_you_to_vote_on_a_poll
+
+            # voted_on_a_poll - if you created poll
                 # actionUser
                 # poll
 
-            # voted_on_a_poll
+            # invited_you_to_vote_on_a_poll
                 # actionUser
                 # poll
 
@@ -58,5 +58,12 @@ export const NotificationTypeDefs = gql`
             groupHandle: String
             agreesWithYou: Boolean
         ): JSON
+        sendInviteNotification(
+            type: String
+            toUserHandle: String
+            actionUserHandle: String
+            questionText: String
+            groupHandle: String
+        ): Notification
     }
 `;

@@ -9,6 +9,7 @@ import useSearchParams from "@state/Global/useSearchParams.effect";
 import { QUESTIONS } from "@state/Question/typeDefs";
 import DropAnimation from "@components/shared/DropAnimation";
 import PollExplanation from '@shared/PollExplanation';
+import useUser from '@state/User/user.effect';
 
 import './style.sass';
 
@@ -17,8 +18,10 @@ export const GroupPolls: FunctionComponent<{
 }> = ({
     sortBy
 }) => {
-        let { handle } = useParams<any>();
+        let { handle, userHandle } = useParams<any>();
         const { allSearchParams, updateParams } = useSearchParams();
+
+        const { user: inviter } = useUser({ userHandle });
 
         const {
             loading: questions_loading,
@@ -28,7 +31,10 @@ export const GroupPolls: FunctionComponent<{
         } = useQuery(QUESTIONS, {
             variables: {
                 groupHandle: handle,
-                sortBy
+                sortBy,
+                ...userHandle && {
+                    inviterHandle: userHandle
+                }
             }
         });
 
@@ -55,6 +61,7 @@ export const GroupPolls: FunctionComponent<{
                                 v={q}
                                 // i={i}
                                 showGroupAndTime={true}
+                                user={inviter}
                             />
                         )}
                         {q.questionType === 'single' && (
@@ -62,6 +69,7 @@ export const GroupPolls: FunctionComponent<{
                                 key={`single-${q.questionText}`}
                                 l={q}
                                 showGroupAndTime={true}
+                                user={inviter}
                             />
                         )}
                         <hr />

@@ -237,7 +237,8 @@ export default function Question() {
 
                             <div className='d-flex justify-content-center align-items-center'>
                                 <div
-                                    className='d-flex justify-content-center pointer ml-2'
+                                    className='d-flex justify-content-center pointer mx-2 button_ small mt-1'
+                                    
                                     role="button"
                                     onClick={async () => {
                                         const inviteLink = `${env.website}/invite/by/${liquidUser?.handle}/to/voteOn/${voteName}/${groupHandle}`;
@@ -254,7 +255,10 @@ export default function Question() {
                                                     modalData: JSON.stringify({
                                                         InviteType: 'toVote',
                                                         inviteLink,
-                                                        voteName
+                                                        voteName,
+                                                        buttonText: `Invite from Contacts`,
+                                                        title: `Vote on ${voteName} with ${liquidUser?.name}`,
+                                                        text: `${liquidUser?.name} is inviting you to vote on ${voteName} with him`,
                                                     })
                                                 }
                                             })
@@ -267,35 +271,54 @@ export default function Question() {
 
                                 {(question.thisUserIsAdmin || liquidUser?.admin === 'total') && (
                                     <>
-                                        <div
-                                            className="pointer text-danger  ml-2"
-                                            onClick={() => updateParams({
-                                                paramsToAdd: {
-                                                    modal: "DeletePoll",
-                                                    modalData: JSON.stringify({
-                                                        questionText: question?.questionText,
-                                                        group: question?.groupChannel?.group,
-                                                        navToGroup: true
-                                                    })
-                                                }
-                                            })}
-                                        >
-                                            Archive
-                                        </div>
-                                        <div
-                                            className="pointer  ml-2"
-                                            onClick={() => updateParams({
-                                                paramsToAdd: {
-                                                    modal: "EditQuestion",
-                                                    modalData: JSON.stringify({
-                                                        questionText: question?.questionText,
-                                                        groupHandle: question?.groupChannel?.group,
-                                                    })
-                                                }
-                                            })}
-                                        >
-                                            Edit
-                                        </div>
+                                        <Popper
+                                            rightOnSmall={true}
+                                            button={
+                                                <div>
+                                                    <ThreeDotsSmallSVG />
+                                                </div>
+                                            }
+                                            oulineInstead={true}
+                                            popperContent={
+                                                <ul className="p-0 m-0 mx-2">
+
+                                                    <li className="d-flex justify-content-center">
+                                                        <div
+                                                            className="button_ small ml-2 text-danger"
+                                                            onClick={() => updateParams({
+                                                                paramsToAdd: {
+                                                                    modal: "DeletePoll",
+                                                                    modalData: JSON.stringify({
+                                                                        questionText: question?.questionText,
+                                                                        group: question?.groupChannel?.group,
+                                                                        navToGroup: true
+                                                                    })
+                                                                }
+                                                            })}
+                                                        >
+                                                            Archive
+                                                        </div>
+                                                    </li>
+
+                                                    <li className="d-flex mt-2 justify-content-center">
+                                                        <div
+                                                            className="button_ small ml-2"
+                                                            onClick={() => updateParams({
+                                                                paramsToAdd: {
+                                                                    modal: "EditQuestion",
+                                                                    modalData: JSON.stringify({
+                                                                        questionText: question?.questionText,
+                                                                        groupHandle: question?.groupChannel?.group,
+                                                                    })
+                                                                }
+                                                            })}
+                                                        >
+                                                            Edit
+                                                        </div>
+                                                    </li>
+                                                </ul>
+                                            }
+                                        />
                                     </>
                                 )}
                             </div>
@@ -305,12 +328,14 @@ export default function Question() {
                         >
                             {/* <small className="time-ago" data-tip="Last vote was"> */}
                             {!!question?.createdBy && (
-                                <Link to={`/profile/${question?.createdBy.handle}`}>
+                                <Link to={`/profile/${question?.createdBy.handle}`} className="mr-1 d-flex align-items-center">
                                     <Avatar
                                         person={question?.createdBy}
                                         type='vote'
                                         groupHandle={groupHandle}
                                     />
+
+                                    <span className='white ml-2'>{question?.createdBy?.name}</span>
                                     {/* <div
                                         className="vote-avatar none mr-1"
                                         style={{

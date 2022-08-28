@@ -43,7 +43,7 @@ export const InviteFor: FunctionComponent<{}> = ({ }) => {
             <ModalHeader
                 title={
                     modalData.InviteType === 'representation' ? `Invite to be represented by you` :
-                        modalData.InviteType === 'toGroup' ? `Invite to join ${modalData.groupName}` :
+                        modalData.InviteType === 'toGroup' ? `Invite vote with you on ${modalData.groupName}` :
                             modalData.InviteType === 'toVote' ? `Invite to Vote on ${modalData.voteName}` :
                                 modalData.InviteType === 'toCompare' ? `Invite to Compare with ${modalData.userHandle === liquidUser.handle ? 'You' : `${modalData.userName}`}` :
                                     ''
@@ -53,24 +53,39 @@ export const InviteFor: FunctionComponent<{}> = ({ }) => {
 
             <div className="Modal-Content">
 
-                <p className="text-center mt-4 mb-n4">
-                    {modalData.InviteType === 'toGroup' && `Share this link with whom you'd like to join ${modalData.groupName}`}
-                    {modalData.InviteType === 'toVote' && `Share this link with whom you'd like to vote on ${modalData.voteName}`}
-                    {modalData.InviteType === 'toCompare' && `Share this link with whom you'd like to compare with ${modalData.userHandle === liquidUser.handle ? 'yourself' : `${modalData.userName}`}`}
-                </p>
+                {!navigator.canShare ? (
+                    <>
+                        <p className="text-center mt-4 mb-n4">
+                            {modalData.InviteType === 'toGroup' && `Share this link with whom you'd like to vote with you on ${modalData.groupName}`}
+                            {modalData.InviteType === 'toVote' && `Share this link with whom you'd like to vote on ${modalData.voteName}`}
+                            {modalData.InviteType === 'toCompare' && `Share this link with whom you'd like to compare with ${modalData.userHandle === liquidUser.handle ? 'yourself' : `${modalData.userName}`}`}
+                        </p>
 
-                <div className="my-5">
-                    <InvitesLink
-                        label={'Get Link'}
-                        inviteLink={modalData.inviteLink}
-                    />
-                </div>
+                        <div className="my-5">
+                            <InvitesLink
+                                label={'Get Link'}
+                                inviteLink={modalData.inviteLink}
+                            />
+                        </div>
+                    </>
+                ) : (
+                    <div className='d-flex justify-content-center mt-4'>
+                        <button
+                            className="button_"
+                            onClick={() => navigator.share({
+                                title: modalData?.title,
+                                text: modalData?.text,
+                                url: modalData?.inviteLink
+                            })}
+                        >{modalData?.buttonText}</button>
+                    </div>
+                )}
                 <br />
 
-                {/* <hr className="mt-0 pt-3 mb-4" />
+                <hr className="mt-0 pt-3 mb-4 mx-1" />
 
                 <p className="text-center mb-4">
-                    Or invite your followers
+                    <b>Or invite your followers</b>
                 </p>
 
                 <div className="my-3">
@@ -89,7 +104,7 @@ export const InviteFor: FunctionComponent<{}> = ({ }) => {
                             questionText={modalData.questionText}
                         />
                     ))('invitedUsers')}
-                </div> */}
+                </div>
 
             </div>
         </form>
