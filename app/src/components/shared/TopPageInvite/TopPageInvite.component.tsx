@@ -2,6 +2,7 @@ import React, { FunctionComponent, useEffect, useState } from 'react';
 import { useNavigate, useParams } from "react-router-dom";
 import { useQuery, useMutation } from "@apollo/client";
 import { useAuth0 } from "@auth0/auth0-react";
+import { Link } from "react-router-dom";
 
 import BackArrowSVG from "@shared/Icons/BackArrow.svg";
 import GroupSvg from "@shared/Icons/Group.svg";
@@ -16,6 +17,7 @@ import {
     EDIT_GROUP_MEMBER_CHANNEL_RELATION, EDIT_USER_REPRESENTATIVE_GROUP_RELATION
 } from "@state/User/typeDefs";
 import useSearchParams from "@state/Global/useSearchParams.effect";
+import Avatar from "@components/shared/Avatar";
 
 import './style.sass';
 
@@ -47,11 +49,11 @@ export const TopPageInvite: FunctionComponent<{
             <div className="position-relative">
                 <div
                     className="close-corner-x"
-                    onClick={() => 
-                            to === 'poll' ? navigate(`/poll/${voteName}/${groupHandle}`) :
+                    onClick={() =>
+                        to === 'poll' ? navigate(`/poll/${voteName}/${groupHandle}`) :
                             to === 'group' ? navigate(`/group/${groupHandle}`) :
-                            to === 'compareWithProfile' ? navigate(`/profile/${userHandle}`) :
-                            null
+                                to === 'compareWithProfile' ? navigate(`/profile/${userHandle}`) :
+                                    null
                     }
                     role="button"
                 >
@@ -65,12 +67,15 @@ export const TopPageInvite: FunctionComponent<{
                             ${to === 'poll' ? 'mt-2' : 'mt-4'}
                             d-flex justify-content-center align-items-center mb-3 px-5
                         `}>
-                            <div
-                                className="small-avatar bg"
-                                style={{
-                                    background: inviter?.avatar && `url(${inviter.avatar}) 50% 50% / cover no-repeat`
-                                }}
-                            />
+
+                            <Link to={`/profile/${inviter?.handle}`}>
+                                <Avatar
+                                    person={inviter}
+                                    groupHandle={group?.handle}
+                                    type="small"
+                                />
+                            </Link>
+
                             <p className="m-0">
                                 {to === 'group' && `${inviter?.name} is inviting you to vote with him on ${group?.name}`}
                                 {to === 'poll' && `${inviter?.name} is inviting you to vote`}

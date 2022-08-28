@@ -56,8 +56,6 @@ export const Profile: FunctionComponent<{}> = ({ }) => {
         }
     }, [allSearchParams.refetch]);
 
-    console.log({ profile });
-
     return !profile ? (
         <div className="d-flex align-items-center justify-content-center min-vh-100 mt-n5">
             <DropAnimation />
@@ -319,7 +317,7 @@ export const Profile: FunctionComponent<{}> = ({ }) => {
                                         </>
                                     ) : null}
 
-                                    {!profile.yourStats?.followersYouFollow?.length ? (
+                                    {!profile.yourStats?.followersYouFollow?.length && (liquidUser?.handle !== profile?.handle) ? (
                                         <small className='faded'>Not followed by anyone you follow</small>
                                     ) : null}
                                 </div>
