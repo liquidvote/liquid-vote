@@ -259,6 +259,7 @@ export default function Question() {
                                                         buttonText: `Invite from Contacts`,
                                                         title: `Vote on ${voteName} with ${liquidUser?.name}`,
                                                         text: `${liquidUser?.name} is inviting you to vote on ${voteName} with him`,
+                                                        groupHandle: question?.groupChannel?.group
                                                     })
                                                 }
                                             })

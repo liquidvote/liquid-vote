@@ -58,12 +58,13 @@ export const Notifications: FunctionComponent<{}> = ({ }) => {
 
             {yourNotifications_data?.YourNotifications?.map((n: any) => (
                 <Notification
-                    user={n.actionUser}
+                    user={n.user}
                     type={n.type}
                     question={n.question}
                     choiceText={n.choiceText}
                     group={n.group}
                     agreesWithYou={n.agreesWithYou}
+                    actionUser={n.actionUser}
                     when={n.lastEditOn}
                     seen={n.seen}
                 />

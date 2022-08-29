@@ -19,6 +19,11 @@ export const YOUR_NOTIFICATIONS = gql`
                 name
                 handle
             }
+            user {
+                handle
+                name
+                avatar
+            }
             agreesWithYou
             lastEditOn
         }
@@ -26,11 +31,24 @@ export const YOUR_NOTIFICATIONS = gql`
 `;
 
 export const INVITATIONS_SENT_AND_THAT_COULD_BE_SENT = gql`
-    query {
-        InvitationsSentAndThatCouldBeSent {
+    query (
+        $type: String!
+        $questionText: String
+        $choiceText: String
+        $groupHandle: String
+        $userHandle: String
+    ) {
+        InvitationsSentAndThatCouldBeSent(
+            type: $type
+            questionText: $questionText
+            choiceText: $choiceText
+            groupHandle: $groupHandle
+            userHandle: $userHandle
+        ) {
             type
             seen
-            actionUser {
+            inviteSent
+            toUser {
                 handle
                 name
                 avatar
@@ -60,16 +78,16 @@ export const SEND_INVITE_NOTIFICATION = gql`
     mutation (
         $type: String!
         $toUserHandle: String!
-        $actionUserHandle: String!
         $questionText: String
         $groupHandle: String
+        $userHandle: String
     ) {
         sendInviteNotification(
-            type: $type
-            toUserHandle: $toUserHandle
-            actionUserHandle: $actionUserHandle
-            questionText: $questionText
-            groupHandle: $groupHandle
+            type: $type,
+            toUserHandle: $toUserHandle,
+            questionText: $questionText,
+            groupHandle: $groupHandle,
+            userHandle: $userHandle
         ) {
             type
             seen

@@ -43,7 +43,7 @@ export const InviteFor: FunctionComponent<{}> = ({ }) => {
             <ModalHeader
                 title={
                     modalData.InviteType === 'representation' ? `Invite to be represented by you` :
-                        modalData.InviteType === 'toGroup' ? `Invite vote with you on ${modalData.groupName}` :
+                        modalData.InviteType === 'toGroup' ? `Invite to vote with you on ${modalData.groupName}` :
                             modalData.InviteType === 'toVote' ? `Invite to Vote on ${modalData.voteName}` :
                                 modalData.InviteType === 'toCompare' ? `Invite to Compare with ${modalData.userHandle === liquidUser.handle ? 'You' : `${modalData.userName}`}` :
                                     ''
@@ -55,15 +55,14 @@ export const InviteFor: FunctionComponent<{}> = ({ }) => {
 
                 {!navigator.canShare ? (
                     <>
-                        <p className="text-center mt-4 mb-n4">
-                            {modalData.InviteType === 'toGroup' && `Share this link with whom you'd like to vote with you on ${modalData.groupName}`}
-                            {modalData.InviteType === 'toVote' && `Share this link with whom you'd like to vote on ${modalData.voteName}`}
-                            {modalData.InviteType === 'toCompare' && `Share this link with whom you'd like to compare with ${modalData.userHandle === liquidUser.handle ? 'yourself' : `${modalData.userName}`}`}
+                        <p className="mt-4 mb-n4">
+                            <b>
+                                Share invite link
+                            </b>
                         </p>
 
-                        <div className="my-5">
+                        <div className="mt-5 mb-1">
                             <InvitesLink
-                                label={'Get Link'}
                                 inviteLink={modalData.inviteLink}
                             />
                         </div>
@@ -80,15 +79,15 @@ export const InviteFor: FunctionComponent<{}> = ({ }) => {
                         >{modalData?.buttonText}</button>
                     </div>
                 )}
-                <br />
+                {/* <br /> */}
 
-                <hr className="mt-0 pt-3 mb-4 mx-1" />
+                {/* <hr className="mt-0 mb-5 mx-1" /> */}
 
-                <p className="text-center mb-4">
+                <p className="mt-4 mb-4">
                     <b>Or invite your followers</b>
                 </p>
 
-                <div className="my-3">
+                <div className="my-3 mb-5">
                     {((name: keyof IFormValues) => (
                         <InvitesInput
                             name={name}
@@ -99,9 +98,15 @@ export const InviteFor: FunctionComponent<{}> = ({ }) => {
                             value={watch(name)}
                             error={errors[name]}
                             setValue={setValue}
+                            type={
+                                modalData.InviteType === 'representation' ? `` :
+                                    modalData.InviteType === 'toGroup' ? `invited_you_to_vote_on_group` :
+                                        modalData.InviteType === 'toVote' ? `invited_you_to_vote_on_a_poll` :
+                                            modalData.InviteType === 'toCompare' ? `invited_you_to_vote_on_profile` :
+                                                ''}
                             groupHandle={modalData.groupHandle}
                             userHandle={modalData.userHandle}
-                            questionText={modalData.questionText}
+                            questionText={modalData.voteName}
                         />
                     ))('invitedUsers')}
                 </div>

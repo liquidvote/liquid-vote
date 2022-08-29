@@ -11,7 +11,11 @@ export const Avatar: FunctionComponent<{
     person, type = 'small', groupHandle, hideComparisson
 }) => {
 
-        const { user } = useUser({ userHandle: person?.handle, groupHandle, skip: !!hideComparisson });
+        const { user } = useUser({
+            userHandle: person?.handle,
+            // groupHandle,
+            skip: !!hideComparisson
+        });
 
         return (
             <div className='position-relative'>
@@ -22,18 +26,18 @@ export const Avatar: FunctionComponent<{
                 {!hideComparisson ? (
                     <>
                         <AgreementMeter
-                            inner
+                            // inner
                             type={type}
                             yourStats={(user || person)?.yourStats}
                             personStats={(user || person)?.stats}
                         />
-                        {groupHandle ? (
+                        {/* {groupHandle ? (
                             <AgreementMeter
                                 type={type}
                                 yourStats={(user || person)?.groupStats?.yourStats}
                                 personStats={(user || person)?.groupStats?.stats}
                             />
-                        ) : null}
+                        ) : null} */}
                     </>
                 ) : null}
                 {/* <AgreementMeter inner type={type} person={user || person} /> */}

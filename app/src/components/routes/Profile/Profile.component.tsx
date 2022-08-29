@@ -194,7 +194,7 @@ export const Profile: FunctionComponent<{}> = ({ }) => {
                                 >
                                     {
                                         profile.isRepresentingYou ?
-                                            `Represents you in ${profile.isRepresentingYou} group${profile.isRepresentingYou >1 ? 's' : null}` :
+                                            `Represents you in ${profile.isRepresentingYou} group${profile.isRepresentingYou > 1 ? 's' : null}` :
                                             "Delegate Votes To"
                                     }
                                 </div>
@@ -208,7 +208,7 @@ export const Profile: FunctionComponent<{}> = ({ }) => {
                 <p className="profile-handle">@{profile.handle}</p>
                 {profile.isYouFollowing ? (
                     <small
-                        className={`badge ml-2 mt-n1`}
+                        className={`badge inverted ml-2 mt-n1`}
                     >follows you</small>
                 ) : null}
             </div>
@@ -450,6 +450,18 @@ export const Profile: FunctionComponent<{}> = ({ }) => {
                 <li className="nav-item">
                     <Link className={`nav-link ${(!section || section === 'votes') && !groupHandle && 'active'}`} to={`/profile/${handle}/votes`}>
                         <b>{profile?.stats?.directVotesMade}</b> Votes
+
+                        {profile?.yourStats?.directVotesInAgreement ? (
+                            <>
+                                <small className="ml-2">
+                                    <b className='white forDirect px-1 rounded'>{profile?.yourStats?.directVotesInAgreement}</b>
+                                </small>
+                                <small className="ml-n1">
+                                    <b className='white againstDirect px-1 rounded'>{profile?.yourStats?.directVotesInDisagreement}</b>
+                                </small>
+                            </>
+                        ) : null}
+
                     </Link>
                 </li>
                 <li className="nav-item">

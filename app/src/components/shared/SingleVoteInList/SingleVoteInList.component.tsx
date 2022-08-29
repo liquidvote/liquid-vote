@@ -23,8 +23,6 @@ export const SingleVoteInList: FunctionComponent<{
     showChart
 }) => {
 
-        console.log({ l });
-
         const { allSearchParams, updateParams } = useSearchParams();
 
         return (

@@ -837,6 +837,7 @@ export const notifyFollowers = async ({
             group: null,
             groupHandle,
             agreesWithYou: position === u.followerVote?.position,
+            userHandle: null,
 
             mongoDB,
             AuthUser

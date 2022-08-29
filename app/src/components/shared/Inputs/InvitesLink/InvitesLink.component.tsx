@@ -25,11 +25,11 @@ export const InvitesLink: FunctionComponent<Props> = ({
 
     return (
         <div className={
-            `InputWrapper hasValue ${isFocused && 'isFocused'}`
+            `InputWrapper no-label hasValue ${isFocused && 'isFocused'}`
         }>
-            <label>
+            {/* <label>
                 {label}
-            </label>
+            </label> */}
 
             <div className="inputElementWrapper">
                 <div className="inputElementWrapper">

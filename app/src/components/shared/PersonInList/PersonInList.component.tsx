@@ -18,13 +18,17 @@ export const PersonInList: FunctionComponent<{
     groupHandle?: string,
     groupName?: string,
     isShowingRepresentativeRelation?: boolean,
-    includeVotes?: boolean
+    includeVotes?: boolean,
+    alternativeButton?: any,
+    hideBottomBorder?: boolean
 }> = ({
     person,
     groupHandle,
     groupName,
     isShowingRepresentativeRelation,
-    includeVotes
+    includeVotes,
+    alternativeButton,
+    hideBottomBorder
 }) => {
 
         const { user, user_refetch } = useUser({ userHandle: person.handle, groupHandle });
@@ -42,7 +46,7 @@ export const PersonInList: FunctionComponent<{
         }] = useMutation(EDIT_USER_FOLLOWING_RELATION);
 
         return (
-            <div className="d-flex relative border-bottom py-2 pb-3 mb-2">
+            <div className={`d-flex relative ${hideBottomBorder ? '' : 'border-bottom'} py-2 pb-3 mb-2`}>
                 <Link to={`/profile/${person.handle}`}>
                     <Avatar person={person} type="small" groupHandle={groupHandle} />
                 </Link>
@@ -53,7 +57,7 @@ export const PersonInList: FunctionComponent<{
                                 <b className="white">{person.name}</b>
                                 {user?.isFollowingYou ? (
                                     <small
-                                        className={`badge ml-2 mt-n1`}
+                                        className={`badge inverted ml-2 mt-n1`}
                                     >follows you</small>
                                 ) : null}
                             </div>
@@ -61,36 +65,43 @@ export const PersonInList: FunctionComponent<{
                         </Link>
                         <div className="d-flex mb-1 ml-n1">
                             <div className="d-flex ml-n1 justify-content-center">
-                                <div
-                                    // onClick={() => setIsRepresenting(!isRepresenting)}
-                                    onClick={() => !!liquidUser ? editUserFollowingRelation({
-                                        variables: {
-                                            FollowedHandle: user?.handle,
-                                            FollowingHandle: liquidUser?.handle,
-                                            IsFollowing: !user?.isYouFollowing
-                                        }
-                                    })
-                                        .then((r) => {
-                                            user_refetch();
-                                        }) : (
-                                        updateParams({
-                                            paramsToAdd: {
-                                                modal: "RegisterBefore",
-                                                modalData: JSON.stringify({
-                                                    toWhat: 'followUser',
-                                                    userName: user?.name
+                                {
+                                    !alternativeButton && (
+                                        <>
+                                            <div
+                                                // onClick={() => setIsRepresenting(!isRepresenting)}
+                                                onClick={() => !!liquidUser ? editUserFollowingRelation({
+                                                    variables: {
+                                                        FollowedHandle: user?.handle,
+                                                        FollowingHandle: liquidUser?.handle,
+                                                        IsFollowing: !user?.isYouFollowing
+                                                    }
                                                 })
-                                            }
-                                        })
-                                    )}
-                                    className={`button_ small mr-2 ${user?.isYouFollowing ? "selected" : ""}`}
-                                >
-                                    {
-                                        user?.isYouFollowing ?
-                                            "Following" :
-                                            "Follow"
-                                    }
-                                </div>
+                                                    .then((r) => {
+                                                        user_refetch();
+                                                    }) : (
+                                                    updateParams({
+                                                        paramsToAdd: {
+                                                            modal: "RegisterBefore",
+                                                            modalData: JSON.stringify({
+                                                                toWhat: 'followUser',
+                                                                userName: user?.name
+                                                            })
+                                                        }
+                                                    })
+                                                )}
+                                                className={`button_ small mr-2 ${user?.isYouFollowing ? "selected" : ""}`}
+                                            >
+                                                {
+                                                    user?.isYouFollowing ?
+                                                        "Following" :
+                                                        "Follow"
+                                                }
+                                            </div>
+                                        </>
+                                    )
+                                }
+                                {alternativeButton ? alternativeButton : null}
                             </div>
                         </div>
                     </div>

@@ -1258,6 +1258,7 @@ export const UserResolvers = {
                     group: null,
                     groupHandle: null,
                     agreesWithYou: null,
+                    userHandle: null,
 
                     mongoDB,
                     AuthUser

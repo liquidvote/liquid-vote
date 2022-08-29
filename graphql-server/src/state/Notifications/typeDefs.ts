@@ -21,11 +21,17 @@ export const NotificationTypeDefs = gql`
                 # actionUser
                 # poll
 
-            # invited_you_to_join_group
+            # invited_you_to_vote_on_group
                 #actionUser
                 #group
 
+            # invited_you_to_vote_on_profile
+                #actionUser
+                #user
+
         seen: Boolean
+        inviteSent: Boolean
+        inviteAcceptedOn: String    # group | yourProfile
         
         toUser: User # Id
 
@@ -33,6 +39,7 @@ export const NotificationTypeDefs = gql`
         question: Question  # Id
         choiceText: String
         group: Group # Id
+        user: User # Id
         agreesWithYou: Boolean
         lastEditOn: String
     }
@@ -41,9 +48,10 @@ export const NotificationTypeDefs = gql`
         YourNotifications: [Notification]
         InvitationsSentAndThatCouldBeSent(
             type: String
-            question: String
-            actionUserHandle: String
-            group: String
+            questionText: String
+            choiceText: String
+            groupHandle: String
+            userHandle: String
         ): [Notification]
     }
 
@@ -61,9 +69,9 @@ export const NotificationTypeDefs = gql`
         sendInviteNotification(
             type: String
             toUserHandle: String
-            actionUserHandle: String
             questionText: String
-            groupHandle: String
+            groupHandle: String,
+            userHandle: String
         ): Notification
     }
 `;

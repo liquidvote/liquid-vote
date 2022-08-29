@@ -35,7 +35,7 @@ export const Group: FunctionComponent<{}> = ({ }) => {
     let { handle, section, userHandle } = useParams<any>();
     const { allSearchParams, updateParams } = useSearchParams();
 
-    const [sortBy, setSortBy] = useState('time');
+    const [sortBy, setSortBy] = useState('votersYouFollowOrRepresentingYouTimeWeight');
 
     const { group, group_refetch } = useGroup({ handle });
 
@@ -397,7 +397,7 @@ export const Group: FunctionComponent<{}> = ({ }) => {
                 </div>
             </div> */}
 
-            {
+            {/* {
                 isMember ? (
                     <div className="d-flex justify-content-center mt-3 mb-3">
                         <div
@@ -419,7 +419,9 @@ export const Group: FunctionComponent<{}> = ({ }) => {
                 ) : (
                     <br />
                 )
-            }
+            } */}
+            <br />
+
 
 
             <ul className="nav d-flex flex-nowrap justify-content-around align-items-center mt-1 mb-n4 mx-n3">
@@ -428,12 +430,12 @@ export const Group: FunctionComponent<{}> = ({ }) => {
                         <b>{group?.stats?.questions}</b>{' '}Polls
                     </Link>
                 </li>
-                <li className="px-4 mt-1">
+                {/* <li className="px-4 mt-1">
                     <VoteSortPicker
                         updateSortInParent={setSortBy}
                         initialSort="votersYouFollowOrRepresentingYouTimeWeight"
                     />
-                </li>
+                </li> */}
             </ul>
 
             {/* <pre style={{ color: 'white' }}>{JSON.stringify(group, null, 2)}</pre> */}
@@ -444,6 +446,31 @@ export const Group: FunctionComponent<{}> = ({ }) => {
                 (!section || section === 'polls') && (
                     <div>
                         <GroupPolls sortBy={sortBy} />
+
+                        {
+                            isMember ? (
+                                <div className="d-flex justify-content-center mt-3 mb-3">
+                                    <div
+                                        onClick={() => updateParams({
+                                            paramsToAdd: {
+                                                modal: "EditQuestion",
+                                                modalData: JSON.stringify({
+                                                    questionText: 'new',
+                                                    groupHandle: handle,
+                                                })
+                                            }
+                                        })}
+                                        className="button_ mx-5 my-3 mb-4"
+                                    >
+                                        <DropPlusSVG />
+                                        <div className="ml-2">Create a new Poll</div>
+                                    </div>
+                                </div>
+                            ) : (
+                                <br />
+                            )
+                        }
+
                     </div>
                 )
             }

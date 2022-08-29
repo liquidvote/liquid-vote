@@ -8,13 +8,15 @@ import { timeAgo } from '@state/TimeAgo';
 import './style.sass';
 
 export const Notification: FunctionComponent<{
-    user: any,
+    actionUser: any,
+    user?: any,
     type:
     'voted_on_a_poll_you_voted' |
     'followed_you' |
     'invited_you_to_vote_on_a_poll' |
     'voted_on_a_poll' |
-    'invited_you_to_join_group',
+    'invited_you_to_vote_on_group' |
+    'invited_you_to_vote_on_profile',
 
     question: any,
     choiceText: string,
@@ -23,6 +25,7 @@ export const Notification: FunctionComponent<{
     when: string,
     seen: boolean
 }> = ({
+    actionUser,
     user,
     type,
     question,
@@ -36,10 +39,10 @@ export const Notification: FunctionComponent<{
             <>
                 <div className={`d-flex relative align-items-center notification ${!seen ? 'not-seen' : null}`}>
 
-                    {user ? (
-                        <Link to={`/profile/${user?.handle}`}>
+                    {actionUser ? (
+                        <Link to={`/profile/${actionUser?.handle}`}>
                             <Avatar
-                                person={user}
+                                person={actionUser}
                                 // groupHandle={groupChannel?.group}
                                 type="small"
                             />
@@ -55,10 +58,10 @@ export const Notification: FunctionComponent<{
                     <div className="flex-fill">
                         <div className="mb-n1 flex-fill d-flex align-items-center justify-content-between">
                             <div className="w-100">
-                                {user ? (
+                                {actionUser ? (
                                     <div className="d-flex align-items-center justify-content-between">
-                                        <Link to={`/profile/${user?.handle}`} className="d-block">
-                                            <b className="mr-1">{user?.name}</b>
+                                        <Link to={`/profile/${actionUser?.handle}`} className="d-block">
+                                            <b className="mr-1">{actionUser?.name}</b>
                                         </Link>
 
                                         <div className="d-flex ml-1">
@@ -84,8 +87,6 @@ export const Notification: FunctionComponent<{
                                                             <b className="againstDirect white px-1 rounded">Disagreed</b>
                                                         )}
                                                         {' '}
-                                                        {/* or
-                                                    <b className="againstDirect white px-1 rounded">disagrees</b> */}
                                                         with you on
                                                         {' '}
                                                         <Link
@@ -100,17 +101,6 @@ export const Notification: FunctionComponent<{
                                                         Followed you
                                                     </>
                                                 ) : null}
-                                                {type === 'invited_you_to_vote_on_a_poll' ? (
-                                                    <>
-                                                        Invited you to vote on
-                                                        {' '}
-                                                        <Link
-                                                            to={`/${question?.questionType === 'single' ? 'poll' : 'multipoll'}/${question?.questionText}/${group?.handle}`}
-                                                        >
-                                                            <b className="white">{question?.questionText}</b>
-                                                        </Link>
-                                                    </>
-                                                ) : null}
                                                 {type === 'voted_on_a_poll' ? (
                                                     <>
                                                         Voted on
@@ -122,9 +112,31 @@ export const Notification: FunctionComponent<{
                                                         </Link>
                                                     </>
                                                 ) : null}
-                                                {type === 'invited_you_to_join_group' ? (
+                                                {type === 'invited_you_to_vote_on_a_poll' ? (
                                                     <>
-                                                        Invited you to join
+                                                        Invited you to vote on
+                                                        {' '}
+                                                        <Link
+                                                            to={`/${question?.questionType === 'single' ? 'poll' : 'multipoll'}/${question?.questionText}/${group?.handle}`}
+                                                        >
+                                                            <b className="white">{question?.questionText}</b>
+                                                        </Link>
+                                                    </>
+                                                ) : null}
+                                                {type === 'invited_you_to_vote_on_profile' ? (
+                                                    <>
+                                                        Invited you to vote with
+                                                        {' '}
+                                                        <Link to={`/profile/${user?.handle}`}>
+                                                            {user?.handle !== actionUser?.handle ? (
+                                                                <b className="white">{user?.name}</b>
+                                                            ) : <b className="white">him</b>}
+                                                        </Link>
+                                                    </>
+                                                ) : null}
+                                                {type === 'invited_you_to_vote_on_group' ? (
+                                                    <>
+                                                        Invited you to vote on
                                                         {' '}
                                                         <Link to={`/group/${group?.handle}`}><b className="white">{group?.name}</b></Link>
                                                     </>
