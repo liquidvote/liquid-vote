@@ -35,12 +35,19 @@ export const NotificationResolvers = {
                         'foreignField': '_id',
                         'as': 'question'
                     }
-                },{
+                }, {
                     '$lookup': {
                         'from': 'Users',
                         'localField': 'user',
                         'foreignField': '_id',
                         'as': 'user'
+                    }
+                }, {
+                    '$lookup': {
+                        'from': 'Users',
+                        'localField': 'inviterUser',
+                        'foreignField': '_id',
+                        'as': 'inviterUser'
                     }
                 }, {
                     '$addFields': {
@@ -55,6 +62,9 @@ export const NotificationResolvers = {
                         },
                         'user': {
                             '$first': '$user.LiquidUser'
+                        },
+                        'inviterUser': {
+                            '$first': '$inviterUser.LiquidUser'
                         }
                     }
                 }, {
@@ -234,7 +244,8 @@ export const NotificationResolvers = {
             toUserHandle,
             questionText,
             groupHandle,
-            userHandle
+            userHandle,
+            inviteLink
         }, {
             mongoDB, AuthUser
         }) => {
@@ -271,6 +282,8 @@ export const NotificationResolvers = {
                 group: null,
                 groupHandle,
                 agreesWithYou: null,
+                inviterUser: null,
+                inviteLink,
 
                 mongoDB,
                 AuthUser
@@ -308,6 +321,8 @@ export const NotificationResolvers = {
                 groupHandle,
                 agreesWithYou,
                 userHandle,
+                inviterUser: null,
+                inviteLink: null,
 
                 mongoDB,
                 AuthUser
@@ -333,6 +348,8 @@ export const saveAndSendNotification = async ({
     groupHandle,
     agreesWithYou,
     userHandle,
+    inviterUser,
+    inviteLink,
 
     mongoDB,
     AuthUser
@@ -394,7 +411,8 @@ export const saveAndSendNotification = async ({
                 choiceText: choiceText,
                 group: Group?._id,
                 createdOn: Date.now(),
-                user: User?._id
+                user: User?._id,
+                inviterUser: inviterUser?._id
             }
         },
         {
@@ -410,7 +428,8 @@ export const saveAndSendNotification = async ({
     ) ?
         sendEmail({
             toAddress: ToUser.LiquidUser.email,
-            subject: `${ActionUser?.LiquidUser?.name} - ${type}`
+            subject: `${ActionUser?.LiquidUser?.name} - ${type}`,
+            inviteLink
         }) :
         null;
 
@@ -419,7 +438,8 @@ export const saveAndSendNotification = async ({
             token: ToUser?.NotificationSettings?.firebase_token,
             title: `${ActionUser?.LiquidUser?.name} - ${type}`,
             body: `${ActionUser?.LiquidUser?.name} - ${type}`,
-            image: `${ActionUser?.LiquidUser?.avatar}`
+            image: `${ActionUser?.LiquidUser?.avatar}`,
+            inviteLink
         }) :
         null;
 

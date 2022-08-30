@@ -73,7 +73,8 @@ export const VoteTypeDefs = gql`
             choiceText: String,
             group: String,
             channel: String,
-            Vote: JSON
+            Vote: JSON,
+            inviterHandle: String
         ): Vote
     }
 `;

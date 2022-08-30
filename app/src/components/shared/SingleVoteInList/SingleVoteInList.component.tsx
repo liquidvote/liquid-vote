@@ -15,12 +15,14 @@ export const SingleVoteInList: FunctionComponent<{
     showGroupAndTime?: boolean,
     hideTitle?: boolean,
     showChart?: boolean,
+    inviterHandle?: string
 }> = ({
     l,
     user,
     showGroupAndTime,
     hideTitle,
-    showChart
+    showChart,
+    inviterHandle
 }) => {
 
         const { allSearchParams, updateParams } = useSearchParams();
@@ -125,6 +127,7 @@ export const SingleVoteInList: FunctionComponent<{
                             inList={true}
                             showChart={showChart}
                             yourStats={l.yourStats}
+                            inviterHandle={inviterHandle}
                         />
                     </div>
                 </div>

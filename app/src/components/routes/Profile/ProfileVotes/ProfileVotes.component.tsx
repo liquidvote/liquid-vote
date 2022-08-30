@@ -19,7 +19,7 @@ import './style.sass';
 
 export const ProfileVotes: FunctionComponent<{}> = ({ }) => {
 
-    let { section, subsection, subsubsection, handle, groupHandle } = useParams<any>();
+    let { section, subsection, subsubsection, handle, groupHandle, inviterHandle } = useParams<any>();
 
     const [sortBy, setSortBy] = useState('time');
 
@@ -190,6 +190,7 @@ export const ProfileVotes: FunctionComponent<{}> = ({ }) => {
                                     v={v?.question}
                                     showGroupAndTime={true}
                                     user={profile}
+                                    inviterHandle={inviterHandle}
                                 />
                             )}
                             {v?.question?.questionType === 'single' && (
@@ -198,6 +199,7 @@ export const ProfileVotes: FunctionComponent<{}> = ({ }) => {
                                     l={v?.question}
                                     showGroupAndTime={true}
                                     user={profile}
+                                    inviterHandle={inviterHandle}
                                 />
                             )}
                             <hr />

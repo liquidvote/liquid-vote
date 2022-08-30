@@ -357,7 +357,8 @@ export const VoteResolvers = {
             Vote,
             questionText,
             choiceText,
-            group
+            group,
+            inviterHandle
         }, {
             mongoDB, AuthUser
         }) => {
@@ -383,6 +384,10 @@ export const VoteResolvers = {
                     // 'groupChannel.channel': channel,
                     user: new ObjectId(AuthUser?._id)
                 });
+
+            const InviterUser = inviterHandle && await mongoDB.collection("Users").findOne({
+                'LiquidUser.handle': inviterHandle,
+            });
 
             const savedVote = !!AuthUser && (await mongoDB.collection("Votes")
                 .findOneAndUpdate({
@@ -414,7 +419,10 @@ export const VoteResolvers = {
                             'isDirect': true,
                             'representatives': Vote_?.representatives || [],
                         },
-                        lastEditOn: Date.now()
+                        lastEditOn: Date.now(),
+                        ...InviterUser && {
+                            'inviter': InviterUser?._id
+                        }
                     },
                     $setOnInsert: {
                         'questionText': questionText,
@@ -465,6 +473,7 @@ export const VoteResolvers = {
             const notifiedFollowers = savedVote?.isDirect && await notifyFollowers({
                 AuthUser,
                 UserId: AuthUser._id,
+                InviterUser,
                 questionText,
                 choiceText,
                 groupHandle: group,
@@ -472,10 +481,26 @@ export const VoteResolvers = {
                 mongoDB
             });
 
-            console.log({
-                notifiedFollowers,
-                savedVote
+            // Notify Inviter
+            const notifiedInviter = InviterUser && await notifyInviter({
+                AuthUser,
+                // UserId,
+                InviterUser,
+                questionText,
+                choiceText,
+                groupHandle: group,
+                position: savedVote?.position,
+                mongoDB
             });
+
+            // console.log({
+            //     notifiedFollowers: notifiedFollowers?.map(f => ({
+            //         f: JSON.stringify(f.u, null, 2)
+            //     })),
+            //     savedVote,
+            //     notifiedInviter,
+            //     InviterUser
+            // });
 
             return {
                 ...savedVote,
@@ -709,6 +734,7 @@ export const updateQuestionDelegatedVotes = async ({
 export const notifyFollowers = async ({
     AuthUser,
     UserId,
+    InviterUser,
     questionText,
     choiceText,
     groupHandle,
@@ -724,6 +750,15 @@ export const notifyFollowers = async ({
                             '$eq': [
                                 '$followedId', {
                                     '$toObjectId': ObjectId(UserId)
+                                }
+                            ]
+                        }
+                    },
+                    {
+                        '$expr': {
+                            '$ne': [
+                                '$followingId', {
+                                    '$toObjectId': ObjectId(InviterUser?._id)
                                 }
                             ]
                         }
@@ -838,6 +873,8 @@ export const notifyFollowers = async ({
             groupHandle,
             agreesWithYou: position === u.followerVote?.position,
             userHandle: null,
+            inviterUser: InviterUser?._id,
+            inviteLink: null,
 
             mongoDB,
             AuthUser
@@ -851,4 +888,73 @@ export const notifyFollowers = async ({
 
 
     return followersThatVotedNotified;
+};
+
+export const notifyInviter = async ({
+    AuthUser,
+    // UserId,
+    InviterUser,
+    questionText,
+    choiceText,
+    groupHandle,
+    position,
+    mongoDB
+}) => {
+
+    const InviterVote = (await mongoDB.collection("Votes")
+        .aggregate([
+            {
+                '$match': {
+                    '$expr': {
+                        '$and': [
+                            {
+                                '$eq': [
+                                    '$questionText', questionText
+                                ]
+                            }, {
+                                '$eq': [
+                                    '$choiceText', choiceText
+                                ]
+                            }, {
+                                '$eq': [
+                                    '$groupChannel.group', groupHandle
+                                ]
+                            }, {
+                                '$eq': [
+                                    '$user', {
+                                        '$toObjectId': InviterUser?._id
+                                    }
+                                ]
+                            },
+                            { 'isDirect': true },
+                        ]
+                    }
+                }
+            }
+        ]).toArray()
+    )?.[0];
+
+    const notification = await saveAndSendNotification({
+        type: 'voted_on_a_poll',
+        toUser: InviterUser,
+        toUserHandle: null,
+        actionUser: AuthUser,
+        actionUserHandle: null,
+        question: null,
+        questionText,
+        choiceText,
+        group: null,
+        groupHandle,
+        agreesWithYou: InviterVote ? position === InviterVote?.position : null,
+        userHandle: null,
+        inviterUser: InviterUser,
+        inviteLink: null,
+
+        mongoDB,
+        AuthUser
+    });
+
+    return {
+        notification
+    };
 };

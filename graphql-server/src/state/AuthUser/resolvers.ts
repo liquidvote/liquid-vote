@@ -9,10 +9,6 @@ export const AuthUserResolvers = {
                 'seen': false,
             }).count();
 
-            console.log({
-                unseenNotificationCount
-            })
-
             return AuthUser && {
                 ...AuthUser,
                 unseenNotificationCount

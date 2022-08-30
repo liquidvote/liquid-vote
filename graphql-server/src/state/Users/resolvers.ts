@@ -1259,6 +1259,8 @@ export const UserResolvers = {
                     groupHandle: null,
                     agreesWithYou: null,
                     userHandle: null,
+                    inviterUser: null,
+                    inviteLink: null,
 
                     mongoDB,
                     AuthUser

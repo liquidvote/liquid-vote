@@ -34,7 +34,7 @@ export const GroupInProfileList: FunctionComponent<{
     isSelected
 }) => {
 
-        let { section, subsection, subsubsection, handle, groupHandle } = useParams<any>();
+        let { section, subsection, subsubsection, handle, inviterHandle } = useParams<any>();
 
         const { liquidUser } = useAuthUser();
 
@@ -269,7 +269,7 @@ export const GroupInProfileList: FunctionComponent<{
                                                                 }
                                                             }}
                                                         >
-                                                            Share Votes
+                                                            Invite
                                                         </div>
                                                     </li>
                                                 )}
@@ -303,6 +303,7 @@ export const GroupInProfileList: FunctionComponent<{
                             groupHandle={group.handle}
                             subsection={subsection}
                             subsubsection={subsubsection}
+                            inviterHandle={inviterHandle}
                         />
                     )}
                 </div>

@@ -13,11 +13,13 @@ export const MultiVoteInList: FunctionComponent<{
     showGroupAndTime: boolean,
     user?: any,
     showChart?: boolean,
+    inviterHandle?: string
 }> = ({
     v,
     showGroupAndTime,
     user,
-    showChart
+    showChart,
+    inviterHandle
 }) => {
 
         const { allSearchParams, updateParams } = useSearchParams();
@@ -147,6 +149,7 @@ export const MultiVoteInList: FunctionComponent<{
                                     maxVoteCount={maxCount}
                                     user={user}
                                     showChart={showChart}
+                                    inviterHandle={inviterHandle}
                                 />
                             </div>
                         ))}

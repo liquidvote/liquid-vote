@@ -13,19 +13,19 @@ export const NotificationTypeDefs = gql`
             # followed_you ✅
                 # actionUser
 
-            # voted_on_a_poll - if you created poll
+            # voted_on_a_poll - if you created poll | if you invited to vote ✅
                 # actionUser
                 # poll
 
-            # invited_you_to_vote_on_a_poll
+            # invited_you_to_vote_on_a_poll 🏗
                 # actionUser
                 # poll
 
-            # invited_you_to_vote_on_group
+            # invited_you_to_vote_on_group 🏗
                 #actionUser
                 #group
 
-            # invited_you_to_vote_on_profile
+            # invited_you_to_vote_on_profile 🏗
                 #actionUser
                 #user
 
@@ -34,6 +34,8 @@ export const NotificationTypeDefs = gql`
         inviteAcceptedOn: String    # group | yourProfile
         
         toUser: User # Id
+        inviterUser: User # Id
+        inviteLink: String
 
         actionUser: User # Id
         question: Question  # Id
@@ -72,6 +74,7 @@ export const NotificationTypeDefs = gql`
             questionText: String
             groupHandle: String,
             userHandle: String
+            inviteLink: String
         ): Notification
     }
 `;

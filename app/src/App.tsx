@@ -46,11 +46,11 @@ export default function App() {
                     <SideMenu />
                     <div className="App border-sides">
                         <Routes>
-                            <Route path="/invite/by/:userHandle/to/group/:handle" element={<Loader component={<Group />} />} />
-                            <Route path="/invite/by/:userHandle/to/group/:handle/:acceptOnLogin" element={<Loader component={<Group />} />} />
-                            <Route path="/invite/by/:handle/to/causeOnProfile/:groupHandle" element={<Loader component={<Profile />} />} />
+                            <Route path="/invite/by/:inviterHandle/to/group/:handle" element={<Loader component={<Group />} />} />
+                            <Route path="/invite/by/:inviterHandle/to/group/:handle/:acceptOnLogin" element={<Loader component={<Group />} />} />
+                            <Route path="/invite/by/:inviterHandle/to/causeOnProfile/:groupHandle" element={<Loader component={<Profile />} />} />
                             <Route path="/invite/by/:inviterHandle/toCompareWith/:handle" element={<Loader component={<Profile />} />} />
-                            <Route path="/invite/by/:userHandle/to/voteOn/:voteName/:groupHandle" element={<Loader component={<Question />} />} />
+                            <Route path="/invite/by/:inviterHandle/to/voteOn/:voteName/:groupHandle" element={<Loader component={<Question />} />} />
 
                             <Route path="/poll/:voteName/:groupHandle/:section/:subsection/:subsubsection" element={<Loader component={<Question />} />} />
                             <Route path="/poll/:voteName/:groupHandle/:section/:subsection" element={<Loader component={<Question />} />} />

@@ -28,7 +28,7 @@ import Avatar from '@components/shared/Avatar';
 
 export default function Question() {
 
-    let { voteName, groupHandle, section, userHandle } = useParams<any>();
+    let { voteName, groupHandle, section, inviterHandle } = useParams<any>();
     const { allSearchParams, updateParams } = useSearchParams();
 
     const { group, group_refetch } = useGroup({ handle: groupHandle });
@@ -80,9 +80,9 @@ export default function Question() {
 
             <Header title="Opinion Poll" />
 
-            {!!userHandle && (
+            {!!inviterHandle && (
                 <TopPageInvite
-                    inviterHandle={userHandle}
+                    inviterHandle={inviterHandle}
                     groupHandle={groupHandle}
                     voteName={voteName}
                     to="poll"
@@ -196,6 +196,7 @@ export default function Question() {
                                     stats={c.stats}
                                     yourVote={c.yourVote}
                                     yourStats={c?.yourStats}
+                                    inviterHandle={inviterHandle}
                                 // maxVoteCount={maxVoteCount}
                                 />
                             </div>
@@ -207,6 +208,7 @@ export default function Question() {
                             stats={question?.stats}
                             yourVote={question?.yourVote}
                             yourStats={question?.yourStats}
+                            inviterHandle={inviterHandle}
                         />
                 }
 

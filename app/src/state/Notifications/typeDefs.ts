@@ -24,6 +24,12 @@ export const YOUR_NOTIFICATIONS = gql`
                 name
                 avatar
             }
+            inviterUser {
+                handle
+                name
+                avatar
+            }
+            inviteLink
             agreesWithYou
             lastEditOn
         }
@@ -81,6 +87,7 @@ export const SEND_INVITE_NOTIFICATION = gql`
         $questionText: String
         $groupHandle: String
         $userHandle: String
+        $inviteLink: String
     ) {
         sendInviteNotification(
             type: $type,
@@ -88,6 +95,7 @@ export const SEND_INVITE_NOTIFICATION = gql`
             questionText: $questionText,
             groupHandle: $groupHandle,
             userHandle: $userHandle
+            inviteLink: $inviteLink
         ) {
             type
             seen

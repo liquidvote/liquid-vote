@@ -9,7 +9,8 @@ import { INVITES, EDIT_INVITE } from "@state/Invites/typeDefs";
 import { USER_GROUPS } from "@state/User/typeDefs";
 import useAuthUser from '@state/AuthUser/authUser.effect';
 import InvitesInput from '@components/shared/Inputs/InvitesInput';
-import InvitesLink from '@components/shared/Inputs/InvitesLink'
+import InvitesLink from '@components/shared/Inputs/InvitesLink';
+import env from '@env';
 
 import ModalHeader from "../../shared/ModalHeader";
 import './style.sass';
@@ -38,6 +39,21 @@ export const InviteFor: FunctionComponent<{}> = ({ }) => {
         setValue('invitedUsers', []);
     }, [modalData?.InviteType]);
 
+    const mobileShareTitle =
+        modalData.InviteType === 'toGroup' ? `Vote on ${modalData?.groupName} with ${liquidUser?.name}` :
+            modalData.InviteType === 'toVote' ? `Vote on ${modalData?.voteName} with ${liquidUser?.name}` :
+                modalData.InviteType === 'toCompare' ? `Compare with with ${modalData?.userName}` : '';
+
+    const mobileShareText =
+        modalData.InviteType === 'toGroup' ? `${liquidUser?.name} is inviting you to vote on ${modalData?.groupName} with him` :
+            modalData.InviteType === 'toVote' ? `${liquidUser?.name} is inviting you to vote on ${modalData?.voteName} with him` :
+                modalData.InviteType === 'toCompare' ? `${liquidUser?.name} is inviting you to compare ${liquidUser?.handle === modalData?.userHandle ? 'with him' : `with ${modalData?.userName}`}` : '';
+
+    const inviteLink =
+        modalData.InviteType === 'toGroup' ? `${env.website}/invite/by/${liquidUser?.handle}/to/causeOnProfile/${modalData.groupHandle}` :
+            modalData.InviteType === 'toVote' ? `${env.website}/invite/by/${liquidUser?.handle}/to/voteOn/${modalData?.voteName}/${modalData?.groupHandle}` :
+                modalData.InviteType === 'toCompare' ? `${env.website}/invite/by/${liquidUser?.handle}/toCompareWith/${modalData.userHandle}` : '';
+
     return (
         <form>
             <ModalHeader
@@ -63,7 +79,7 @@ export const InviteFor: FunctionComponent<{}> = ({ }) => {
 
                         <div className="mt-5 mb-1">
                             <InvitesLink
-                                inviteLink={modalData.inviteLink}
+                                inviteLink={inviteLink}
                             />
                         </div>
                     </>
@@ -72,11 +88,11 @@ export const InviteFor: FunctionComponent<{}> = ({ }) => {
                         <button
                             className="button_"
                             onClick={() => navigator.share({
-                                title: modalData?.title,
-                                text: modalData?.text,
-                                url: modalData?.inviteLink
+                                title: mobileShareTitle,
+                                text: mobileShareText,
+                                url: inviteLink
                             })}
-                        >{modalData?.buttonText}</button>
+                        >Invite from Contacts</button>
                     </div>
                 )}
                 {/* <br /> */}
@@ -107,6 +123,7 @@ export const InviteFor: FunctionComponent<{}> = ({ }) => {
                             groupHandle={modalData.groupHandle}
                             userHandle={modalData.userHandle}
                             questionText={modalData.voteName}
+                            inviteLink={inviteLink}
                         />
                     ))('invitedUsers')}
                 </div>

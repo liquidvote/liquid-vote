@@ -32,7 +32,7 @@ import './style.sass';
 export const Group: FunctionComponent<{}> = ({ }) => {
 
     const navigate = useNavigate();
-    let { handle, section, userHandle } = useParams<any>();
+    let { handle, section, inviterHandle } = useParams<any>();
     const { allSearchParams, updateParams } = useSearchParams();
 
     const [sortBy, setSortBy] = useState('votersYouFollowOrRepresentingYouTimeWeight');
@@ -100,9 +100,9 @@ export const Group: FunctionComponent<{}> = ({ }) => {
         <>
             <Header title={group?.name} iconType="group" />
 
-            {!!userHandle && (
+            {!!inviterHandle && (
                 <TopPageInvite
-                    inviterHandle={userHandle}
+                    inviterHandle={inviterHandle}
                     groupHandle={handle}
                     to="group"
                 />

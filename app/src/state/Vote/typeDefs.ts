@@ -175,14 +175,16 @@ export const EDIT_VOTE = gql`
       $choiceText: String,
       $group: String,
       $channel: String,
-      $Vote: JSON!
+      $Vote: JSON!,
+      $inviterHandle: String
     ) {
         editVote(
             questionText: $questionText,
             choiceText: $choiceText,
             group: $group,
             channel: $channel,
-            Vote: $Vote
+            Vote: $Vote,
+            inviterHandle: $inviterHandle
         ) {
             # _id
             questionText

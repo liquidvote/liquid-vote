@@ -9,7 +9,8 @@ AWS.config.update({ region: "eu-west-1" });
 
 export const sendEmail = async ({
     toAddress,
-    subject
+    subject,
+    inviteLink
     // fromWhom,
     // toWhat,
     // inviteId
@@ -29,7 +30,7 @@ export const sendEmail = async ({
         });
     }));
 
-    console.log({ emailHtml });
+    console.log({ emailHtml, inviteLink });
 
 
 

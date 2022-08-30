@@ -11,13 +11,15 @@ export const sendPushNotification = async ({
     token,
     title,
     body,
-    image
+    image,
+    inviteLink
 }) => {
     const message = {
         notification: {
             "title": title,
             "body": body,
-            "image": image
+            "image": image,
+            "click_action": inviteLink || "https://liquid-vote.com/notifications"
         },
         token
     };

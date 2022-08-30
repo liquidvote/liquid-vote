@@ -10,14 +10,15 @@ import './style.sass';
 export const Notification: FunctionComponent<{
     actionUser: any,
     user?: any,
+    inviterUser?: any,
+    liquidUserHandle?: string,
     type:
-    'voted_on_a_poll_you_voted' |
-    'followed_you' |
-    'invited_you_to_vote_on_a_poll' |
-    'voted_on_a_poll' |
-    'invited_you_to_vote_on_group' |
-    'invited_you_to_vote_on_profile',
-
+        'voted_on_a_poll_you_voted' |
+        'followed_you' |
+        'invited_you_to_vote_on_a_poll' |
+        'voted_on_a_poll' |
+        'invited_you_to_vote_on_group' |
+        'invited_you_to_vote_on_profile',
     question: any,
     choiceText: string,
     group: any,
@@ -27,6 +28,8 @@ export const Notification: FunctionComponent<{
 }> = ({
     actionUser,
     user,
+    inviterUser,
+    liquidUserHandle,
     type,
     question,
     choiceText,
@@ -110,6 +113,26 @@ export const Notification: FunctionComponent<{
                                                         >
                                                             <b className="white">{question?.questionText}{choiceText ? `: ${choiceText}` : ''}</b>
                                                         </Link>
+                                                        {inviterUser?.handle === liquidUserHandle ? (
+                                                            <>
+                                                                {' '}
+                                                                <small>
+                                                                    by your invite
+                                                                    {(typeof agreesWithYou !== undefined ?
+                                                                        <>
+                                                                            {', '}
+                                                                            {agreesWithYou ? (
+                                                                                <b className="forDirect white px-1 rounded">Agreeing</b>
+                                                                            ) : (
+                                                                                <b className="againstDirect white px-1 rounded">Disagreeing</b>
+                                                                            )}
+                                                                            {' '}
+                                                                            with you on
+                                                                        </> : null
+                                                                    )}
+                                                                </small>
+                                                            </>
+                                                        ) : null}
                                                     </>
                                                 ) : null}
                                                 {type === 'invited_you_to_vote_on_a_poll' ? (

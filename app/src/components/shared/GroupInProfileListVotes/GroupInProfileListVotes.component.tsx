@@ -10,7 +10,19 @@ import MultiVoteInList from "@shared/MultiVoteInList";
 
 import './style.sass';
 
-export const GroupInProfileListVotes: FunctionComponent<{ userHandle?: string, groupHandle?: string, subsection?: string, subsubsection?: string }> = ({ userHandle, groupHandle, subsection, subsubsection }) => {
+export const GroupInProfileListVotes: FunctionComponent<{
+    userHandle?: string,
+    groupHandle?: string,
+    subsection?: string,
+    subsubsection?: string
+    inviterHandle?: string
+}> = ({
+    userHandle,
+    groupHandle,
+    subsection,
+    subsubsection,
+    inviterHandle
+}) => {
 
     // let { section, subsection, subsubsection, handle, groupHandle } = useParams<any>();
 
@@ -100,6 +112,7 @@ export const GroupInProfileListVotes: FunctionComponent<{ userHandle?: string, g
                                 }}
                                 user={profile}
                                 showGroupAndTime={true}
+                                inviterHandle={inviterHandle}
                             />
                         )
                     }
@@ -112,6 +125,7 @@ export const GroupInProfileListVotes: FunctionComponent<{ userHandle?: string, g
                                 }}
                                 user={profile}
                                 showGroupAndTime={true}
+                                inviterHandle={inviterHandle}
                             />
                         )
                     }

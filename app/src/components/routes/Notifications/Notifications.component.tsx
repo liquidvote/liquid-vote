@@ -17,7 +17,7 @@ export const Notifications: FunctionComponent<{}> = ({ }) => {
 
     let { section, handle } = useParams<any>();
     const { allSearchParams, updateParams } = useSearchParams();
-    // const { liquidUser } = useAuthUser();
+    const { liquidUser } = useAuthUser();
 
     const {
         loading: yourNotifications_loading,
@@ -65,8 +65,10 @@ export const Notifications: FunctionComponent<{}> = ({ }) => {
                     group={n.group}
                     agreesWithYou={n.agreesWithYou}
                     actionUser={n.actionUser}
+                    inviterUser={n.inviterUser}
                     when={n.lastEditOn}
                     seen={n.seen}
+                    liquidUserHandle={liquidUser?.handle}
                 />
             ))}
 

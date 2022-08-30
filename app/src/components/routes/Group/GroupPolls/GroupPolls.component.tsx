@@ -18,10 +18,10 @@ export const GroupPolls: FunctionComponent<{
 }> = ({
     sortBy
 }) => {
-        let { handle, userHandle } = useParams<any>();
+        let { handle, inviterHandle } = useParams<any>();
         const { allSearchParams, updateParams } = useSearchParams();
 
-        const { user: inviter } = useUser({ userHandle });
+        const { user: inviter } = useUser({ userHandle: inviterHandle });
 
         const {
             loading: questions_loading,
@@ -32,8 +32,8 @@ export const GroupPolls: FunctionComponent<{
             variables: {
                 groupHandle: handle,
                 sortBy,
-                ...userHandle && {
-                    inviterHandle: userHandle
+                ...inviterHandle && {
+                    inviterHandle
                 }
             }
         });
@@ -62,6 +62,7 @@ export const GroupPolls: FunctionComponent<{
                                 // i={i}
                                 showGroupAndTime={true}
                                 user={inviter}
+                                inviterHandle={inviterHandle}
                             />
                         )}
                         {q.questionType === 'single' && (
@@ -70,6 +71,7 @@ export const GroupPolls: FunctionComponent<{
                                 l={q}
                                 showGroupAndTime={true}
                                 user={inviter}
+                                inviterHandle={inviterHandle}
                             />
                         )}
                         <hr />

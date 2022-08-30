@@ -16,19 +16,12 @@ import DropAnimation from "@shared/DropAnimation";
 import './style.sass';
 
 type Props = {
-    // ref: any,
-    register: any,
-    name: string,
-    label?: string,
-    value: any,
-    disabled?: boolean,
-    autoFocus?: boolean,
-    setValue: any,
     type: string,
     groupHandle?: string,
     userHandle?: string,
     questionText?: string,
     choiceText?: string,
+    inviteLink?: string
 }
 
 export const InvitesInput: FunctionComponent<Props> = ({
@@ -36,7 +29,8 @@ export const InvitesInput: FunctionComponent<Props> = ({
     groupHandle,
     userHandle,
     questionText,
-    choiceText
+    choiceText,
+    inviteLink
 }) => {
 
     const [sendInviteNotification, {
@@ -108,7 +102,8 @@ export const InvitesInput: FunctionComponent<Props> = ({
                                                                     toUserHandle: n.toUser?.handle,
                                                                     questionText,
                                                                     groupHandle,
-                                                                    userHandle
+                                                                    userHandle,
+                                                                    inviteLink
                                                                 }
                                                             }).then(() => {
                                                                 InvitationsSentAndThatCouldBeSent_refetch();

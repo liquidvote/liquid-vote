@@ -27,6 +27,7 @@ export const Choice: FunctionComponent<{
     maxVoteCount?: number,
     user?: any,
     extraRefetchQueries?: any,
+    inviterHandle?: string
 }> = ({
     choiceText,
     voteName,
@@ -40,7 +41,8 @@ export const Choice: FunctionComponent<{
     showChart = true,
     maxVoteCount,
     user,
-    extraRefetchQueries
+    extraRefetchQueries,
+    inviterHandle
 }) => {
 
         const { allSearchParams, updateParams } = useSearchParams();
@@ -90,6 +92,7 @@ export const Choice: FunctionComponent<{
                         Vote: {
                             position: (vote === yourVote_?.position) ? null : vote
                         },
+                        inviterHandle
                     }
                 });
             } else {

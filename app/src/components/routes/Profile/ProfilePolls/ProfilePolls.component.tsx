@@ -14,6 +14,7 @@ import './style.sass';
 
 export const ProfilePolls: FunctionComponent<{ userHandle: string, user: any }> = ({ userHandle, user }) => {
 
+    let { inviterHandle } = useParams<any>();
     const { liquidUser } = useAuthUser();
 
     const [sortBy, setSortBy] = useState('time');
@@ -61,6 +62,7 @@ export const ProfilePolls: FunctionComponent<{ userHandle: string, user: any }> 
                             v={v}
                             showGroupAndTime={true}
                             user={user}
+                            inviterHandle={inviterHandle}
                         />
                     )}
                     {v.questionType === 'single' && (
@@ -69,6 +71,7 @@ export const ProfilePolls: FunctionComponent<{ userHandle: string, user: any }> 
                             l={v}
                             showGroupAndTime={true}
                             user={user}
+                            inviterHandle={inviterHandle}
                         />
                     )}
 
