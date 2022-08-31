@@ -240,32 +240,22 @@ export default function Question() {
                             <div className='d-flex justify-content-center align-items-center'>
                                 <div
                                     className='d-flex justify-content-center pointer mx-2 button_ small mt-1'
-                                    
+
                                     role="button"
                                     onClick={async () => {
-                                        const inviteLink = `${env.website}/invite/by/${liquidUser?.handle}/to/voteOn/${voteName}/${groupHandle}`;
-                                        try {
-                                            await navigator.share({
-                                                title: `Vote on ${voteName} with ${liquidUser?.name}`,
-                                                text: `${liquidUser?.name} is inviting you to vote on ${voteName} with him`,
-                                                url: inviteLink
-                                            })
-                                        } catch (err) {
-                                            updateParams({
-                                                paramsToAdd: {
-                                                    modal: "InviteFor",
-                                                    modalData: JSON.stringify({
-                                                        InviteType: 'toVote',
-                                                        inviteLink,
-                                                        voteName,
-                                                        buttonText: `Invite from Contacts`,
-                                                        title: `Vote on ${voteName} with ${liquidUser?.name}`,
-                                                        text: `${liquidUser?.name} is inviting you to vote on ${voteName} with him`,
-                                                        groupHandle: question?.groupChannel?.group
-                                                    })
-                                                }
-                                            })
-                                        }
+                                        updateParams({
+                                            paramsToAdd: {
+                                                modal: "InviteFor",
+                                                modalData: JSON.stringify({
+                                                    InviteType: 'toVote',
+                                                    voteName,
+                                                    buttonText: `Invite from Contacts`,
+                                                    title: `Vote on ${voteName} with ${liquidUser?.name}`,
+                                                    text: `${liquidUser?.name} is inviting you to vote on ${voteName} with him`,
+                                                    groupHandle: question?.groupChannel?.group
+                                                })
+                                            }
+                                        })
                                     }}
                                 >
 

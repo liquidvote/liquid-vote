@@ -146,28 +146,16 @@ export const Group: FunctionComponent<{}> = ({ }) => {
                     <div
                         className="button_ small mb-2 ml-2"
                         onClick={async () => {
-                            const inviteLink = `${env.website}/invite/by/${liquidUser?.handle}/to/group/${group.handle}`;
-
-                            try {
-                                await navigator.share({
-                                    title: `Vote on ${group.name} with ${liquidUser?.name}`,
-                                    text: `${liquidUser?.name} is inviting you to vote on ${group.name}`,
-                                    url: inviteLink
-                                })
-
-                            } catch (err) {
-                                updateParams({
-                                    paramsToAdd: {
-                                        modal: "InviteFor",
-                                        modalData: JSON.stringify({
-                                            InviteType: 'toGroup',
-                                            groupHandle: group.handle,
-                                            groupName: group.name,
-                                            inviteLink
-                                        })
-                                    }
-                                })
-                            }
+                            updateParams({
+                                paramsToAdd: {
+                                    modal: "InviteFor",
+                                    modalData: JSON.stringify({
+                                        InviteType: 'toGroup',
+                                        groupHandle: group.handle,
+                                        groupName: group.name
+                                    })
+                                }
+                            })
                         }}
                     >
                         <InviteTinySvg />

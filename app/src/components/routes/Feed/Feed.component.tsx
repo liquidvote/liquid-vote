@@ -16,13 +16,12 @@ import GroupPollListCover from "@shared/GroupPollListCover";
 
 import './style.sass';
 
-
 export const Feed: FunctionComponent<{}> = ({ }) => {
 
     let { section } = useParams<any>();
     const { liquidUser } = useAuthUser();
     const { user: yourUser } = useUser({ userHandle: liquidUser?.handle });
-    const { loginWithPopup, isLoading: auth0_loading } = useAuth0();
+    const { loginWithPopup, isLoading: auth0_loading, isAuthenticated } = useAuth0();
 
     const loadingMessages = [
         'gathering all the votes',
@@ -37,14 +36,10 @@ export const Feed: FunctionComponent<{}> = ({ }) => {
     const [selectedLoadingMessage, setSelectedLoadingMessage] = useState(0);
 
     useEffect(() => {
-        if (selectedLoadingMessage < (loadingMessages.length - 1)) {
-            setTimeout(() => setSelectedLoadingMessage(selectedLoadingMessage + 1), 1000 + selectedLoadingMessage * 400);
+        if (isAuthenticated && selectedLoadingMessage < (loadingMessages.length - 1)) {
+            setTimeout(() => setSelectedLoadingMessage(selectedLoadingMessage + 1), 1500 + selectedLoadingMessage * 300);
         }
-    }, [selectedLoadingMessage]);
-
-    // const setNextLoadingMessage = () => setSelectedLoadingMessage(selectedLoadingMessage + 1);
-
-    // console.log({ yourUser });
+    }, [selectedLoadingMessage, isAuthenticated]);
 
     const {
         loading: questions_loading,
@@ -130,10 +125,9 @@ export const Feed: FunctionComponent<{}> = ({ }) => {
                     </>
                 ))}
 
-                {(!liquidUser && !auth0_loading) && (
+                {(!liquidUser && !isAuthenticated) && (
                     <div className="d-flex align-items-center justify-content-center min-vh-100 flex-column">
                         <div className="p-4 text-center">
-
                             <h3>Liquid Vote is more fun with friends.</h3>
 
                             <p>Login to see what they are voting on.</p>
@@ -157,7 +151,7 @@ export const Feed: FunctionComponent<{}> = ({ }) => {
                     </div>
                 )}
 
-                {(liquidUser && !!questions_data?.Questions && !yourUser?.stats?.following && !auth0_loading) && (
+                {(liquidUser && !!questions_data?.Questions && !yourUser?.stats?.following) && (
                     <div className="d-flex align-items-center justify-content-center min-vh-100 flex-column">
                         <div className="p-4 text-center">
                             <h3>Liquid Vote is more fun with friends.</h3>
@@ -167,7 +161,7 @@ export const Feed: FunctionComponent<{}> = ({ }) => {
                     </div>
                 )}
 
-                {(questions_data?.Questions?.length === 0 && !questions_loading && !auth0_loading) && (
+                {(questions_data?.Questions?.length === 0 && !questions_loading && liquidUser) && (
                     <div className="d-flex align-items-center justify-content-center min-vh-100 flex-column">
                         <div className="p-4 text-center">
                             The people you follow haven't voted yet, at least not in any public groups, or groups you have joined yet
@@ -175,7 +169,7 @@ export const Feed: FunctionComponent<{}> = ({ }) => {
                     </div>
                 )}
 
-                {(questions_loading || auth0_loading) && (
+                {(questions_loading || (isAuthenticated && !liquidUser)) && (
                     <div className="d-flex align-items-center justify-content-center min-vh-100 flex-column">
                         <DropAnimation />
                         <p className='mt-4 text-center px-5'>{loadingMessages[selectedLoadingMessage]}</p>

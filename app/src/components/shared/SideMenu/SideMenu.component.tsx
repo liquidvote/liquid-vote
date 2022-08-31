@@ -24,7 +24,7 @@ export const SideMenu: FunctionComponent<{}> = ({ }) => {
     const location = useLocation();
     const { allSearchParams, updateParams } = useSearchParams();
 
-    const { user, isAuthenticated, isLoading, loginWithRedirect, logout, loginWithPopup } = useAuth0();
+    const { user, isAuthenticated, isLoading: auth0_loading, loginWithRedirect, logout, loginWithPopup } = useAuth0();
 
     const { liquidUser, liquidUser_refetch, unseenNotificationCount } = useAuthUser();
 
@@ -115,11 +115,6 @@ export const SideMenu: FunctionComponent<{}> = ({ }) => {
                             startVisible={true}
                             rightOnSmall={true}
                             button={<div>
-                                {/* <img
-                                    className="vote-avatar"
-                                    src={liquidUser?.avatar || 'http://images.liquid-vote.com/system/loading.gif'}
-                                    alt={liquidUser?.name || 'loading'}
-                                /> */}
                                 <ThreeDotsSVG />
                             </div>}
                             popperContent={

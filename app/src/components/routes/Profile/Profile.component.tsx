@@ -95,28 +95,16 @@ export const Profile: FunctionComponent<{}> = ({ }) => {
                     <div
                         className="button_ small mb-2 mr-2"
                         onClick={async () => {
-                            const inviteLink = `${env.website}/invite/by/${liquidUser?.handle}/toCompareWith/${profile.handle}`;
-
-                            try {
-                                await navigator.share({
-                                    title: `Compare with with ${profile.name}`,
-                                    text: `${liquidUser?.name} is inviting you to compare ${liquidUser?.handle === profile.handle ? 'with him' : `with ${profile.name}`}`,
-                                    url: inviteLink
-                                })
-
-                            } catch (err) {
-                                updateParams({
-                                    paramsToAdd: {
-                                        modal: "InviteFor",
-                                        modalData: JSON.stringify({
-                                            InviteType: 'toCompare',
-                                            userHandle: profile.handle,
-                                            userName: profile.name,
-                                            inviteLink
-                                        })
-                                    }
-                                })
-                            }
+                            updateParams({
+                                paramsToAdd: {
+                                    modal: "InviteFor",
+                                    modalData: JSON.stringify({
+                                        InviteType: 'toCompare',
+                                        userHandle: profile.handle,
+                                        userName: profile.name
+                                    })
+                                }
+                            })
                         }}
                     >
                         <InviteTinySvg />

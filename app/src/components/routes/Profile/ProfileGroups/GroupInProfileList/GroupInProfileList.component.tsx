@@ -246,27 +246,16 @@ export const GroupInProfileList: FunctionComponent<{
                                                         <div
                                                             className="button_ small ml-2"
                                                             onClick={async () => {
-                                                                const inviteLink = `${env.website}/invite/by/${liquidUser?.handle}/to/causeOnProfile/${group.handle}`;
-
-                                                                try {
-                                                                    await navigator.share({
-                                                                        title: `Vote on ${group.name} with ${liquidUser?.name}`,
-                                                                        text: `${liquidUser?.name} is inviting you to vote on ${group.name} with him`,
-                                                                        url: inviteLink
-                                                                    })
-                                                                } catch (err) {
-                                                                    updateParams({
-                                                                        paramsToAdd: {
-                                                                            modal: "InviteFor",
-                                                                            modalData: JSON.stringify({
-                                                                                InviteType: 'toGroup',
-                                                                                groupHandle: group.handle,
-                                                                                groupName: group.name,
-                                                                                inviteLink
-                                                                            })
-                                                                        }
-                                                                    })
-                                                                }
+                                                                updateParams({
+                                                                    paramsToAdd: {
+                                                                        modal: "InviteFor",
+                                                                        modalData: JSON.stringify({
+                                                                            InviteType: 'toGroup',
+                                                                            groupHandle: group.handle,
+                                                                            groupName: group.name
+                                                                        })
+                                                                    }
+                                                                })
                                                             }}
                                                         >
                                                             Invite
