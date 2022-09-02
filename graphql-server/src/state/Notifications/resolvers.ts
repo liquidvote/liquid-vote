@@ -437,10 +437,10 @@ export const saveAndSendNotification = async ({
         messageText
     });
 
-
     // if user allows Email
     const emailStatus = (
-        ToUser.NotificationSettings.allowEmails ||
+        ToUser.NotificationSettings?.allowEmails ||
+        typeof ToUser.NotificationSettings === undefined ||
         typeof ToUser.NotificationSettings?.allowEmails === undefined
     ) ?
         sendEmail({

@@ -33,22 +33,13 @@ export const InvitesInput: FunctionComponent<Props> = ({
     inviteLink
 }) => {
 
+    const [invitesHandlesLoading, setInvitesHandlesLoading] = useState<string[]>([]);
+
     const [sendInviteNotification, {
         loading: sendInviteNotification_loading,
         error: sendInviteNotification_error,
         data: sendInviteNotification_data,
     }] = useMutation(SEND_INVITE_NOTIFICATION);
-
-    const [isFocused, setIsFocused] = useState(false);
-    const [userSearch, setUserSearch] = useState('');
-
-    console.log({
-        type,
-        groupHandle,
-        userHandle,
-        questionText,
-        choiceText
-    });
 
     const {
         loading: InvitationsSentAndThatCouldBeSent_loading,
@@ -65,19 +56,10 @@ export const InvitesInput: FunctionComponent<Props> = ({
         }
     });
 
-    console.log({ InvitationsSentAndThatCouldBeSent_data });
-
     return (
         <>
 
-            <div className={
-                `
-                    InputWrapper
-                    ${userSearch.length > 0 && 'hasValue'}
-                    ${isFocused && 'isFocused'}
-                    position-relative
-                `
-            }>
+            <div className={`InputWrapper position-relative`}>
                 {!!InvitationsSentAndThatCouldBeSent_data && (
                     <ul className="invitesInputList invites-search-results w-100 bg mt-2">
 
@@ -89,28 +71,42 @@ export const InvitesInput: FunctionComponent<Props> = ({
                                             person={n.toUser}
                                             alternativeButton={
                                                 <>
-                                                    {n.inviteSent ? (
-                                                        <small
-                                                            className="badge inverted"
-                                                        >sent ✅</small>
-                                                    ) : (
-                                                        <small
-                                                            className="button_ inverted small"
-                                                            onClick={() => sendInviteNotification({
-                                                                variables: {
-                                                                    type,
-                                                                    toUserHandle: n.toUser?.handle,
-                                                                    questionText,
-                                                                    groupHandle,
-                                                                    userHandle,
-                                                                    inviteLink
-                                                                }
-                                                            }).then(() => {
-                                                                InvitationsSentAndThatCouldBeSent_refetch();
-                                                            })
-                                                            }
-                                                        >send invite</small>
-                                                    )}
+                                                    {invitesHandlesLoading.includes(n.toUser?.handle) ?
+                                                        <img
+                                                            className={`vote-avatar`}
+                                                            src={'http://images.liquid-vote.com/system/loading.gif'}
+                                                        />
+                                                        : n.inviteSent ? (
+                                                            <small
+                                                                className="badge inverted"
+                                                            >sent ✅</small>
+                                                        ) : (
+                                                            <small
+                                                                className="button_ inverted small"
+                                                                onClick={() => {
+                                                                    setInvitesHandlesLoading([
+                                                                        ...invitesHandlesLoading,
+                                                                        n.toUser?.handle
+                                                                    ]);
+                                                                    sendInviteNotification({
+                                                                        variables: {
+                                                                            type,
+                                                                            toUserHandle: n.toUser?.handle,
+                                                                            questionText,
+                                                                            groupHandle,
+                                                                            userHandle,
+                                                                            inviteLink
+                                                                        }
+                                                                    }).then(() => {
+                                                                        InvitationsSentAndThatCouldBeSent_refetch().then(() => {
+                                                                            setInvitesHandlesLoading(
+                                                                                invitesHandlesLoading.filter(h => h !== n.toUser?.handle)
+                                                                            )
+                                                                        })
+                                                                    })
+                                                                }}
+                                                            >send invite</small>
+                                                        )}
                                                 </>
                                             }
                                             hideBottomBorder={true}

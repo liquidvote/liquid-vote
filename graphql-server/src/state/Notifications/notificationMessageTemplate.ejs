@@ -6,16 +6,14 @@
             <b className="againstDirect white px-1 rounded">Disagreed</b>
         <%}%>
         with you on
-        <a target="_blank" href="www.liquid-vote.com/<% if (question.questionType === 'single') { %>poll<% } else { %>multipoll<%}%>/<%=question.questionText%>/<%=group.handle%>">
+        <a class="white" target="_blank" href="www.liquid-vote.com/<% if (question.questionType === 'single') { %>poll<% } else { %>multipoll<%}%>/<%=question.questionText%>/<%=group.handle%>">
             <b className="white"><%=question.questionText%><% if(choiceText) { %>: <%=choiceText%> <% } %></b>
         </a>
     <%} else if (type === 'followed_you') {%>
         Followed you
     <%} else if (type === 'voted_on_a_poll') {%>
-    
-
         Voted on
-        <a target="_blank" href="www.liquid-vote.com/<% if (question.questionType === 'single') { %>poll<% } else { %>multipoll<%}%>/<%=question.questionText%>/<%=group.handle%>">
+        <a class="white" target="_blank" href="www.liquid-vote.com/<% if (question.questionType === 'single') { %>poll<% } else { %>multipoll<%}%>/<%=question.questionText%>/<%=group.handle%>">
             <b className="white"><%=question.questionText%><% if(choiceText) { %>: <%=choiceText%> <% } %></b>
         </a>
         <% if (inviterUser.LiquidUser.handle === toUser.LiquidUser.handle) { %>
@@ -34,13 +32,13 @@
 
     <%} else if (type === 'invited_you_to_vote_on_a_poll') {%>
         Invited you to vote on
-        <a href="<%=inviteLink%>">
+        <a class="white" href="<%=inviteLink%>">
             <b className="white"><%=question.questionText%></b>
         </a>
 
     <%} else if (type === 'invited_you_to_vote_on_profile') {%>
         Invited you to vote with
-        <a href="<%=inviteLink%>">
+        <a class="white" href="<%=inviteLink%>">
             <% if (user.LiquidUser.handle !== actionUser.LiquidUser.handle) { %>
                 <b className="white"><%=user.LiquidUser.name%></b>
             <% } else { %>
@@ -50,7 +48,7 @@
 
     <%} else if (type === 'invited_you_to_vote_on_group') {%>
         Invited you to vote on
-        <a href="<%=inviteLink%>">
+        <a class="white" href="<%=inviteLink%>">
             <b className="white"><%=group.name%></b>
         </a>
     <% } %>

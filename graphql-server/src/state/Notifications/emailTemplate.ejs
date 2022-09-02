@@ -147,8 +147,8 @@
       }
 
       a {
-        color: #3498db;
-        text-decoration: underline;
+        color: white;
+        text-decoration: none;
       }
 
       /* -------------------------------------
@@ -408,7 +408,7 @@
       }
 
       .white {
-        color: white;
+        color: white !important;
       }
 
       .bg-primary_ {
@@ -483,7 +483,9 @@
                         <div
                           class="d-flex relative align-items-center notification not-seen"
                         >
-                          <a target="_blank" href="www.liquid-vote.com/profile/<%=actionUser.LiquidUser.handle%>"
+                          <a
+                            target="_blank"
+                            href="www.liquid-vote.com/profile/<%=actionUser.LiquidUser.handle%>"
                             ><div class="position-relative">
                               <div
                                 class="small-avatar bg-primary_"
@@ -502,7 +504,9 @@
                                 <div
                                   class="d-flex align-items-center justify-content-between"
                                 >
-                                  <a class="d-block" href="www.liquid-vote.com/profile/<%=actionUser.LiquidUser.handle%>"
+                                  <a
+                                    class="d-block"
+                                    href="www.liquid-vote.com/profile/<%=actionUser.LiquidUser.handle%>"
                                     ><b class="mr-1 color-primary"
                                       ><%=actionUser.LiquidUser.name%></b
                                     ></a
@@ -517,7 +521,8 @@
                                     class="d-flex align-items-center justify-content-between w-100"
                                   >
                                     <div class="d-flex align-items-center">
-                                      <%- include('notificationMessageTemplate', {}) %>
+                                      <%- include('notificationMessageTemplate',
+                                      {}) %>
                                     </div>
                                   </div>
                                 </div>
@@ -548,7 +553,9 @@
                     <span class="apple-link">Liquid Vote</span>
                     <br />
                     Don't like these emails?
-                    <a class="white" href="www.liquid-vote.com?/notifications?modal=NotificationSettings"
+                    <a
+                      class="white"
+                      href="www.liquid-vote.com?/notifications?modal=NotificationSettings"
                       >Unsubscribe</a
                     >.
                   </td>
