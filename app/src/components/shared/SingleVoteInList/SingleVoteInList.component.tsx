@@ -82,14 +82,14 @@ export const SingleVoteInList: FunctionComponent<{
                     <div className="">
                         {(!!l.questionText && !hideTitle) && (
                             <div className="d-flex align-items-center flex-wrap">
-                                <a
+                                <Link
                                     className="white mr-2"
-                                    href={`/poll/${encodeURIComponent(l.questionText)}/${l.groupChannel?.group}`}
+                                    to={`/poll/${encodeURIComponent(l.questionText)}/${l.groupChannel?.group}`}
                                 >
                                     <div className={`${showGroupAndTime && 'limit-right'}`} title={l.questionText}>
                                         {l.questionText}
                                     </div>
-                                </a>
+                                </Link>
                                 {/* {l.userVote && (
                                     <VotedExplanation
                                         position={l.userVote.position}

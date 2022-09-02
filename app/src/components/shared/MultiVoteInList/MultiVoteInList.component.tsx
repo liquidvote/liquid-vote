@@ -1,7 +1,8 @@
 import React, { FunctionComponent, useState } from 'react';
 import ReactTooltip from 'react-tooltip';
-import { timeAgo } from '@state/TimeAgo';
+import { Link } from "react-router-dom";
 
+import { timeAgo } from '@state/TimeAgo';
 import './style.sass';
 import Choice from "@shared/Choice";
 import ThreeDotsSmallSVG from '@shared/Icons/ThreeDots-small-horizontal.svg';
@@ -103,15 +104,15 @@ export const MultiVoteInList: FunctionComponent<{
                 )} */}
 
                 <div className="d-flex align-items-center flex-wrap">
-                    <a
+                    <Link
                         className="white"
-                        href={`/multipoll/${encodeURIComponent(v.questionText)}/${v.groupChannel?.group}`}
+                        to={`/multipoll/${encodeURIComponent(v.questionText)}/${v.groupChannel?.group}`}
                     >
                         <div
                             className={`question-title-in-list ${showGroupAndTime && 'limit-right'}`}
                             title={v.questionText}
                         >{v.questionText}?</div>
-                    </a>
+                    </Link>
 
                     {/* {!!showGroupAndTime && (
                         <Link to={`/group/${v.groupChannel.group}`}
