@@ -19,7 +19,17 @@ export const sendPushNotification = async ({
             "title": title,
             "body": body,
             "image": image,
-            "click_action": inviteLink || "https://liquid-vote.com/notifications"
+
+        },
+        android: {
+            notification: {
+                clickAction: (inviteLink || "https://liquid-vote.com/notifications").replace("https://liquid-vote.com", "")
+            }
+        },
+        webpush: {
+            fcmOptions: {
+                link: (inviteLink || "https://liquid-vote.com/notifications").replace("https://liquid-vote.com", "")
+            }
         },
         token
     };

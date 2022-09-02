@@ -80,65 +80,11 @@ export const Notifications: FunctionComponent<{}> = ({ }) => {
                 </div>
             )}
 
-            {(yourNotifications_loading) && (
+            {(!yourNotifications_data || yourNotifications_loading) && (
                 <div className="d-flex align-items-center justify-content-center min-vh-100 flex-column">
                     <DropAnimation />
                 </div>
             )}
-
-            {/* <Notification
-                user={liquidUser}
-                type="voted_on_a_poll_you_voted"
-            />
-            <Notification
-                user={liquidUser}
-                type="followed_you"
-            />
-            <Notification
-                user={liquidUser}
-                type="invited_you_to_vote_on_a_poll"
-            />
-            <Notification
-                user={liquidUser}
-                type="voted_on_a_poll_you_created"
-            />
-            <Notification
-                user={liquidUser}
-                type="invited_you_to_join_group"
-            /> */}
-
-            {/* {[...Array(10).keys()].map((k) => (
-                <>
-                    <Notification
-                        key={k}
-                        user={liquidUser}
-                    />
-                </>
-            ))} */}
-            {/* <div className='d-flex justify-content-center'>
-                <button className='button_' onClick={getToken_}>allow notifications</button>
-            </div> */}
-
-            {/* <ul className="nav d-flex flex-nowrap justify-content-around align-items-center mt-1 mx-n3">
-                <li className="nav-item">
-                    <Link className={`nav-link ${!section && 'active'}`} to={`/notifications`}>
-                        Yours
-                    </Link>
-                </li>
-                <li className="nav-item">
-                    <Link className={`nav-link ${section === 'representatives' && 'active'}`} to={`/notifications/representatives`}>
-                        Representatives
-                    </Link>
-                </li>
-            </ul> */}
-
-
-
-
-            {/* <br />
-            <pre>{JSON.stringify(yourNotifications_data?.YourNotifications, null, 2)}</pre> */}
-
-
         </>
     );
 }

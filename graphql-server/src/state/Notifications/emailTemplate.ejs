@@ -3,7 +3,7 @@
   <head>
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-    <title>Simple Transactional Email</title>
+    <!-- <title>Simple Transactional Email</title> -->
     <style>
       /* -------------------------------------
           GLOBAL RESETS
@@ -443,13 +443,19 @@
       .d-inline-block {
         display: inline-block !important;
       }
+
+      .forDirect {
+        fill: #079270;
+        background: #079270;
+        color: #079270;
+      }
+
+      .rounded {
+        border-radius: 0.25rem !important;
+      }
     </style>
   </head>
   <body>
-    <span class="preheader"
-      >This is preheader text. Some clients will show this text as a
-      preview.</span
-    >
     <table
       role="presentation"
       border="0"
@@ -477,43 +483,17 @@
                         <div
                           class="d-flex relative align-items-center notification not-seen"
                         >
-                          <a href="/profile/yuriwentink"
+                          <a target="_blank" href="www.liquid-vote.com/profile/<%=actionUser.LiquidUser.handle%>"
                             ><div class="position-relative">
                               <div
                                 class="small-avatar bg-primary_"
                                 style="
-                                  background: url('https://lh3.googleusercontent.com/a-/AOh14GjNe4m_NKzMcc3k_gKu6XEGlowrdGnjK0Nq4dvT6w=s96-c')
+                                  background: url('<%=actionUser.LiquidUser.avatar%>')
                                     50% 50% / cover no-repeat;
                                 "
                               ></div>
-                              <div class="circles small inner">
-                                <svg viewBox="0 0 150 150">
-                                  <path
-                                    class="agreement for-stroke"
-                                    d="M 75 75 m -45, 0 a 45,45 0 1,0 90,0 a 45,45 0 1,0 -90,0"
-                                    fill="none"
-                                    style="
-                                      stroke-dashoffset: 117.301;
-                                      transform: rotate(147.974deg);
-                                    "
-                                  >
-                                    <title>4 Votes in Disagreement</title>
-                                  </path>
-                                  <path
-                                    class="disagreement against-stroke"
-                                    d="M 75 75 m -45, 0 a 45,45 0 1,0 90,0 a 45,45 0 1,0 -90,0"
-                                    fill="none"
-                                    style="
-                                      stroke-dashoffset: 328.183;
-                                      transform: rotate(194.504deg);
-                                    "
-                                  >
-                                    <title>4 Votes in Disagreement</title>
-                                  </path>
-                                </svg>
-                              </div>
-                            </div></a
-                          >
+                            </div>
+                          </a>
                           <div class="flex-fill">
                             <div
                               class="mb-n1 flex-fill d-flex align-items-center justify-content-between"
@@ -522,13 +502,14 @@
                                 <div
                                   class="d-flex align-items-center justify-content-between"
                                 >
-                                  <a class="d-block" href="/profile/yuriwentink"
+                                  <a class="d-block" href="www.liquid-vote.com/profile/<%=actionUser.LiquidUser.handle%>"
                                     ><b class="mr-1 color-primary"
-                                      >yuriwentink</b
+                                      ><%=actionUser.LiquidUser.name%></b
                                     ></a
                                   >
                                   <div class="d-flex ml-1"></div>
                                 </div>
+
                                 <div
                                   class="d-flex align-items-center mt-0 mb-0 w-100"
                                 >
@@ -536,71 +517,14 @@
                                     class="d-flex align-items-center justify-content-between w-100"
                                   >
                                     <div class="d-flex align-items-center">
-                                      <small
-                                        class="d-inline-block mr-1 color-primary"
-                                        >Voted on
-                                        <a
-                                          href="/poll/Marijuana could be fully legal/should-it-be-legal"
-                                          ><b class="white"
-                                            >Marijuana could be fully legal</b
-                                          ></a
-                                        ></small
-                                      >
+                                      <%- include('notificationMessageTemplate', {}) %>
                                     </div>
-                                    <small class="faded color-primary"
-                                      >5 minutes ago</small
-                                    >
                                   </div>
                                 </div>
                               </div>
                             </div>
                           </div>
                         </div>
-
-                        <!-- <p>Hi there,</p>
-                        <p>
-                          Sometimes you just want to send a simple HTML email
-                          with a simple design and clear call to action. This is
-                          it.
-                        </p>
-                        <table
-                          role="presentation"
-                          border="0"
-                          cellpadding="0"
-                          cellspacing="0"
-                          class="btn btn-primary"
-                        >
-                          <tbody>
-                            <tr>
-                              <td align="left">
-                                <table
-                                  role="presentation"
-                                  border="0"
-                                  cellpadding="0"
-                                  cellspacing="0"
-                                >
-                                  <tbody>
-                                    <tr>
-                                      <td>
-                                        <a
-                                          href="http://htmlemail.io"
-                                          target="_blank"
-                                          >Call To Action</a
-                                        >
-                                      </td>
-                                    </tr>
-                                  </tbody>
-                                </table>
-                              </td>
-                            </tr>
-                          </tbody>
-                        </table>
-                        <p>
-                          This is a really simple email template. Its sole
-                          purpose is to get the recipient to click the button
-                          with no distractions.
-                        </p>
-                        <p>Good luck! Hope it works.</p> -->
                       </td>
                     </tr>
                   </table>
@@ -624,7 +548,7 @@
                     <span class="apple-link">Liquid Vote</span>
                     <br />
                     Don't like these emails?
-                    <a class="white" href="http://i.imgur.com/CScmqnj.gif"
+                    <a class="white" href="www.liquid-vote.com?/notifications?modal=NotificationSettings"
                       >Unsubscribe</a
                     >.
                   </td>

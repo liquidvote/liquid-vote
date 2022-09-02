@@ -35,8 +35,8 @@
   "devDependencies": {
     "apollo-server": "^2",
     "nodemon": "^2.0.14",
-    "serverless": "^3.20.0",
-    "serverless-domain-manager": "^6.0.3",
+    "serverless": "^3.22.0",
+    "serverless-domain-manager": "^6.1.0",
     "serverless-offline": "^8.8.1",
     "serverless-plugin-typescript": "^2.1.2",
     "ts-node": "^10.8.1",

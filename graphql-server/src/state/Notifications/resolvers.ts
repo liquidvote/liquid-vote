@@ -374,21 +374,6 @@ export const saveAndSendNotification = async ({
 
     const User = userHandle && await mongoDB.collection("Users").findOne({ 'LiquidUser.handle': userHandle });
 
-    console.log({
-        type,
-        toUser,
-        toUserHandle,
-        actionUser,
-        actionUserHandle,
-        question,
-        questionText,
-        choiceText,
-        group,
-        groupHandle,
-        agreesWithYou,
-        User
-    });
-
     const savedNotification = (await mongoDB.collection("Notifications").findOneAndUpdate(
         {
             type,
@@ -421,23 +406,65 @@ export const saveAndSendNotification = async ({
         }
     ))?.value;
 
+    const messageText = ({
+        "voted_on_a_poll_you_voted": `${agreesWithYou ? 'Agreed' : 'Disagreed'} with you on ${Question?.questionText}${choiceText ? `: ${choiceText}` : ''}`,
+        "followed_you": `Followed you`,
+        "voted_on_a_poll": `Voted on ${Question?.questionText}${choiceText ? `: ${choiceText}` : ''} ${inviterUser?._id.toString() === AuthUser?._id.toString() ? ` by your invite${(typeof agreesWithYou !== undefined ? `, ${agreesWithYou ? `Agreeing` : `Disagreeing`} with you ` : null)}` : null}`,
+        "invited_you_to_vote_on_a_poll": `Invited you to vote on ${Question?.questionText}`,
+        "invited_you_to_vote_on_profile": `Invited you to vote with ${User?._id.toString() !== actionUser?._id.toString() ? (User?.LiquidUser?.name) : 'him'}`,
+        "invited_you_to_vote_on_group": `Invited you to vote on  ${group?.name}`,
+    }[type]);
+
+    const notificationLink = inviteLink ||
+        type === 'voted_on_a_poll_you_voted' ? `` :
+        type === 'followed_you' ? `` :
+            type === 'voted_on_a_poll' ? `` : null
+
+
+    console.log({
+        type,
+        toUser,
+        toUserHandle,
+        actionUser,
+        actionUserHandle,
+        question,
+        questionText,
+        choiceText,
+        group,
+        groupHandle,
+        agreesWithYou,
+        User,
+        messageText
+    });
+
+
     // if user allows Email
-    const emailStatus = false && (
+    const emailStatus = (
         ToUser.NotificationSettings.allowEmails ||
         typeof ToUser.NotificationSettings?.allowEmails === undefined
     ) ?
         sendEmail({
             toAddress: ToUser.LiquidUser.email,
-            subject: `${ActionUser?.LiquidUser?.name} - ${type}`,
-            inviteLink
+            subject: `${ActionUser?.LiquidUser?.name} ${messageText}`,
+            data: {
+                inviteLink,
+                type,
+                agreesWithYou,
+                question: Question,
+                group: Group,
+                choiceText,
+                actionUser,
+                toUser: ToUser,
+                user: User
+            }
         }) :
         null;
 
     const pushNotificationStatus = (!!ToUser?.NotificationSettings?.firebase_token) ?
         sendPushNotification({
             token: ToUser?.NotificationSettings?.firebase_token,
-            title: `${ActionUser?.LiquidUser?.name} - ${type}`,
-            body: `${ActionUser?.LiquidUser?.name} - ${type}`,
+            title: `${ActionUser?.LiquidUser?.name} on Liquid Vote`,
+            body: `${ActionUser?.LiquidUser?.name} ${messageText}`,
             image: `${ActionUser?.LiquidUser?.avatar}`,
             inviteLink
         }) :

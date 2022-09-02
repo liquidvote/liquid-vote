@@ -81,6 +81,10 @@ export const Notification: FunctionComponent<{
                                 <div className="d-flex align-items-center mt-0 mb-0 w-100">
                                     <div className='d-flex align-items-center justify-content-between w-100'>
                                         <div className="d-flex align-items-center">
+
+
+
+                                            {/* TODO: Move to server  */}
                                             <small className="d-inline-block mr-1">
                                                 {type === 'voted_on_a_poll_you_voted' ? (
                                                     <>
@@ -127,7 +131,7 @@ export const Notification: FunctionComponent<{
                                                                                 <b className="againstDirect white px-1 rounded">Disagreeing</b>
                                                                             )}
                                                                             {' '}
-                                                                            with you on
+                                                                            with you
                                                                         </> : null
                                                                     )}
                                                                 </small>
@@ -165,6 +169,11 @@ export const Notification: FunctionComponent<{
                                                     </>
                                                 ) : null}
                                             </small>
+                                            {/*  */}
+
+
+
+
                                         </div>
 
                                         <small className='faded'>

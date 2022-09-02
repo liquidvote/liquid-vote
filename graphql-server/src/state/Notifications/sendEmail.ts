@@ -10,7 +10,17 @@ AWS.config.update({ region: "eu-west-1" });
 export const sendEmail = async ({
     toAddress,
     subject,
-    inviteLink
+    data: {
+        inviteLink,
+        type,
+        agreesWithYou,
+        question,
+        group,
+        choiceText,
+        actionUser,
+        toUser,
+        user
+    }
     // fromWhom,
     // toWhat,
     // inviteId
@@ -22,7 +32,17 @@ export const sendEmail = async ({
 
 
     const emailHtml = await (new Promise(resolve => {
-        ejs.renderFile(__dirname + "/emailTemplate.ejs", {}, (err, result) => {
+        ejs.renderFile(__dirname + "/emailTemplate.ejs", {
+            type,
+            agreesWithYou,
+            question,
+            group,
+            choiceText,
+            actionUser,
+            toUser,
+            user,
+            inviteLink
+        }, (err, result) => {
             if (err) {
                 console.log(err);
             }
@@ -30,7 +50,7 @@ export const sendEmail = async ({
         });
     }));
 
-    console.log({ emailHtml, inviteLink });
+    // console.log({ emailHtml, inviteLink });
 
 
 
@@ -52,7 +72,7 @@ export const sendEmail = async ({
                     },
                     Text: {
                         Charset: "UTF-8",
-                        Data: "🧪",
+                        Data: subject,
                     },
                 },
             },
