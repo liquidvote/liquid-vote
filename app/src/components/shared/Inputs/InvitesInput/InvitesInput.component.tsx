@@ -123,6 +123,10 @@ export const InvitesInput: FunctionComponent<Props> = ({
                         <DropAnimation />
                     </div>
                 )}
+
+                {InvitationsSentAndThatCouldBeSent_data?.InvitationsSentAndThatCouldBeSent?.length === 0 ? (
+                    <div className='ml-2'>Once you have some...</div>
+                ) : null}
             </div>
 
         </>
