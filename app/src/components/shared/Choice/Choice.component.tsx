@@ -372,7 +372,7 @@ export const Choice: FunctionComponent<{
                                 </div>
                             ) : (
                                 <div
-                                    className="d-flex pointer flex-wrap mt-2 w-100"
+                                    className="d-flex pointer flex-wrap mt-2 w-100 w-100-plus20"
                                 >
                                     {(
                                         !!user ? [] : forDisplayed
@@ -554,7 +554,7 @@ export const Choice: FunctionComponent<{
                                     }
                                 </div>
                             ) : <div
-                                className="d-flex mr-n2 pointer w-100 flex-wrap mt-2 justify-content-end"
+                                className="d-flex mr-n2 pointer w-100 w-100-plus20 flex-wrap mt-2 justify-content-end"
                             >
                                 {
                                     (
