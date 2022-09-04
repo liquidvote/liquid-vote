@@ -30,10 +30,6 @@ export const SideMenu: FunctionComponent<{}> = ({ }) => {
 
     const { message } = useFirebaseNotifications();
 
-    console.log({
-        message
-    });
-
     useEffect(() => {
         if (!!isAuthenticated) {
 
@@ -76,23 +72,6 @@ export const SideMenu: FunctionComponent<{}> = ({ }) => {
                 <GroupSvg />
             </Link>
 
-            {/* {liquidUser?.admin === 'total' && (
-                <>
-                    <Link to="/admin" data-tip="Admin">
-                        <AdminSvg />
-                    </Link>
-                </>
-            )} */}
-
-            {/* <Link to="/tags" data-tip="Tags">
-                <HashTagSvg />
-            </Link> */}
-            {/* <Link to="/feed">
-                <BookmarkSvg />
-            </Link>
-            <Link to="/feed">
-                <AnalyticsSvg />
-            </Link> */}
             <div className="hide-on-smaller-sideMenu">
                 <br />
                 <br />
