@@ -49,6 +49,10 @@ export const Profile: FunctionComponent<{}> = ({ }) => {
         data: editUserFollowingRelation_data,
     }] = useMutation(EDIT_USER_FOLLOWING_RELATION);
 
+    const isFollowing = editUserFollowingRelation_data ?
+        editUserFollowingRelation_data?.editUserFollowingRelation?.isFollowing :
+        profile?.isYouFollowing;
+
     useEffect(() => {
         if (allSearchParams.refetch === 'user') {
             user_refetch();
@@ -125,37 +129,44 @@ export const Profile: FunctionComponent<{}> = ({ }) => {
                         </>
                     ) : (
                         <>
-                            <div
-                                // onClick={() => setIsRepresenting(!isRepresenting)}
-                                onClick={() => !!liquidUser ? editUserFollowingRelation({
-                                    variables: {
-                                        FollowedHandle: profile?.handle,
-                                        FollowingHandle: liquidUser?.handle,
-                                        IsFollowing: !profile.isYouFollowing
-                                    }
-                                })
-                                    .then((r) => {
-                                        console.log({ r });
-                                        user_refetch();
-                                    }) : (
-                                    updateParams({
-                                        paramsToAdd: {
-                                            modal: "RegisterBefore",
-                                            modalData: JSON.stringify({
-                                                toWhat: 'followUser',
-                                                userName: profile.name
-                                            })
+                            {(editUserFollowingRelation_loading || user_loading) ? (
+                                <img
+                                    className="vote-avatar"
+                                    src={'http://images.liquid-vote.com/system/loading.gif'}
+                                />
+                            ) : (
+                                <div
+                                    // onClick={() => setIsRepresenting(!isRepresenting)}
+                                    onClick={() => !!liquidUser ? editUserFollowingRelation({
+                                        variables: {
+                                            FollowedHandle: profile?.handle,
+                                            FollowingHandle: liquidUser?.handle,
+                                            IsFollowing: !isFollowing
                                         }
                                     })
-                                )}
-                                className={`button_ small mr-2 ${profile.isYouFollowing ? "selected" : ""}`}
-                            >
-                                {
-                                    profile.isYouFollowing ?
-                                        "Following" :
-                                        "Follow"
-                                }
-                            </div>
+                                        .then((r) => {
+                                            console.log({ r });
+                                            user_refetch();
+                                        }) : (
+                                        updateParams({
+                                            paramsToAdd: {
+                                                modal: "RegisterBefore",
+                                                modalData: JSON.stringify({
+                                                    toWhat: 'followUser',
+                                                    userName: profile.name
+                                                })
+                                            }
+                                        })
+                                    )}
+                                    className={`button_ small mr-2 ${isFollowing ? "selected" : ""}`}
+                                >
+                                    {
+                                        isFollowing ?
+                                            "Following" :
+                                            "Follow"
+                                    }
+                                </div>
+                            )}
                             {profile.isRepresentingYou ? (
                                 <div
                                     // onClick={() => setIsRepresenting(!isRepresenting)}
@@ -194,7 +205,7 @@ export const Profile: FunctionComponent<{}> = ({ }) => {
             <h2 className="profile-name white mt-2">{profile.name}</h2>
             <div className="d-flex align-items-center">
                 <p className="profile-handle">@{profile.handle}</p>
-                {profile.isYouFollowing ? (
+                {profile.isFollowingYou ? (
                     <small
                         className={`badge inverted ml-2 mt-n1`}
                     >follows you</small>

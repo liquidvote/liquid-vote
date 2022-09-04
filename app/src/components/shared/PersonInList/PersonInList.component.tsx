@@ -45,6 +45,12 @@ export const PersonInList: FunctionComponent<{
             data: editUserFollowingRelation_data,
         }] = useMutation(EDIT_USER_FOLLOWING_RELATION);
 
+        const isUser = liquidUser?.handle === user?.handle;
+
+        const isFollowing =  editUserFollowingRelation_data ?
+            editUserFollowingRelation_data?.editUserFollowingRelation?.isFollowing :
+            user?.isYouFollowing;
+
         return (
             <div className={`d-flex relative ${hideBottomBorder ? '' : 'border-bottom'} py-2 pb-3 mb-2`}>
                 <Link to={`/profile/${person.handle}`}>
@@ -66,38 +72,44 @@ export const PersonInList: FunctionComponent<{
                         <div className="d-flex mb-1 ml-n1">
                             <div className="d-flex ml-n1 justify-content-center">
                                 {
-                                    !alternativeButton && (
+                                    !alternativeButton && !isUser && (
                                         <>
-                                            <div
-                                                // onClick={() => setIsRepresenting(!isRepresenting)}
-                                                onClick={() => !!liquidUser ? editUserFollowingRelation({
-                                                    variables: {
-                                                        FollowedHandle: user?.handle,
-                                                        FollowingHandle: liquidUser?.handle,
-                                                        IsFollowing: !user?.isYouFollowing
-                                                    }
-                                                })
-                                                    .then((r) => {
-                                                        user_refetch();
-                                                    }) : (
-                                                    updateParams({
-                                                        paramsToAdd: {
-                                                            modal: "RegisterBefore",
-                                                            modalData: JSON.stringify({
-                                                                toWhat: 'followUser',
-                                                                userName: user?.name
-                                                            })
+                                            {(editUserFollowingRelation_loading || user_loading) ? (
+                                                <img
+                                                    className="vote-avatar"
+                                                    src={'http://images.liquid-vote.com/system/loading.gif'}
+                                                />
+                                            ) : (
+                                                <div
+                                                    onClick={() => !!liquidUser ? editUserFollowingRelation({
+                                                        variables: {
+                                                            FollowedHandle: user?.handle,
+                                                            FollowingHandle: liquidUser?.handle,
+                                                            IsFollowing: !isFollowing
                                                         }
                                                     })
-                                                )}
-                                                className={`button_ small mr-2 ${user?.isYouFollowing ? "selected" : ""}`}
-                                            >
-                                                {
-                                                    user?.isYouFollowing ?
-                                                        "Following" :
-                                                        "Follow"
-                                                }
-                                            </div>
+                                                        .then((r) => {
+                                                            user_refetch();
+                                                        }) : (
+                                                        updateParams({
+                                                            paramsToAdd: {
+                                                                modal: "RegisterBefore",
+                                                                modalData: JSON.stringify({
+                                                                    toWhat: 'followUser',
+                                                                    userName: user?.name
+                                                                })
+                                                            }
+                                                        })
+                                                    )}
+                                                    className={`button_ small mr-2 ${isFollowing ? "selected" : ""}`}
+                                                >
+                                                    {
+                                                        isFollowing ?
+                                                            "Following" :
+                                                            "Follow"
+                                                    }
+                                                </div>
+                                            )}
                                         </>
                                     )
                                 }
