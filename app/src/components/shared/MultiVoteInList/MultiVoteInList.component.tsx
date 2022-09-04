@@ -14,27 +14,26 @@ export const MultiVoteInList: FunctionComponent<{
     showGroupAndTime: boolean,
     user?: any,
     showChart?: boolean,
-    inviterHandle?: string
+    inviterHandle?: string,
+    votersInCommonStats?: any,
+    originalQuestion?: any,
+    originalQuestionMaxCount?: number
 }> = ({
     v,
     showGroupAndTime,
     user,
     showChart,
-    inviterHandle
+    inviterHandle,
+    votersInCommonStats,
+    originalQuestion,
+    originalQuestionMaxCount
 }) => {
 
         const { allSearchParams, updateParams } = useSearchParams();
 
         const [showAllChoices, setShowAllChoices] = useState(false);
 
-        const arrayOfCounts = v.choices.map(c => c.stats?.forCount + c.stats?.againstCount);
-
-        const maxCount = Math.max(...arrayOfCounts);
-
-        // const sortedChoices = [...v.choices]?.
-        //     sort((a, b) => (b?.stats?.directVotes + b?.stats?.indirectVotes) - (a?.stats?.directVotes + a?.stats?.indirectVotes));
-
-        // const maxVoteCount = sortedChoices?.[0]?.stats?.directVotes + sortedChoices?.[0]?.stats?.indirectVotes;
+        const maxCount = Math.max(...v.choices.map(c => c.stats?.forCount + c.stats?.againstCount));
 
         return (
             <div className="position-relative">
@@ -147,10 +146,12 @@ export const MultiVoteInList: FunctionComponent<{
                                     yourStats={c.yourStats}
                                     userVote={c.userVote}
                                     inList={true}
-                                    maxVoteCount={maxCount}
+                                    maxVoteCount={originalQuestionMaxCount || maxCount}
                                     user={user}
                                     showChart={showChart}
                                     inviterHandle={inviterHandle}
+                                    votersInCommonStats={votersInCommonStats}
+                                    originalQuestion={originalQuestion}
                                 />
                             </div>
                         ))}

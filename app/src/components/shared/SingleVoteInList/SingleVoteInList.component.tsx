@@ -15,14 +15,20 @@ export const SingleVoteInList: FunctionComponent<{
     showGroupAndTime?: boolean,
     hideTitle?: boolean,
     showChart?: boolean,
-    inviterHandle?: string
+    inviterHandle?: string,
+    votersInCommonStats?: any,
+    originalQuestion?: any,
+    originalQuestionMaxCount?: number
 }> = ({
     l,
     user,
     showGroupAndTime,
     hideTitle,
     showChart,
-    inviterHandle
+    inviterHandle,
+    votersInCommonStats,
+    originalQuestion,
+    originalQuestionMaxCount
 }) => {
 
         const { allSearchParams, updateParams } = useSearchParams();
@@ -128,6 +134,9 @@ export const SingleVoteInList: FunctionComponent<{
                             showChart={showChart}
                             yourStats={l.yourStats}
                             inviterHandle={inviterHandle}
+                            votersInCommonStats={votersInCommonStats}
+                            originalQuestion={originalQuestion}
+                            maxVoteCount={originalQuestionMaxCount}
                         />
                     </div>
                 </div>

@@ -363,6 +363,9 @@ export default function Question() {
                     <QuestionArguments />
                 )}
 
+                <br />
+                <br />
+
                 <ul className="nav d-flex justify-content-around mt-1 mx-n3">
                     <li className="nav-item">
                         <Link className={`nav-link active`} to={`/poll/${voteName}/${groupHandle}`}>
@@ -371,7 +374,7 @@ export default function Question() {
                     </li>
                 </ul>
 
-                <QuestionsVotersAlsoVotedOn />
+                <QuestionsVotersAlsoVotedOn originalQuestion={question} />
 
                 <br />
                 <br />

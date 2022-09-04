@@ -10,7 +10,7 @@ import GroupPollListCover from "@shared/GroupPollListCover";
 
 import './style.sass';
 
-export const QuestionsVotersAlsoVotedOn: FunctionComponent<{}> = ({ }) => {
+export const QuestionsVotersAlsoVotedOn: FunctionComponent<{ originalQuestion?: any }> = ({ originalQuestion }) => {
 
     let { voteName, groupHandle, section, subsection, subsubsection } = useParams<any>();
 
@@ -26,9 +26,9 @@ export const QuestionsVotersAlsoVotedOn: FunctionComponent<{}> = ({ }) => {
         }
     });
 
-    // console.log({
-    //     questions_data
-    // });
+    const maxCount = originalQuestion?.questionType === 'single' ?
+        originalQuestion?.stats?.forCount + originalQuestion?.stats?.againstCount :
+        Math.max(...originalQuestion.choices.map(c => c.stats?.forCount + c.stats?.againstCount));
 
     return (
         <div className="mt-3">
@@ -51,6 +51,9 @@ export const QuestionsVotersAlsoVotedOn: FunctionComponent<{}> = ({ }) => {
                                 key={`multi-${v.questionText}`}
                                 v={v}
                                 showGroupAndTime={true}
+                                votersInCommonStats={v?.votersInCommonStats}
+                                originalQuestion={originalQuestion}
+                                originalQuestionMaxCount={maxCount}
                             />
                         )}
                         {v.questionType === 'single' && (
@@ -58,6 +61,9 @@ export const QuestionsVotersAlsoVotedOn: FunctionComponent<{}> = ({ }) => {
                                 key={`single-${v.questionText}`}
                                 l={v}
                                 showGroupAndTime={true}
+                                votersInCommonStats={v?.votersInCommonStats}
+                                originalQuestion={originalQuestion}
+                                originalQuestionMaxCount={maxCount}
                             />
                         )}
                         <hr />

@@ -23,6 +23,7 @@ export default function useUser({
 
     return {
         user: user_data?.User,
-        user_refetch
+        user_refetch,
+        user_loading
     };
 }

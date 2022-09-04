@@ -31,7 +31,7 @@ export const PersonInList: FunctionComponent<{
     hideBottomBorder
 }) => {
 
-        const { user, user_refetch } = useUser({ userHandle: person.handle, groupHandle });
+        const { user, user_refetch, user_loading } = useUser({ userHandle: person.handle, groupHandle });
 
         const { liquidUser } = useAuthUser();
 
@@ -111,16 +111,39 @@ export const PersonInList: FunctionComponent<{
 
                     {includeVotes ? (
                         <>
-                            {!isShowingRepresentativeRelation ? (
+                            {user_loading ?
+                                <img
+                                    className={`vote-avatar tiny`}
+                                    src={'http://images.liquid-vote.com/system/loading.gif'}
+                                />
+                                : null}
+
+                            {!user_loading && !isShowingRepresentativeRelation ? (
                                 <div className="d-flex mt-1">
                                     <small className="d-flex mb-0">
                                         <b className='white mr-1'>{' '}{user?.groupStats?.stats?.directVotesMade || 0}</b> votes
                                         {groupName ? ` on ${groupName}` : ''}
+
+
+                                        {user?.groupStats?.yourStats ? (
+                                            <>
+                                                ・
+                                                <small className="d-flex align-items-center">
+                                                    <b className='white mr-1 forDirect px-1 rounded'>{' '}{user?.groupStats?.yourStats?.directVotesInAgreement} </b> same
+                                                </small>
+                                                ・
+                                                <small className="d-flex align-items-center">
+                                                    <b className='white mr-1 againstDirect px-1 rounded'>{' '}{user?.groupStats?.yourStats?.directVotesInDisagreement}</b> differ
+                                                </small>
+                                            </>
+                                        ) : null}
+
+
                                     </small>
                                 </div>
                             ) : null}
 
-                            {!!user?.groupStats?.stats?.directVotesMade && (
+                            {!user_loading && !!user?.groupStats?.stats?.directVotesMade && (
                                 <small className='d-flex white'>
                                     <a className='link white pointer' onClick={() => setShowVotes(!showVotes)}>{showVotes ? 'hide' : 'show'} votes</a>
                                 </small>

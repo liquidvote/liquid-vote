@@ -103,7 +103,7 @@ export const GroupPeople: FunctionComponent<{}> = ({ }) => {
                 <div className="mt-n2">
                     {group_members_data?.GroupMembers?.map((el, i) => (
                         <PersonInList
-                            key={'gp_members' + el.handle}
+                            key={'gp_members' + el.handle + handle}
                             person={el}
                             groupHandle={handle}
                             groupName={group?.name}

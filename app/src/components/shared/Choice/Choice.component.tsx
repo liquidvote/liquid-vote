@@ -11,6 +11,7 @@ import useAuthUser from '@state/AuthUser/authUser.effect';
 import useSearchParams from "@state/Global/useSearchParams.effect";
 import Avatar from '@components/shared/Avatar';
 
+import YayNayBubbles from './YayNayBubbles';
 import './style.sass';
 
 export const Choice: FunctionComponent<{
@@ -27,7 +28,9 @@ export const Choice: FunctionComponent<{
     maxVoteCount?: number,
     user?: any,
     extraRefetchQueries?: any,
-    inviterHandle?: string
+    inviterHandle?: string,
+    votersInCommonStats?: any
+    originalQuestion?: any
 }> = ({
     choiceText,
     voteName,
@@ -42,7 +45,9 @@ export const Choice: FunctionComponent<{
     maxVoteCount,
     user,
     extraRefetchQueries,
-    inviterHandle
+    inviterHandle,
+    votersInCommonStats,
+    originalQuestion
 }) => {
 
         const { allSearchParams, updateParams } = useSearchParams();
@@ -665,8 +670,48 @@ export const Choice: FunctionComponent<{
                             </div>
                         </div>
                     </div>
-                )
-                }
+                )}
+
+                {votersInCommonStats ? (
+                    <>
+                        <br />
+                        {votersInCommonStats?.choices?.filter(c => !choiceText || c?.choiceText === choiceText)?.map((c, i) => (
+                            <div>
+                                <div className='d-flex justify-content-center align-items-center'>
+                                    <div className='d-flex'>
+                                        <YayNayBubbles
+                                            forCount={c?.stats?.for_for}
+                                            againstCount={c?.stats?.against_for}
+                                            maxVoteCount={maxVoteCount_}
+                                        />
+                                        <div className='p-1'></div>
+                                        <YayNayBubbles
+                                            forCount={c?.stats?.for_against}
+                                            againstCount={c?.stats?.against_against}
+                                            maxVoteCount={maxVoteCount_}
+                                        />
+                                    </div>
+                                </div>
+                                {
+                                    c?.originalQuestionVoteChoiceText ? (
+                                        <div className='faded d-flex align-items-center justify-content-center'>
+                                            <small>
+                                                <b>{c?.originalQuestionVoteChoiceText}</b>
+                                                {/* <span>{c?.choiceText}</span> */}
+                                            </small>
+                                            <br />
+                                        </div>
+                                    ) : null
+                                }
+                            </div>
+                        ))}
+
+                        <div className='d-flex align-items-center justify-content-center'>
+                            <br />
+                            <small><b className='faded white mb-5 text-center'>{originalQuestion?.questionText}</b></small>
+                        </div>
+                    </>
+                ) : null}
             </div >
         );
     }
