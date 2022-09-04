@@ -94,53 +94,57 @@ export const QuestionsAgg = ({
                     ]
                 }
             }
-        }, {
-            '$lookup': {
-                'as': 'yourVote',
-                'from': 'Votes',
-                'let': {
-                    'user': AuthUserId,
-                    'questionText': '$questionText',
-                    'choiceText': '$choiceText',
-                    'group': '$groupChannel.group'
-                },
-                'pipeline': [
-                    {
-                        '$match': {
-                            '$expr': {
-                                '$and': [
-                                    {
-                                        '$eq': [
-                                            '$questionText', '$$questionText'
-                                        ]
-                                    }, {
-                                        '$eq': [
-                                            '$choiceText', '$$choiceText'
-                                        ]
-                                    }, {
-                                        '$eq': [
-                                            '$groupChannel.group', '$$group'
-                                        ]
-                                    }, {
-                                        '$eq': [
-                                            '$user', {
-                                                '$toObjectId': '$$user'
-                                            }
-                                        ]
-                                    }
-                                ]
+        },
+
+        ...AuthUserId ? [
+            {
+                '$lookup': {
+                    'as': 'yourVote',
+                    'from': 'Votes',
+                    'let': {
+                        'user': AuthUserId,
+                        'questionText': '$questionText',
+                        'choiceText': '$choiceText',
+                        'group': '$groupChannel.group'
+                    },
+                    'pipeline': [
+                        {
+                            '$match': {
+                                '$expr': {
+                                    '$and': [
+                                        {
+                                            '$eq': [
+                                                '$questionText', '$$questionText'
+                                            ]
+                                        }, {
+                                            '$eq': [
+                                                '$choiceText', '$$choiceText'
+                                            ]
+                                        }, {
+                                            '$eq': [
+                                                '$groupChannel.group', '$$group'
+                                            ]
+                                        }, {
+                                            '$eq': [
+                                                '$user', {
+                                                    '$toObjectId': '$$user'
+                                                }
+                                            ]
+                                        }
+                                    ]
+                                }
                             }
                         }
-                    }
-                ]
-            }
-        }, {
-            '$addFields': {
-                'yourVote': {
-                    '$first': '$yourVote'
+                    ]
                 }
-            }
-        },
+            }, {
+                '$addFields': {
+                    'yourVote': {
+                        '$first': '$yourVote'
+                    }
+                }
+            },
+        ] : [],
 
         ...userId ? [
             {

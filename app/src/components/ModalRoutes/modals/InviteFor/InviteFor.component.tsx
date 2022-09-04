@@ -50,7 +50,7 @@ export const InviteFor: FunctionComponent<{}> = ({ }) => {
                 modalData.InviteType === 'toCompare' ? `${liquidUser?.name} is inviting you to compare ${liquidUser?.handle === modalData?.userHandle ? 'with him' : `with ${modalData?.userName}`}` : '';
 
     const inviteLink =
-        modalData.InviteType === 'toGroup' ? `${env.website}/invite/by/${liquidUser?.handle}/to/causeOnProfile/${modalData.groupHandle}` :
+        modalData.InviteType === 'toGroup' ? `${env.website}/invite/by/${liquidUser?.handle}/to/group/${modalData.groupHandle}` :
             modalData.InviteType === 'toVote' ? `${env.website}/invite/by/${liquidUser?.handle}/to/voteOn/${modalData?.voteName}/${modalData?.groupHandle}` :
                 modalData.InviteType === 'toCompare' ? `${env.website}/invite/by/${liquidUser?.handle}/toCompareWith/${modalData.userHandle}` : '';
 

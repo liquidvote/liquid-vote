@@ -155,18 +155,16 @@ export const QuestionResolvers = {
                 ...q,
                 _id: 'Question_InList_' + q?.id,
                 allowNewChoices: q.allowNewChoices || false, // TODO: this should be obsoleted
-                ...(q.questionType === 'single' && !!AuthUser) && {
+                ...(q.questionType === 'single') && {
                     yourVote: q?.choices[0]?.yourVote,
                     userVote: q?.choices[0]?.userVote,
                 },
                 ...(q.questionType === 'multi') && {
                     choices: await Promise.all(q?.choices?.map(async (c) => ({
                         ...c?.choice,
-                        ...(!!AuthUser) && {
-                            yourVote: c?.yourVote,
-                            userVote: c?.userVote,
-                            yourStats: c?.yourStats
-                        }
+                        yourVote: c?.yourVote,
+                        userVote: c?.userVote,
+                        yourStats: c?.yourStats
                     })))
                 },
                 group: {
