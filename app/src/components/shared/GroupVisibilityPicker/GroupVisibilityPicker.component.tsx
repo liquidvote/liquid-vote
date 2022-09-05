@@ -26,7 +26,15 @@ export const GroupVisibilityPicker: FunctionComponent<{
             loading: editGroupMemberChannelRelation_loading,
             error: editGroupMemberChannelRelation_error,
             data: editGroupMemberChannelRelation_data,
-        }] = useMutation(EDIT_GROUP_MEMBER_CHANNEL_RELATION);
+        }] = useMutation(EDIT_GROUP_MEMBER_CHANNEL_RELATION, {
+            update: cache => {
+                cache.evict({
+                    id: "ROOT_QUERY",
+                    fieldName: "UserGroups"
+                });
+                cache.gc();
+            }
+        });
 
         const visibility: "everyone" | "members" | "following" | "self" =
             (group?.yourMemberRelation?.visibility ||

@@ -98,25 +98,33 @@ export const GroupChannelPicker: FunctionComponent<Props> = ({
 
                 <div className="d-flex justify-content-between m-2">
                     <div className="d-flex align-items-center cursor flex-wrap mt-4 w-100">
-                        <div data-tip="Channel to poll in">
+                        <div className='mr-1' data-tip="Channel to poll in">
                             <GroupSVG />
                         </div>
-                        <select
-                            className="badge select ml-1 mb-1 mt-1 inverted"
-                            onChange={handleGroupPickChange}
-                            value={value?.group}
-                            onBlur={() => setIsFocused(false)}
-                            onFocus={() => setIsFocused(true)}
-                            disabled={disabled}
-                        >
-                            {yourGroups_data?.UserGroups?.map((g: any) => (
-                                <option
-                                    key={'yourGroups-' + g.name}
-                                    value={g.handle}
-                                >{g.name}</option>
-                            ))}
-                            <option value="">--</option>
-                        </select>
+                        {yourGroups_loading ? (
+                            <img
+                                className="vote-avatar"
+                                src={'http://images.liquid-vote.com/system/loading.gif'}
+                            />
+                        ) : (
+
+                            <select
+                                className="badge max-w-180 select ml-1 mb-1 mt-1 inverted"
+                                onChange={handleGroupPickChange}
+                                value={value?.group}
+                                onBlur={() => setIsFocused(false)}
+                                onFocus={() => setIsFocused(true)}
+                                disabled={disabled}
+                            >
+                                {yourGroups_data?.UserGroups?.map((g: any) => (
+                                    <option
+                                        key={'yourGroups-' + g.name}
+                                        value={g.handle}
+                                    >{g.name}</option>
+                                ))}
+                                <option value="">--</option>
+                            </select>
+                        )}
                         {/* <select
                             className="badge select ml-1 mb-1 mt-1 inverted"
                             onChange={handleChannelPickChange}
