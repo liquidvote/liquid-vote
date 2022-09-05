@@ -61,12 +61,11 @@ export const QuestionResolvers = {
             notUsers
         }, { mongoDB, AuthUser }) => {
 
-            console.log({
-                inviterHandle
-            });
-
             const AuthUserGroupMemberRelations = !!AuthUser && await mongoDB.collection("GroupMembers")
-                .find({ 'userId': new ObjectId(AuthUser?._id) })
+                .find({
+                    'userId': new ObjectId(AuthUser?._id),
+                    'isMember': true
+                })
                 .toArray();
 
             const AuthUserGroups = !!AuthUserGroupMemberRelations && await mongoDB.collection("Groups").find({
@@ -82,6 +81,11 @@ export const QuestionResolvers = {
             const InviterUser = !!inviterHandle && await mongoDB.collection("Users")
                 .findOne({ 'LiquidUser.handle': inviterHandle });
 
+            console.log({
+                groupHandle,
+                // AuthUserGroupMemberRelations
+            });
+
             const Agg = [
                 ...createdByHandle ? [{
                     '$match': {
@@ -91,7 +95,7 @@ export const QuestionResolvers = {
                 ...QuestionsAgg({
                     questionText: null,
                     // group: groupHandle,
-                    group: groupHandle ?
+                    group: typeof groupHandle !== 'undefined' ?
                         groupHandle :
                         (!!AuthUser && !notUsers) ?
                             { '$in': AuthUserGroups.map(g => g.handle) } :
@@ -141,15 +145,17 @@ export const QuestionResolvers = {
                 ] : []
             ]
 
-            // const writeToDebugFile = fs.writeFile(
-            //     process.cwd() + '/debug' + '/Questions.json',
-            //     JSON.stringify(Agg, null, 2),
-            //     { encoding: 'utf8' }
-            // );
+            const writeToDebugFile = fs.writeFile(
+                process.cwd() + '/debug' + '/Questions.json',
+                JSON.stringify(Agg, null, 2),
+                { encoding: 'utf8' }
+            );
 
             const Questions = await mongoDB.collection("Questions")
                 .aggregate(Agg)
                 .toArray();
+
+            console.log("Questions");
 
             return (await Promise.all(Questions.map(async (q, i) => ({
                 ...q,

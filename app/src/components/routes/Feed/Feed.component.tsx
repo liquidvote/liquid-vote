@@ -50,6 +50,7 @@ export const Feed: FunctionComponent<{}> = ({ }) => {
         variables: {
             sortBy: liquidUser ? 'votersYouFollowOrRepresentingYouTimeWeight' : 'weight',
             notUsers: section === 'other' || !liquidUser,
+            // groupHandle: null
         },
         skip: !liquidUser || !yourUser?.stats?.following
     });
