@@ -686,12 +686,14 @@ export const Choice: FunctionComponent<{
                                 <div className='d-flex justify-content-center align-items-center'>
                                     <div className='d-flex'>
                                         <YayNayBubbles
+                                            parent="yay"
                                             forCount={c?.stats?.for_for}
                                             againstCount={c?.stats?.against_for}
                                             maxVoteCount={maxVoteCount_}
                                         />
-                                        <div className='p-1'></div>
+                                        <div className='p-2'></div>
                                         <YayNayBubbles
+                                            parent="nay"
                                             forCount={c?.stats?.for_against}
                                             againstCount={c?.stats?.against_against}
                                             maxVoteCount={maxVoteCount_}
