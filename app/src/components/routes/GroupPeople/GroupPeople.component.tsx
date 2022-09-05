@@ -74,7 +74,7 @@ export const GroupPeople: FunctionComponent<{}> = ({ }) => {
                     </Link>
                 </li>
                 {
-                    group?.yourStats && (
+                    group?.yourStats && (group?.yourStats.representing || group?.yourStats.representedBy) ? (
                         <>
                             <li className="nav-item">
                                 <Link className={`nav-link ${which === 'representingYou' && 'active'}`} to={`/group-people/${group?.handle}/representingYou`}>
@@ -87,7 +87,7 @@ export const GroupPeople: FunctionComponent<{}> = ({ }) => {
                                 </Link>
                             </li>
                         </>
-                    )
+                    ) : null
                 }
             </ul>
             <hr />

@@ -221,7 +221,13 @@ export const Choice: FunctionComponent<{
                                 style={{
                                     ...(maxVoteCount_) && {
                                         'maxWidth':
-                                            ((stats?.directVotes + stats?.indirectVotes | 0) / maxVoteCount_) * 100 + '%'
+                                            ((
+                                                editVote_data?.editVote?.QuestionStats ? (
+                                                    editVote_data?.editVote?.QuestionStats?.directVotes +
+                                                    editVote_data?.editVote?.QuestionStats?.indirectVotes
+                                                ) : 
+                                                stats?.directVotes + stats?.indirectVotes | 0
+                                            ) / maxVoteCount_) * 100 + '%'
                                     }
                                 }}
                             >
