@@ -177,7 +177,7 @@ export const UserResolvers = {
             const isUser = !!AuthUser && AuthUser?._id?.toString() === User?._id?.toString();
 
             return !!User ? {
-                id: User?.LiquidUser?.handle + groupHandle,
+                id: User?.LiquidUser?.handle + (groupHandle ? groupHandle : ''),
                 ...User?.LiquidUser,
                 ...isUser ? {
                     email: User?.LiquidUser?.email

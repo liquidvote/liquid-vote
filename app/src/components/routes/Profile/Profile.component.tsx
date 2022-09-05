@@ -47,7 +47,15 @@ export const Profile: FunctionComponent<{}> = ({ }) => {
         loading: editUserFollowingRelation_loading,
         error: editUserFollowingRelation_error,
         data: editUserFollowingRelation_data,
-    }] = useMutation(EDIT_USER_FOLLOWING_RELATION);
+    }] = useMutation(EDIT_USER_FOLLOWING_RELATION, {
+        update: cache => {
+            cache.evict({
+                id: `User:${liquidUser?.handle}`,
+                broadcast: true,
+            });
+            cache.gc();
+        }
+    });
 
     const isFollowing = editUserFollowingRelation_data ?
         editUserFollowingRelation_data?.editUserFollowingRelation?.isFollowing :

@@ -43,7 +43,15 @@ export const PersonInList: FunctionComponent<{
             loading: editUserFollowingRelation_loading,
             error: editUserFollowingRelation_error,
             data: editUserFollowingRelation_data,
-        }] = useMutation(EDIT_USER_FOLLOWING_RELATION);
+        }] = useMutation(EDIT_USER_FOLLOWING_RELATION, {
+            update: cache => {
+                cache.evict({
+                    id: `User:${liquidUser?.handle}`,
+                    broadcast: true,
+                });
+                cache.gc();
+            }
+        });
 
         const isUser = liquidUser?.handle === user?.handle;
 
