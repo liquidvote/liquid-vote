@@ -179,6 +179,21 @@ export const Choice: FunctionComponent<{
 
         const maxVoteCount_ = maxVoteCount || (stats_?.forCount + stats_?.againstCount);
 
+        const maxChartWidth = (
+            (
+                (
+                    editVote_data?.editVote?.QuestionStats ? (
+                        editVote_data?.editVote?.QuestionStats?.directVotes
+                        + editVote_data?.editVote?.QuestionStats?.indirectVotes
+                    ) : (
+                        stats?.directVotes
+                        + stats?.indirectVotes
+                    )
+                ) / maxVoteCount_
+            ) || 0.2
+        )
+            * 100;
+
         return (
             <div className={`${!inList && 'not-in-list'}`}>
                 <div
@@ -220,14 +235,7 @@ export const Choice: FunctionComponent<{
                                 className='w-100'
                                 style={{
                                     ...(maxVoteCount_) && {
-                                        'maxWidth':
-                                            ((
-                                                editVote_data?.editVote?.QuestionStats ? (
-                                                    editVote_data?.editVote?.QuestionStats?.directVotes +
-                                                    editVote_data?.editVote?.QuestionStats?.indirectVotes
-                                                ) : 
-                                                stats?.directVotes + stats?.indirectVotes | 0
-                                            ) / maxVoteCount_) * 100 + '%'
+                                        'maxWidth': maxChartWidth + '%'
                                     }
                                 }}
                             >

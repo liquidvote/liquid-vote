@@ -110,7 +110,7 @@ export const MultiVoteInList: FunctionComponent<{
                         <div
                             className={`question-title-in-list ${showGroupAndTime && 'limit-right'}`}
                             title={v.questionText}
-                        >{v.questionText}?</div>
+                        >{v.questionText}</div>
                     </Link>
 
                     {/* {!!showGroupAndTime && (
