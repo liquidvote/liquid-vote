@@ -150,8 +150,6 @@ export const QuestionResolvers = {
                 .aggregate(Agg)
                 .toArray();
 
-            console.log("Questions");
-
             return (await Promise.all(Questions.map(async (q, i) => ({
                 ...q,
                 _id: 'Question_InList_' + q?.id,
