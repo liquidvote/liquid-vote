@@ -81,11 +81,6 @@ export const QuestionResolvers = {
             const InviterUser = !!inviterHandle && await mongoDB.collection("Users")
                 .findOne({ 'LiquidUser.handle': inviterHandle });
 
-            console.log({
-                groupHandle,
-                // AuthUserGroupMemberRelations
-            });
-
             const Agg = [
                 ...createdByHandle ? [{
                     '$match': {
@@ -145,11 +140,11 @@ export const QuestionResolvers = {
                 ] : []
             ]
 
-            const writeToDebugFile = fs.writeFile(
-                process.cwd() + '/debug' + '/Questions.json',
-                JSON.stringify(Agg, null, 2),
-                { encoding: 'utf8' }
-            );
+            // const writeToDebugFile = fs.writeFile(
+            //     process.cwd() + '/debug' + '/Questions.json',
+            //     JSON.stringify(Agg, null, 2),
+            //     { encoding: 'utf8' }
+            // );
 
             const Questions = await mongoDB.collection("Questions")
                 .aggregate(Agg)
