@@ -69,7 +69,15 @@ export const EditQuestion: FunctionComponent<{}> = ({ }) => {
         loading: editQuestion_loading,
         error: editQuestion_error,
         data: editQuestion_data,
-    }] = useMutation(EDIT_QUESTION);
+    }] = useMutation(EDIT_QUESTION, {
+        update: cache => {
+            cache.evict({
+                id: `ROOT_QUERY`,
+                fieldName: "Questions"
+            });
+            cache.gc();
+        }
+    });
 
     useEffect(() => {
         if (!!question_data?.Question) {
