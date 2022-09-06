@@ -8,6 +8,7 @@ import ThreeDotsSmallSVG from '@shared/Icons/ThreeDots-small-horizontal.svg';
 import Popper from "@shared/Popper";
 
 import './style.sass';
+import { useState } from 'react';
 
 export const SingleVoteInList: FunctionComponent<{
     l: any,
@@ -32,6 +33,8 @@ export const SingleVoteInList: FunctionComponent<{
 }) => {
 
         const { allSearchParams, updateParams } = useSearchParams();
+
+        const [showComparison, setShowComparison] = useState(false);
 
         return (
             <div className="position-relative">
@@ -134,10 +137,18 @@ export const SingleVoteInList: FunctionComponent<{
                             showChart={showChart}
                             yourStats={l.yourStats}
                             inviterHandle={inviterHandle}
-                            votersInCommonStats={votersInCommonStats}
-                            originalQuestion={originalQuestion}
+                            votersInCommonStats={showComparison ? votersInCommonStats : null}
+                            originalQuestion={showComparison ? originalQuestion : null}
                             maxVoteCount={originalQuestionMaxCount}
                         />
+
+                        {votersInCommonStats ? (
+                            <div className='d-flex mt-4 align-items-center justify-content-center'>
+                                <small className='white pointer white-underline-onhover' onClick={() => setShowComparison(!showComparison)}>
+                                    {showComparison ? 'Hide' : 'Show'} comparison 🧪
+                                </small>
+                            </div>
+                        ): null}
                     </div>
                 </div>
             </div>

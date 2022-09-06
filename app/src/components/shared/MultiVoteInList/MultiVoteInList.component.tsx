@@ -33,6 +33,8 @@ export const MultiVoteInList: FunctionComponent<{
 
         const [showAllChoices, setShowAllChoices] = useState(false);
 
+        const [showComparison, setShowComparison] = useState(false);
+
         const maxCount = Math.max(...v.choices.map(c => c.stats?.forCount + c.stats?.againstCount));
 
         return (
@@ -150,8 +152,8 @@ export const MultiVoteInList: FunctionComponent<{
                                     user={user}
                                     showChart={showChart}
                                     inviterHandle={inviterHandle}
-                                    votersInCommonStats={votersInCommonStats}
-                                    originalQuestion={originalQuestion}
+                                    votersInCommonStats={showComparison ? votersInCommonStats : null}
+                                    originalQuestion={showComparison ? originalQuestion : null}
                                 />
                             </div>
                         ))}
@@ -167,6 +169,14 @@ export const MultiVoteInList: FunctionComponent<{
                         >{showAllChoices ? 'Show less' : `Show ${v.choices?.length - 4} more`}</div>
                     </div>
                 )}
+
+                {votersInCommonStats ? (
+                    <div className='d-flex mt-4 align-items-center justify-content-center'>
+                        <small className='white pointer white-underline-onhover' onClick={() => setShowComparison(!showComparison)}>
+                            {showComparison ? 'Hide' : 'Show'} comparison 🧪
+                        </small>
+                    </div>
+                ) : null}
             </div>
         );
     }
