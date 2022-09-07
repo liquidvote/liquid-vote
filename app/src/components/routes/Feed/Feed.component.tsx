@@ -65,10 +65,11 @@ export const Feed: FunctionComponent<{}> = ({ }) => {
     return (
         <>
             {/* <Header
-                title="Following Feed"
-            // rightElement={
-            //     () => <VoteSortPicker updateSortInParent={setSortBy} initialSort={sortBy} />
-            // }
+                title="Feed"
+                // subtitle="Polls from groups you've joined that people you follow have recently voted on"
+                // rightElement={
+                //     () => <VoteSortPicker updateSortInParent={setSortBy} initialSort={sortBy} />
+                // }
             /> */}
 
             {/* {

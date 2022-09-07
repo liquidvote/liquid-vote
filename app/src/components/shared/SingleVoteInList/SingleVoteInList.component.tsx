@@ -95,7 +95,7 @@ export const SingleVoteInList: FunctionComponent<{
                                     className="white mr-2"
                                     to={`/poll/${encodeURIComponent(l.questionText)}/${l.groupChannel?.group}`}
                                 >
-                                    <div className={`${showGroupAndTime && 'limit-right'}`} title={l.questionText}>
+                                    <div className={`question-title-in-list ${showGroupAndTime && 'limit-right'}`} title={l.questionText}>
                                         {l.questionText}
                                     </div>
                                 </Link>
@@ -116,7 +116,7 @@ export const SingleVoteInList: FunctionComponent<{
                         )}
 
                         {showGroupAndTime && (
-                            <div className="d-flex flex-column justify-content-end mb-2">
+                            <div className="d-flex flex-column justify-content-end mb-2 mt-1">
                                 <small className="tiny-text" data-tip="Last vote was">
                                     {!!l?.stats.lastVoteOn ?
                                         'last vote was ' + timeAgo.format(new Date(Number(l?.stats?.lastVoteOn))) :

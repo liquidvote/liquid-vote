@@ -233,11 +233,7 @@ export const Choice: FunctionComponent<{
                         >
                             <span
                                 className='w-100'
-                                style={{
-                                    ...(maxVoteCount_) && {
-                                        'maxWidth': maxChartWidth + '%'
-                                    }
-                                }}
+                                style={{ 'maxWidth': maxChartWidth + '%'  }}
                             >
                                 <Chart
                                     name={choiceText || null}

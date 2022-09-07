@@ -156,7 +156,7 @@ export const EditQuestion: FunctionComponent<{}> = ({ }) => {
                 channel: modalData.channelHandle || '',
                 Question: {
                     ...values,
-                    questionText: values.questionText.replaceAll('?', '')
+                    questionText: values.questionText
                 }
             }
         });

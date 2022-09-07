@@ -7,12 +7,14 @@ import './style.sass';
 
 export const Header: FunctionComponent<{
     title: string,
+    subtitle?: string,
     noBottom?: boolean,
     backLink?: string,
     iconType?: string,
     rightElement?: any
 }> = ({
     title,
+    subtitle,
     noBottom,
     backLink,
     iconType = 'none',
@@ -36,6 +38,7 @@ export const Header: FunctionComponent<{
                 </div>
                 <div className="top-text-container">
                     <div>{title}</div>
+                    {subtitle ? <small>{subtitle}</small> : null}
                 </div>
                 {/* <div className="ml-auto">
                     {((iconType: string) => ({

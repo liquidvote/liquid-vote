@@ -50,7 +50,7 @@ export const GroupPolls: FunctionComponent<{
         return (
             <>
                 {questions_data?.Questions?.map((q: any, i: any) => (
-                    <div key={'polls-' + i}>
+                    <div key={'polls-' + i} className="mt-4">
                         <PollExplanation
                             p={q}
                         />
