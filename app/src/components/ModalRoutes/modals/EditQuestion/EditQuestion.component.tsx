@@ -218,7 +218,7 @@ export const EditQuestion: FunctionComponent<{}> = ({ }) => {
                                 register={register(name, {
                                     // required: true,
                                     validate: {
-                                        minLength: v => v?.length > 5 || 'we need at least 5 characters here',
+                                        minLength: v => v?.length > 3 || 'we need at least 3 characters here',
                                         tooBig: v => v?.length < 80 || 'should be smaller than 80 characters',
                                         // noSpecialCharacters: v => /^[_A-z0-9]*((-|\s|%|\?)*[_A-z0-9])*$/.test(v) || 'no special characters'
                                     }

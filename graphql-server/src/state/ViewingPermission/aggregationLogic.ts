@@ -41,6 +41,16 @@ export const canViewUsersVoteOrCause = ({ AuthUser }) => [
     //     }
     // },
 
+    // Question not Deleted
+    {
+        '$match':
+        {
+            '$expr': {
+                '$ne': ['$question.status',  'deleted']
+            }
+        }
+    },
+
     // userRel
     {
         '$lookup': {

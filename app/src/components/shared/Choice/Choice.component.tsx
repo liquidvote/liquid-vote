@@ -740,7 +740,7 @@ export const Choice: FunctionComponent<{
                         {votersInCommonStats?.choices?.filter(c => !choiceText || c?.choiceText === choiceText)?.map((c, i) => (
                             <div>
                                 <div className='d-flex justify-content-center align-items-center'>
-                                    <div className='d-flex'>
+                                    <div className='d-flex faded'>
                                         <YayNayBubbles
                                             parent="yay"
                                             forCount={c?.stats?.for_for}
