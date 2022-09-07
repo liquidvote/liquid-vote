@@ -10,6 +10,8 @@ import { voteStatsMap } from '@state/Question/map';
 import useAuthUser from '@state/AuthUser/authUser.effect';
 import useSearchParams from "@state/Global/useSearchParams.effect";
 import Avatar from '@components/shared/Avatar';
+import useGroup from "@state/Group/group.effect";
+import { EDIT_GROUP_MEMBER_CHANNEL_RELATION } from "@state/User/typeDefs";
 
 import YayNayBubbles from './YayNayBubbles';
 import './style.sass';
@@ -54,6 +56,8 @@ export const Choice: FunctionComponent<{
 
         const { liquidUser } = useAuthUser();
 
+        const { group } = useGroup({ handle: groupHandle });
+
         const [editVote, {
             loading: editVote_loading,
             error: editVote_error,
@@ -80,6 +84,28 @@ export const Choice: FunctionComponent<{
 
         const yourVote_ = editVote_data ? editVote_data?.editVote : yourVote;
 
+        const [editGroupMemberChannelRelation, {
+            loading: editGroupMemberChannelRelation_loading,
+            error: editGroupMemberChannelRelation_error,
+            data: editGroupMemberChannelRelation_data,
+        }] = useMutation(EDIT_GROUP_MEMBER_CHANNEL_RELATION, {
+            update: cache => {
+                cache.evict({
+                    id: "ROOT_QUERY",
+                    fieldName: "UserGroups"
+                });
+                cache.evict({
+                    id: "ROOT_QUERY",
+                    fieldName: "Group",
+                    args: { handle: groupHandle },
+                    broadcast: true,
+                    // Group:{"handle":"should-it-be-legal"}
+                    // fieldName: "UserGroups"
+                });
+                cache.gc();
+            }
+        });
+
         // console.log({
         //     yourVote,
         //     yourVote_,
@@ -89,6 +115,19 @@ export const Choice: FunctionComponent<{
         const handleUserVote = (vote: string) => {
 
             if (!!liquidUser) {
+
+                if (
+                    !group?.yourMemberRelation?.isMember && !(vote === yourVote_?.position)
+                ) {
+                    editGroupMemberChannelRelation({
+                        variables: {
+                            UserHandle: liquidUser?.handle,
+                            GroupHandle: groupHandle,
+                            IsMember: true
+                        }
+                    })
+                }
+
                 editVote({
                     variables: {
                         questionText: voteName,

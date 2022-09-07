@@ -191,7 +191,7 @@ export const ListVoters: FunctionComponent<{}> = ({ }) => {
                     <div className="p-4 text-center">
                         {
                             (() => {
-                                if (type === 'all' && followsOnly) {
+                                if (type === 'directVotesMade' && followsOnly) {
                                     return 'No one you follow has voted on this poll yet'
                                 } else if (type === 'directFor') {
                                     return 'This poll hasn\'t received any votes in favor yet';
@@ -205,8 +205,8 @@ export const ListVoters: FunctionComponent<{}> = ({ }) => {
                                     return 'You haven\'t represented anyone for this poll yet';
                                 } else if (type === 'indirectVotesMadeForYou') {
                                     return 'No one has represented you for this poll yet';
-                                }
-                                return 'type'
+                                } 
+                                return type
                             })()
                         }{' '}
                     </div>
