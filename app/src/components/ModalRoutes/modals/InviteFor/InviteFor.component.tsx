@@ -45,8 +45,8 @@ export const InviteFor: FunctionComponent<{}> = ({ }) => {
                 modalData.InviteType === 'toCompare' ? `Compare with with ${modalData?.userName}` : '';
 
     const mobileShareText =
-        modalData.InviteType === 'toGroup' ? `${liquidUser?.name} is inviting you to vote on ${modalData?.groupName} with him` :
-            modalData.InviteType === 'toVote' ? `${liquidUser?.name} is inviting you to vote on ${modalData?.voteName} with him` :
+        modalData.InviteType === 'toGroup' ? `${liquidUser?.name} is inviting you to vote with him on ${modalData?.groupName}` :
+            modalData.InviteType === 'toVote' ? `${liquidUser?.name} is inviting you to vote with him on ${modalData?.voteName}` :
                 modalData.InviteType === 'toCompare' ? `${liquidUser?.name} is inviting you to compare ${liquidUser?.handle === modalData?.userHandle ? 'with him' : `with ${modalData?.userName}`}` : '';
 
     const inviteLink =
@@ -79,7 +79,7 @@ export const InviteFor: FunctionComponent<{}> = ({ }) => {
 
                         <div className="mt-5 mb-1">
                             <InvitesLink
-                                inviteLink={inviteLink}
+                                inviteLink={`${mobileShareText}\n${inviteLink}`}
                             />
                         </div>
                     </>
