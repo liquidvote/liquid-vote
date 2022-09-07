@@ -1,4 +1,4 @@
-import React, { FunctionComponent } from 'react';
+import React, { FunctionComponent, useEffect } from 'react';
 import { Link } from "react-router-dom";
 import numeral from 'numeral';
 import { useMutation } from "@apollo/client";
@@ -167,6 +167,11 @@ export const Choice: FunctionComponent<{
             editVote_data?.editVote?.representeeVotes?.filter(v => v.isDirect === false)?.length :
             yourStats?.usersYouAreRepresentingCount;
 
+        // const newMaxCount =
+        //     editVote_data &&
+        //     maxVoteCount === (stats?.forCount + stats?.againstCount) ? 
+
+
         // console.log({
         //     yourVote,
         //     forRepresentatives,
@@ -183,16 +188,24 @@ export const Choice: FunctionComponent<{
             (
                 (
                     editVote_data?.editVote?.QuestionStats ? (
-                        editVote_data?.editVote?.QuestionStats?.directVotes
-                        + editVote_data?.editVote?.QuestionStats?.indirectVotes
+                        editVote_data?.editVote?.QuestionStats?.forCount +
+                        editVote_data?.editVote?.QuestionStats?.againstCount
+                        // + editVote_data?.editVote?.QuestionStats?.indirectVotes
                     ) : (
-                        stats?.directVotes
-                        + stats?.indirectVotes
+                        stats?.forCount
+                        + stats?.againstCount
+                        // + stats?.indirectVotes
                     )
                 ) / maxVoteCount_
             ) || 0.2
         )
             * 100;
+
+        // useEffect(() => {
+        //     if(editVote_data && maxVoteCount === (stats?.forCount + stats?.againstCount)) {
+        //         console.log("update max vote count");
+        //     }
+        // }, [maxVoteCount_]);
 
         return (
             <div className={`${!inList && 'not-in-list'}`}>
@@ -431,7 +444,7 @@ export const Choice: FunctionComponent<{
 
                         {editVote_loading ? (
                             <img
-                                className={`vote-avatar ${inList && 'tiny'}`}
+                                className={`vote-avatar ${inList && 'tiny-loader'}`}
                                 src={'http://images.liquid-vote.com/system/loading.gif'}
                             />
                         ) : (

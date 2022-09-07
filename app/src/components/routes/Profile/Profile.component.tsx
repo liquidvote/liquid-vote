@@ -103,9 +103,9 @@ export const Profile: FunctionComponent<{}> = ({ }) => {
                 <div className="avatar-wrapper">
                     <Avatar person={profile} type="profile" />
                 </div>
-                <div className="profile-buttons-container">
+                <div className="profile-buttons-container z-1">
                     <div
-                        className="button_ small mb-2 mr-2"
+                        className="button_ small mb-2 mr-2 z-1"
                         onClick={async () => {
                             updateParams({
                                 paramsToAdd: {
