@@ -346,13 +346,21 @@
       .notification {
         margin: -15px -15px;
         padding: 15px;
+
+        border: 1px solid rgba(0, 0, 0, 0.3) !important;
+        border-radius: 5px;
+      }
+
+      .d-flex {
+        display: flex !important;
+      }
+
+      .justify-content-between {
+        justify-content: space-between;
       }
 
       .align-items-center {
-        align-items: center !important;
-      }
-      .d-flex {
-        display: flex !important;
+        align-items: center;
       }
 
       *,
@@ -382,9 +390,6 @@
       .align-items-center {
         align-items: center !important;
       }
-      .justify-content-between {
-        justify-content: space-between !important;
-      }
       .flex-fill {
         flex: 1 1 auto !important;
       }
@@ -394,17 +399,6 @@
 
       .w-100 {
         width: 100% !important;
-      }
-
-      .align-items-center {
-        align-items: center !important;
-      }
-
-      .justify-content-between {
-        justify-content: space-between !important;
-      }
-      .d-flex {
-        display: flex !important;
       }
 
       .white {
@@ -453,6 +447,10 @@
       .rounded {
         border-radius: 0.25rem !important;
       }
+
+      .logo {
+        max-height: 50px;
+      }
     </style>
   </head>
   <body>
@@ -479,7 +477,40 @@
                     cellspacing="0"
                   >
                     <tr>
+                      <td align="left">
+                        <div>
+                          <a
+                            target="_blank"
+                            href="www.liquid-vote.com/profile/<%=toUser.LiquidUser.handle%>"
+                            ><div class="position-relative">
+                              <div
+                                class="small-avatar bg-primary_"
+                                style="
+                                  background: url('<%=toUser.LiquidUser.avatar%>')
+                                    50% 50% / cover no-repeat;
+                                  max-width: fit-content;
+                                "
+                              ></div>
+                            </div>
+                          </a>
+                        </div>
+                      </td>
+                      <td align="right">
+                        <a target="_blank" href="www.liquid-vote.com">
+                          <img
+                            class="logo rounded"
+                            src="https://images.liquid-vote.com/system/logo.png"
+                          />
+                        </a>
+                      </td>
+                    </tr>
+                    <tr>
                       <td>
+                        <br />
+                      </td>
+                    </tr>
+                    <tr>
+                      <td colspan="2">
                         <div
                           class="d-flex relative align-items-center notification not-seen"
                         >
@@ -555,7 +586,7 @@
                     Don't like these emails?
                     <a
                       class="white"
-                      href="www.liquid-vote.com?/notifications?modal=NotificationSettings"
+                      href="www.liquid-vote.com/notifications?modal=NotificationSettings"
                       >Unsubscribe</a
                     >.
                   </td>

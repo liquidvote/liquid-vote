@@ -56,8 +56,8 @@ export const NotificationSettings: FunctionComponent<{}> = ({ }) => {
     }
 
     useEffect(() => {
-        setValue('allowEmails', typeof notificationSettings?.allowEmails !== undefined ?  notificationSettings?.allowEmails : true);
-        setValue('allowNotifications', typeof notificationSettings?.allowNotifications !== undefined ? notificationSettings?.allowNotifications : true);
+        setValue('allowEmails', typeof notificationSettings?.allowEmails !== "undefined" ?  notificationSettings?.allowEmails : true);
+        setValue('allowNotifications', typeof notificationSettings?.allowNotifications !== "undefined" ? notificationSettings?.allowNotifications : true);
     }, [notificationSettings]);
 
     useEffect(() => {

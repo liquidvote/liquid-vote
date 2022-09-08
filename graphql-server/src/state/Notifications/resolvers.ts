@@ -411,19 +411,24 @@ export const saveAndSendNotification = async ({
         "followed_you": `Followed you`,
         "voted_on_a_poll": `Voted on ${Question?.questionText}${choiceText ? `: ${choiceText}` : ''} ${inviterUser?._id.toString() === AuthUser?._id.toString() ? ` by your invite${(typeof agreesWithYou !== undefined ? `, ${agreesWithYou ? `Agreeing` : `Disagreeing`} with you ` : null)}` : null}`,
         "invited_you_to_vote_on_a_poll": `Invited you to vote on ${Question?.questionText}`,
-        "invited_you_to_vote_on_profile": `Invited you to vote with ${User?._id.toString() !== actionUser?._id.toString() ? (User?.LiquidUser?.name) : 'him'}`,
+        "invited_you_to_vote_on_profile": `Invited you to vote with ${User?._id.toString() !== ActionUser?._id.toString() ? (User?.LiquidUser?.name) : 'him'}`,
         "invited_you_to_vote_on_group": `Invited you to vote on  ${group?.name}`,
     }[type]);
 
     const notificationLink = inviteLink ||
         type === 'voted_on_a_poll_you_voted' ? `` :
         type === 'followed_you' ? `` :
-            type === 'voted_on_a_poll' ? `` : null
+            type === 'voted_on_a_poll' ? `` : null;
 
+    const canSendEmail = ToUser.NotificationSettings?.allowEmails ||
+        typeof ToUser.NotificationSettings === 'undefined' ||
+        typeof ToUser.NotificationSettings?.allowEmails === 'undefined';
+
+    const canSendNotification = !!ToUser?.NotificationSettings?.firebase_token;
 
     console.log({
         type,
-        toUser,
+        ToUser,
         toUserHandle,
         actionUser,
         actionUserHandle,
@@ -434,15 +439,13 @@ export const saveAndSendNotification = async ({
         groupHandle,
         agreesWithYou,
         User,
-        messageText
+        messageText,
+        canSendEmail,
+        canSendNotification
     });
 
     // if user allows Email
-    const emailStatus = (
-        ToUser.NotificationSettings?.allowEmails ||
-        typeof ToUser.NotificationSettings === undefined ||
-        typeof ToUser.NotificationSettings?.allowEmails === undefined
-    ) ?
+    const emailStatus = (canSendEmail) ?
         sendEmail({
             toAddress: ToUser.LiquidUser.email,
             subject: `${ActionUser?.LiquidUser?.name} ${messageText}`,
@@ -453,14 +456,14 @@ export const saveAndSendNotification = async ({
                 question: Question,
                 group: Group,
                 choiceText,
-                actionUser,
+                actionUser: ActionUser,
                 toUser: ToUser,
                 user: User
             }
         }) :
         null;
 
-    const pushNotificationStatus = (!!ToUser?.NotificationSettings?.firebase_token) ?
+    const pushNotificationStatus = (canSendNotification) ?
         sendPushNotification({
             token: ToUser?.NotificationSettings?.firebase_token,
             title: `${ActionUser?.LiquidUser?.name} on Liquid Vote`,
@@ -469,6 +472,11 @@ export const saveAndSendNotification = async ({
             inviteLink
         }) :
         null;
+
+    console.log({
+        emailStatus,
+        pushNotificationStatus
+    });
 
     return {
         ...savedNotification,
