@@ -412,7 +412,7 @@ export const saveAndSendNotification = async ({
         "voted_on_a_poll": `Voted on ${Question?.questionText}${choiceText ? `: ${choiceText}` : ''} ${inviterUser?._id.toString() === AuthUser?._id.toString() ? ` by your invite${(typeof agreesWithYou !== undefined ? `, ${agreesWithYou ? `Agreeing` : `Disagreeing`} with you ` : null)}` : null}`,
         "invited_you_to_vote_on_a_poll": `Invited you to vote on ${Question?.questionText}`,
         "invited_you_to_vote_on_profile": `Invited you to vote with ${User?._id.toString() !== ActionUser?._id.toString() ? (User?.LiquidUser?.name) : 'him'}`,
-        "invited_you_to_vote_on_group": `Invited you to vote on  ${group?.name}`,
+        "invited_you_to_vote_on_group": `Invited you to vote on ${Group?.name}`,
     }[type]);
 
     const notificationLink = inviteLink ||
