@@ -98,6 +98,7 @@ export const QuestionsAgg = ({
 
         ...AuthUserId ? [
             {
+                // TODO: Index, +2.539
                 '$lookup': {
                     'as': 'yourVote',
                     'from': 'Votes',
@@ -766,81 +767,82 @@ const yourStats = ({ AuthUserId }) => [
                 ]
             }
         },
-        {
-            '$lookup': {
-                as: "usersYouAreRepresenting",
-                from: "Votes",
-                let: {
-                    'loggedInUser': AuthUserId,
-                    "questionText": "$questionText",
-                    "choiceText": "$choiceText",
-                    "group": "$groupChannel.group"
-                },
-                'pipeline': [
-                    {
-                        '$match': {
-                            '$and': [
-                                { 'isDirect': false },
-                                { 'position': { $ne: null } },
-                                {
-                                    '$expr': {
-                                        '$eq': [
-                                            '$questionText', '$$questionText'
-                                        ]
-                                    }
-                                },
-                                {
-                                    '$expr': {
-                                        '$eq': [
-                                            '$choiceText', '$$choiceText'
-                                        ]
-                                    }
-                                },
-                                {
-                                    '$expr': {
-                                        '$eq': [
-                                            '$groupChannel.group', '$$group'
-                                        ]
-                                    }
-                                },
-                            ]
-                        }
-                    },
-                    {
-                        '$match': {
-                            '$expr': {
-                                '$gte': [
-                                    {
-                                        '$size': {
-                                            '$filter': {
-                                                'input': '$representatives',
-                                                'as': 'r',
-                                                'cond': {
-                                                    '$and': [
-                                                        {
-                                                            '$eq': [
-                                                                '$$r.representativeId', {
-                                                                    '$toObjectId': '$$loggedInUser'
-                                                                }
-                                                            ]
-                                                        },
-                                                        {
-                                                            '$ne': [
-                                                                '$$r.position', 'delegated'
-                                                            ]
-                                                        }
-                                                    ]
-                                                }
-                                            }
-                                        }
-                                    }, 1
-                                ]
-                            }
-                        }
-                    }
-                ]
-            }
-        },
+        // {
+        //     // TODO: Index, +45.2959
+        //     '$lookup': {
+        //         as: "usersYouAreRepresenting",
+        //         from: "Votes",
+        //         let: {
+        //             'loggedInUser': AuthUserId,
+        //             "questionText": "$questionText",
+        //             "choiceText": "$choiceText",
+        //             "group": "$groupChannel.group"
+        //         },
+        //         'pipeline': [
+        //             {
+        //                 '$match': {
+        //                     '$and': [
+        //                         { 'isDirect': false },
+        //                         { 'position': { $ne: null } },
+        //                         {
+        //                             '$expr': {
+        //                                 '$eq': [
+        //                                     '$questionText', '$$questionText'
+        //                                 ]
+        //                             }
+        //                         },
+        //                         {
+        //                             '$expr': {
+        //                                 '$eq': [
+        //                                     '$choiceText', '$$choiceText'
+        //                                 ]
+        //                             }
+        //                         },
+        //                         {
+        //                             '$expr': {
+        //                                 '$eq': [
+        //                                     '$groupChannel.group', '$$group'
+        //                                 ]
+        //                             }
+        //                         },
+        //                     ]
+        //                 }
+        //             },
+        //             {
+        //                 '$match': {
+        //                     '$expr': {
+        //                         '$gte': [
+        //                             {
+        //                                 '$size': {
+        //                                     '$filter': {
+        //                                         'input': '$representatives',
+        //                                         'as': 'r',
+        //                                         'cond': {
+        //                                             '$and': [
+        //                                                 {
+        //                                                     '$eq': [
+        //                                                         '$$r.representativeId', {
+        //                                                             '$toObjectId': '$$loggedInUser'
+        //                                                         }
+        //                                                     ]
+        //                                                 },
+        //                                                 {
+        //                                                     '$ne': [
+        //                                                         '$$r.position', 'delegated'
+        //                                                     ]
+        //                                                 }
+        //                                             ]
+        //                                         }
+        //                                     }
+        //                                 }
+        //                             }, 1
+        //                         ]
+        //                     }
+        //                 }
+        //             }
+        //         ]
+        //     }
+        // },
         {
             '$addFields': {
                 'yourStats': {
@@ -848,7 +850,8 @@ const yourStats = ({ AuthUserId }) => [
                     'votersYouFollowCount': { '$size': '$votersYouFollow' },
                     'votersRepresentingYou': '$yourVote.representatives',
                     'votersRepresentingYouCount': { '$size': '$yourVote.representatives' },
-                    'usersYouAreRepresentingCount': { '$size': '$usersYouAreRepresenting' },
+                    // 'usersYouAreRepresentingCount': { '$size': '$usersYouAreRepresenting' },
+                    'usersYouAreRepresentingCount': 0,
                 }
             }
         },
