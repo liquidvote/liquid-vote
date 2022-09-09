@@ -20,7 +20,7 @@ export const Feed: FunctionComponent<{}> = ({ }) => {
 
     let { section } = useParams<any>();
     const { liquidUser } = useAuthUser();
-    const { user: yourUser } = useUser({ userHandle: liquidUser?.handle });
+    const { user: yourUser, user_loading: yourUser_loading } = useUser({ userHandle: liquidUser?.handle });
     const { loginWithPopup, isLoading: auth0_loading, isAuthenticated } = useAuth0();
 
     const loadingMessages = [
@@ -52,15 +52,15 @@ export const Feed: FunctionComponent<{}> = ({ }) => {
             notUsers: section === 'other' || !liquidUser,
             // groupHandle: null
         },
-        skip: !liquidUser || !yourUser?.stats?.following
+        skip: !liquidUser
     });
 
-    console.log({
-        liquidUser,
-        yourUser,
-        section,
-        questions_data
-    });
+    // console.log({
+    //     liquidUser,
+    //     yourUser,
+    //     section,
+    //     questions_data
+    // });
 
     return (
         <>
@@ -93,7 +93,7 @@ export const Feed: FunctionComponent<{}> = ({ }) => {
             } */}
 
             <div className="mt-3">
-                {questions_data?.Questions?.map((v: any, i: any) => (
+                {yourUser?.stats?.following > 0 && questions_data?.Questions?.map((v: any, i: any) => (
                     <>
                         {v?.group?.handle !== questions_data?.Questions[i - 1]?.group?.handle ? (
                             <GroupPollListCover
@@ -154,7 +154,7 @@ export const Feed: FunctionComponent<{}> = ({ }) => {
                     </div>
                 )}
 
-                {(liquidUser && !yourUser?.stats?.following && !questions_loading) && (
+                {(liquidUser && yourUser?.stats?.following === 0 && !questions_loading) && (
                     <div className="d-flex align-items-center justify-content-center min-vh-100 flex-column">
                         <div className="p-4 text-center">
                             <h3>Liquid Vote is more fun with friends.</h3>
@@ -172,7 +172,7 @@ export const Feed: FunctionComponent<{}> = ({ }) => {
                     </div>
                 )}
 
-                {(questions_loading || (isAuthenticated && !liquidUser)) && (
+                {(questions_loading || yourUser_loading || (isAuthenticated && !liquidUser)) && (
                     <div className="d-flex align-items-center justify-content-center min-vh-100 flex-column">
                         <DropAnimation />
                         <p className='mt-4 text-center px-5'>{loadingMessages[selectedLoadingMessage]}</p>
