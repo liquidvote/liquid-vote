@@ -55,12 +55,9 @@ export const Feed: FunctionComponent<{}> = ({ }) => {
         skip: !liquidUser
     });
 
-    // console.log({
-    //     liquidUser,
-    //     yourUser,
-    //     section,
-    //     questions_data
-    // });
+    console.log({
+        liquidUser, yourUser, questions_loading
+    });
 
     return (
         <>
@@ -154,12 +151,12 @@ export const Feed: FunctionComponent<{}> = ({ }) => {
                     </div>
                 )}
 
-                {(liquidUser && yourUser?.stats?.following === 0 && !questions_loading) && (
+                {(liquidUser && yourUser && !yourUser?.stats?.following && !questions_loading) && (
                     <div className="d-flex align-items-center justify-content-center min-vh-100 flex-column">
                         <div className="p-4 text-center">
                             <h3>Liquid Vote is more fun with friends.</h3>
 
-                            <p>Follow people to see here what they are voting on.</p>
+                            <p>Follow some to see what they are voting on.</p>
                         </div>
                     </div>
                 )}

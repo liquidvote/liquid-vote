@@ -4,6 +4,7 @@ service: graphql
 provider:
   name: aws
   runtime: nodejs16.x
+  region: eu-west-1
 functions:
   graphql:
     # this is formatted as <FILENAME>.<HANDLER>
@@ -20,7 +21,6 @@ functions:
 
 plugins:
   - serverless-plugin-typescript
-  - serverless-offline
   - serverless-domain-manager
 package:
   patterns:
@@ -28,8 +28,6 @@ package:
     - src/**
   excludeDevDependencies: true
 custom:
-  serverless-offline:
-    noPrependStageInUrl: true
   customDomain:
     domainName: graphql.liquid-vote.com
     stage: dev
