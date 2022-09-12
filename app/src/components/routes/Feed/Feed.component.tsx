@@ -55,10 +55,6 @@ export const Feed: FunctionComponent<{}> = ({ }) => {
         skip: !liquidUser
     });
 
-    console.log({
-        liquidUser, yourUser, questions_loading
-    });
-
     return (
         <>
             {/* <Header
@@ -128,9 +124,9 @@ export const Feed: FunctionComponent<{}> = ({ }) => {
                 {(!liquidUser && !isAuthenticated) && (
                     <div className="d-flex align-items-center justify-content-center min-vh-100 flex-column">
                         <div className="p-4 text-center">
-                            <h3>Liquid Vote is more fun with friends.</h3>
+                            <h3>Welcome to <b className='white'>Liquid Vote</b>!</h3>
 
-                            <p>Login to see what they are voting on.</p>
+                            <p>Login to vote with your friends and the world around you.</p>
 
                             <div className="d-flex align-items-center justify-content-center">
                                 <div
@@ -154,7 +150,7 @@ export const Feed: FunctionComponent<{}> = ({ }) => {
                 {(liquidUser && yourUser && !yourUser?.stats?.following && !questions_loading) && (
                     <div className="d-flex align-items-center justify-content-center min-vh-100 flex-column">
                         <div className="p-4 text-center">
-                            <h3>Liquid Vote is more fun with friends.</h3>
+                            <h3><b className='white'>Liquid Vote</b> is more fun with friends.</h3>
 
                             <p>Follow some to see what they are voting on.</p>
                         </div>
