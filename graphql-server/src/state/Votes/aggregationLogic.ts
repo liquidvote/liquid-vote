@@ -15,19 +15,49 @@ export const VotersAgg = ({
         [
             {
                 '$match': {
-                    ...(!!questionText) && {
-                        'questionText': questionText
-                    },
-                    // ...(!!choiceText) && {
-                    //     'choiceText': choiceText
-                    // },
-                    ...(!!userHandle) && {
-                        'user': new ObjectId(User._id)
-                    },
-                    ...(!!groupHandle) && {
-                        'groupChannel.group': groupHandle
-                    },
-                    'position': { $ne: null }
+                    "$and": [
+                        ...(!!questionText) ? [
+                            {
+                                "$expr": {
+                                    "$eq": [
+                                        "$questionText", questionText
+                                    ]
+                                }
+                            }
+                        ] : [],
+
+                        ...(!!userHandle) ? [
+                            {
+                                "$expr": {
+                                    "$eq": [
+                                        "$user",
+                                        {
+                                            "$toObjectId": new ObjectId(User._id)
+                                        }
+                                    ]
+                                }
+                            }
+                        ] : [],
+
+                        ...(!!groupHandle) ? [
+                            {
+                                "$expr": {
+                                    "$eq": [
+                                        "$groupChannel.group", groupHandle
+                                    ]
+                                }
+                            }
+                        ] : [],
+
+                        {
+                            "$expr": {
+                                "$ne": [
+                                    "$position", null
+                                ]
+                            }
+                        }
+
+                    ]
                 }
             }
         ]
@@ -124,7 +154,7 @@ export const VotersAgg = ({
                             '$and': [
                                 {
                                     '$eq': [
-                                        '$isDirect', true
+                                        '$userVote.isDirect', true
                                     ]
                                 }, {
                                     '$eq': [
@@ -142,7 +172,7 @@ export const VotersAgg = ({
                             '$and': [
                                 {
                                     '$eq': [
-                                        '$isDirect', true
+                                        '$userVote.isDirect', true
                                     ]
                                 },
                                 {
@@ -152,7 +182,7 @@ export const VotersAgg = ({
                                 },
                                 {
                                     '$eq': [
-                                        '$position', '$yourVote.position'
+                                        '$userVote.position', '$yourVote.position'
                                     ]
                                 },
                                 {
@@ -166,7 +196,7 @@ export const VotersAgg = ({
                             '$and': [
                                 {
                                     '$eq': [
-                                        '$isDirect', true
+                                        '$userVote.isDirect', true
                                     ]
                                 },
                                 {
@@ -176,7 +206,7 @@ export const VotersAgg = ({
                                 },
                                 {
                                     '$ne': [
-                                        '$position', '$yourVote.position'
+                                        '$userVote.position', '$yourVote.position'
                                     ]
                                 },
                                 {
@@ -193,7 +223,7 @@ export const VotersAgg = ({
                                     '$or': [
                                         { $not: ["$yourVote"] },
                                         { $ne: ["$yourVote.choiceText", choiceText] },
-                                        { $ne: ["$isDirect", true] }
+                                        { $ne: ["$userVote.isDirect", true] }
                                     ]
                                 },
                                 then: false,
@@ -208,7 +238,7 @@ export const VotersAgg = ({
                                                         '$and': [
                                                             {
                                                                 '$eq': [
-                                                                    '$$r.representativeId', '$user'
+                                                                    '$$r.representativeId', '$userVote.user'
                                                                 ]
                                                             }
                                                         ]
@@ -225,7 +255,7 @@ export const VotersAgg = ({
                                 // if: false,
                                 if: {
                                     '$or': [
-                                        { $eq: ["$isDirect", true] },
+                                        { $eq: ["$userVote.isDirect", true] },
                                         { $ne: ["$yourVote.choiceText", choiceText] },
                                         { $ne: ["$yourVote.isDirect", true] }
                                     ]
@@ -236,11 +266,11 @@ export const VotersAgg = ({
                                         {
                                             '$size': {
                                                 '$filter': {
-                                                    'input': '$representatives',
+                                                    'input': '$userVote.representatives',
                                                     'as': 'r',
                                                     'cond': {
                                                         '$eq': [
-                                                            '$$r.representativeId', ObjectId('60ba506d2e7efed1c46e1837')
+                                                            '$$r.representativeId', new ObjectId(AuthUser?._id)
                                                         ]
                                                     }
                                                 }
@@ -318,7 +348,7 @@ export const VotersAgg = ({
             }
         ]
     ),
-    representativeUsers: (
+    representativeUsersForUserVote: (
         [
             {
                 '$unwind': {
@@ -362,14 +392,14 @@ export const VotersAgg = ({
                     'userVote': { '$first': '$userVote' },
                     'yourVote': { '$first': '$yourVote' },
                     'youAndUserDetails': { '$first': '$youAndUserDetails' },
-                    'representatives': { '$push': '$userVote.representatives' },
+                    'userVote_representatives': { '$push': '$userVote.representatives' },
                     'user': { '$first': '$user' },
                 }
             }, {
                 '$addFields': {
-                    'representatives': {
+                    'userVote_representatives': {
                         '$filter': {
-                            'input': '$representatives',
+                            'input': '$userVote_representatives',
                             'as': 'r',
                             'cond': {
                                 "$gt": ["$$r", {}]
@@ -379,7 +409,7 @@ export const VotersAgg = ({
                 }
             }, {
                 '$addFields': {
-                    'userVote.representatives': '$representatives'
+                    'userVote.representatives': '$userVote_representatives'
                 }
             }
         ]
@@ -388,10 +418,10 @@ export const VotersAgg = ({
         [
             {
                 '$lookup': {
-                    'as': 'representeeVotes',
+                    'as': 'userVoteRepresenteeVotes',
                     'from': 'Votes',
                     'let': {
-                        'representativeId': { '$toObjectId': '$user' },
+                        'representativeId': { '$toObjectId': '$userVote.user' },
                         'questionText': '$questionText',
                         'choiceText': '$choiceText',
                         'group': '$groupChannel.group'
@@ -463,16 +493,10 @@ export const VotersAgg = ({
             },
             {
                 '$addFields': {
-                    'representeeCount': { $size: "$representeeVotes" },
-                    'userVote.representeeVotes': '$representeeVotes'
+                    'representeeCount': { $size: "$userVoteRepresenteeVotes" },
+                    'userVote.representeeVotes': '$userVoteRepresenteeVotes'
                 }
             }
-        ]
-    ),
-    representeeVotesAsList: (
-        [
-            { '$unwind': '$representeeVotes' },
-            { '$replaceRoot': { newRoot: '$representeeVotes' } }
         ]
     ),
     mergedChoices: (
@@ -498,8 +522,6 @@ export const VotersAgg = ({
                         }
                     },
                     'lastEditOn': { '$last': '$lastEditOn' },
-                    'representeeVotes': { '$push': '$representeeVotes' },
-                    'representatives': { '$push': '$representatives' },
                     'user': { '$first': '$user' },
                     // for single questions
                     'yourVote': { '$first': '$yourVote' },
@@ -614,12 +636,12 @@ export const VotersAgg = ({
         [
             {
                 '$unwind': {
-                    'path': '$representeeVotes',
+                    'path': '$userVote.representeeVotes',
                     'preserveNullAndEmptyArrays': true
                 }
             }, {
                 '$unwind': {
-                    'path': '$representeeVotes',
+                    'path': '$userVote.representeeVotes',
                     'preserveNullAndEmptyArrays': true
                 }
             }, {
@@ -628,7 +650,7 @@ export const VotersAgg = ({
                         'user': '$_id.user',
                         'questionText': '$_id.questionText',
                         'groupChannel': '$_id.groupChannel',
-                        'representeeHandle': '$representeeVotes.user.handle'
+                        'representeeHandle': '$userVote.representeeVotes.user.handle'
                     },
                     'root': {
                         '$first': '$$ROOT'
@@ -647,8 +669,6 @@ export const VotersAgg = ({
                     'groupChannel': { '$first': '$root.groupChannel' },
                     'choiceVotes': { '$first': '$root.choiceVotes' },
                     'lastEditOn': { '$first': '$root.lastEditOn' },
-                    'representeeVotes': { '$push': '$root.representeeVotes' },
-                    'representatives': { '$first': '$root.representatives' },
                     'user': { '$first': '$root.user' },
                     'yourVote': { '$first': '$root.yourVote' },
                     'userVote': { '$first': '$root.userVote' },
@@ -662,12 +682,12 @@ export const VotersAgg = ({
         [
             {
                 '$unwind': {
-                    'path': '$representatives',
+                    'path': '$userVote.representatives',
                     'preserveNullAndEmptyArrays': true
                 }
             }, {
                 '$unwind': {
-                    'path': '$representatives',
+                    'path': '$userVote.representatives',
                     'preserveNullAndEmptyArrays': true
                 }
             }, {
@@ -677,7 +697,7 @@ export const VotersAgg = ({
                         'user': '$_id.user',
                         'questionText': '$_id.questionText',
                         'groupChannel': '$_id.groupChannel',
-                        'representativeId': '$representatives.representativeId'
+                        'representativeId': '$userVote.representatives.representativeId'
                     },
                     'root': {
                         '$first': '$$ROOT'
@@ -696,13 +716,18 @@ export const VotersAgg = ({
                     'groupChannel': { '$first': '$root.groupChannel' },
                     'choiceVotes': { '$first': '$root.choiceVotes' },
                     'lastEditOn': { '$first': '$root.lastEditOn' },
-                    'representeeVotes': { '$first': '$root.representeeVotes' },
-                    'representatives': { '$push': '$root.representatives' },
+                    // 'representeeVotes': { '$first': '$root.representeeVotes' },
                     'user': { '$first': '$root.user' },
                     'yourVote': { '$first': '$root.yourVote' },
                     'userVote': { '$first': '$root.userVote' },
+                    'userVote_representatives': { '$push': '$root.userVote.representatives' },
                     'youAndUserDetailsCount': { '$first': '$root.youAndUserDetailsCount' },
                     'Count': { '$first': '$root.Count' },
+                }
+            },
+            {
+                '$addFields': {
+                    'userVote.representatives': '$userVote_representatives'
                 }
             }
         ]
@@ -758,15 +783,165 @@ export const VotersAgg = ({
                     'question.group': { $first: '$group' },
                     'group': { $first: '$group' }
                 }
-            },
-            {
-                '$addFields': {
-                    'userId': '$user'
-                }
-            },
+            }
         ]
     ),
-    addMemberRelationToGroup: ([
+    mergeQuestionAndChoiceVotes: ([
+        {
+            '$unwind': {
+                'path': '$question.choices',
+                'preserveNullAndEmptyArrays': true
+            }
+        },
+        {
+            '$addFields': {
+                'question.choices.yourVote': {
+                    '$filter': {
+                        'input': '$choiceVotes',
+                        'as': 'c',
+                        'cond': {
+                            '$and': [
+                                {
+                                    '$eq': [
+                                        '$$c.yourVote.user', { "$toObjectId": AuthUser?._id }
+                                    ],
+                                },
+                                {
+                                    '$eq': [
+                                        '$$c.yourVote.choiceText', "$question.choices.text"
+                                    ]
+                                }
+                            ]
+                        }
+                    }
+                },
+                'question.choices.userVote': {
+                    '$filter': {
+                        'input': '$choiceVotes',
+                        'as': 'c',
+                        'cond': {
+                            '$and': [
+                                {
+                                    '$eq': [
+                                        '$$c.userVote.user', { "$toObjectId": "$user" }
+                                    ]
+                                },
+                                {
+                                    '$eq': [
+                                        '$$c.userVote.choiceText', "$question.choices.text"
+                                    ]
+                                }
+                            ]
+                        }
+                    }
+                },
+            }
+        },
+        {
+            '$lookup': {
+                'as': 'yourVote_',
+                'from': 'Votes',
+                'let': {
+                    'alreadyHasYourVote': {
+                        "$size": "$question.choices.yourVote"
+                    },
+                    'userId': new ObjectId(AuthUser?._id),
+                    'questionText': '$questionText',
+                    'choiceText': '$question.choices.text',
+                    'group': '$groupChannel.group',
+                },
+                'pipeline': [
+                    {
+                        '$match': {
+                            '$expr': {
+                                '$lt': [
+                                    '$$alreadyHasYourVote', 1
+                                ]
+                            }
+                        },
+                    },
+                    {
+                        '$match': {
+                            '$and': [
+                                {
+                                    '$expr': {
+                                        '$eq': [
+                                            '$user', {
+                                                '$toObjectId': '$$userId'
+                                            }
+                                        ]
+                                    }
+                                },
+                                {
+                                    '$expr': {
+                                        '$eq': [
+                                            '$questionText', '$$questionText'
+                                        ]
+                                    }
+                                },
+                                {
+                                    '$expr': {
+                                        '$eq': [
+                                            '$choiceText', '$$choiceText'
+                                        ]
+                                    }
+                                },
+                                {
+                                    '$expr': {
+                                        '$eq': [
+                                            '$groupChannel.group', '$$group'
+                                        ]
+                                    }
+                                }
+
+                            ]
+                        }
+                    }
+                ]
+            }
+        },
+        {
+            '$addFields': {
+                'question.choices.yourVote': {
+                    $cond: {
+                        if: { $gt: [{ '$size': '$question.choices.yourVote.yourVote' }, 0] },
+                        then: { '$first': '$question.choices.yourVote.yourVote' },
+                        else: { '$first': '$yourVote_' }
+                    }
+                },
+                'question.choices.userVote': { '$first': '$question.choices.userVote.userVote' },
+            }
+        },
+        {
+            '$group': {
+                '_id': {
+                    'user': '$user',
+                    'questionText': '$questionText',
+                    'groupChannel': '$groupChannel'
+                },
+                'questionText': { '$first': '$questionText' },
+                'groupChannel': { '$first': '$groupChannel' },
+                'choiceVotes': { '$first': '$choiceVotes' },
+                'lastEditOn': { '$first': '$lastEditOn' },
+                // 'representeeVotes': { '$first': '$representeeVotes' },
+                'user': { '$first': '$user' },
+                'yourVote': { '$first': '$yourVote' },
+                'userVote': { '$first': '$userVote' },
+                'youAndUserDetailsCount': { '$first': '$youAndUserDetailsCount' },
+                'Count': { '$first': '$Count' },
+                'question': { $first: '$question' },
+                'group': { $first: '$group' },
+
+                'question_choices': { '$push': '$question.choices' },
+            }
+        },
+        {
+            '$addFields': {
+                'question.choices': '$question_choices'
+            }
+        },
+    ]),
+    addYourMemberRelationToGroup: ([
         {
             $addFields: {
                 'question.group.yourMemberRelation': '$yourRel',
@@ -794,7 +969,7 @@ export const VotersAgg = ({
             },
             {
                 '$addFields': {
-                    'user': {
+                    'userVote.user': {
                         $cond: { if: { $eq: ['$visibility.hasViewingPermission', true] }, then: '$user', else: null }
                     }
                 }
@@ -803,20 +978,29 @@ export const VotersAgg = ({
     ),
     sortLogic: (
         [
-            {
-                '$addFields': {
-                    'representeeVotesCount': { '$size': "$representeeVotes" }
-                }
-            },
             ...(sortBy === 'weight') ? [
+                {
+                    '$addFields': {
+                        'representeeVotesCount': { '$size': "$userVote.representeeVotes" }
+                    }
+                },
                 {
                     '$sort': { representeeVotesCount: -1 }
                 }
             ] : [],
             ...(sortBy === 'time') ? [
-                {
-                    '$sort': { lastEditOn: -1 }
-                }
+                ...userHandle ? [
+                    {
+                        $sort: {
+                            'lastEditOn': -1,
+                            'visibility.visibilityLevel': 1
+                        }
+                    }
+                ] : [
+                    {
+                        '$sort': { 'lastEditOn': -1 }
+                    },
+                ],
             ] : []
         ]
     ),
@@ -911,7 +1095,7 @@ export const VotersAgg = ({
                 }
             }
         },
-    ])
+    ]),
 });
 
 export const VotesGeneralAggregateLogic = async ({
@@ -948,32 +1132,35 @@ export const VotesGeneralAggregateLogic = async ({
             ...filterAfterYourVoteAndBooleans
         ] : [],
         ...AggregateLogic.representativeUsersForYourVote,
-        ...AggregateLogic.representativeUsers,
+        ...AggregateLogic.representativeUsersForUserVote,
         ...AggregateLogic.representeeVotes,
         ...AggregateLogic.mergedChoices,
         ...AggregateLogic.mergedChoicesUniqueRepresentatives,
-        ...AggregateLogic.mergedChoicesUniqueRepresentees,
+        // ...AggregateLogic.mergedChoicesUniqueRepresentees, // broken
         ...!!filterAfterMerge ? [
             ...filterAfterMerge
         ] : [],
         ...AggregateLogic.matchChoiceParam(choiceFilters),
-        ...AggregateLogic.sortLogic,
         ...AggregateLogic.questionAndGroup,
+        ...AggregateLogic.mergeQuestionAndChoiceVotes,
+        {
+            '$addFields': {
+                'userId': '$user'
+            }
+        },
         ...canViewUsersVoteOrCause({ AuthUser }),
         ...userHandle ? [
             {
                 $match: {
                     'visibility.hasViewingPermission': true
                 }
-            },
-            {
-                $sort: { 'visibility.visibilityLevel': 1 }
             }
         ] : [],
-        ...AggregateLogic.addMemberRelationToGroup,
+        ...AggregateLogic.sortLogic,
+        ...AggregateLogic.addYourMemberRelationToGroup,
         ...AggregateLogic.userObject,
 
-        ...(followsOnly && AuthUser) ? AggregateLogic.filterFollows : []
+        ...(followsOnly && AuthUser) ? AggregateLogic.filterFollows : [],
     ];
 };
 

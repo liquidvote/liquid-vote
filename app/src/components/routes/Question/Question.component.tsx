@@ -25,6 +25,7 @@ import QuestionArguments from "./QuestionArguments";
 import ThreeDotsSmallSVG from '@shared/Icons/ThreeDots-small-horizontal.svg';
 import Popper from "@shared/Popper";
 import Avatar from '@components/shared/Avatar';
+import MetaTags from "@components/shared/MetaTags";
 
 export default function Question() {
 
@@ -76,6 +77,12 @@ export default function Question() {
         </div>
     ) : (question_error) ? (<>Error</>) : (
         <>
+            <MetaTags
+                title={question?.questionText+' on '+group?.name}
+                description={question?.description}
+                image={group?.cover}
+            />
+
             <ReactTooltip place="bottom" type="dark" effect="solid" />
 
             <Header title="Opinion Poll" />

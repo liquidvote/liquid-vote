@@ -13,6 +13,7 @@ import VoteSortPicker from '@components/shared/VoteSortPicker';
 import PollExplanation from '@shared/PollExplanation';
 import useUser from '@state/User/user.effect';
 import GroupPollListCover from "@shared/GroupPollListCover";
+import MetaTags from "@components/shared/MetaTags";
 
 import './style.sass';
 
@@ -57,6 +58,11 @@ export const Feed: FunctionComponent<{}> = ({ }) => {
 
     return (
         <>
+            <MetaTags
+                title="Liquid Vote - Where opinions are found"
+                description="Liquid Vote is an open platform where users express opinions through polls launched by friends or experts on any topic."
+                image="https://images.liquid-vote.com/system/logo.png"
+            />
             {/* <Header
                 title="Feed"
                 // subtitle="Polls from groups you've joined that people you follow have recently voted on"
@@ -172,6 +178,16 @@ export const Feed: FunctionComponent<{}> = ({ }) => {
                     </div>
                 )}
             </div>
+
+
+            {/* Feed Engagement Primers */}
+            {/* Follow your Followers's Follows - if you have <5 followers */}
+            {/* Invite other's to compare with Followings - if Following(s) have <5 followers */}
+            {/* Invite Followings to vote on Causes you've voted but they haven't */}
+            {/* Be the first of your friends to vote on new Causes */}
+            {/* Launch a new poll in one of your Causes */}
+            {/* Launch a new Cause */}
+
         </>
     );
 }

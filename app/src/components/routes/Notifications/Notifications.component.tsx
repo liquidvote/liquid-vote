@@ -9,6 +9,7 @@ import useAuthUser from '@state/AuthUser/authUser.effect';
 import DropAnimation from '@components/shared/DropAnimation';
 import CogSVG from "@shared/Icons/Cog.svg";
 import useSearchParams from "@state/Global/useSearchParams.effect";
+import MetaTags from "@components/shared/MetaTags";
 
 import './style.sass';
 import { Notification } from './Notification/Notification.component';
@@ -41,6 +42,12 @@ export const Notifications: FunctionComponent<{}> = ({ }) => {
 
     return (
         <>
+            <MetaTags
+                title="Notifications - Liquid Vote"
+                description="Where opinions are found"
+                image="https://images.liquid-vote.com/system/logo.png"
+            />
+
             <Header
                 title="Notifications"
                 rightElement={() => (

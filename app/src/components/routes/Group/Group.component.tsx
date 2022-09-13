@@ -25,6 +25,7 @@ import env from '@env';
 import InviteTinySvg from "@shared/Icons/Invite-tiny.svg";
 import Avatar from '@components/shared/Avatar';
 import GroupVisibilityPicker from '@components/shared/GroupVisibilityPicker';
+import MetaTags from "@components/shared/MetaTags";
 
 import GroupPolls from './GroupPolls';
 import './style.sass';
@@ -98,6 +99,12 @@ export const Group: FunctionComponent<{}> = ({ }) => {
         </div>
     ) : (
         <>
+            <MetaTags
+                title={group?.name+' on Liquid Vote'}
+                description={group?.bio}
+                image={group?.cover}
+            />
+
             <Header title={group?.name} iconType="group" />
 
             {!!inviterHandle && (

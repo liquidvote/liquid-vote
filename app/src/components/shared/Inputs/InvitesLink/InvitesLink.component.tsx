@@ -34,6 +34,7 @@ export const InvitesLink: FunctionComponent<Props> = ({
             <div className="inputElementWrapper">
                 <div className="inputElementWrapper">
                     <textarea
+                        className='invite-link-textarea'
                         // type={'input'}
                         value={inviteLink}
                         onClick={e => (e.target as any).select()}

@@ -246,46 +246,25 @@ export const VoteResolvers = {
             //     { encoding: 'utf8' }
             // );
 
-            const Votes = (await mongoDB.collection("Votes").aggregate(VotesSpecificAggregateLogic).toArray())
+            const Votes = (await mongoDB.collection("Votes")
+                .aggregate(VotesSpecificAggregateLogic).toArray())
                 .map(v => ({
-                    // _id: Math.random()*1000000,
                     ...v,
-
-                    // get `yourVote`s into `question` and `question.choices`
                     question: {
                         ...v.question,
                         _id: `choiceaggregate_${type}_${questionText}_${choiceText}_${groupHandle}_${userHandle}_${v.user?.handle}_${v.questionText}`,
-                        choices: v.question?.choices?.map(c => ({
-                            ...c,
-                            userVote: !!v.choiceVotes?.find(cv => cv.userVote?.choiceText === c.text)?.userVote ? ({
-                                ...v.choiceVotes?.find(cv => cv.userVote.choiceText === c.text)?.userVote,
-                                user: v.user,
-                                groupChannel: v.groupChannel,
-                                // _id: `userChoiceVote_${type}_${questionText}_${choiceText}_${groupHandle}_${userHandle}_${v.user?.handle}_${v.questionText}_${c.text}`,
-                            }) : null,
-                            yourVote: !!v.choiceVotes?.find(cv => cv.userVote?.choiceText === c.text)?.yourVote ? ({
-                                ...v.choiceVotes?.find(cv => cv.userVote.choiceText === c.text)?.yourVote,
-                                user: AuthUser.LiquidUser,
-                                groupChannel: v.groupChannel,
-                                // _id: `yourVote_${type}_${questionText}_${choiceText}_${groupHandle}_${userHandle}_${v.user?.handle}_${v.questionText}_${c.text}`,
-                            }) : null
-                        })),
+
                         yourVote: {
                             ...v.yourVote,
-                            user: AuthUser.LiquidUser,
-                            // _id: `yourVote_${type}_${questionText}_${groupHandle}_${userHandle}_${v.user?.handle}_${v.questionText}`,
                         },
                         userVote: {
                             ...v.userVote,
-                            user: v.user,
-                            // _id: `userVote_${type}_${questionText}_${groupHandle}_${userHandle}_${v.user?.handle}_${v.questionText}`,
                         },
                         group: {
                             ...v.question.group,
                             thisUserIsAdmin: v.question.group?.admins?.map(a => a?.handle)?.includes(AuthUser?.LiquidUser?.handle)
                         },
-                    },
-                    // _id: `choiceaggregate_${type}_${questionText}_${choiceText}_${groupHandle}_${userHandle}_${v.user?.handle}_${v.questionText}`,
+                    }
                 }));;
 
             console.log({

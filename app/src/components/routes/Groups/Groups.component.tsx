@@ -9,6 +9,7 @@ import useAuthUser from '@state/AuthUser/authUser.effect';
 import DropAnimation from '@components/shared/DropAnimation';
 import useSearchParams from "@state/Global/useSearchParams.effect";
 import useUser from '@state/User/user.effect';
+import MetaTags from "@components/shared/MetaTags";
 
 import './style.sass';
 
@@ -37,6 +38,12 @@ export const Groups: FunctionComponent<{}> = ({ }) => {
 
     return (
         <>
+            <MetaTags
+                title="Causes - Liquid Vote"
+                description="Find causes you care about, and let your opinions be known."
+                image="https://images.liquid-vote.com/system/logo.png"
+            />
+
             <Header title="Causes" />
 
             {!!liquidUser && (

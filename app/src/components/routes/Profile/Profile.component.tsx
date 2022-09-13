@@ -75,7 +75,7 @@ export const Profile: FunctionComponent<{}> = ({ }) => {
     ) : user_error ? (<>Error</>) : (
         <>
             <MetaTags
-                title={profile?.name}
+                title={profile?.name+' on Liquid Vote'}
                 description={profile?.bio}
                 image={profile?.avatar}
             // url={``}
@@ -263,7 +263,6 @@ export const Profile: FunctionComponent<{}> = ({ }) => {
                         </div>
                     </div>
                 ) : null}
-                {/* <small className="">Not represented by anyone you follow</small> */}
             </div>
 
             <div>
@@ -333,123 +332,6 @@ export const Profile: FunctionComponent<{}> = ({ }) => {
                     </div>
                 </div>
             </div>
-            {/* {profile?.yourStats?.groupsInCommon && (
-                    <Link to={`/profile-people/${profile.handle}/groups`} className="mr-2">
-                        <b>{profile?.yourStats?.groupsInCommon}</b> Groups in common
-                    </Link>
-                )} */}
-
-            {/* <div className="profile-stats-container mb-2 mt-2 flex-nowrap">
-                <div className="mr-1"><DropSVG /></div>
-
-                <div>
-                    <div className="d-flex flex-wrap">
-                        <Link
-                            to={`/profile/${profile?.handle}/votes/direct`}
-                            className="mr-2 pointer"
-                        >
-                            <b className="white">{(
-                                profile?.stats.directVotesMade
-                            ) || 0}</b> Direct Votes
-                        </Link>
-
-                        {!!profile?.yourStats && (
-                            <>
-                                <Link
-                                    to={`/profile/${profile?.handle}/votes/direct/same`}
-                                    className="mr-2 pointer"
-                                >
-                                    <b className="white forDirect px-1 rounded">{(
-                                        profile?.yourStats.directVotesInAgreement
-                                    ) || 0}</b> Same as yours
-                                </Link>
-                                <Link
-                                    to={`/profile/${profile?.handle}/votes/direct/different`}
-                                    className="mr-2 pointer"
-                                >
-                                    <b className="white againstDirect px-1 rounded">{(
-                                        profile?.yourStats.directVotesInDisagreement
-                                    ) || 0}</b> Different
-                                </Link>
-                            </>
-                        )}
-                    </div>
-                    <div className="d-flex flex-wrap">
-                        <Link
-                            to={`/profile/${profile?.handle}/votes/represented`}
-                            className="mr-2 pointer"
-                        >
-                            <b className="white">{(
-                                profile?.stats.indirectVotesMadeByUser
-                            ) || 0}</b> Represented Votes
-                        </Link>
-
-                        {!!profile?.yourStats && (
-                            <>
-                                <Link
-                                    to={`/profile/${profile?.handle}/votes/represented/byyou`}
-                                    className="mr-2 pointer"
-                                >
-                                    <b className="white">{(
-                                        profile?.yourStats.indirectVotesMadeByYou
-                                    ) || 0}</b> By You
-                                </Link>
-                                <Link
-                                    to={`/profile/${profile?.handle}/votes/represented/foryou`}
-                                    className="mr-2 pointer"
-                                >
-                                    <b className="white">{(
-                                        profile?.yourStats.indirectVotesMadeForYou
-                                    ) || 0}</b> For You
-                                </Link>
-                            </>
-                        )}
-                    </div>
-                </div>
-            </div> */}
-
-
-            {/* 
-            
-                // directVotesMade: 14
-                groupsJoined: 4
-                indirectVotesMadeByUser: 1
-                indirectVotesMadeForUser: 1
-                lastDirectVoteOn: "0"
-                representedBy: 3
-                representing: 1
-
-                // directVotesInAgreement: 4
-                directVotesInCommon: 11
-                // directVotesInDisagreement: 7
-                // indirectVotesMadeByYou: 1
-                // indirectVotesMadeForYou: 1
-                votesInCommon: 13
-            
-            */}
-
-            {/* {
-                !!userGroups?.length && (
-                    <div className="mt-1 mb-3 d-flex align-items-start flex-nowrap justify-content-between">
-                        <div className="d-flex flex-column">
-                            <div
-                                className="d-flex flex-wrap justify-content-start"
-                            >
-                                <div data-tip="User Groups">
-                                    <GroupSmallSvg />
-                                </div>
-                                {userGroups?.map((el: any, i: any) => (
-                                    <Link
-                                        to={`/group/${el.handle}`}
-                                        key={'s-' + el.name}
-                                        className={`badge inverted ml-1 mb-1 mt-1`}
-                                    >{el.name}</Link>
-                                ))}
-                            </div>
-                        </div>
-                    </div>
-                )
-            } */}
 
             <br />
 
@@ -492,6 +374,15 @@ export const Profile: FunctionComponent<{}> = ({ }) => {
             {/* Polls Created */}
             {(section === 'polls') && <ProfilePolls userHandle={profile.handle} user={profile} />}
             {(section === 'followings') && <ProfileFollowings />}
+
+
+
+            {/* Profile Engagement Primers */}
+            {/* Follow user - if you haven't followed yet */}
+            {/* Follow user's Followers - if you have <5 followers */}
+            {/* Invite other's to compare with user - if user has <5 followers */}
+            {/* Invite user to vote on Causes you've voted but he hasn't - if user follows you */}
+            {/* See what else users you follow are voting on (take to feed) - if above don't apply */}
         </>
     );
 }
