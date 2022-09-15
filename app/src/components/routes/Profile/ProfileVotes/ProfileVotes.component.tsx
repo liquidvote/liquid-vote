@@ -137,6 +137,27 @@ export const ProfileVotes: FunctionComponent<{}> = ({ }) => {
                 </>
             )} */}
 
+
+            {!!liquidUser && profile.handle !== liquidUser.handle && (subsubsection === 'same' || subsubsection === 'different') && (
+                <>
+                    <ul className="nav d-flex justify-content-around mt-n3 mx-n3">
+                        <li className="nav-item">
+                            <Link className={`nav-link ${subsubsection === 'same' && 'active'}`} to={`/profile/${handle}/votes/direct/same`}>
+                                <b className="white forDirect px-1 rounded" >{profile?.yourStats?.directVotesInAgreement}</b> Same as you
+                            </Link>
+                        </li>
+                        <li className="nav-item">
+                            <Link className={`nav-link ${subsubsection === 'different' && 'active'}`} to={`/profile/${handle}/votes/direct/different`}>
+                                <b className="white againstDirect px-1 rounded" >{profile?.yourStats?.directVotesInDisagreement}</b> Different
+                            </Link>
+                        </li>
+                    </ul>
+                    <hr className="mt-n4" />
+                </>
+            )}
+
+
+
             {user_votes_data?.Votes.length === 0 && (
                 <div className="p-4 text-center">
                     {profile?.name}{' '}
@@ -170,6 +191,7 @@ export const ProfileVotes: FunctionComponent<{}> = ({ }) => {
                         {v?.question?.group?.handle !== user_votes_data?.Votes[i - 1]?.question?.group?.handle ? (
                             <GroupPollListCover
                                 group={v?.question?.group}
+                                user={profile}
                             />
                         ) : null}
                         <div key={'feed-poll-' + v?.question?.group?.handle + '-' + v?.question?.questionText}>

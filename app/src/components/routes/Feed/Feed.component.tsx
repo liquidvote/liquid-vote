@@ -14,6 +14,11 @@ import PollExplanation from '@shared/PollExplanation';
 import useUser from '@state/User/user.effect';
 import GroupPollListCover from "@shared/GroupPollListCover";
 import MetaTags from "@components/shared/MetaTags";
+import InviteSvg from "@shared/Icons/Invite.svg";
+import DropPlusSVG from "@shared/Icons/Drop+.svg";
+import GroupSvg from "@shared/Icons/Group-plus.svg";
+import useSearchParams from "@state/Global/useSearchParams.effect";
+
 
 import './style.sass';
 
@@ -23,6 +28,7 @@ export const Feed: FunctionComponent<{}> = ({ }) => {
     const { liquidUser } = useAuthUser();
     const { user: yourUser, user_loading: yourUser_loading } = useUser({ userHandle: liquidUser?.handle });
     const { loginWithPopup, isLoading: auth0_loading, isAuthenticated } = useAuth0();
+    const { allSearchParams, updateParams } = useSearchParams();
 
     const loadingMessages = [
         'gathering all the votes',
@@ -56,11 +62,13 @@ export const Feed: FunctionComponent<{}> = ({ }) => {
         skip: !liquidUser
     });
 
+    console.log({ yourUser });
+
     return (
         <>
             <MetaTags
                 title="Liquid Vote - Where opinions are found"
-                description="Liquid Vote is an open platform where users express opinions through polls launched by friends or experts on any topic."
+                description="Liquid Vote is a voting platform where opinions are communicated through polls from friends or experts on any topic."
                 image="https://images.liquid-vote.com/system/logo.png"
             />
             {/* <Header
@@ -132,7 +140,7 @@ export const Feed: FunctionComponent<{}> = ({ }) => {
                         <div className="p-4 text-center">
                             <h3>Welcome to <b className='white'>Liquid Vote</b>!</h3>
 
-                            <p>Login to vote with your friends and the world around you.</p>
+                            <p className='feed-about'>Where we vote with friends and experts, on any topic.</p>
 
                             <div className="d-flex align-items-center justify-content-center">
                                 <div
@@ -158,8 +166,32 @@ export const Feed: FunctionComponent<{}> = ({ }) => {
                         <div className="p-4 text-center">
                             <h3><b className='white'>Liquid Vote</b> is more fun with friends.</h3>
 
-                            <p>Follow some to see what they are voting on.</p>
+                            <p className='feed-about'>Follow some to see what they are voting on.</p>
                         </div>
+
+                        {
+                            yourUser?.stats?.followedBy ? (
+                                <>
+                                    <hr className='w-100 mx-5' />
+
+                                    <div className='mt-5'>
+                                        <div className="question-title-in-list mt-0 white line-height-24">
+                                            <b className='white mx-1'>{yourUser?.stats?.followedBy}</b> voter{yourUser?.stats?.followedBy > 1 ? 's' : null} follow{yourUser?.stats?.followedBy > 1 ? null : 's'} you
+                                        </div>
+
+                                        <div className="d-flex justify-content-center">
+                                            <Link to={`/profile-follows/${liquidUser.handle}/following`} className="button_ mt-4">
+                                                Visit them
+                                            </Link>
+                                        </div>
+
+                                        <br />
+                                    </div>
+                                </>
+                            ) : null
+                        }
+
+
                     </div>
                 )}
 
@@ -182,11 +214,143 @@ export const Feed: FunctionComponent<{}> = ({ }) => {
 
             {/* Feed Engagement Primers */}
             {/* Follow your Followers's Follows - if you have <5 followers */}
+            {/* <div>
+                <div className="d-flex align-items-center justify-content-between mb-3">
+                    <div className="question-title-in-list mt-0 white line-height-24">Compare with voters you haven't noticed yet</div>
+
+                    <div className="d-flex justify-content-center">
+                        <div className={`button_ active`}>
+                            Visit them
+                        </div>
+                    </div>
+                </div>
+
+                <hr />
+                <br />
+            </div> */}
+
             {/* Invite other's to compare with Followings - if Following(s) have <5 followers */}
+            {yourUser?.stats?.following ? (
+                <div>
+                    <div className="d-flex align-items-center justify-content-between mb-3">
+                        <div className="question-title-in-list mt-0 white line-height-24">Invite others to compare with your <b className='white mx-1'>{yourUser?.stats?.following}</b> follows</div>
+
+                        <div className="d-flex flex-column align-items-center justify-content-center">
+                            <Link to={`/profile-follows/${liquidUser.handle}/followedby`} className="button_">
+                                Visit them
+                            </Link>
+                        </div>
+                    </div>
+
+                    <hr />
+                    <br />
+                </div>
+            ) : null}
             {/* Invite Followings to vote on Causes you've voted but they haven't */}
+            {/* <div>
+                <div className="d-flex align-items-center justify-content-between mb-3">
+                    <div className="question-title-in-list mt-0 white line-height-24">Invite others to compare with your <b className='white mx-1'>3</b> votes</div>
+
+                    <div className="d-flex justify-content-center">
+                        <div className={`button_ active`}>
+                            <b className="white mr-4 ml-1 mt-n1">
+                                <InviteSvg />
+                            </b>
+                            Share Invite
+                        </div>
+                    </div>
+
+                </div>
+
+                <hr />
+                <br />
+            </div> */}
             {/* Be the first of your friends to vote on new Causes */}
+            <div>
+                <div className="d-flex align-items-center justify-content-between mb-3">
+                    <div className="question-title-in-list mt-0 white line-height-24">Find new Causes</div>
+
+                    <div className="d-flex justify-content-center">
+                        <Link to={`/groups/other`} className="button_">
+                            Visit them
+                        </Link>
+                    </div>
+
+                </div>
+
+                <hr />
+                <br />
+            </div>
             {/* Launch a new poll in one of your Causes */}
+            <div>
+                <div className="d-flex align-items-center justify-content-between mb-3">
+                    <div className="question-title-in-list mt-0 white line-height-24">Launch a new poll</div>
+
+                    <div className="d-flex justify-content-center">
+                        <div
+                            className={`button_ active ml-5`}
+                            onClick={() => liquidUser ? updateParams({
+                                paramsToAdd: {
+                                    modal: "EditQuestion",
+                                    modalData: JSON.stringify({
+                                        questionText: 'new'
+                                    })
+                                }
+                            }) : updateParams({
+                                paramsToAdd: {
+                                    modal: "RegisterBefore",
+                                    modalData: JSON.stringify({
+                                        toWhat: 'launchPoll'
+                                    })
+                                }
+                            })}
+                        >
+                            Launch poll
+                            {/* <b className="white mx-2 mt-n1">
+                                <DropPlusSVG />
+                            </b> */}
+                        </div>
+                    </div>
+
+                </div>
+
+                <hr />
+                <br />
+            </div>
             {/* Launch a new Cause */}
+            <div>
+                <div className="d-flex align-items-center justify-content-between mb-3">
+                    <div className="question-title-in-list mt-0 white line-height-24 ">Launch a new cause</div>
+
+                    <div className="d-flex justify-content-center">
+                        <div
+                            className={`button_ active`}
+                            onClick={() => liquidUser ? updateParams({
+                                paramsToAdd: {
+                                    modal: 'EditGroup',
+                                    modalData: JSON.stringify({ groupHandle: 'new' })
+                                }
+                            }) : updateParams({
+                                paramsToAdd: {
+                                    modal: "RegisterBefore",
+                                    modalData: JSON.stringify({
+                                        toWhat: 'createGroup'
+                                    })
+                                }
+                            })}
+                        >
+                            Launch cause
+                            {/* <b className="white mx-2 mt-n1">
+                                <GroupSvg />
+                            </b> */}
+                        </div>
+                    </div>
+
+                </div>
+
+                <hr />
+                <br />
+            </div>
 
         </>
     );

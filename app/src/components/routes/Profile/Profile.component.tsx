@@ -16,6 +16,7 @@ import useAuthUser from '@state/AuthUser/authUser.effect';
 import MetaTags from "@components/shared/MetaTags";
 import Avatar from "@components/shared/Avatar";
 import InviteTinySvg from "@shared/Icons/Invite-tiny.svg";
+import InviteSvg from "@shared/Icons/Invite.svg";
 import env from '@env';
 import TopPageInvite from '@components/shared/TopPageInvite';
 
@@ -75,7 +76,7 @@ export const Profile: FunctionComponent<{}> = ({ }) => {
     ) : user_error ? (<>Error</>) : (
         <>
             <MetaTags
-                title={profile?.name+' on Liquid Vote'}
+                title={profile?.name + ' on Liquid Vote'}
                 description={profile?.bio}
                 image={profile?.avatar}
             // url={``}
@@ -210,23 +211,31 @@ export const Profile: FunctionComponent<{}> = ({ }) => {
                     )}
                 </div>
             </div>
-            <h2 className="profile-name white mt-2">{profile.name}</h2>
-            <div className="d-flex align-items-center">
-                <p className="profile-handle">@{profile.handle}</p>
-                {profile.isFollowingYou ? (
-                    <small
-                        className={`badge inverted ml-2 mt-n1`}
-                    >follows you</small>
-                ) : null}
-            </div>
-            <div className="profile-description pre-wrap">
-                {profile.bio}
+            <div className="d-flex align-items-center justify-content-between mb-3">
+                <div>
+                    <h2 className="profile-name white mt-2">{profile.name}</h2>
+                    <div className="d-flex align-items-center">
+                        <p className="profile-handle">@{profile.handle}</p>
+                        {profile.isFollowingYou ? (
+                            <small
+                                className={`badge inverted ml-2 mt-n1`}
+                            >follows you</small>
+                        ) : null}
+                    </div>
+                </div>
+                <div className="profile-description ml-3 pre-wrap white small w-100">
+                    {profile.bio}
+                </div>
             </div>
             {/* <pre>{JSON.stringify(profile, null, 2)}</pre> */}
             <div className="profile-icons-container d-flex mt-2">
                 <div>
                     <div className="mr-1"><LocationSVG /></div>
                     <div>{profile.location}</div>
+                </div>
+                <div>
+                    <div className="mr-1"><CalendarSVG /></div>
+                    <div>Joined {timeAgo.format(new Date(Number(profile.joinedOn)))}</div>
                 </div>
                 {profile.externalLink && (
                     <div>
@@ -241,15 +250,11 @@ export const Profile: FunctionComponent<{}> = ({ }) => {
                         </a>
                     </div>
                 )}
-                <div>
-                    <div className="mr-1"><CalendarSVG /></div>
-                    <div>Joined {timeAgo.format(new Date(Number(profile.joinedOn)))}</div>
-                </div>
             </div>
 
             <div>
                 {(profile?.stats?.representedBy || profile?.stats?.representing) ? (
-                    <div className="profile-stats-container mt-2 flex-nowrap">
+                    <div className="profile-stats-container flex-nowrap">
                         <div className="mr-1"><HandshakeSVG /></div>
                         <div className="d-flex flex-column">
                             <div className="d-flex flex-wrap">
@@ -266,7 +271,7 @@ export const Profile: FunctionComponent<{}> = ({ }) => {
             </div>
 
             <div>
-                <div className="profile-stats-container mt-2 flex-nowrap">
+                <div className="profile-stats-container flex-nowrap">
                     <div className="mr-1"><ProfileSmallSVG /></div>
                     <div className="d-flex flex-column flex-nowrap">
                         <div className="d-flex flex-wrap align-items-center">
@@ -335,20 +340,24 @@ export const Profile: FunctionComponent<{}> = ({ }) => {
 
             <br />
 
-            <ul className="nav d-flex justify-content-around mt-n2 mx-n3">
+            <ul className="nav d-flex justify-content-around mx-n3">
                 <li className="nav-item">
-                    <Link className={`nav-link ${(!section || section === 'votes') && !groupHandle && 'active'}`} to={`/profile/${handle}/votes`}>
+                    <Link className={`nav-link d-flex align-items-center justify-content-center ${(!section || section === 'votes') && !groupHandle && 'active'}`} to={`/profile/${handle}/votes`}>
                         <b>{profile?.stats?.directVotesMade}</b> Votes
 
                         {profile?.yourStats?.directVotesInAgreement ? (
-                            <>
-                                <small className="ml-2">
-                                    <b className='white forDirect px-1 rounded'>{profile?.yourStats?.directVotesInAgreement}</b>
-                                </small>
-                                <small className="ml-n1">
-                                    <b className='white againstDirect px-1 rounded'>{profile?.yourStats?.directVotesInDisagreement}</b>
-                                </small>
-                            </>
+                            <div className="d-flex">
+                                <Link className={`nav-link p-0`} to={`/profile/${handle}/votes/direct/same`}>
+                                    <small className="ml-2">
+                                        <b className='white forDirect px-1 rounded'>{profile?.yourStats?.directVotesInAgreement}</b>
+                                    </small>
+                                </Link>
+                                <Link className={`nav-link p-0`} to={`/profile/${handle}/votes/direct/different`}>
+                                    <small className="ml-n1">
+                                        <b className='white againstDirect px-1 rounded'>{profile?.yourStats?.directVotesInDisagreement}</b>
+                                    </small>
+                                </Link>
+                            </div>
                         ) : null}
 
                     </Link>
@@ -379,10 +388,144 @@ export const Profile: FunctionComponent<{}> = ({ }) => {
 
             {/* Profile Engagement Primers */}
             {/* Follow user - if you haven't followed yet */}
+            {(profile?.isThisUser || isFollowing) ? null : (
+                <div>
+                    <div className="d-flex align-items-center justify-content-between mb-5">
+                        <div>
+                            <div className="question-title-in-list white line-height-24 mt-0">Follow <b>{profile?.name}</b></div>
+                        </div>
+                        <div
+                            onClick={() => !!liquidUser ? editUserFollowingRelation({
+                                variables: {
+                                    FollowedHandle: profile?.handle,
+                                    FollowingHandle: liquidUser?.handle,
+                                    IsFollowing: !isFollowing
+                                }
+                            })
+                                .then((r) => {
+                                    console.log({ r });
+                                    user_refetch();
+                                }) : (
+                                updateParams({
+                                    paramsToAdd: {
+                                        modal: "RegisterBefore",
+                                        modalData: JSON.stringify({
+                                            toWhat: 'followUser',
+                                            userName: profile.name
+                                        })
+                                    }
+                                })
+                            )}
+                            className={`button_ ${isFollowing ? "selected" : ""}`}
+                        >
+                            {
+                                isFollowing ?
+                                    "Following" :
+                                    "Follow"
+                            }
+                        </div>
+                    </div>
+
+                    <hr />
+                    <br />
+                    <br />
+                </div>
+            )}
+
+
+
             {/* Follow user's Followers - if you have <5 followers */}
+            {(!profile?.isThisUser && profile?.stats?.following && isFollowing) ? (
+                <div>
+                    <div className="d-flex align-items-center justify-content-between mb-5">
+                        <div className="question-title-in-list white line-height-24 mt-0">Compare with the<b className="white mx-1">{profile?.stats?.following || 0}</b>voters <b>{profile?.name}</b> follows</div>
+
+                        <div className="d-flex justify-content-center">
+                            <Link to={`/profile-follows/${profile.handle}/following`} className="button_ ml-5">
+                                Visit them
+                            </Link>
+                        </div>
+                    </div>
+                    <hr />
+                    <br />
+                    <br />
+                </div>
+            ) : null}
+
             {/* Invite other's to compare with user - if user has <5 followers */}
-            {/* Invite user to vote on Causes you've voted but he hasn't - if user follows you */}
-            {/* See what else users you follow are voting on (take to feed) - if above don't apply */}
+            {(!profile?.isThisUser && isFollowing) ? (
+                <div>
+                    <div className="d-flex align-items-center justify-content-between mb-5">
+                        <div className="question-title-in-list white line-height-24 mt-0">Invite others to compare with <b className="white">{profile?.name}</b></div>
+
+                        <div className="d-flex justify-content-center">
+                            <div
+                                className={`button_ active`}
+                                onClick={async () => {
+                                    updateParams({
+                                        paramsToAdd: {
+                                            modal: "InviteFor",
+                                            modalData: JSON.stringify({
+                                                InviteType: 'toCompare',
+                                                userHandle: profile.handle,
+                                                userName: profile.name
+                                            })
+                                        }
+                                    })
+                                }}
+                            >
+                                <b className="white mr-3 mt-n1">
+                                    <InviteSvg />
+                                </b>
+                                Share Invite
+                            </div>
+                        </div>
+                    </div>
+
+                    <hr />
+                    <br />
+                    <br />
+                </div>
+            ) : null}
+
+
+
+            {/* Invite user to vote with you */}
+            {(!profile?.isThisUser && isFollowing) ? (
+                <div>
+                    <div className="d-flex align-items-center justify-content-between mb-5">
+                        <div className="question-title-in-list white line-height-24 mt-0">Invite <b className="white">{profile?.name}</b> to compare with you</div>
+
+                        <div className="d-flex justify-content-center">
+                            <div
+                                className={`button_ active`}
+                                onClick={async () => {
+                                    updateParams({
+                                        paramsToAdd: {
+                                            modal: "InviteFor",
+                                            modalData: JSON.stringify({
+                                                InviteType: 'toCompare',
+                                                userHandle: liquidUser.handle,
+                                                userName: liquidUser.name
+                                            })
+                                        }
+                                    })
+                                }}
+                            >
+                                <b className="white mr-3 mt-n1">
+                                    <InviteSvg />
+                                </b>
+                                Share Invite
+                            </div>
+                        </div>
+                    </div>
+
+                    <hr />
+                    <br />
+                    <br />
+                </div>
+            ) : null}
+
         </>
     );
 }

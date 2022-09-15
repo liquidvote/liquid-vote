@@ -1,5 +1,5 @@
 import React, { FunctionComponent, useEffect } from 'react';
-import { Link, useLocation } from "react-router-dom";
+import { Link, NavLink, useLocation } from "react-router-dom";
 import { useAuth0 } from "@auth0/auth0-react";
 import { useQuery } from "@apollo/client";
 
@@ -54,23 +54,26 @@ export const SideMenu: FunctionComponent<{}> = ({ }) => {
             <Link to="/" className="hide-on-smaller-sideMenu">
                 <RippleDrop />
             </Link>
-            <Link to="/home" data-tip="Following Feed">
-                <FeedSVG />
-            </Link>
+            <NavLink to="/home" data-tip="Following Feed" activeClassName="active">
+                <div className="notification-wrapper">
+                    <FeedSVG />
+                    <div className="notif-you mt-n1 small forDirect white"></div>
+                </div>
+            </NavLink>
             {isAuthenticated && user && (
                 <>
-                    <Link to="/notifications" data-tip="Notifications" className="notification-wrapper">
+                    <NavLink to="/notifications" data-tip="Notifications" className="notification-wrapper" activeClassName="active">
                         <NotificationSvg />
                         {unseenNotificationCount ? (
                             <div className="notif-you forDirect white">{unseenNotificationCount}</div>
                         ) : null}
                         {/* <div className="notif-representatives for white">4</div> */}
-                    </Link>
+                    </NavLink>
                 </>
             )}
-            <Link to="/groups" data-tip={isAuthenticated ? "Your Causes" : " Causes"}>
+            <NavLink to="/groups" data-tip={isAuthenticated ? "Your Causes" : " Causes"} activeClassName="active">
                 <GroupSvg />
-            </Link>
+            </NavLink>
 
             <div className="hide-on-smaller-sideMenu">
                 <br />

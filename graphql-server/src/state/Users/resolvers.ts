@@ -684,19 +684,9 @@ export const UserResolvers = {
             // };
 
             const UserGroups = !notUsers && (
-                await mongoDB.collection("GroupMembers").aggregate(UserGroupsAggFromGroupMembers
-                ).toArray())
-                // .map(
-                //     (g) => {
-
-                //         console.log({
-                //             v: VisibilitySortOrder[g?.userRel?.visibility || 'none'],
-                //             vv: g?.userRel?.visibility
-                //         });
-
-                //         return g;
-                //     }
-                // )
+                await mongoDB.collection("GroupMembers")
+                    .aggregate(UserGroupsAggFromGroupMembers).toArray()
+            )
                 .map((g) => ({
                     ...g.group,
                     thisUserIsAdmin: !!g.group?.admins.find(u => u.handle === AuthUser?.LiquidUser?.handle),

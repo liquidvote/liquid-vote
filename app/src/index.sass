@@ -122,6 +122,11 @@ $theme5-colors: ("bg": #0b414d, "primary": #08f3a5, "secondary": white, "border"
         &.admin
             *
                 fill: red
+        
+    .active
+        .icon, .icon-large, .icon-small, .icon-tiny
+            *
+                fill: white
 
     .svgText
         fill: map-get($theme, "secondary")
@@ -342,6 +347,9 @@ form
 p
     line-height: initial
 
+.line-height-small
+    line-height: 10px
+
 h1
     font-weight: 100
     margin: 0px -15px 15px
@@ -468,11 +476,15 @@ hr
     > *
         margin-bottom: 10px
 
+.icon-large
+    width: 45px
+
 .icon
     width: 27px
 
-.icon-large
-    width: 45px
+
+.icon-pre-small
+    width: 23px
 
 .icon-small
     width: 20px
@@ -978,6 +990,9 @@ hr
         right: -8px
         top: -2px
 
+        &.small
+            transform: scale(0.4)
+
     .notif-representatives
         right: 19px
         top: -2px
@@ -1013,3 +1028,12 @@ small, .small
 
 .flex-1
     flex: 1
+
+.transform-group-svg
+    transform: scale(0.7) translate(0px, 7px)
+
+.line-height-24
+    line-height: 24px
+
+.line-height-20
+    line-height: 20px

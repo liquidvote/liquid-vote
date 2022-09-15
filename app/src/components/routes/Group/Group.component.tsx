@@ -214,7 +214,7 @@ export const Group: FunctionComponent<{}> = ({ }) => {
             <div className="profile-description pre-wrap">
                 {group?.bio}
             </div>
-            <div className="profile-icons-container d-flex mt-2 mb-2">
+            <div className="profile-icons-container d-flex">
                 {/* <div>
                     <LocationSVG />
                     <div>{group?.bio}</div>

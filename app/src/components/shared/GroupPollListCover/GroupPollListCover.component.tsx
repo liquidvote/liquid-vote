@@ -2,10 +2,14 @@ import React, { FunctionComponent } from 'react';
 import { Link } from "react-router-dom";
 
 import GroupVisibilityPicker from '@components/shared/GroupVisibilityPicker';
+import Avatar from '@components/shared/Avatar';
+import useUser from '@state/User/user.effect';
 
 import './style.sass';
 
-export const GroupPollListCover: FunctionComponent<{ group: any }> = ({ group }) => {
+export const GroupPollListCover: FunctionComponent<{ group: any, user?: any }> = ({ group, user }) => {
+
+    const { user: userWithMoreData } = useUser({ userHandle: user?.handle, groupHandle: group?.handle });
 
     return (
         <>
@@ -56,6 +60,126 @@ export const GroupPollListCover: FunctionComponent<{ group: any }> = ({ group })
                                                 ) : <LinkSVG />}
                                             </div> */}
                                     </div>
+
+
+                                    {user ? (
+                                        <div className='d-flex align-items-stretch pb-3 mb-n3 mt-2'>
+                                            <Link
+                                                replace
+                                                className="position-relative mt-n1"
+                                                to={`/profile/${user.handle}/cause/${group.handle}`}
+                                            >
+                                                <Avatar
+                                                    person={{
+                                                        ...user,
+                                                        // yourStats: userWithMoreData.yourUserStats,
+                                                        // stats: userWithMoreData.userStats
+                                                    }}
+                                                    groupHandle={group?.handle}
+                                                    type="vote"
+                                                />
+                                            </Link>
+
+                                            {userWithMoreData ? (
+                                                <div className='d-flex align-items-center ml-2 mt-n1'>
+                                                    <div className='d-flex flex-column'>
+                                                        <Link
+                                                            replace
+                                                            className="d-flex flex-column text-decoration-none"
+                                                            to={`/profile/${user.handle}/cause/${group.handle}`}
+                                                        >
+                                                            {
+                                                                (userWithMoreData?.groupStats?.stats?.representedBy || userWithMoreData?.groupStats?.stats?.representing) ?
+                                                                    <div className='d-flex align-items-center mb-n1'>
+
+                                                                        <small className='primary-color d-flex'>
+                                                                            <>
+                                                                                <div className="d-flex flex-column">
+                                                                                    <div className="d-flex flex-wrap">
+                                                                                        {userWithMoreData?.groupStats?.stats?.representedBy ? (
+                                                                                            <>
+
+                                                                                                <Link to={`/profile-people/${user.handle}/representedBy`} className="mr-1">
+                                                                                                    represents{' '}<b className="white mr-1">{userWithMoreData?.groupStats?.stats?.representedBy}</b>
+                                                                                                </Link>
+                                                                                            </>
+                                                                                        ) : null}
+                                                                                    </div>
+                                                                                </div>
+                                                                            </>
+                                                                        </small>
+
+                                                                        <div
+                                                                            className={`
+                                                                            d-flex align-items-center ${(group.youToHimRepresentativeRelation?.isRepresentingYou ||
+                                                                                    group.representativeRelation?.isRepresentingYou
+                                                                                ) ? '' : 'd-none'}
+                                                                    `}
+                                                                        >
+                                                                            {group.representativeRelation?.isRepresentingYou &&
+                                                                                !group.youToHimRepresentativeRelation?.isRepresentingYou ?
+                                                                                (
+                                                                                    <small
+                                                                                        className="badge inverted"
+                                                                                    >represents you</small>
+                                                                                ) : ""}
+                                                                            {group.youToHimRepresentativeRelation?.isRepresentingYou &&
+                                                                                !group.representativeRelation?.isRepresentingYou ?
+                                                                                (
+                                                                                    <small
+                                                                                        className="badge inverted"
+                                                                                    >you represent him</small>
+                                                                                ) : ""}
+                                                                            {
+                                                                                group.youToHimRepresentativeRelation?.isRepresentingYou &&
+                                                                                    group.representativeRelation?.isRepresentingYou ?
+                                                                                    (
+                                                                                        <small
+                                                                                            className="badge inverted no-max-w"
+                                                                                        >you represent each other 🤝</small>
+                                                                                    ) : ""
+                                                                            }
+                                                                        </div>
+                                                                    </div>
+                                                                    :
+                                                                    <></>
+                                                            }
+
+                                                            <div className="d-flex align-items-center">
+                                                                <small className={`d-flex`}>
+                                                                    <b className='white'>
+                                                                        {' '}{userWithMoreData?.groupStats?.stats?.directVotesMade} votes
+                                                                        {/* {' '} */}
+                                                                        {/* {isSelected ? '⬆' : '⬇'} */}
+                                                                    </b>
+                                                                </small>
+                                                                {!!userWithMoreData?.groupStats?.yourStats?.directVotesInCommon ? (
+                                                                    <>
+                                                                        {/* ・
+                                                                        <small className="d-flex mb-0">
+                                                                            <b className='white mr-1'>{' '}{userWithMoreData?.groupStats?.yourStats?.directVotesInCommon}</b> in common
+                                                                        </small>
+                                                                    */}
+                                                                        ・
+                                                                        <small className="d-flex align-items-center">
+                                                                            <b className='white mr-1 forDirect px-1 rounded'>{' '}{userWithMoreData?.groupStats?.yourStats?.directVotesInAgreement} </b> same
+                                                                        </small>
+                                                                        ・
+                                                                        <small className="d-flex align-items-center">
+                                                                            <b className='white mr-1 againstDirect px-1 rounded'>{' '}{userWithMoreData?.groupStats?.yourStats?.directVotesInDisagreement}</b> differ
+                                                                        </small>
+                                                                    </>
+                                                                ) : <span className='opacity-0'>・</span>}
+                                                            </div>
+
+                                                        </Link>
+                                                    </div>
+                                                </div>
+                                            ) : null}
+                                        </div>
+                                    ) : null}
+
+
                                 </div>
                                 <GroupVisibilityPicker
                                     group={group}
