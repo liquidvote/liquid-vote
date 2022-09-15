@@ -211,7 +211,7 @@ export const Group: FunctionComponent<{}> = ({ }) => {
                     </div> */}
                 </div>
             </div>
-            <div className="profile-description pre-wrap">
+            <div className="profile-description pre-wrap my-2 white">
                 {group?.bio}
             </div>
             <div className="profile-icons-container d-flex">
@@ -303,7 +303,7 @@ export const Group: FunctionComponent<{}> = ({ }) => {
                             ) : null}
                         </div>
                         {(group?.yourStats.representing || group?.yourStats.representedBy) ? (
-                            <div className="profile-stats-container flex-nowrap mt-2">
+                            <div className="profile-stats-container flex-nowrap">
                                 <div className="mr-1"><HandshakeSVG /></div>
                                 <div className="d-flex flex-wrap">
                                     <Link className="mr-2" to={`/group-people/${group?.handle}/representingYou`}>
