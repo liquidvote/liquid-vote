@@ -75,6 +75,7 @@ export const ProfileFollowings: FunctionComponent<{}> = ({ }) => {
                         <PersonInList
                             key={'pf_followedby'+el.handle}
                             person={el}
+                            includeVotes={true}
                         />
                     ))}
                     {(!user_following_data?.UserFollowing?.length && !user_following_loading) && (
@@ -89,6 +90,7 @@ export const ProfileFollowings: FunctionComponent<{}> = ({ }) => {
                         <PersonInList
                             key={'pf_following'+el.handle}
                             person={el}
+                            includeVotes={true}
                         />
                     ))}
                     {(!user_followed_by_data?.UserFollowedBy?.length && !user_followed_by_loading) && (

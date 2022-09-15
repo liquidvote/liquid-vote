@@ -31,7 +31,7 @@ export const PersonInList: FunctionComponent<{
     hideBottomBorder
 }) => {
 
-        const { user, user_refetch, user_loading } = useUser({ userHandle: person.handle, groupHandle });
+        const { user, user_refetch, user_loading } = useUser({ userHandle: person?.handle, groupHandle });
 
         const { liquidUser } = useAuthUser();
 
@@ -55,7 +55,7 @@ export const PersonInList: FunctionComponent<{
 
         const isUser = liquidUser?.handle === user?.handle;
 
-        const isFollowing =  editUserFollowingRelation_data ?
+        const isFollowing = editUserFollowingRelation_data ?
             editUserFollowingRelation_data?.editUserFollowingRelation?.isFollowing :
             user?.isYouFollowing;
 
@@ -138,22 +138,36 @@ export const PersonInList: FunctionComponent<{
                                 />
                                 : null}
 
-                            {!user_loading && !isShowingRepresentativeRelation ? (
+                            {!user_loading ? (
                                 <div className="d-flex mt-1">
                                     <small className="d-flex mb-0">
-                                        <b className='white mr-1'>{' '}{user?.groupStats?.stats?.directVotesMade || 0}</b> votes
+                                        <b className='white mr-1'>{' '}{
+                                            groupHandle ?
+                                                user?.groupStats?.stats?.directVotesMade :
+                                                user?.stats?.directVotesMade || 0
+                                        }</b> votes
                                         {groupName ? ` on ${groupName}` : ''}
 
 
-                                        {user?.groupStats?.yourStats ? (
+                                        {user?.yourStats || user?.groupStats?.yourStats ? (
                                             <>
                                                 ・
                                                 <small className="d-flex align-items-center">
-                                                    <b className='white mr-1 forDirect px-1 rounded'>{' '}{user?.groupStats?.yourStats?.directVotesInAgreement} </b> same
+                                                    <b className='white mr-1 forDirect px-1 rounded'>{' '}{
+                                                        groupHandle ?
+                                                            user?.groupStats?.yourStats?.directVotesInAgreement :
+                                                            user?.yourStats?.directVotesInAgreement
+                                                        || 0
+                                                    } </b> same
                                                 </small>
                                                 ・
                                                 <small className="d-flex align-items-center">
-                                                    <b className='white mr-1 againstDirect px-1 rounded'>{' '}{user?.groupStats?.yourStats?.directVotesInDisagreement}</b> differ
+                                                    <b className='white mr-1 againstDirect px-1 rounded'>{' '}{
+                                                        groupHandle ?
+                                                            user?.groupStats?.yourStats?.directVotesInDisagreement :
+                                                            user?.yourStats?.directVotesInDisagreement
+                                                        || 0
+                                                    }</b> differ
                                                 </small>
                                             </>
                                         ) : null}
@@ -186,7 +200,7 @@ export const PersonInList: FunctionComponent<{
                             className="d-flex flex-wrap justify-content-start"
                         >
                             <div>
-                                on:{' '}
+                                <small>on:</small>{' '}
                             </div>
                             {person.representationGroups?.map((el: any, i: any) => (
                                 <Link
