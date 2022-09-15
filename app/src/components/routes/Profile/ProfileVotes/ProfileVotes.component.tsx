@@ -237,9 +237,7 @@ export const ProfileVotes: FunctionComponent<{}> = ({ }) => {
                     </div>
                 )
             }
-
-            <br />
-            <br />
+            
             {/* <pre style={{ color: "white" }}>
                 {JSON.stringify(profile?.stats, null, 2)}
                 {JSON.stringify(profile?.yourStats, null, 2)}

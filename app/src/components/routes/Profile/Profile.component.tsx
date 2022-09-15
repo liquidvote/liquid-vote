@@ -378,13 +378,15 @@ export const Profile: FunctionComponent<{}> = ({ }) => {
 
             <hr className="mt-n4" />
 
-            <div className="min-vh-100">
+            <div className="min-vh-100 mb-5">
                 {((!section || section === 'votes') && !groupHandle) && <ProfileVotes />}
                 {(section === 'groups' || !!groupHandle) && <ProfileGroups />}
                 {/* Polls Created */}
                 {(section === 'polls') && <ProfilePolls userHandle={profile.handle} user={profile} />}
                 {(section === 'followings') && <ProfileFollowings />}
             </div>
+
+            <br />
 
             {/* Profile Engagement Primers */}
             {/* Follow user - if you haven't followed yet */}

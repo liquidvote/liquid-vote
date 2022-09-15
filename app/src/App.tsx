@@ -98,10 +98,13 @@ const ScrollToTop = () => {
     const { pathname } = useLocation();
 
     useEffect(() => {
-        const numberOfSlashes = pathname.split("/").length - 1;
-        if (numberOfSlashes < 3) {
-            window.scrollTo(0, 0);
-        }
+        // const numberOfSlashes = pathname.split("/").length - 1;
+
+        // console.log(numberOfSlashes);
+
+        // if (numberOfSlashes < 3) {
+        // }
+        window.scrollTo(0, 0);
     }, [pathname]);
 
     return null;
