@@ -378,13 +378,13 @@ export const Profile: FunctionComponent<{}> = ({ }) => {
 
             <hr className="mt-n4" />
 
-            {((!section || section === 'votes') && !groupHandle) && <ProfileVotes />}
-            {(section === 'groups' || !!groupHandle) && <ProfileGroups />}
-            {/* Polls Created */}
-            {(section === 'polls') && <ProfilePolls userHandle={profile.handle} user={profile} />}
-            {(section === 'followings') && <ProfileFollowings />}
-
-
+            <div className="min-vh-100">
+                {((!section || section === 'votes') && !groupHandle) && <ProfileVotes />}
+                {(section === 'groups' || !!groupHandle) && <ProfileGroups />}
+                {/* Polls Created */}
+                {(section === 'polls') && <ProfilePolls userHandle={profile.handle} user={profile} />}
+                {(section === 'followings') && <ProfileFollowings />}
+            </div>
 
             {/* Profile Engagement Primers */}
             {/* Follow user - if you haven't followed yet */}
@@ -441,7 +441,7 @@ export const Profile: FunctionComponent<{}> = ({ }) => {
                         <div className="question-title-in-list white line-height-24 mt-0">Compare with the<b className="white mx-1">{profile?.stats?.following || 0}</b>voters <b>{profile?.name}</b> follows</div>
 
                         <div className="d-flex justify-content-center">
-                            <Link to={`/profile-follows/${profile.handle}/following`} className="button_ ml-5">
+                            <Link to={`/profile-follows/${profile.handle}/followedby`} className="button_ ml-5">
                                 Visit them
                             </Link>
                         </div>
