@@ -14,6 +14,7 @@ import SingleVoteInList from "@shared/SingleVoteInList";
 import MultiVoteInList from "@shared/MultiVoteInList";
 import { timeAgo } from '@state/TimeAgo';
 import GroupPollListCover from "@shared/GroupPollListCover";
+import ArgumentInList from '@shared/ArgumentInList';
 
 import './style.sass';
 
@@ -224,6 +225,19 @@ export const ProfileVotes: FunctionComponent<{}> = ({ }) => {
                                     inviterHandle={inviterHandle}
                                 />
                             )}
+
+                            {v?.userArgument ? (
+                                <div className='mt-4 mb-n1'>
+                                    <ArgumentInList
+                                        a={{
+                                            ...v?.userArgument,
+                                            user: profile
+                                        }}
+                                        groupHandle={v?.question?.group?.handle}
+                                    />
+                                </div>
+                                // <pre>{JSON.stringify(v?.userArgument, null, 2)}</pre>
+                            ) : null}
                             <hr />
                         </div>
                     </>
@@ -237,7 +251,7 @@ export const ProfileVotes: FunctionComponent<{}> = ({ }) => {
                     </div>
                 )
             }
-            
+
             {/* <pre style={{ color: "white" }}>
                 {JSON.stringify(profile?.stats, null, 2)}
                 {JSON.stringify(profile?.yourStats, null, 2)}

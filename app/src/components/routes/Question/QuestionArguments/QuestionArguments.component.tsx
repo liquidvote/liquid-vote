@@ -5,7 +5,7 @@ import { useQuery, useMutation } from "@apollo/client";
 import useAuthUser from '@state/AuthUser/authUser.effect';
 import { ARGUMENTS } from "@state/Argument/typeDefs";
 import ArgumentForm from '@components/shared/Forms/ArgumentForm';
-import ArgumentInList from './ArgumentInList';
+import ArgumentInList from '@shared/ArgumentInList';
 
 import './style.sass';
 
@@ -45,7 +45,10 @@ export const QuestionArguments: FunctionComponent<{}> = ({ }) => {
 
             {arguments_data?.Arguments?.filter(a => a.user.handle !== liquidUser?.handle)?.
                 map(a =>
-                    <ArgumentInList key={a.user.handle} a={a} groupHandle={groupHandle} />
+                    <>
+                        <ArgumentInList key={a.user.handle} a={a} groupHandle={groupHandle} />
+                        <hr />
+                    </>
                 )
             }
         </>

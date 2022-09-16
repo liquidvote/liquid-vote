@@ -948,6 +948,47 @@ export const VotersAgg = ({
             }
         }
     ]),
+    userArgument: ([
+        {
+            '$lookup': {
+                'as': 'userArgument',
+                'from': 'Arguments',
+                'let': {
+                    'userId': "$user",
+                    'questionId': "$question._id",
+                },
+                'pipeline': [
+                    {
+                        '$match': {
+                            '$and': [
+                                {
+                                    '$expr': {
+                                        '$eq': [
+                                            '$user', {
+                                                '$toObjectId': '$$userId'
+                                            }
+                                        ]
+                                    }
+                                },
+                                {
+                                    '$expr': {
+                                        '$eq': [
+                                            '$question', '$$questionId'
+                                        ]
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                ]
+            }
+        },
+        {
+            $addFields: {
+                'userArgument': { '$first': '$userArgument' }
+            }
+        }
+    ]),
     userObject: (
         [
             {
@@ -1158,6 +1199,7 @@ export const VotesGeneralAggregateLogic = async ({
         ] : [],
         ...AggregateLogic.sortLogic,
         ...AggregateLogic.addYourMemberRelationToGroup,
+        ...AggregateLogic.userArgument,
         ...AggregateLogic.userObject,
 
         ...(followsOnly && AuthUser) ? AggregateLogic.filterFollows : [],

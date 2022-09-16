@@ -90,7 +90,6 @@ export const ArgumentInList: FunctionComponent<{ a: any, groupHandle: string }> 
                     </div>
                 </div>
             </div>
-            <hr />
         </>
     );
 }

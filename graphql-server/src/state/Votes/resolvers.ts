@@ -270,7 +270,7 @@ export const VoteResolvers = {
             console.log({
                 type,
                 VotesL: Votes?.length,
-                // VotesR: Votes.map(v => v?.yourVote?.representatives)
+                // VotesR: Votes.map(v => v?.userArgument)
             });
 
             return Votes;

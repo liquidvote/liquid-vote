@@ -119,6 +119,15 @@ export const VOTES = gql`
             handle
             avatar
         }
+        userArgument {
+            argumentText
+            stats {
+                votes
+                lastVoteOn
+            }
+            yourUpVote
+            lastEditOn
+        }
     }
   }
 

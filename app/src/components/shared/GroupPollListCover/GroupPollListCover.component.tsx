@@ -88,63 +88,6 @@ export const GroupPollListCover: FunctionComponent<{ group: any, user?: any }> =
                                                             className="d-flex flex-column text-decoration-none"
                                                             to={`/profile/${user.handle}/cause/${group.handle}`}
                                                         >
-                                                            {
-                                                                (userWithMoreData?.groupStats?.stats?.representedBy || userWithMoreData?.groupStats?.stats?.representing) ?
-                                                                    <div className='d-flex align-items-center mb-n1'>
-
-                                                                        <small className='primary-color d-flex'>
-                                                                            <>
-                                                                                <div className="d-flex flex-column">
-                                                                                    <div className="d-flex flex-wrap">
-                                                                                        {userWithMoreData?.groupStats?.stats?.representedBy ? (
-                                                                                            <>
-
-                                                                                                <Link to={`/profile-people/${user.handle}/representedBy`} className="mr-1">
-                                                                                                    represents{' '}<b className="white mr-1">{userWithMoreData?.groupStats?.stats?.representedBy}</b>
-                                                                                                </Link>
-                                                                                            </>
-                                                                                        ) : null}
-                                                                                    </div>
-                                                                                </div>
-                                                                            </>
-                                                                        </small>
-
-                                                                        <div
-                                                                            className={`
-                                                                            d-flex align-items-center ${(group.youToHimRepresentativeRelation?.isRepresentingYou ||
-                                                                                    group.representativeRelation?.isRepresentingYou
-                                                                                ) ? '' : 'd-none'}
-                                                                    `}
-                                                                        >
-                                                                            {group.representativeRelation?.isRepresentingYou &&
-                                                                                !group.youToHimRepresentativeRelation?.isRepresentingYou ?
-                                                                                (
-                                                                                    <small
-                                                                                        className="badge inverted"
-                                                                                    >represents you</small>
-                                                                                ) : ""}
-                                                                            {group.youToHimRepresentativeRelation?.isRepresentingYou &&
-                                                                                !group.representativeRelation?.isRepresentingYou ?
-                                                                                (
-                                                                                    <small
-                                                                                        className="badge inverted"
-                                                                                    >you represent him</small>
-                                                                                ) : ""}
-                                                                            {
-                                                                                group.youToHimRepresentativeRelation?.isRepresentingYou &&
-                                                                                    group.representativeRelation?.isRepresentingYou ?
-                                                                                    (
-                                                                                        <small
-                                                                                            className="badge inverted no-max-w"
-                                                                                        >you represent each other 🤝</small>
-                                                                                    ) : ""
-                                                                            }
-                                                                        </div>
-                                                                    </div>
-                                                                    :
-                                                                    <></>
-                                                            }
-
                                                             <div className="d-flex align-items-center">
                                                                 <small className={`d-flex`}>
                                                                     <b className='white'>
@@ -171,7 +114,6 @@ export const GroupPollListCover: FunctionComponent<{ group: any, user?: any }> =
                                                                     </>
                                                                 ) : <span className='opacity-0'>・</span>}
                                                             </div>
-
                                                         </Link>
                                                     </div>
                                                 </div>

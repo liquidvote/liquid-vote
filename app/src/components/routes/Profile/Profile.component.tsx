@@ -252,7 +252,7 @@ export const Profile: FunctionComponent<{}> = ({ }) => {
                 )}
             </div>
 
-            <div>
+            {/* <div>
                 {(profile?.stats?.representedBy || profile?.stats?.representing) ? (
                     <div className="profile-stats-container flex-nowrap">
                         <div className="mr-1"><HandshakeSVG /></div>
@@ -268,7 +268,7 @@ export const Profile: FunctionComponent<{}> = ({ }) => {
                         </div>
                     </div>
                 ) : null}
-            </div>
+            </div> */}
 
             <div>
                 <div className="profile-stats-container flex-nowrap">
