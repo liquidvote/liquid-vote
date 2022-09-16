@@ -141,34 +141,40 @@ export const PersonInList: FunctionComponent<{
                             {!user_loading ? (
                                 <div className="d-flex mt-1">
                                     <small className="d-flex mb-0">
-                                        <b className='white mr-1'>{' '}{
-                                            groupHandle ?
-                                                user?.groupStats?.stats?.directVotesMade :
-                                                user?.stats?.directVotesMade || 0
-                                        }</b> votes
+                                        <Link to={`/profile/${person.handle}/votes`}>
+                                            <b className='white mr-1'>{' '}{
+                                                groupHandle ?
+                                                    user?.groupStats?.stats?.directVotesMade :
+                                                    user?.stats?.directVotesMade || 0
+                                            }</b> votes
+                                        </Link>
                                         {groupName ? ` on ${groupName}` : ''}
 
 
                                         {user?.yourStats || user?.groupStats?.yourStats ? (
                                             <>
                                                 ・
-                                                <small className="d-flex align-items-center">
-                                                    <b className='white mr-1 forDirect px-1 rounded'>{' '}{
-                                                        groupHandle ?
-                                                            user?.groupStats?.yourStats?.directVotesInAgreement :
-                                                            user?.yourStats?.directVotesInAgreement
-                                                        || 0
-                                                    } </b> same
-                                                </small>
+                                                <Link to={`/profile/${person.handle}/votes/direct/same`}>
+                                                    <small className="d-flex align-items-center">
+                                                        <b className='white mr-1 forDirect px-1 rounded'>{' '}{
+                                                            groupHandle ?
+                                                                user?.groupStats?.yourStats?.directVotesInAgreement :
+                                                                user?.yourStats?.directVotesInAgreement
+                                                                || 0
+                                                        } </b> same
+                                                    </small>
+                                                </Link>
                                                 ・
-                                                <small className="d-flex align-items-center">
-                                                    <b className='white mr-1 againstDirect px-1 rounded'>{' '}{
-                                                        groupHandle ?
-                                                            user?.groupStats?.yourStats?.directVotesInDisagreement :
-                                                            user?.yourStats?.directVotesInDisagreement
-                                                        || 0
-                                                    }</b> differ
-                                                </small>
+                                                <Link to={`/profile/${person.handle}/votes/direct/different`}>
+                                                    <small className="d-flex align-items-center">
+                                                        <b className='white mr-1 againstDirect px-1 rounded'>{' '}{
+                                                            groupHandle ?
+                                                                user?.groupStats?.yourStats?.directVotesInDisagreement :
+                                                                user?.yourStats?.directVotesInDisagreement
+                                                                || 0
+                                                        }</b> differ
+                                                    </small>
+                                                </Link>
                                             </>
                                         ) : null}
 

@@ -79,9 +79,9 @@ export const ProfilePolls: FunctionComponent<{ userHandle: string, user: any }> 
                 </div>
             ))}
 
-            {questions_data?.UserQuestions?.length === 0 && (
+            {questions_data?.Questions?.length === 0 && (
                 <div className="p-4 text-center">
-                    User hasn't launched any polls yet
+                    {user?.name} hasn't launched any polls you can see yet
                 </div>
             )}
 
