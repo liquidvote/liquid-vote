@@ -57,7 +57,9 @@ export const SideMenu: FunctionComponent<{}> = ({ }) => {
             <NavLink to="/home" data-tip="Following Feed" activeClassName="active">
                 <div className="notification-wrapper">
                     <FeedSVG />
-                    <div className="notif-you mt-n1 small forDirect white"></div>
+                    {liquidUser ? (
+                        <div className="notif-you mt-n1 small forDirect white"></div>
+                    ) : null}
                 </div>
             </NavLink>
             {isAuthenticated && user && (
@@ -72,7 +74,12 @@ export const SideMenu: FunctionComponent<{}> = ({ }) => {
                 </>
             )}
             <NavLink to="/groups" data-tip={isAuthenticated ? "Your Causes" : " Causes"} activeClassName="active">
-                <GroupSvg />
+                <div className="notification-wrapper">
+                    <GroupSvg />
+                    {!liquidUser ? (
+                        <div className="notif-you mt-n1 small forDirect white"></div>
+                    ) : null}
+                </div>
             </NavLink>
 
             <div className="hide-on-smaller-sideMenu">

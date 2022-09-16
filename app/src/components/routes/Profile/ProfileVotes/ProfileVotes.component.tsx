@@ -238,6 +238,12 @@ export const ProfileVotes: FunctionComponent<{}> = ({ }) => {
                                 </div>
                                 // <pre>{JSON.stringify(v?.userArgument, null, 2)}</pre>
                             ) : null}
+                            {v?.question?.group?.handle !== user_votes_data?.Votes[i + 1]?.question?.group?.handle ? (
+                                <>
+                                    <br />
+                                    <br />
+                                </>
+                            ) : null}
                             <hr />
                         </div>
                     </>

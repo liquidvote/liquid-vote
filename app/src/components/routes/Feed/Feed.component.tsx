@@ -130,6 +130,13 @@ export const Feed: FunctionComponent<{}> = ({ }) => {
                                     showGroupAndTime={true}
                                 />
                             )}
+
+                            {v?.group?.handle !== questions_data?.Questions[i + 1]?.group?.handle ? (
+                                <>
+                                    <br />
+                                    <br />
+                                </>
+                            ) : null}
                             <hr />
                         </div>
                     </>
@@ -182,6 +189,31 @@ export const Feed: FunctionComponent<{}> = ({ }) => {
                                         <div className="d-flex justify-content-center">
                                             <Link to={`/profile-follows/${liquidUser.handle}/following`} className="button_ mt-4">
                                                 Visit them
+                                            </Link>
+                                        </div>
+
+                                        <br />
+                                    </div>
+                                </>
+                            ) : null
+                        }
+
+                        {
+                            !yourUser?.stats?.followedBy ? (
+                                <>
+                                    <hr className='w-100 mx-5' />
+
+                                    <div className='mt-5'>
+                                        <div className="question-title-in-list mt-0 white line-height-24">
+                                            No friend's here yet? Vote with us then!    
+                                        </div>
+
+                                        <div className="d-flex justify-content-between mt-4">
+                                            <Link to={`/invite/by/buesimples/toCompareWith/buesimples`} className="button_">
+                                                Vote with Pedro
+                                            </Link>
+                                            <Link to={`/invite/by/yuriwentink/toCompareWith/yuriwentink`} className="button_">
+                                                Vote with Yuri
                                             </Link>
                                         </div>
 

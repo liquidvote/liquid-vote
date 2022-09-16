@@ -392,40 +392,53 @@ export const Profile: FunctionComponent<{}> = ({ }) => {
             {/* Follow user - if you haven't followed yet */}
             {(profile?.isThisUser || isFollowing) ? null : (
                 <div>
-                    <div className="d-flex align-items-center justify-content-between mb-5">
-                        <div>
+                    <div className="d-flex align-items-center justify-content-around mb-5">
+                        {/* <div>
                             <div className="question-title-in-list white line-height-24 mt-0">Follow <b>{profile?.name}</b></div>
-                        </div>
-                        <div
-                            onClick={() => !!liquidUser ? editUserFollowingRelation({
-                                variables: {
-                                    FollowedHandle: profile?.handle,
-                                    FollowingHandle: liquidUser?.handle,
-                                    IsFollowing: !isFollowing
-                                }
-                            })
-                                .then((r) => {
-                                    console.log({ r });
-                                    user_refetch();
-                                }) : (
-                                updateParams({
-                                    paramsToAdd: {
-                                        modal: "RegisterBefore",
-                                        modalData: JSON.stringify({
-                                            toWhat: 'followUser',
-                                            userName: profile.name
-                                        })
+                        </div> */}
+
+                        {(editUserFollowingRelation_loading) ? (
+                            <img
+                                className="vote-avatar"
+                                src={'http://images.liquid-vote.com/system/loading.gif'}
+                            />
+                        ) : (
+
+                            <div
+                                onClick={() => !!liquidUser ? editUserFollowingRelation({
+                                    variables: {
+                                        FollowedHandle: profile?.handle,
+                                        FollowingHandle: liquidUser?.handle,
+                                        IsFollowing: !isFollowing
                                     }
                                 })
-                            )}
-                            className={`button_ ${isFollowing ? "selected" : ""}`}
-                        >
-                            {
-                                isFollowing ?
-                                    "Following" :
-                                    "Follow"
-                            }
-                        </div>
+                                    .then((r) => {
+                                        console.log({ r });
+                                        user_refetch();
+                                    }) : (
+                                    updateParams({
+                                        paramsToAdd: {
+                                            modal: "RegisterBefore",
+                                            modalData: JSON.stringify({
+                                                toWhat: 'followUser',
+                                                userName: profile.name
+                                            })
+                                        }
+                                    })
+                                )}
+                                className={`button_ ${isFollowing ? "selected" : ""}`}
+                            >
+                                {
+                                    isFollowing ?
+                                        "Following" :
+                                        "Follow"
+                                }
+                                {' '}
+                                <b className="white ml-1">{profile?.name}</b>
+                            </div>
+                        )}
+
+
                     </div>
 
                     <hr />
