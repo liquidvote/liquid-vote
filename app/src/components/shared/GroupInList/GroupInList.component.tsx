@@ -40,7 +40,7 @@ export const GroupInList: FunctionComponent<{
             editGroupMemberChannelRelation_data?.editGroupMemberChannelRelation?.isMember;
 
         return (
-            <div className="d-flex relative border-bottom py-3 mx-n3 px-3">
+            <div className="d-flex relative border-bottom py-4 mx-n3 px-3">
                 <Link to={`/group/${group.handle}`}>
                     <div
                         className={`small-avatar square bg`}

@@ -100,7 +100,7 @@ export const Group: FunctionComponent<{}> = ({ }) => {
     ) : (
         <>
             <MetaTags
-                title={group?.name+' on Liquid Vote'}
+                title={group?.name + ' on Liquid Vote'}
                 description={group?.bio}
                 image={group?.cover}
             />
@@ -444,7 +444,7 @@ export const Group: FunctionComponent<{}> = ({ }) => {
 
                         {
                             isMember ? (
-                                <div className="d-flex justify-content-center mt-3 mb-3">
+                                <div className="d-flex justify-content-center mt-5 mb-3">
                                     <div
                                         onClick={() => updateParams({
                                             paramsToAdd: {
@@ -465,11 +465,25 @@ export const Group: FunctionComponent<{}> = ({ }) => {
                                 <br />
                             )
                         }
-
+                    <hr />
                     </div>
                 )
             }
 
+            <div>
+                <div className="d-flex align-items-center justify-content-between mb-5 mt-5">
+                    <div className="question-title-in-list white line-height-24 mt-0">Compare with <b>{group?.name}'s</b><b className="white mx-1">{group?.stats?.members || 0}</b>members</div>
+
+                    <div className="d-flex justify-content-center">
+                        <Link to={`/group-people/${group?.handle}/members`} className="button_ ml-5">
+                            Visit them
+                        </Link>
+                    </div>
+                </div>
+                <hr />
+                <br />
+                <br />
+            </div>
         </>
     );
 }

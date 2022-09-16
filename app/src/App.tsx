@@ -100,11 +100,11 @@ const ScrollToTop = () => {
     useEffect(() => {
         // const numberOfSlashes = pathname.split("/").length - 1;
 
-        // console.log(numberOfSlashes);
+        const navigatingToUserGroupOnProfile = pathname.split("/")[3] === 'cause';
 
-        // if (numberOfSlashes < 3) {
-        // }
-        window.scrollTo(0, 0);
+        if (!navigatingToUserGroupOnProfile) {
+            window.scrollTo(0, 0);
+        }
     }, [pathname]);
 
     return null;
