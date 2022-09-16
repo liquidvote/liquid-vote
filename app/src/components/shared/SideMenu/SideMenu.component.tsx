@@ -76,7 +76,7 @@ export const SideMenu: FunctionComponent<{}> = ({ }) => {
             <NavLink to="/groups" data-tip={isAuthenticated ? "Your Causes" : " Causes"} activeClassName="active">
                 <div className="notification-wrapper">
                     <GroupSvg />
-                    {!liquidUser ? (
+                    {!liquidUser && !isAuthenticated ? (
                         <div className="notif-you mt-n1 small forDirect white"></div>
                     ) : null}
                 </div>

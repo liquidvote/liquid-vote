@@ -161,11 +161,11 @@ export const VotersAgg = ({
                                         '$yourVote.isDirect', true
                                     ]
                                 },
-                                {
-                                    '$eq': [
-                                        '$yourVote.choiceText', choiceText
-                                    ]
-                                }
+                                // {
+                                //     '$eq': [
+                                //         '$yourVote.choiceText', choiceText
+                                //     ]
+                                // }
                             ]
                         },
                         'InAgreement': {
@@ -185,11 +185,11 @@ export const VotersAgg = ({
                                         '$userVote.position', '$yourVote.position'
                                     ]
                                 },
-                                {
-                                    '$eq': [
-                                        '$yourVote.choiceText', choiceText
-                                    ]
-                                }
+                                // {
+                                //     '$eq': [
+                                //         '$yourVote.choiceText', choiceText
+                                //     ]
+                                // }
                             ]
                         },
                         'InDisagreement': {
@@ -209,11 +209,11 @@ export const VotersAgg = ({
                                         '$userVote.position', '$yourVote.position'
                                     ]
                                 },
-                                {
-                                    '$eq': [
-                                        '$yourVote.choiceText', choiceText
-                                    ]
-                                }
+                                // {
+                                //     '$eq': [
+                                //         '$yourVote.choiceText', choiceText
+                                //     ]
+                                // }
                             ]
                         },
                         'yourVoteMadeByUser': {
