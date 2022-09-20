@@ -142,13 +142,13 @@ export const PersonInList: FunctionComponent<{
                                 <div className="d-flex mt-1">
                                     <small className="d-flex mb-0">
                                         <Link to={`/profile/${person.handle}/votes`}>
-                                            <b className='white mr-1'>{' '}{
+                                            <b className='white mr-1'>{
                                                 groupHandle ?
                                                     user?.groupStats?.stats?.directVotesMade :
                                                     user?.stats?.directVotesMade || 0
-                                            }</b> votes
+                                            }</b>votes
                                         </Link>
-                                        {groupName ? ` on ${groupName}` : ''}
+                                        {groupName ? (<span className="ml-1">on {groupName}</span>) : ''}
 
 
                                         {user?.yourStats || user?.groupStats?.yourStats ? (
