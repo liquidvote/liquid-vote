@@ -161,6 +161,15 @@ export const MultiVoteInList: FunctionComponent<{
                     {/* <pre style={{ 'color': 'white' }}>{JSON.stringify(v.choices, null, 2)}</pre> */}
                 </div>
 
+                {v.choices?.length > 4 && (
+                    <div className="d-flex justify-content-start mt-3">
+                        <div
+                            className="white pointer underline"
+                            onClick={() => setShowAllChoices(!showAllChoices)}
+                        >{showAllChoices ? 'Show less' : `Show ${v.choices?.length - 4} more`}</div>
+                    </div>
+                )}
+
                 {
                     v?.questionType === 'multi' && !!v?.allowNewChoices && (
                         <div className="d-flex justify-content-start mt-3">
@@ -180,15 +189,6 @@ export const MultiVoteInList: FunctionComponent<{
                         </div>
                     )
                 }
-
-                {v.choices?.length > 4 && (
-                    <div className="d-flex justify-content-start mt-3">
-                        <div
-                            className="white pointer underline"
-                            onClick={() => setShowAllChoices(!showAllChoices)}
-                        >{showAllChoices ? 'Show less' : `Show ${v.choices?.length - 4} more`}</div>
-                    </div>
-                )}
 
                 {votersInCommonStats ? (
                     <div className='d-flex mt-4 align-items-center justify-content-center'>
