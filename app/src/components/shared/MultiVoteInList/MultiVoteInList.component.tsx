@@ -161,34 +161,38 @@ export const MultiVoteInList: FunctionComponent<{
                     {/* <pre style={{ 'color': 'white' }}>{JSON.stringify(v.choices, null, 2)}</pre> */}
                 </div>
 
-                {v.choices?.length > 4 && (
-                    <div className="d-flex justify-content-start mt-3">
-                        <div
-                            className="white pointer underline"
-                            onClick={() => setShowAllChoices(!showAllChoices)}
-                        >{showAllChoices ? 'Show less' : `Show ${v.choices?.length - 4} more`}</div>
+                <div className='d-flex justify-content-between'>
+                    <div>
+                        {v.choices?.length > 4 && (
+                            <div className="d-flex justify-content-start mt-3">
+                                <div
+                                    className="white pointer underline"
+                                    onClick={() => setShowAllChoices(!showAllChoices)}
+                                >{showAllChoices ? 'Show less' : `Show ${v.choices?.length - 4} more`}</div>
+                            </div>
+                        )}
                     </div>
-                )}
 
-                {
-                    v?.questionType === 'multi' && !!v?.allowNewChoices && (
-                        <div className="d-flex justify-content-start mt-3">
-                            <div
-                                className="white pointer underline"
-                                onClick={() => updateParams({
-                                    paramsToAdd: {
-                                        modal: "AddChoice",
-                                        modalData: JSON.stringify({
-                                            questionText: v?.questionText,
-                                            group: v?.groupChannel?.group,
-                                            navToGroup: true
-                                        })
-                                    }
-                                })}
-                            >{`Add another choice`}</div>
-                        </div>
-                    )
-                }
+                    {
+                        v?.questionType === 'multi' && !!v?.allowNewChoices && (
+                            <div className="d-flex justify-content-start mt-3 small faded">
+                                <div
+                                    className="white pointer underline"
+                                    onClick={() => updateParams({
+                                        paramsToAdd: {
+                                            modal: "AddChoice",
+                                            modalData: JSON.stringify({
+                                                questionText: v?.questionText,
+                                                group: v?.groupChannel?.group,
+                                                navToGroup: true
+                                            })
+                                        }
+                                    })}
+                                >{`Add another choice`}</div>
+                            </div>
+                        )
+                    }
+                </div>
 
                 {votersInCommonStats ? (
                     <div className='d-flex mt-4 align-items-center justify-content-center'>
