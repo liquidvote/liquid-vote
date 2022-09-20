@@ -161,6 +161,26 @@ export const MultiVoteInList: FunctionComponent<{
                     {/* <pre style={{ 'color': 'white' }}>{JSON.stringify(v.choices, null, 2)}</pre> */}
                 </div>
 
+                {
+                    v?.questionType === 'multi' && !!v?.allowNewChoices && (
+                        <div className="d-flex justify-content-start mt-3">
+                            <div
+                                className="white pointer underline"
+                                onClick={() => updateParams({
+                                    paramsToAdd: {
+                                        modal: "AddChoice",
+                                        modalData: JSON.stringify({
+                                            questionText: v?.questionText,
+                                            group: v?.groupChannel?.group,
+                                            navToGroup: true
+                                        })
+                                    }
+                                })}
+                            >{`Add another choice`}</div>
+                        </div>
+                    )
+                }
+
                 {v.choices?.length > 4 && (
                     <div className="d-flex justify-content-start mt-3">
                         <div
