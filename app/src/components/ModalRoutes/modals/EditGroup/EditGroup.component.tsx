@@ -129,7 +129,7 @@ export const EditGroup: FunctionComponent<{}> = ({ }) => {
                                 register={register(name, {
                                     required: true,
                                     validate: {
-                                        tooBig: v => v.length < 20 || 'should be smaller than 20 characters',
+                                        tooBig: v => v.length < 30 || 'should be smaller than 30 characters',
                                     }
                                 })}
                                 precedingText="@"
